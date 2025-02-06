@@ -1,0 +1,7 @@
+.env
+*.env
+.env*
+/data
+/generatedImages
+/node_modules
+cookies-local.json

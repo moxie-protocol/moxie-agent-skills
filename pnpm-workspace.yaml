@@ -1,0 +1,7 @@
+packages:
+    - "docs"
+    - "packages/*"
+    - "client"
+    - "agent"
+    - "moxie-agent"
+    - "moxie-broadcasting-agent"

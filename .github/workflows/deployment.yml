@@ -1,0 +1,79 @@
+name: Creator-Agent Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "dev/uat/prod env"
+        default: "development"
+        type: choice
+        required: true
+        options:
+          - development
+          - uat
+          - production
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: creator-agent
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  setup-environment:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ github.event.inputs.environment }}
+    steps:
+      - run: echo "null"
+  deploy:
+    name: Deploy
+    needs: [setup-environment]
+    runs-on: ubuntu-latest
+    environment: ${{ needs.setup-environment.outputs.environment }}
+
+    steps:
+      - name: Echo output
+        run: echo ${{ needs.setup-environment.outputs.environment }}
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials (Development)
+        if: github.event.inputs.environment == 'development'
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-session-name: Github
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::679464682883:role/githubactions
+
+      - name: Configure AWS credentials (UAT)
+        if: github.event.inputs.environment == 'uat'
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-session-name: Github
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::114810186946:role/githubactions
+
+      - name: Configure AWS credentials (Production)
+        if: github.event.inputs.environment == 'production'
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-session-name: Github
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::114810186946:role/githubactions
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker buildx build --platform=linux/amd64 --no-cache -t  $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
