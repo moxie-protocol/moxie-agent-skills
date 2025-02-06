@@ -18,9 +18,6 @@
       "exec": "node --enable-source-maps --loader ts-node/esm src/index.ts"
     },
     "dependencies": {
-      "@elizaos/adapter-postgres": "workspace:*",
-      "@elizaos/adapter-redis": "workspace:*",
-      "@elizaos/client-twitter": "workspace:*",
       "@elizaos/core": "workspace:*",
       "@elizaos/moxie-lib": "workspace:*",
       "dotenv": "^16.4.7",

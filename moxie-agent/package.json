@@ -18,12 +18,8 @@
         "exec": "node --enable-source-maps --loader ts-node/esm src/index.ts"
     },
     "dependencies": {
-        "@elizaos/adapter-postgres": "workspace:*",
-        "@elizaos/adapter-redis": "workspace:*",
-        "@elizaos/client-auto": "workspace:*",
         "@elizaos/client-moxie": "workspace:*",
         "@elizaos/core": "workspace:*",
-        "@elizaos/plugin-bootstrap": "workspace:*",
         "@elizaos/plugin-moxie-balance": "workspace:*",
         "@elizaos/plugin-moxie-big-fan": "workspace:*",
         "@elizaos/plugin-moxie-token-details": "workspace:*",

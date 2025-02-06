@@ -5,22 +5,17 @@ import { fileURLToPath } from "url";
 import {
     AgentRuntime,
     CacheManager,
-    CacheStore,
     Character,
     DbCacheAdapter,
     defaultCharacter,
     elizaLogger,
     FsCacheAdapter,
-    ICacheManager,
-    IDatabaseAdapter,
     IDatabaseCacheAdapter,
     ModelProviderName,
     settings,
     stringToUuid,
     validateCharacterConfig,
 } from "@elizaos/core";
-import { PostgresDatabaseAdapter } from "@elizaos/adapter-postgres";
-import { RedisClient } from "@elizaos/adapter-redis";
 import { validateEnv } from "./config/dotenvConfig";
 import yargs from "yargs";
 import { scheduleCrons } from "./utils/utilities";
@@ -263,27 +258,6 @@ export function getTokenForProvider(
     }
 }
 
-function initializeDatabase() {
-    if (process.env.POSTGRES_URL) {
-         elizaLogger.info("Initializing PostgreSQL connection...");
-         const db = new PostgresDatabaseAdapter({
-             connectionString: process.env.POSTGRES_URL,
-             parseInputs: true,
-         });
-
-         // Test the connection
-         db.init()
-             .then(() => {
-                 elizaLogger.success("Successfully connected to PostgreSQL database");
-             })
-             .catch((error) => {
-                 elizaLogger.error("Failed to connect to PostgreSQL:", error);
-             });
-
-         return db;
-     }
-}
-
 function initializeDbCache(character: Character, db: IDatabaseCacheAdapter) {
     if (!character?.id) {
         throw new Error(
@@ -304,67 +278,15 @@ function initializeFsCache(baseDir: string, character: Character) {
 
     const cache = new CacheManager(new FsCacheAdapter(cacheDir));
     return cache;
-}
-
-function initializeCache(
-    cacheStore: string,
-    character: Character,
-    baseDir?: string,
-    db?: IDatabaseCacheAdapter
-) {
-    switch (cacheStore) {
-        case CacheStore.REDIS:
-            if (process.env.REDIS_URL) {
-                elizaLogger.info("Connecting to Redis...");
-                const redisClient = new RedisClient(process.env.REDIS_URL);
-                if (!character?.id) {
-                    throw new Error(
-                        "CacheStore.REDIS requires id to be set in character definition"
-                    );
-                }
-                return new CacheManager(
-                    new DbCacheAdapter(redisClient, character.id)
-                );
-            } else {
-                throw new Error("REDIS_URL environment variable is not set.");
-            }
-
-        case CacheStore.DATABASE:
-            if (db) {
-                elizaLogger.info("Using Database Cache...");
-                return initializeDbCache(character, db);
-            } else {
-                throw new Error(
-                    "Database adapter is not provided for CacheStore.Database."
-                );
-            }
-
-        case CacheStore.FILESYSTEM:
-            elizaLogger.info("Using File System Cache...");
-            if (!baseDir) {
-                throw new Error(
-                    "baseDir must be provided for CacheStore.FILESYSTEM."
-                );
-            }
-            return initializeFsCache(baseDir, character);
-
-        default:
-            throw new Error(
-                `Invalid cache store: ${cacheStore} or required configuration missing.`
-            );
-    }
-}
+}å
 
 export async function createAgent(
     character: Character,
-    db: IDatabaseAdapter,
-    cache: ICacheManager,
     token: string
 ): Promise<AgentRuntime> {
     elizaLogger.log(`Creating runtime for character ${character.name}`);
 
     return new AgentRuntime({
-        databaseAdapter: db,
         agentId: character.id,
         token,
         modelProvider: character.modelProvider,
@@ -375,31 +297,19 @@ export async function createAgent(
         actions: [],
         services: [],
         managers: [],
-        cacheManager: cache,
         fetch: logFetch
     });
 }
 
 // Main function for initializing runtime and character
 async function initializeCharacterAndRuntime(character: Character) {
-    let db: IDatabaseAdapter & IDatabaseCacheAdapter;
     try {
 
-        db = initializeDatabase() as IDatabaseAdapter & IDatabaseCacheAdapter;
-        await db.init();
-
-        const cache = initializeCache(
-            process.env.CACHE_STORE ?? CacheStore.DATABASE,
-            character,
-            "",
-            db
-        );
-
         const token = getTokenForProvider(character.modelProvider, character);
-        const runtime: AgentRuntime = await createAgent(character, db, cache, token);
+        const runtime: AgentRuntime = await createAgent(character, token);
 
         await runtime.initialize();
-        return { runtime, db };
+        return { runtime };
     } catch (error) {
         elizaLogger.error(`Error initializing character ${character.name}: ${error}`);
         throw error;
@@ -417,7 +327,7 @@ async function scheduleTasks() {
         character.id ??= stringToUuid(character.name);
         character.username ??= character.name;
 
-        const { runtime, db } = await initializeCharacterAndRuntime(character);
+        const { runtime } = await initializeCharacterAndRuntime(character);
         await scheduleCrons(character, runtime);
     }
 }

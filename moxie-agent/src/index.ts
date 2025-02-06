@@ -1,24 +1,17 @@
-import { PostgresDatabaseAdapter } from "@elizaos/adapter-postgres";
 import { AutoClientInterface } from "@elizaos/client-auto";
-import { RedisClient } from "@elizaos/adapter-redis";
 import moxieBigFanPlugin from "@elizaos/plugin-moxie-big-fan";
 import moxieTokenDetailsPlugin from "@elizaos/plugin-moxie-token-details";
 
 import {
     AgentRuntime,
     CacheManager,
-    CacheStore,
     Character,
     Client,
     Clients,
-    DbCacheAdapter,
     defaultCharacter,
     elizaLogger,
     FsCacheAdapter,
     IAgentRuntime,
-    ICacheManager,
-    IDatabaseAdapter,
-    IDatabaseCacheAdapter,
     ModelProviderName,
     settings,
     stringToUuid,
@@ -396,28 +389,6 @@ export function getTokenForProvider(
     }
 }
 
-function initializeDatabase() {
-   if (process.env.POSTGRES_URL) {
-        elizaLogger.info("Initializing PostgreSQL connection...");
-        const db = new PostgresDatabaseAdapter({
-            connectionString: process.env.POSTGRES_URL,
-            parseInputs: true,
-        });
-
-        // Test the connection
-        db.init()
-            .then(() => {
-                elizaLogger.success("Successfully connected to PostgreSQL database");
-            })
-            .catch((error) => {
-                elizaLogger.error("Failed to connect to PostgreSQL:", error);
-            });
-
-        return db;
-    }
-
-}
-
 // also adds plugins from character file into the runtime
 export async function initializeClients(
     character: Character,
@@ -478,14 +449,11 @@ let nodePlugin: any | undefined;
 
 export async function createAgent(
     character: Character,
-    db: IDatabaseAdapter,
-    cache: ICacheManager,
     token: string
 ): Promise<AgentRuntime> {
     elizaLogger.log(`Creating runtime for character ${character.name}`);
 
     return new AgentRuntime({
-        databaseAdapter: db,
         token,
         modelProvider: character.modelProvider,
         evaluators: [],
@@ -502,7 +470,6 @@ export async function createAgent(
         actions: [],
         services: [],
         managers: [],
-        cacheManager: cache,
         fetch: logFetch
     });
 }
@@ -519,70 +486,10 @@ function initializeFsCache(baseDir: string, character: Character) {
     return cache;
 }
 
-function initializeDbCache(character: Character, db: IDatabaseCacheAdapter) {
-    if (!character?.id) {
-        throw new Error(
-            "initializeFsCache requires id to be set in character definition"
-        );
-    }
-    const cache = new CacheManager(new DbCacheAdapter(db, character.id));
-    return cache;
-}
-
-function initializeCache(
-    cacheStore: string,
-    character: Character,
-    baseDir?: string,
-    db?: IDatabaseCacheAdapter
-) {
-    switch (cacheStore) {
-        case CacheStore.REDIS:
-            if (process.env.REDIS_URL) {
-                elizaLogger.info("Connecting to Redis...");
-                const redisClient = new RedisClient(process.env.REDIS_URL);
-                if (!character?.id) {
-                    throw new Error(
-                        "CacheStore.REDIS requires id to be set in character definition"
-                    );
-                }
-                return new CacheManager(
-                    new DbCacheAdapter(redisClient, character.id) // Using DbCacheAdapter since RedisClient also implements IDatabaseCacheAdapter
-                );
-            } else {
-                throw new Error("REDIS_URL environment variable is not set.");
-            }
-
-        case CacheStore.DATABASE:
-            if (db) {
-                elizaLogger.info("Using Database Cache...");
-                return initializeDbCache(character, db);
-            } else {
-                throw new Error(
-                    "Database adapter is not provided for CacheStore.Database."
-                );
-            }
-
-        case CacheStore.FILESYSTEM:
-            elizaLogger.info("Using File System Cache...");
-            if (!baseDir) {
-                throw new Error(
-                    "baseDir must be provided for CacheStore.FILESYSTEM."
-                );
-            }
-            return initializeFsCache(baseDir, character);
-
-        default:
-            throw new Error(
-                `Invalid cache store: ${cacheStore} or required configuration missing.`
-            );
-    }
-}
-
 async function startAgent(
     character: Character,
     moxieClient: MoxieClient
 ): Promise<AgentRuntime> {
-    let db: IDatabaseAdapter & IDatabaseCacheAdapter;
     try {
         character.id ??= stringToUuid(character.name);
         character.username ??= character.name;
@@ -594,21 +501,8 @@ async function startAgent(
             fs.mkdirSync(dataDir, { recursive: true });
         }
 
-        db = initializeDatabase() as IDatabaseAdapter &
-            IDatabaseCacheAdapter;
-
-        await db.init();
-
-        const cache = initializeCache(
-            process.env.CACHE_STORE ?? CacheStore.DATABASE,
-            character,
-            "",
-            db
-        ); // "" should be replaced with dir for file system caching. THOUGHTS: might probably make this into an env
         const runtime: AgentRuntime = await createAgent(
             character,
-            db,
-            cache,
             token
         );
 
@@ -658,13 +552,7 @@ const checkPortAvailable = (port: number): Promise<boolean> => {
 };
 
 const startAgents = async () => {
-
-    const db = initializeDatabase() as IDatabaseAdapter &
-            IDatabaseCacheAdapter;
-
-    await db.init();
-
-    const moxieClient = new MoxieClient(db);
+    const moxieClient = new MoxieClient();
     let serverPort = parseInt(settings.SERVER_PORT || "3000");
     const args = parseArguments();
     let charactersArg = args.characters || args.character;
