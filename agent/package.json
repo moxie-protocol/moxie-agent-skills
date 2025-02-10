@@ -18,6 +18,9 @@
         "exec": "node --enable-source-maps --loader ts-node/esm src/index.ts"
     },
     "dependencies": {
+        "@elizaos/adapter-sqlite": "0.1.9",
+        "@elizaos/client-auto": "0.1.9",
+        "@elizaos/client-direct": "0.1.9",
         "@elizaos/client-moxie": "workspace:*",
         "@elizaos/core": "workspace:*",
         "@elizaos/plugin-moxie-balance": "workspace:*",
@@ -26,9 +29,7 @@
         "readline": "1.3.0",
         "ws": "8.18.0",
         "yargs": "17.7.2",
-        "@elizaos/plugin-moxie-swap": "workspace:*",
         "@huggingface/transformers": "3.0.2"
-
     },
     "devDependencies": {
         "@types/jest": "^29.5.14",

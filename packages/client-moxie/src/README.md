@@ -11,8 +11,3 @@ Client Moxie provides several API endpoints for interacting with agents:
 - **GET /v1/agent**: Retrieve a list of all agents.
 - **POST /v1/:agentId/message**: Send a message to a specific agent.
 - **GET /v1/agent/interactions**: Fetch interactions for a specific agent.
-
-### Authentication
-
-To secure your API, use the `auth` middleware in your routes:
-

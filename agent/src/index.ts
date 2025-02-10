@@ -1,33 +1,34 @@
+import { SqliteDatabaseAdapter } from "@elizaos/adapter-sqlite";
 import { AutoClientInterface } from "@elizaos/client-auto";
-import moxieBigFanPlugin from "@elizaos/plugin-moxie-big-fan";
-import moxieTokenDetailsPlugin from "@elizaos/plugin-moxie-token-details";
-
+import Database from "better-sqlite3";
 import {
     AgentRuntime,
     CacheManager,
-    Character,
-    Client,
+    type Character,
+    type Client,
     Clients,
+    DbCacheAdapter,
     defaultCharacter,
     elizaLogger,
-    FsCacheAdapter,
-    IAgentRuntime,
+    type IAgentRuntime,
+    type ICacheManager,
+    type IDatabaseAdapter,
+    type IDatabaseCacheAdapter,
     ModelProviderName,
     settings,
     stringToUuid,
     validateCharacterConfig,
 } from "@elizaos/core";
-
-import { bootstrapPlugin } from "@elizaos/plugin-bootstrap";
 import { MoxieClient } from "@elizaos/client-moxie";
-import { moxieSwapPlugin } from "@elizaos/plugin-moxie-swap";
-import fs from "fs";
-import net from "net";
-import path from "path";
-import { fileURLToPath } from "url";
+import fs from "node:fs";
+import net from "node:net";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import yargs from "yargs";
-import { moxieBalancePlugin } from "@elizaos/plugin-moxie-balance";
-
+// import moxieBigFanPlugin from "@elizaos/plugin-moxie-big-fan";
+// import moxieTokenDetailsPlugin from "@elizaos/plugin-moxie-token-details";
+// import { moxieSwapPlugin } from "@elizaos/plugin-moxie-swap";
+import elizaLogger from "../../packages/core/src/logger";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -78,14 +79,29 @@ function tryLoadFile(filePath: string): string | null {
 function mergeCharacters(base: Character, child: Character): Character {
     const mergeObjects = (baseObj: any, childObj: any) => {
         const result: any = {};
-        const keys = new Set([...Object.keys(baseObj || {}), ...Object.keys(childObj || {})]);
-        keys.forEach(key => {
-            if (typeof baseObj[key] === 'object' && typeof childObj[key] === 'object' && !Array.isArray(baseObj[key]) && !Array.isArray(childObj[key])) {
+        const keys = new Set([
+            ...Object.keys(baseObj || {}),
+            ...Object.keys(childObj || {}),
+        ]);
+        keys.forEach((key) => {
+            if (
+                typeof baseObj[key] === "object" &&
+                typeof childObj[key] === "object" &&
+                !Array.isArray(baseObj[key]) &&
+                !Array.isArray(childObj[key])
+            ) {
                 result[key] = mergeObjects(baseObj[key], childObj[key]);
-            } else if (Array.isArray(baseObj[key]) || Array.isArray(childObj[key])) {
-                result[key] = [...(baseObj[key] || []), ...(childObj[key] || [])];
+            } else if (
+                Array.isArray(baseObj[key]) ||
+                Array.isArray(childObj[key])
+            ) {
+                result[key] = [
+                    ...(baseObj[key] || []),
+                    ...(childObj[key] || []),
+                ];
             } else {
-                result[key] = childObj[key] !== undefined ? childObj[key] : baseObj[key];
+                result[key] =
+                    childObj[key] !== undefined ? childObj[key] : baseObj[key];
             }
         });
         return result;
@@ -101,32 +117,36 @@ async function loadCharacter(filePath: string): Promise<Character> {
     let character = JSON.parse(content);
     validateCharacterConfig(character);
 
-     // .id isn't really valid
-     const characterId = character.id || character.name;
-     const characterPrefix = `CHARACTER.${characterId.toUpperCase().replace(/ /g, "_")}.`;
-     const characterSettings = Object.entries(process.env)
-         .filter(([key]) => key.startsWith(characterPrefix))
-         .reduce((settings, [key, value]) => {
-             const settingKey = key.slice(characterPrefix.length);
-             return { ...settings, [settingKey]: value };
-         }, {});
-     if (Object.keys(characterSettings).length > 0) {
-         character.settings = character.settings || {};
-         character.settings.secrets = {
-             ...characterSettings,
-             ...character.settings.secrets,
-         };
-     }
-     // Handle plugins
-     character.plugins = await handlePluginImporting(
-        character.plugins
-    );
+    // .id isn't really valid
+    const characterId = character.id || character.name;
+    const characterPrefix = `CHARACTER.${characterId.toUpperCase().replace(/ /g, "_")}.`;
+    const characterSettings = Object.entries(process.env)
+        .filter(([key]) => key.startsWith(characterPrefix))
+        .reduce((settings, [key, value]) => {
+            const settingKey = key.slice(characterPrefix.length);
+            return { ...settings, [settingKey]: value };
+        }, {});
+    if (Object.keys(characterSettings).length > 0) {
+        character.settings = character.settings || {};
+        character.settings.secrets = {
+            ...characterSettings,
+            ...character.settings.secrets,
+        };
+    }
+    // Handle plugins
+    character.plugins = await handlePluginImporting(character.plugins);
     if (character.extends) {
-        elizaLogger.info(`Merging  ${character.name} character with parent characters`);
+        elizaLogger.info(
+            `Merging  ${character.name} character with parent characters`
+        );
         for (const extendPath of character.extends) {
-            const baseCharacter = await loadCharacter(path.resolve(path.dirname(filePath), extendPath));
+            const baseCharacter = await loadCharacter(
+                path.resolve(path.dirname(filePath), extendPath)
+            );
             character = mergeCharacters(baseCharacter, character);
-            elizaLogger.info(`Merged ${character.name} with ${baseCharacter.name}`);
+            elizaLogger.info(
+                `Merged ${character.name} with ${baseCharacter.name}`
+            );
         }
     }
     return character;
@@ -251,7 +271,6 @@ export function getTokenForProvider(
     provider: ModelProviderName,
     character: Character
 ): string | undefined {
-
     switch (provider) {
         // no key needed for llama_local or gaianet
         case ModelProviderName.LLAMALOCAL:
@@ -389,6 +408,24 @@ export function getTokenForProvider(
     }
 }
 
+function initializeDatabase(dataDir: string) {
+    const filePath =
+        process.env.SQLITE_FILE ?? path.resolve(dataDir, "db.sqlite");
+    elizaLogger.info(`Initializing SQLite database at ${filePath}...`);
+    const db = new SqliteDatabaseAdapter(new Database(filePath));
+
+    // Test the connection
+    db.init()
+        .then(() => {
+            elizaLogger.success("Successfully connected to SQLite database");
+        })
+        .catch((error) => {
+            elizaLogger.error("Failed to connect to SQLite:", error);
+        });
+
+    return db;
+}
+
 // also adds plugins from character file into the runtime
 export async function initializeClients(
     character: Character,
@@ -441,55 +478,56 @@ export async function initializeClients(
     return clients;
 }
 
-function getSecret(character: Character, secret: string) {
-    return character.settings?.secrets?.[secret] || process.env[secret];
-}
-
-let nodePlugin: any | undefined;
-
 export async function createAgent(
     character: Character,
+    db: IDatabaseAdapter,
+    cache: ICacheManager,
     token: string
 ): Promise<AgentRuntime> {
     elizaLogger.log(`Creating runtime for character ${character.name}`);
 
     return new AgentRuntime({
+        databaseAdapter: db,
         token,
         modelProvider: character.modelProvider,
         evaluators: [],
         character,
         // character.plugins are handled when clients are added
-        plugins: [
-            bootstrapPlugin,
-            moxieBalancePlugin,
-            moxieSwapPlugin,
-            moxieBigFanPlugin,
-            moxieTokenDetailsPlugin,
-        ].filter(Boolean),
+        plugins: [].filter(Boolean),
         providers: [],
         actions: [],
         services: [],
         managers: [],
-        fetch: logFetch
+        cacheManager: cache,
+        fetch: logFetch,
     });
 }
 
-function initializeFsCache(baseDir: string, character: Character) {
+function initializeDbCache(character: Character, db: IDatabaseCacheAdapter) {
     if (!character?.id) {
         throw new Error(
             "initializeFsCache requires id to be set in character definition"
         );
     }
-    const cacheDir = path.resolve(baseDir, character.id, "cache");
-
-    const cache = new CacheManager(new FsCacheAdapter(cacheDir));
+    const cache = new CacheManager(new DbCacheAdapter(db, character.id));
     return cache;
+}
+
+function initializeCache(character: Character, db?: IDatabaseCacheAdapter) {
+    if (db) {
+        elizaLogger.info("Using Database Cache...");
+        return initializeDbCache(character, db);
+    }
+    throw new Error(
+        "Database adapter is not provided for CacheStore.Database."
+    );
 }
 
 async function startAgent(
     character: Character,
     moxieClient: MoxieClient
 ): Promise<AgentRuntime> {
+    let db: IDatabaseAdapter & IDatabaseCacheAdapter;
     try {
         character.id ??= stringToUuid(character.name);
         character.username ??= character.name;
@@ -501,8 +539,16 @@ async function startAgent(
             fs.mkdirSync(dataDir, { recursive: true });
         }
 
+        db = initializeDatabase(dataDir) as IDatabaseAdapter &
+            IDatabaseCacheAdapter;
+
+        await db.init();
+
+        const cache = initializeCache(character, db); // "" should be replaced with dir for file system caching. THOUGHTS: might probably make this into an env
         const runtime: AgentRuntime = await createAgent(
             character,
+            db,
+            cache,
             token
         );
 
@@ -552,10 +598,21 @@ const checkPortAvailable = (port: number): Promise<boolean> => {
 };
 
 const startAgents = async () => {
-    const moxieClient = new MoxieClient();
-    let serverPort = parseInt(settings.SERVER_PORT || "3000");
+    const dataDir = path.join(__dirname, "../data");
+
+    if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+    }
+
+    const db = initializeDatabase(dataDir) as IDatabaseAdapter &
+        IDatabaseCacheAdapter;
+
+    await db.init();
+
+    const moxieClient = new MoxieClient(db);
+    let serverPort = Number.parseInt(settings.SERVER_PORT || "3000");
     const args = parseArguments();
-    let charactersArg = args.characters || args.character;
+    const charactersArg = args.characters || args.character;
     let characters = [defaultCharacter];
 
     if (charactersArg) {
@@ -589,7 +646,7 @@ const startAgents = async () => {
 
     moxieClient.start(serverPort);
 
-    if (serverPort !== parseInt(settings.SERVER_PORT || "3000")) {
+    if (serverPort !== Number.parseInt(settings.SERVER_PORT || "3000")) {
         elizaLogger.log(`Server started on alternate port ${serverPort}`);
     }
 

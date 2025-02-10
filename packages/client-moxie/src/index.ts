@@ -1,15 +1,13 @@
 import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
-
 import {
-    AgentRuntime,
+    type AgentRuntime,
     elizaLogger,
     messageCompletionFooter,
-    IDatabaseAdapter,
+    type IDatabaseAdapter,
 } from "@elizaos/core";
-import { createMoxieApiRouter } from "./moxieApis.ts"
-
+import { createMoxieApiRouter } from "./moxieApis.ts";
 
 export const messageHandlerTemplate =
     // {{goals}}
@@ -63,8 +61,6 @@ Note that {{agentName}} is capable of reading/seeing/hearing various forms of me
 # Instructions: Write the next message for {{agentName}}.
 ` + messageCompletionFooter;
 
-
-
 export class MoxieClient {
     public app: express.Application;
     private agents: Map<string, AgentRuntime>; // container management
@@ -77,14 +73,13 @@ export class MoxieClient {
         this.app = express();
         this.app.use(cors());
         this.agents = new Map();
-        this.db = db
+        this.db = db;
 
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({ extended: true }));
 
         const moxieApiRouter = createMoxieApiRouter(this.agents, this);
-        this.app.use("/v1", moxieApiRouter);
-
+        this.app.use(moxieApiRouter);
     }
 
     // agent/src/index.ts:startAgent calls this

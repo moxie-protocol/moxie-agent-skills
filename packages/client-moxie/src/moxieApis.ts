@@ -1,47 +1,36 @@
-import { auth } from "./middleware/auth";
-import bodyParser, { text } from "body-parser";
+import bodyParser from "body-parser";
 import cors from "cors";
+import { type UUID, validateUuid } from "@elizaos/core";
 import {
-    Account,
-    Client,
-    DatabaseAdapter,
-    IAgentRuntime,
-    UUID,
-    validateCharacterConfig,
-    validateUuid,
-} from "@elizaos/core";
-
-import {
-    AgentRuntime,
+    type AgentRuntime,
     composeContext,
     elizaLogger,
     generateMessageResponse,
     getEmbeddingZeroVector,
     getEnvVariable,
-    Media,
-    Memory,
+    type Memory,
     ModelClass,
 } from "@elizaos/core";
-
-import { MoxieClient, messageHandlerTemplate } from ".";
+import { type MoxieClient, messageHandlerTemplate } from ".";
 import { stringToUuid } from "@elizaos/core";
-import { Content } from "@elizaos/core";
-import { UserAgentInfo, UserAgentInteraction } from "./types/types.ts";
+import type { Content } from "@elizaos/core";
+import type { UserAgentInfo, UserAgentInteraction } from "./types/types.ts";
 import {
     MINIMUM_CREATOR_AGENT_COINS,
     COMMON_AGENT_ID,
+    mockMoxieUser,
 } from "./constants/constants";
-import { privyClient } from "./lib/privy";
-import { Wallet } from "@privy-io/server-auth";
+import type { Wallet } from "@privy-io/server-auth";
 import {
     validateCreatorAgentCoinBalance,
     validateInputAgentInteractions,
 } from "./helpers";
-import express, { Request, Response } from "express";
+import express from "express";
 import { ResponseHelper } from "./responseHelper.ts";
 import { traceIdMiddleware } from "./middleware/traceId.ts";
 import { ftaService, moxieUserService } from "@elizaos/moxie-lib";
-import { MoxieUser } from "@elizaos/moxie-lib";
+import type { MoxieUser } from "@elizaos/moxie-lib";
+import elizaLogger from "../../core/src/logger";
 
 interface UUIDParams {
     agentId: UUID;
@@ -94,32 +83,36 @@ export function createMoxieApiRouter(
         res.send("Ok");
     });
 
-    router.post("/:agentId/message", auth, async (req, res) => {
+    router.post("/:agentId/message", async (req, res) => {
         try {
-            elizaLogger.debug(`/v1 message api is started`, {
+            elizaLogger.debug("/v1 message api is started", {
                 traceId: req.traceId,
             });
-            const privyId = req.privyId;
-            elizaLogger.info(`privyId extracted from token: ${privyId}`, {
+            elizaLogger.info("privyId extracted from token", {
                 traceId: req.traceId,
             });
             const agentId = req.params.agentId;
             let runtime = agents.get(agentId);
 
-            // validations
-            const { roomId, text } = req.body;
+            elizaLogger.debug(JSON.stringify(req));
 
-            if (!roomId || !validateUuid(roomId)) {
-                res.status(400).json(
-                    ResponseHelper.error<UserAgentInfo>(
-                        "MISSING_MANDATORY_INPUT",
-                        "Invalid or missing `roomId`. Expected to be a valid UUID.",
-                        req.path,
-                        req.traceId
-                    )
-                );
-                return;
-            }
+            // validations
+            const {
+                // roomId,
+                text,
+            } = req.body;
+
+            // if (!roomId || !validateUuid(roomId)) {
+            //     res.status(400).json(
+            //         ResponseHelper.error<UserAgentInfo>(
+            //             "MISSING_MANDATORY_INPUT",
+            //             "Invalid or missing `roomId`. Expected to be a valid UUID.",
+            //             req.path,
+            //             req.traceId
+            //         )
+            //     );
+            //     return;
+            // }
 
             if (!text || text.trim() === "") {
                 res.status(400).json(
@@ -157,135 +150,11 @@ export function createMoxieApiRouter(
                 return;
             }
 
-            let moxieUserId: string = await runtime.cacheManager.get(
-                `privyId-${privyId}`
-            );
-            let moxieUserInfo: MoxieUser = undefined;
-            let agentWallet: Wallet = undefined;
-            if (moxieUserId) {
-                elizaLogger.info(
-                    `privyId exists in cache hence skipping the api calls and get the data from memory`,
-                    { traceId: req.traceId }
-                );
-                moxieUserInfo = await runtime.cacheManager.get(
-                    `moxieUserInfo-${moxieUserId}`
-                );
-                agentWallet = await runtime.cacheManager.get(
-                    `agentWallet-${moxieUserId}`
-                );
-            } else {
-                // trigger apis to fetch details
-                moxieUserInfo =
-                    await moxieUserService.getUserByPrivyBearerToken(
-                        req.header("Authorization")
-                    );
-                elizaLogger.info(
-                    `moxieUserInfo`,
-                    { moxieUserInfo },
-                    { traceId: req.traceId }
-                );
-                moxieUserId = moxieUserInfo.id;
-                // check if the user has an account. if not then throw error to create agent
-                const accountResponse =
-                    await runtime.databaseAdapter.getAccountById(
-                        stringToUuid(moxieUserId)
-                    );
-                if (!accountResponse) {
-                    res.status(403).json(
-                        ResponseHelper.error<null>(
-                            "AGENT_NOT_EXISTS",
-                            `user doesn't have an agent`,
-                            req.path,
-                            req.traceId
-                        )
-                    );
-                    return;
-                }
-
-                const privyUserDetails = await privyClient.getUserById(privyId);
-                const linkedAccounts = privyUserDetails.linkedAccounts?.filter(
-                    (linkedAccount) =>
-                        linkedAccount.type == "wallet" &&
-                        linkedAccount.connectorType == "embedded"
-                );
-                agentWallet =
-                    linkedAccounts && linkedAccounts.length > 0
-                        ? (linkedAccounts[0] as Wallet)
-                        : undefined;
-                elizaLogger.info(
-                    `agentWallet`,
-                    { agentWallet },
-                    { traceId: req.traceId }
-                );
-
-                // set in cache
-                const expiry = Date.now() + 300000; // 5 minutes
-                await runtime.cacheManager.set(
-                    `moxieUserInfo-${moxieUserId}`,
-                    moxieUserInfo,
-                    { expires: expiry }
-                ); // moxieUserInfo-<<moxie userid>> to user object
-                await runtime.cacheManager.set(
-                    stringToUuid(moxieUserId),
-                    moxieUserId,
-                    { expires: expiry }
-                ); // userId uuid mapping to moxie userid
-                await runtime.cacheManager.set(
-                    `agentWallet-${moxieUserId}`,
-                    agentWallet,
-                    { expires: expiry }
-                ); // agent wallet info
-                await runtime.cacheManager.set(
-                    `privyId-${privyId}`,
-                    moxieUserId,
-                    { expires: expiry }
-                ); // privyId to moxie user id with 5 minutes expiration
-                elizaLogger.info("successfully set the cache elements", {
-                    traceId: req.traceId,
-                });
-            }
-
-            // validate if user has min. creator agent coins
-            const { creatorAgentBalance, hasSufficientBalance } =
-                await validateCreatorAgentCoinBalance(moxieUserInfo.wallets);
-            if (!hasSufficientBalance) {
-                res.status(403).json(
-                    ResponseHelper.error<null>(
-                        "USER_NOT_ELIGIBILE",
-                        `user need to hold ${MINIMUM_CREATOR_AGENT_COINS} creator agent tokens to interact with agent. current balance is ${creatorAgentBalance}`,
-                        req.path,
-                        req.traceId,
-                        {
-                            minimumCreatorAgentCoins:
-                                MINIMUM_CREATOR_AGENT_COINS,
-                            currentCreatorAgentCoinsBalance:
-                                creatorAgentBalance,
-                        }
-                    )
-                );
-                return;
-            }
+            const moxieUserInfo: MoxieUser = mockMoxieUser;
+            const moxieUserId: string = moxieUserInfo.id;
+            const agentWallet: Wallet = undefined;
 
             const userId = stringToUuid(moxieUserId);
-
-            // check the roomId is belongs to this user or not.
-            const participants =
-                await runtime.databaseAdapter.getParticipantsForRoom(roomId);
-            if (
-                participants &&
-                participants.length > 0 &&
-                !participants.includes(userId)
-            ) {
-                res.status(403).json(
-                    ResponseHelper.error<null>(
-                        "INVALID_REQUEST",
-                        `user doesn't belong to this roomId`,
-                        req.path,
-                        req.traceId
-                    )
-                );
-                return;
-            }
 
             await runtime.ensureConnection(
                 userId,
@@ -310,7 +179,7 @@ export function createMoxieApiRouter(
             };
 
             const memory: Memory = {
-                id: stringToUuid(messageId + "-" + userId),
+                id: stringToUuid(`${messageId}-${userId}`),
                 ...userMessage,
                 agentId: runtime.agentId,
                 userId,
@@ -360,7 +229,7 @@ export function createMoxieApiRouter(
 
             // save response to memory
             const responseMessage: Memory = {
-                id: stringToUuid(messageId + "-" + runtime.agentId),
+                id: stringToUuid(`${messageId}-${runtime.agentId}`),
                 ...userMessage,
                 userId: runtime.agentId,
                 content: response,
@@ -385,7 +254,7 @@ export function createMoxieApiRouter(
                 traceId: req.traceId,
             });
 
-            let messageFromActions: boolean = false;
+            let messageFromActions = false;
             let newContext = "";
             let newAction = undefined;
             await runtime.processActions(
@@ -470,7 +339,7 @@ export function createMoxieApiRouter(
         }
     });
 
-    router.get("/agent", auth, async (req, res) => {
+    router.get("/agent", async (req, res) => {
         elizaLogger.debug(
             `/agent endpoint is triggered with params: ${JSON.stringify(req.query)}`,
             { traceId: req.traceId }
@@ -536,17 +405,23 @@ export function createMoxieApiRouter(
         }
     });
 
-    router.post("/agent", auth, async (req, res) => {
+    router.get("/agents", (req, res) => {
+        const agentsList = Array.from(agents.values()).map((agent) => ({
+            id: agent.agentId,
+            name: agent.character.name,
+            clients: Object.keys(agent.clients),
+        }));
+        res.json({ agents: agentsList });
+    });
+
+    router.post("/agent", async (req, res) => {
         elizaLogger.debug(
             `POST /agent endpoint is triggered with params: ${req.body}`,
             { traceId: req.traceId }
         );
         try {
             // validations
-            const moxieUserInfo =
-                await moxieUserService.getUserByPrivyBearerToken(
-                    req.header("Authorization")
-                );
+            const moxieUserInfo = mockMoxieUser;
             const moxieUserId = moxieUserInfo.id;
             // check if the userId has  already agent created
             const userIdUUID = stringToUuid(moxieUserId);
@@ -577,31 +452,10 @@ export function createMoxieApiRouter(
                 return;
             }
 
-            // Check if the user has sufficient creator agent coins.
-            const { creatorAgentBalance, hasSufficientBalance } =
-                await validateCreatorAgentCoinBalance(moxieUserInfo.wallets);
-            if (!hasSufficientBalance) {
-                res.status(403).json(
-                    ResponseHelper.error<null>(
-                        "USER_NOT_ELIGIBILE",
-                        `user need to hold ${MINIMUM_CREATOR_AGENT_COINS} creator agent tokens to create an agent. current balance is: ${creatorAgentBalance}`,
-                        req.path,
-                        req.traceId,
-                        {
-                            minimumCreatorAgentCoins:
-                                MINIMUM_CREATOR_AGENT_COINS,
-                            currentCreatorAgentCoinsBalance:
-                                creatorAgentBalance,
-                        }
-                    )
-                );
-                return;
-            }
-
             // create an account for the user
             const accountCreationResponse = await moxieClient.db.createAccount({
                 id: userIdUUID,
-                name: moxieUserInfo.userName + " AI Agent",
+                name: `${moxieUserInfo.userName} AI Agent`,
                 username: moxieUserInfo.name,
             });
 
@@ -634,8 +488,8 @@ export function createMoxieApiRouter(
         }
     });
 
-    router.get("/agent/interactions", auth, async (req, res) => {
-        elizaLogger.debug(`started /agent/interactions started`, {
+    router.get("/agent/interactions", async (req, res) => {
+        elizaLogger.debug("started /agent/interactions started", {
             traceId: req.traceId,
         });
         try {
@@ -659,24 +513,8 @@ export function createMoxieApiRouter(
             const agentId = COMMON_AGENT_ID;
             let runtime = agents.get(agentId);
 
-            let moxieUserInfo: MoxieUser = undefined;
-            let moxieUserId: string = await runtime.cacheManager.get(
-                `privyId-${req.privyId}`
-            );
-            if (moxieUserId) {
-                elizaLogger.info(
-                    `privyId exists in cache hence skipping the api calls and get the data from cache`,
-                    { traceId: req.traceId }
-                );
-                moxieUserInfo = await runtime.cacheManager.get(
-                    `moxieUserInfo-${moxieUserId}`
-                );
-            } else {
-                moxieUserInfo =
-                    await moxieUserService.getUserByPrivyBearerToken(
-                        req.header("Authorization")
-                    );
-            }
+            const moxieUserInfo: MoxieUser = mockMoxieUser;
+            const moxieUserId: string = moxieUserInfo.id;
             elizaLogger.debug(`moxieUserId ${moxieUserId}`, {
                 traceId: req.traceId,
             });
@@ -790,7 +628,7 @@ export function createMoxieApiRouter(
         }
     });
 
-    router.get("/agent/:agentId/:roomId/memories", auth, async (req, res) => {
+    router.get("/agent/:agentId/:roomId/memories", async (req, res) => {
         elizaLogger.debug(
             `/agent/:agentId/:roomId/memories started with input:${req.params}`,
             { traceId: req.traceId }

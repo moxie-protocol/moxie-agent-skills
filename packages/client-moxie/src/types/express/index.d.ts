@@ -1,9 +1,8 @@
-import 'express';
+import "express";
 
-declare module 'express-serve-static-core' {
+declare module "express-serve-static-core" {
     interface Request {
-        traceId?: string;  // Add traceId to the Request interface
-        privyId?: string;
+        traceId?: string; // Add traceId to the Request interface
         isAuthorised?: boolean;
     }
 }
