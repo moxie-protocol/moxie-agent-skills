@@ -67,7 +67,6 @@ export default function Page({ agentId }: { agentId: UUID }) {
         }
     };
 
-
     const handleSendMessage = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!input) return;
@@ -128,11 +127,15 @@ export default function Page({ agentId }: { agentId: UUID }) {
             selectedFile?: File | null;
         }) => apiClient.sendMessage(agentId, message, selectedFile),
         onSuccess: (newMessages: ContentWithUser[]) => {
+            console.log(newMessages);
             queryClient.setQueryData(
                 ["messages", agentId],
                 (old: ContentWithUser[] = []) => [
                     ...old.filter((msg) => !msg.isLoading),
-                    ...newMessages.map((msg) => ({
+                    ...(typeof newMessages?.length === "number"
+                        ? newMessages
+                        : [newMessages]
+                    ).map((msg) => ({
                         ...msg,
                         createdAt: Date.now(),
                     })),

@@ -15,22 +15,34 @@ import { type MoxieClient, messageHandlerTemplate } from ".";
 import { stringToUuid } from "@elizaos/core";
 import type { Content } from "@elizaos/core";
 import type { UserAgentInfo, UserAgentInteraction } from "./types/types.ts";
-import {
-    MINIMUM_CREATOR_AGENT_COINS,
-    COMMON_AGENT_ID,
-    mockMoxieUser,
-} from "./constants/constants";
+import { COMMON_AGENT_ID, mockMoxieUser } from "./constants/constants";
 import type { Wallet } from "@privy-io/server-auth";
-import {
-    validateCreatorAgentCoinBalance,
-    validateInputAgentInteractions,
-} from "./helpers";
+import { validateInputAgentInteractions } from "./helpers";
 import express from "express";
 import { ResponseHelper } from "./responseHelper.ts";
 import { traceIdMiddleware } from "./middleware/traceId.ts";
-import { ftaService, moxieUserService } from "@elizaos/moxie-lib";
+import { ftaService } from "@elizaos/moxie-lib";
 import type { MoxieUser } from "@elizaos/moxie-lib";
-import elizaLogger from "../../core/src/logger";
+import multer from "multer";
+import * as fs from "node:fs";
+import * as path from "node:path";
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const uploadDir = path.join(process.cwd(), "data", "uploads");
+        // Create the directory if it doesn't exist
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+        cb(null, `${uniqueSuffix}-${file.originalname}`);
+    },
+});
+
+const upload = multer({ storage });
 
 interface UUIDParams {
     agentId: UUID;
@@ -83,261 +95,269 @@ export function createMoxieApiRouter(
         res.send("Ok");
     });
 
-    router.post("/:agentId/message", async (req, res) => {
-        try {
-            elizaLogger.debug("/v1 message api is started", {
-                traceId: req.traceId,
-            });
-            elizaLogger.info("privyId extracted from token", {
-                traceId: req.traceId,
-            });
-            const agentId = req.params.agentId;
-            let runtime = agents.get(agentId);
+    router.post(
+        "/:agentId/message",
+        upload.single("file"),
+        async (req: express.Request, res: express.Response) => {
+            try {
+                elizaLogger.debug("/v1 message api is started", {
+                    traceId: req.traceId,
+                });
+                elizaLogger.info("privyId extracted from token", {
+                    traceId: req.traceId,
+                });
+                const agentId = req.params.agentId;
+                let runtime = agents.get(agentId);
 
-            elizaLogger.debug(JSON.stringify(req));
+                elizaLogger.info(req.body, { traceId: req.traceId });
 
-            // validations
-            const {
-                // roomId,
-                text,
-            } = req.body;
+                // validations
+                const { roomId, text } = req.body;
 
-            // if (!roomId || !validateUuid(roomId)) {
-            //     res.status(400).json(
-            //         ResponseHelper.error<UserAgentInfo>(
-            //             "MISSING_MANDATORY_INPUT",
-            //             "Invalid or missing `roomId`. Expected to be a valid UUID.",
-            //             req.path,
-            //             req.traceId
-            //         )
-            //     );
-            //     return;
-            // }
+                if (!roomId || !validateUuid(roomId)) {
+                    res.status(400).json(
+                        ResponseHelper.error<UserAgentInfo>(
+                            "MISSING_MANDATORY_INPUT",
+                            "Invalid or missing `roomId`. Expected to be a valid UUID.",
+                            req.path,
+                            req.traceId
+                        )
+                    );
+                    return;
+                }
 
-            if (!text || text.trim() === "") {
-                res.status(400).json(
-                    ResponseHelper.error<UserAgentInfo>(
-                        "MISSING_MANDATORY_INPUT",
-                        "input field `text` is empty or missing",
-                        req.path,
-                        req.traceId
+                if (!text || text.trim() === "") {
+                    res.status(400).json(
+                        ResponseHelper.error<UserAgentInfo>(
+                            "MISSING_MANDATORY_INPUT",
+                            "input field `text` is empty or missing",
+                            req.path,
+                            req.traceId
+                        )
+                    );
+                    return;
+                }
+
+                elizaLogger.debug(
+                    `checking if runtime exists for agentId: ${agentId}`,
+                    { traceId: req.traceId }
+                );
+                // if runtime is null, look for runtime with the same name
+                if (!runtime) {
+                    runtime = Array.from(agents.values()).find(
+                        (a: AgentRuntime) =>
+                            a.character.name.toLowerCase() ===
+                            agentId.toLowerCase()
+                    );
+                }
+
+                if (!runtime) {
+                    res.status(404).json(
+                        ResponseHelper.error<UserAgentInfo>(
+                            "AGENT_NOT_FOUND",
+                            "Agent not found",
+                            req.path,
+                            req.traceId
+                        )
+                    );
+                    return;
+                }
+
+                const moxieUserInfo: MoxieUser = mockMoxieUser;
+                const moxieUserId: string = moxieUserInfo.id;
+                const agentWallet: Wallet = undefined;
+
+                const userId = stringToUuid(moxieUserId);
+
+                await runtime.ensureConnection(
+                    userId,
+                    roomId,
+                    moxieUserInfo.userName,
+                    moxieUserInfo.name,
+                    "direct"
+                );
+
+                const messageId = stringToUuid(Date.now().toString());
+                const content: Content = {
+                    text,
+                    source: "direct",
+                    inReplyTo: req.body.inReplyTo ?? undefined,
+                };
+
+                const userMessage = {
+                    content,
+                    userId,
+                    roomId,
+                    agentId: runtime.agentId,
+                };
+
+                const memory: Memory = {
+                    id: stringToUuid(`${messageId}-${userId}`),
+                    ...userMessage,
+                    agentId: runtime.agentId,
+                    userId,
+                    roomId,
+                    content,
+                    createdAt: Date.now(),
+                };
+
+                await runtime.messageManager.addEmbeddingToMemory(memory);
+                await runtime.messageManager.createMemory(memory);
+
+                let state = await runtime.composeState(userMessage, {
+                    agentName: runtime.character.name,
+                    moxieUserInfo: moxieUserInfo,
+                    agentWallet: agentWallet,
+                });
+
+                const context = composeContext({
+                    state,
+                    template: messageHandlerTemplate,
+                });
+
+                const response = await generateMessageResponse({
+                    runtime: runtime,
+                    context,
+                    modelClass: ModelClass.SMALL,
+                });
+
+                if (!response) {
+                    res.status(500).json(
+                        ResponseHelper.error<null>(
+                            "INTERNAL_SERVER_ERROR",
+                            "No response from generateMessageResponse",
+                            req.path,
+                            req.traceId
+                        )
+                    );
+                    return;
+                }
+
+                // Set headers for chunked transfer encoding
+                res.setHeader("Content-Type", "text/event-stream");
+                res.setHeader("Transfer-Encoding", "chunked");
+                res.setHeader("Connection", "keep-alive");
+                res.setHeader("Cache-Control", "no-cache");
+                res.flushHeaders(); // Ensure headers are sent immediately
+
+                // save response to memory
+                const responseMessage: Memory = {
+                    id: stringToUuid(`${messageId}-${runtime.agentId}`),
+                    ...userMessage,
+                    userId: runtime.agentId,
+                    content: response,
+                    embedding: getEmbeddingZeroVector(),
+                    createdAt: Date.now(),
+                };
+
+                // if the response contains action field, then we dont need to save the memory
+                if (!response.action) {
+                    await runtime.messageManager.createMemory(responseMessage);
+                    state = await runtime.updateRecentMessageState(state);
+                }
+                // check if the user has explicitly provided the action in the request. e.g, this could be for followup actions
+                // then overwrite the action in the response
+                if (req.body.action) {
+                    response.action = req.body.action;
+                }
+
+                let message = null as Content | null;
+
+                elizaLogger.debug(
+                    `processing actions for agentId: ${agentId}`,
+                    {
+                        traceId: req.traceId,
+                    }
+                );
+
+                let messageFromActions = false;
+                let newContext = "";
+                let newAction = undefined;
+                await runtime.processActions(
+                    memory,
+                    [responseMessage],
+                    state,
+                    async (newMessages) => {
+                        messageFromActions = true;
+                        message = newMessages;
+                        newAction = newMessages.action;
+                        newContext += newMessages.text;
+
+                        await new Promise((resolve) =>
+                            setTimeout(resolve, 100)
+                        ); // sleep for 100ms to avoid sending multiple chunks in a single request
+                        res.write(JSON.stringify(newMessages));
+                        return [memory];
+                    }
+                );
+
+                const newMessageId = stringToUuid(Date.now().toString());
+                const newContent: Content = {
+                    text: newContext,
+                    inReplyTo: memory.id,
+                    action: newAction,
+                };
+
+                const agentMessage = {
+                    content: newContent,
+                    userId: runtime.agentId,
+                    roomId,
+                    agentId: runtime.agentId,
+                };
+
+                const newMemory: Memory = {
+                    id: newMessageId,
+                    ...agentMessage,
+                    agentId: runtime.agentId,
+                    userId: runtime.agentId,
+                    roomId,
+                    content,
+                    createdAt: Date.now(),
+                };
+
+                await runtime.messageManager.addEmbeddingToMemory(newMemory);
+                await runtime.messageManager.createMemory(newMemory);
+
+                await runtime.evaluate(memory, state);
+
+                // Check if we should suppress the initial message
+                const action = runtime.actions.find(
+                    (a) => a.name === response.action
+                );
+                const shouldSuppressInitialMessage =
+                    action?.suppressInitialMessage;
+
+                if (!shouldSuppressInitialMessage) {
+                    // write the response to the response stream
+                    res.write(JSON.stringify(response));
+                    // sleep for 100ms to avoid sending multiple chunks in a single request
+                    await new Promise((resolve) => setTimeout(resolve, 100));
+                    if (message && !messageFromActions) {
+                        res.write(JSON.stringify(message));
+                    }
+                } else {
+                    if (message && !messageFromActions) {
+                        res.write(JSON.stringify(message));
+                    }
+                }
+                res.end();
+            } catch (error) {
+                elizaLogger.error(error, { traceId: req.traceId });
+                res.status(500).write(
+                    JSON.stringify(
+                        ResponseHelper.error<null>(
+                            "INTERNAL_SERVER_ERROR",
+                            `error from message api ${error.message}`,
+                            req.path,
+                            req.traceId
+                        )
                     )
                 );
+                res.end();
                 return;
             }
-
-            elizaLogger.debug(
-                `checking if runtime exists for agentId: ${agentId}`,
-                { traceId: req.traceId }
-            );
-            // if runtime is null, look for runtime with the same name
-            if (!runtime) {
-                runtime = Array.from(agents.values()).find(
-                    (a: AgentRuntime) =>
-                        a.character.name.toLowerCase() === agentId.toLowerCase()
-                );
-            }
-
-            if (!runtime) {
-                res.status(404).json(
-                    ResponseHelper.error<UserAgentInfo>(
-                        "AGENT_NOT_FOUND",
-                        "Agent not found",
-                        req.path,
-                        req.traceId
-                    )
-                );
-                return;
-            }
-
-            const moxieUserInfo: MoxieUser = mockMoxieUser;
-            const moxieUserId: string = moxieUserInfo.id;
-            const agentWallet: Wallet = undefined;
-
-            const userId = stringToUuid(moxieUserId);
-
-            await runtime.ensureConnection(
-                userId,
-                roomId,
-                moxieUserInfo.userName,
-                moxieUserInfo.name,
-                "direct"
-            );
-
-            const messageId = stringToUuid(Date.now().toString());
-            const content: Content = {
-                text,
-                source: "direct",
-                inReplyTo: req.body.inReplyTo ?? undefined,
-            };
-
-            const userMessage = {
-                content,
-                userId,
-                roomId,
-                agentId: runtime.agentId,
-            };
-
-            const memory: Memory = {
-                id: stringToUuid(`${messageId}-${userId}`),
-                ...userMessage,
-                agentId: runtime.agentId,
-                userId,
-                roomId,
-                content,
-                createdAt: Date.now(),
-            };
-
-            await runtime.messageManager.addEmbeddingToMemory(memory);
-            await runtime.messageManager.createMemory(memory);
-
-            let state = await runtime.composeState(userMessage, {
-                agentName: runtime.character.name,
-                moxieUserInfo: moxieUserInfo,
-                agentWallet: agentWallet,
-            });
-
-            const context = composeContext({
-                state,
-                template: messageHandlerTemplate,
-            });
-
-            const response = await generateMessageResponse({
-                runtime: runtime,
-                context,
-                modelClass: ModelClass.LARGE,
-            });
-
-            if (!response) {
-                res.status(500).json(
-                    ResponseHelper.error<null>(
-                        "INTERNAL_SERVER_ERROR",
-                        "No response from generateMessageResponse",
-                        req.path,
-                        req.traceId
-                    )
-                );
-                return;
-            }
-
-            // Set headers for chunked transfer encoding
-            res.setHeader("Content-Type", "text/event-stream");
-            res.setHeader("Transfer-Encoding", "chunked");
-            res.setHeader("Connection", "keep-alive");
-            res.setHeader("Cache-Control", "no-cache");
-            res.flushHeaders(); // Ensure headers are sent immediately
-
-            // save response to memory
-            const responseMessage: Memory = {
-                id: stringToUuid(`${messageId}-${runtime.agentId}`),
-                ...userMessage,
-                userId: runtime.agentId,
-                content: response,
-                embedding: getEmbeddingZeroVector(),
-                createdAt: Date.now(),
-            };
-
-            // if the response contains action field, then we dont need to save the memory
-            if (!response.action) {
-                await runtime.messageManager.createMemory(responseMessage);
-                state = await runtime.updateRecentMessageState(state);
-            }
-            // check if the user has explicitly provided the action in the request. e.g, this could be for followup actions
-            // then overwrite the action in the response
-            if (req.body.action) {
-                response.action = req.body.action;
-            }
-
-            let message = null as Content | null;
-
-            elizaLogger.debug(`processing actions for agentId: ${agentId}`, {
-                traceId: req.traceId,
-            });
-
-            let messageFromActions = false;
-            let newContext = "";
-            let newAction = undefined;
-            await runtime.processActions(
-                memory,
-                [responseMessage],
-                state,
-                async (newMessages) => {
-                    messageFromActions = true;
-                    message = newMessages;
-                    newAction = newMessages.action;
-                    newContext += newMessages.text;
-
-                    await new Promise((resolve) => setTimeout(resolve, 100)); // sleep for 100ms to avoid sending multiple chunks in a single request
-                    res.write(JSON.stringify(newMessages));
-                    return [memory];
-                }
-            );
-
-            const newMessageId = stringToUuid(Date.now().toString());
-            const newContent: Content = {
-                text: newContext,
-                inReplyTo: memory.id,
-                action: newAction,
-            };
-
-            const agentMessage = {
-                content: newContent,
-                userId: runtime.agentId,
-                roomId,
-                agentId: runtime.agentId,
-            };
-
-            const newMemory: Memory = {
-                id: newMessageId,
-                ...agentMessage,
-                agentId: runtime.agentId,
-                userId: runtime.agentId,
-                roomId,
-                content,
-                createdAt: Date.now(),
-            };
-
-            await runtime.messageManager.addEmbeddingToMemory(newMemory);
-            await runtime.messageManager.createMemory(newMemory);
-
-            await runtime.evaluate(memory, state);
-
-            // Check if we should suppress the initial message
-            const action = runtime.actions.find(
-                (a) => a.name === response.action
-            );
-            const shouldSuppressInitialMessage = action?.suppressInitialMessage;
-
-            if (!shouldSuppressInitialMessage) {
-                // write the response to the response stream
-                res.write(JSON.stringify(response));
-                // sleep for 100ms to avoid sending multiple chunks in a single request
-                await new Promise((resolve) => setTimeout(resolve, 100));
-                if (message && !messageFromActions) {
-                    res.write(JSON.stringify(message));
-                }
-            } else {
-                if (message && !messageFromActions) {
-                    res.write(JSON.stringify(message));
-                }
-            }
-            res.end();
-        } catch (error) {
-            elizaLogger.error(error, { traceId: req.traceId });
-            res.status(500).write(
-                JSON.stringify(
-                    ResponseHelper.error<null>(
-                        "INTERNAL_SERVER_ERROR",
-                        `error from message api ${error.message}`,
-                        req.path,
-                        req.traceId
-                    )
-                )
-            );
-            res.end();
-            return;
         }
-    });
+    );
 
     router.get("/agent", async (req, res) => {
         elizaLogger.debug(

@@ -67,14 +67,36 @@ export const apiClient = {
         const formData = new FormData();
         formData.append("text", message);
         formData.append("user", "user");
+        formData.append("roomId", agentId);
 
         if (selectedFile) {
             formData.append("file", selectedFile);
         }
-        return fetcher({
-            url: `/${agentId}/message`,
+        return fetch(`${BASE_URL}/${agentId}/message`, {
             method: "POST",
             body: formData,
+        }).then(async (resp) => {
+            if (resp.ok) {
+                const contentType = resp.headers.get("Content-Type");
+
+                if (contentType === "audio/mpeg") {
+                    return await resp.blob();
+                }
+                return resp.json();
+            }
+
+            const errorText = await resp.text();
+            console.error("Error: ", errorText);
+
+            let errorMessage = "An error occurred.";
+            try {
+                const errorObj = JSON.parse(errorText);
+                errorMessage = errorObj.message || errorMessage;
+            } catch {
+                errorMessage = errorText || errorMessage;
+            }
+
+            throw new Error(errorMessage);
         });
     },
     getAgents: () => fetcher({ url: "/agents" }),
