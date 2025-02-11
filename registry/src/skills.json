@@ -1,0 +1,26 @@
+[
+    {
+        "pluginId": "b5622f90-987e-51d1-bea9-5b1471bb9379",
+        "name": "@moxie-protocol/plugin-moxie-balance",
+        "version": "0.1.8+build.1",
+        "author": null,
+        "description": "A Skills for Creator Agents that enables portfolio balance checking for Moxie users' connected wallets.",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-plugin/tree/main/packages/plugin-moxie-balance"
+    },
+    {
+        "pluginId": "2a24e22b-7636-5055-98fd-edd3af5e0152",
+        "name": "@moxie-protocol/plugin-moxie-big-fan",
+        "version": "0.1.8+build.1",
+        "author": null,
+        "description": "A Skills for Creator Agents to enable fetching cryptocurrency price data from the CoinGecko API.",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-plugin/tree/main/packages/plugin-moxie-big-fan"
+    },
+    {
+        "pluginId": "a1aa9887-fc11-5f54-aa62-235c7536ba67",
+        "name": "@moxie-protocol/plugin-moxie-token-details",
+        "version": "0.1.8+build.1",
+        "author": null,
+        "description": "A Skills for Creator Agents that enables fetching of base token details.",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-plugin/tree/main/packages/plugin-moxie-token-details"
+    }
+]
