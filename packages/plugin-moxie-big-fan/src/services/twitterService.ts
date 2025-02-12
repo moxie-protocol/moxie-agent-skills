@@ -1,4 +1,4 @@
-import { elizaLogger } from "@elizaos/core";
+import { elizaLogger } from "@moxie-protocol/core";
 import { Scraper, Tweet } from "agent-twitter-client";
 
 class TwitterService {
@@ -11,8 +11,7 @@ class TwitterService {
     }
 
     async initialize() {
-
-        if(this.isInitialzed) {
+        if (this.isInitialzed) {
             return true;
         }
         try {
@@ -43,7 +42,7 @@ class TwitterService {
                 throw new Error("Failed to login to Twitter - invalid cookies");
             }
 
-            this.isInitialzed = true
+            this.isInitialzed = true;
 
             return this.isInitialzed;
         } catch (error) {
@@ -60,13 +59,14 @@ class TwitterService {
         handle: string,
         maxTweets: number = 20
     ): Promise<Tweet[]> {
-
         const startTime = Date.now();
         const tweets = [];
         try {
-            for await (const tweet of this.scraper.getTweets(handle, maxTweets)) {
-
-                console.log(`Timestamp ${tweet.id} ${tweet.timeParsed}  `)
+            for await (const tweet of this.scraper.getTweets(
+                handle,
+                maxTweets
+            )) {
+                console.log(`Timestamp ${tweet.id} ${tweet.timeParsed}  `);
                 tweets.push(tweet);
             }
         } catch (error) {
@@ -76,13 +76,14 @@ class TwitterService {
         }
 
         const endTime = Date.now();
-        elizaLogger.debug(`Time taken to fetch ${tweets.length} tweets for ${handle}: ${endTime - startTime}ms`);
+        elizaLogger.debug(
+            `Time taken to fetch ${tweets.length} tweets for ${handle}: ${endTime - startTime}ms`
+        );
 
         return tweets;
     }
 }
 export const twitterService = new TwitterService();
-
 
 // const run = async () => {
 
@@ -95,13 +96,11 @@ export const twitterService = new TwitterService();
 
 //             console.log(`Fetching tweets for ${handle}...`);
 
-
 //             for (const tweet of await twitterService.getTweetsByUser(handle, maxTweets)) {
 //                 console.log(`Timestamp ${tweet.id} ${tweet.timeParsed}  `)
 //                 console.log(`${JSON.stringify(tweet)}`)
 //                 console.log('----------\n');
 //             }
-
 
 //         } catch (error) {
 //             console.error('Error fetching tweets:', error.message);
@@ -109,8 +108,6 @@ export const twitterService = new TwitterService();
 
 //         await new Promise(resolve => setTimeout(resolve, 5000));
 //     }
-
-
 
 // }
 

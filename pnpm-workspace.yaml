@@ -3,5 +3,4 @@ packages:
     - "packages/*"
     - "client"
     - "agent"
-    - "moxie-agent"
-    - "moxie-broadcasting-agent"
+    - "registry"

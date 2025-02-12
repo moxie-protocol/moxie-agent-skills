@@ -1,11 +1,11 @@
 {
-    "name": "@elizaos/moxie-lib",
+    "name": "@moxie-protocol/moxie-lib",
     "version": "0.1.8+build.1",
     "main": "dist/index.js",
     "type": "module",
     "types": "dist/index.d.ts",
     "dependencies": {
-        "@elizaos/core": "workspace:*",
+        "@moxie-protocol/core": "workspace:*",
         "axios": "^1.7.9",
         "tsup": "^8.3.5"
     },

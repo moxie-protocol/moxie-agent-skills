@@ -1,12 +1,12 @@
 {
-    "name": "@elizaos/plugin-moxie-balance",
+    "name": "@moxie-protocol/plugin-moxie-balance",
     "version": "0.1.8+build.1",
     "main": "dist/index.js",
     "type": "module",
     "types": "dist/index.d.ts",
     "dependencies": {
-        "@elizaos/core": "workspace:*",
-        "@elizaos/moxie-lib": "workspace:*",
+        "@moxie-protocol/core": "workspace:*",
+        "@moxie-protocol/moxie-lib": "workspace:*",
         "axios": "^1.6.7",
         "zod": "^3.22.4"
     },

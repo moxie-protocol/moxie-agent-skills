@@ -10,9 +10,9 @@ import {
     State,
     elizaLogger,
     streamText,
-} from "@elizaos/core";
+} from "@moxie-protocol/core";
 
-import { moxieUserService } from "@elizaos/moxie-lib";
+import { moxieUserService } from "@moxie-protocol/moxie-lib";
 import * as templates from "../templates";
 import { getMoxieIdsFromMessage, streamTextByLines } from "./utils";
 import { FIVE_MINS, getTweetsCacheKey, ONE_HOUR } from "../cache";
@@ -102,7 +102,12 @@ async function fetchAndValidateTweets(
     callback: HandlerCallback,
     runtime: IAgentRuntime
 ) {
-    const moxieIds: string[] = await getMoxieIdsFromMessage(message,templates.topCreatorsTwitterExamples, state, runtime);
+    const moxieIds: string[] = await getMoxieIdsFromMessage(
+        message,
+        templates.topCreatorsTwitterExamples,
+        state,
+        runtime
+    );
     elizaLogger.debug(`searching for tweets for moxieIds: ${moxieIds}`);
     if (moxieIds.length === 0) {
         callback({

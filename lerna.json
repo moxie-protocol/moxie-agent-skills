@@ -5,7 +5,8 @@
         "docs",
         "agent",
         "client",
-        "!packages/_examples"
+        "!packages/_examples",
+        "registry"
     ],
     "npmClient": "pnpm"
 }

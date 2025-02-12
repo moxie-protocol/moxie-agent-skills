@@ -603,7 +603,9 @@ export async function generateText({
                 });
 
                 response = anthropicResponse;
-                elizaLogger.debug("Received response from Anthropic model.", { response });
+                elizaLogger.debug("Received response from Anthropic model.", {
+                    response,
+                });
                 break;
             }
 
@@ -1041,6 +1043,7 @@ export async function generateText({
 
         return response;
     } catch (error) {
+        console.log("Error in generateText:", error);
         elizaLogger.error("Error in generateText:", error);
         throw error;
     }

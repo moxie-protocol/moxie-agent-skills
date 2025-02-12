@@ -1,12 +1,12 @@
 {
-    "name": "@elizaos/plugin-moxie-big-fan",
+    "name": "@moxie-protocol/plugin-moxie-big-fan",
     "version": "0.1.8+build.1",
     "main": "dist/index.js",
     "type": "module",
     "types": "dist/index.d.ts",
     "dependencies": {
-        "@elizaos/core": "workspace:*",
-        "@elizaos/moxie-lib": "workspace:*",
+        "@moxie-protocol/core": "workspace:*",
+        "@moxie-protocol/moxie-lib": "workspace:*",
         "axios": "^1.7.9",
         "agent-twitter-client": "0.0.18",
         "tsup": "^8.3.5",

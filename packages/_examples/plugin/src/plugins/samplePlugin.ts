@@ -1,4 +1,4 @@
-import { Plugin } from "@elizaos/core";
+import { Plugin } from "@moxie-protocol/core";
 import { createResourceAction } from "../actions/sampleAction";
 import { sampleProvider } from "../providers/sampleProvider";
 import { sampleEvaluator } from "../evaluators/sampleEvalutor";

@@ -1,6 +1,6 @@
 import bodyParser from "body-parser";
 import cors from "cors";
-import { type UUID, validateUuid } from "@elizaos/core";
+import { type UUID, validateUuid } from "@moxie-protocol/core";
 import {
     type AgentRuntime,
     composeContext,
@@ -10,10 +10,10 @@ import {
     getEnvVariable,
     type Memory,
     ModelClass,
-} from "@elizaos/core";
+} from "@moxie-protocol/core";
 import { type MoxieClient, messageHandlerTemplate } from ".";
-import { stringToUuid } from "@elizaos/core";
-import type { Content } from "@elizaos/core";
+import { stringToUuid } from "@moxie-protocol/core";
+import type { Content } from "@moxie-protocol/core";
 import type { UserAgentInfo, UserAgentInteraction } from "./types/types.ts";
 import { COMMON_AGENT_ID, mockMoxieUser } from "./constants/constants";
 import type { Wallet } from "@privy-io/server-auth";
@@ -21,8 +21,8 @@ import { validateInputAgentInteractions } from "./helpers";
 import express from "express";
 import { ResponseHelper } from "./responseHelper.ts";
 import { traceIdMiddleware } from "./middleware/traceId.ts";
-import { ftaService } from "@elizaos/moxie-lib";
-import type { MoxieUser } from "@elizaos/moxie-lib";
+import { ftaService } from "@moxie-protocol/moxie-lib";
+import type { MoxieUser } from "@moxie-protocol/moxie-lib";
 import multer from "multer";
 import * as fs from "node:fs";
 import * as path from "node:path";

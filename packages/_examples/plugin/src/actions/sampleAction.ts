@@ -8,7 +8,7 @@ import {
     generateObject,
     ModelClass,
     elizaLogger,
-} from "@elizaos/core";
+} from "@moxie-protocol/core";
 
 import { CreateResourceSchema, isCreateResourceContent } from "../types";
 

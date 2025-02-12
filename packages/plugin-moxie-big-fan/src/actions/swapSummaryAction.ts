@@ -10,7 +10,7 @@ import {
     parseJSONObjectFromText,
     State,
     streamText,
-} from "@elizaos/core";
+} from "@moxie-protocol/core";
 
 import * as templates from "../templates";
 import { fetchSwapData } from "../utils";
@@ -158,7 +158,6 @@ async function swapSummaryHandler(
     callback?: HandlerCallback,
     fetchOnlyCreatorCoinSwaps: boolean = false
 ) {
-
     // if (moxieIds.length === 0) {
     //     callback({
     //         text: "I couldn't find your favorite creators. Please buy creator tokens to get started.",
@@ -172,39 +171,49 @@ async function swapSummaryHandler(
     const context = composeContext({
         state: {
             ...state,
-            message: message.content.text
+            message: message.content.text,
         },
-        template: templates.swapSummaryInputContextExtraction
+        template: templates.swapSummaryInputContextExtraction,
     });
 
     const response = await generateText({
         runtime,
         context,
-        modelClass: ModelClass.SMALL
+        modelClass: ModelClass.SMALL,
     });
 
-    const { isGeneralQuery, onlyIncludeSpecifiedMoxieIds, isTopTokenOwnersQuery, timeFilter } = parseJSONObjectFromText(response);
+    const {
+        isGeneralQuery,
+        onlyIncludeSpecifiedMoxieIds,
+        isTopTokenOwnersQuery,
+        timeFilter,
+    } = parseJSONObjectFromText(response);
 
-    elizaLogger.debug(`--- >> isGeneralQuery: ${isGeneralQuery}, onlyIncludeSpecifiedMoxieIds: ${onlyIncludeSpecifiedMoxieIds}, isTopTokenOwnersQuery: ${isTopTokenOwnersQuery}, timeFilter: ${timeFilter}`);
-
+    elizaLogger.debug(
+        `--- >> isGeneralQuery: ${isGeneralQuery}, onlyIncludeSpecifiedMoxieIds: ${onlyIncludeSpecifiedMoxieIds}, isTopTokenOwnersQuery: ${isTopTokenOwnersQuery}, timeFilter: ${timeFilter}`
+    );
 
     const moxieIds: string[] = await getMoxieIdsFromMessage(
         message,
         templates.topCreatorsSwapExamples,
         state,
         runtime,
-        isTopTokenOwnersQuery,
+        isTopTokenOwnersQuery
     );
     elizaLogger.debug(`searching for swaps for moxieIds: ${moxieIds}`);
 
     if (!isGeneralQuery && moxieIds.length === 0) {
         callback({
-            text: "I couldn't find the specific creators you mentioned. Please make sure to mention their names or usernames."
+            text: "I couldn't find the specific creators you mentioned. Please make sure to mention their names or usernames.",
         });
         return false;
     }
 
-    const allSwaps = await fetchSwapData(moxieIds, fetchOnlyCreatorCoinSwaps, onlyIncludeSpecifiedMoxieIds);
+    const allSwaps = await fetchSwapData(
+        moxieIds,
+        fetchOnlyCreatorCoinSwaps,
+        onlyIncludeSpecifiedMoxieIds
+    );
 
     if (allSwaps.length === 0) {
         callback({

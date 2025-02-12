@@ -6,13 +6,13 @@ import {
     Memory,
     ModelClass,
     State,
-} from "@elizaos/core";
+} from "@moxie-protocol/core";
 import {
     portfolioService,
     MoxiePortfolio,
     MoxieUser,
-} from "@elizaos/moxie-lib";
-import { ftaService } from "@elizaos/moxie-lib";
+} from "@moxie-protocol/moxie-lib";
+import { ftaService } from "@moxie-protocol/moxie-lib";
 import {
     FIVE_MINS,
     getCurrentMoxieUserContextCacheKey,
@@ -41,18 +41,19 @@ export async function fetchTopCreatorsByMoxieId(
                 10
             );
 
-
         const moxieUserIds = portfolio
-            .filter((p) => p?.fanTokenMoxieUserId && p?.fanTokenMoxieUserId !== moxieId)
+            .filter(
+                (p) =>
+                    p?.fanTokenMoxieUserId && p?.fanTokenMoxieUserId !== moxieId
+            )
             .map((p) => p.fanTokenMoxieUserId);
-
 
         elizaLogger.debug(`caching creators list for ${moxieId}`);
 
-        if(moxieUserIds.length > 0) {
-        await runtime.cacheManager.set(
-            getTopCreatorsCacheKey(moxieId),
-            JSON.stringify(moxieUserIds),
+        if (moxieUserIds.length > 0) {
+            await runtime.cacheManager.set(
+                getTopCreatorsCacheKey(moxieId),
+                JSON.stringify(moxieUserIds),
                 {
                     expires: Date.now() + FIVE_MINS,
                 }
@@ -74,7 +75,6 @@ export async function getMoxieIdsFromMessage(
     isTopTokenOwnersQuery?: boolean
 ): Promise<string[]> {
     try {
-
         const key = getCurrentMoxieUserContextCacheKey(message.roomId);
         const messageText = message.content.text || "";
         const moxieIdPattern = /\bM\d+\b/g;
@@ -114,10 +114,11 @@ export async function getMoxieIdsFromMessage(
             });
 
             moxieIds = JSON.parse(generatedMoxieIds as string);
-
         }
 
-        await runtime.cacheManager.set(key, JSON.stringify(moxieIds), { expires: Date.now() + ONE_DAY });
+        await runtime.cacheManager.set(key, JSON.stringify(moxieIds), {
+            expires: Date.now() + ONE_DAY,
+        });
 
         return moxieIds;
     } catch (error) {
@@ -127,8 +128,10 @@ export async function getMoxieIdsFromMessage(
     }
 }
 
-
-export async function streamTextByLines(stream: AsyncIterable<string>, onLine: (text: string) => void) {
+export async function streamTextByLines(
+    stream: AsyncIterable<string>,
+    onLine: (text: string) => void
+) {
     let buffer = "";
     for await (const textPart of stream) {
         buffer += textPart;

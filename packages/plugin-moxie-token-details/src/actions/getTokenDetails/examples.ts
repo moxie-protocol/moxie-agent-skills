@@ -1,4 +1,4 @@
-import { ActionExample } from "@elizaos/core";
+import { ActionExample } from "@moxie-protocol/core";
 
 export const tokenDetailsExamples: ActionExample[][] = [
     [
@@ -139,18 +139,18 @@ MOXIE shows **mixed signals**, with **short-term bullish patterns** but **long-t
             },
         },
         {
-            "user": "{{user1}}",
-            "content": {
-                "text": "What is the market performance or market sentiment about it?"
-            }
+            user: "{{user1}}",
+            content: {
+                text: "What is the market performance or market sentiment about it?",
+            },
         },
         {
-            "user": "{{agent}}",
-            "content": {
-                "text": "Overall Sentiment: Neutral to Bearish. There is strong short-term buying (1-4H), but significant selling pressure in longer timeframes. Trading patterns indicate higher buy counts compared to sells, but the price is still declining, suggesting larger sell orders.\n\nKey Considerations:\n- **Strength:** Active trading with a high holder count (109K+)\n- **Concerns:** Significant price decline (-15.86%) in the last 24 hours, coupled with limited liquidity ($114K) relative to market cap.\n- **Risk Level:** High, with significant price volatility.\n\n**Investment Advice:** Exercise caution due to high volatility and limited liquidity. If investing, consider small position sizes.",
-                "action": "TOKEN_MARKET_PERFORMANCE"
-            }
-        }
+            user: "{{agent}}",
+            content: {
+                text: "Overall Sentiment: Neutral to Bearish. There is strong short-term buying (1-4H), but significant selling pressure in longer timeframes. Trading patterns indicate higher buy counts compared to sells, but the price is still declining, suggesting larger sell orders.\n\nKey Considerations:\n- **Strength:** Active trading with a high holder count (109K+)\n- **Concerns:** Significant price decline (-15.86%) in the last 24 hours, coupled with limited liquidity ($114K) relative to market cap.\n- **Risk Level:** High, with significant price volatility.\n\n**Investment Advice:** Exercise caution due to high volatility and limited liquidity. If investing, consider small position sizes.",
+                action: "TOKEN_MARKET_PERFORMANCE",
+            },
+        },
     ],
     [
         {
@@ -163,8 +163,7 @@ MOXIE shows **mixed signals**, with **short-term bullish patterns** but **long-t
             user: "{{agent}}",
             content: {
                 text: `I'm sorry, but I can't provide token details for TRUMP on Solana. I only support tokens on Base.`,
-            }
-        }
+            },
+        },
     ],
-
 ];

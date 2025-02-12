@@ -1,14 +1,14 @@
-import { IAgentRuntime } from "@elizaos/core";
+import { IAgentRuntime } from "@moxie-protocol/core";
 
 const CACHE_EXPIRATION = 60000; // 1 minute in milliseconds
 
 export async function setMoxieUserIdCache(
     data: string,
     cacheKey: string,
-    runtime: IAgentRuntime,
+    runtime: IAgentRuntime
 ): Promise<void> {
     await runtime.cacheManager.set(cacheKey, data, {
-        expires: Date.now() + CACHE_EXPIRATION
+        expires: Date.now() + CACHE_EXPIRATION,
     });
 }
 

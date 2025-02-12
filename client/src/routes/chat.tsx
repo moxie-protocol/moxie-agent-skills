@@ -1,6 +1,6 @@
 import { useParams } from "react-router";
 import Chat from "@/components/chat";
-import { UUID } from "@elizaos/core";
+import { UUID } from "@moxie-protocol/core";
 
 export default function AgentRoute() {
     const { agentId } = useParams<{ agentId: UUID }>();

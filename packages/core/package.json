@@ -1,5 +1,5 @@
 {
-    "name": "@elizaos/core",
+    "name": "@moxie-protocol/core",
     "version": "0.1.8+build.1",
     "description": "",
     "type": "module",
@@ -10,7 +10,7 @@
         "./package.json": "./package.json",
         ".": {
             "import": {
-                "@elizaos/source": "./src/index.ts",
+                "@moxie-protocol/source": "./src/index.ts",
                 "types": "./dist/index.d.ts",
                 "default": "./dist/index.js"
             }

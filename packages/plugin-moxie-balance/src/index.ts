@@ -1,4 +1,4 @@
-import { Plugin } from "@elizaos/core";
+import { Plugin } from "@moxie-protocol/core";
 import getMoxiePortfolio from "./actions/getMoxiePortfolio";
 import getMoxieFanTokenPortfolio from "./actions/getMoxieFanTokenPortfolio";
 import getFanTokenTrends from "./actions/getFanTokenTrends";

@@ -1,5 +1,4 @@
-import { elizaLogger } from "@elizaos/core";
-
+import { elizaLogger } from "@moxie-protocol/core";
 
 interface TwitterMetadata {
     username: string;
@@ -25,7 +24,7 @@ export interface MoxieIdentity {
     type: string;
     dataSource: string;
     connectedIdentitiesFetchStatus: string;
-    metadata: TwitterMetadata | FarcasterMetadata ;
+    metadata: TwitterMetadata | FarcasterMetadata;
     profileId: string;
     isActive: boolean;
     createdAt: string;
@@ -40,7 +39,7 @@ export interface MoxieWallet {
     dataSource?: string;
     createdAt: string;
     deletedAt?: string;
-  }
+}
 
 export interface MoxieUser {
     id: string;
@@ -59,12 +58,12 @@ export interface MoxieUser {
     identities: MoxieIdentity[];
     wallets: MoxieWallet[];
     vestingContracts?: VestingContract[] | null;
-  }
+}
 
 export type VestingContract = {
     beneficiaryAddress: string;
     vestingContractAddress: string;
-}
+};
 
 interface MeQueryResponse {
     data: {
@@ -79,14 +78,15 @@ interface MeQueryResponse {
     }>;
 }
 
-
 interface GetUserResponse {
     data: {
         GetUser: MoxieUser;
     };
 }
 
-export async function getUserMoxieWalletAddress(walletAddress: string): Promise<MoxieUser | undefined> {
+export async function getUserMoxieWalletAddress(
+    walletAddress: string
+): Promise<MoxieUser | undefined> {
     try {
         const query = `
             query GetUser($walletAddress: String!) {
@@ -137,12 +137,17 @@ export async function getUserMoxieWalletAddress(walletAddress: string): Promise<
         const result = await response.json();
 
         if (!result.data) {
-            elizaLogger.error(`No data in response for walletAddress ${walletAddress}:`, result);
+            elizaLogger.error(
+                `No data in response for walletAddress ${walletAddress}:`,
+                result
+            );
             return undefined;
         }
 
         if (!result.data.GetUser) {
-            elizaLogger.error(`No user found for walletAddress ${walletAddress}`);
+            elizaLogger.error(
+                `No user found for walletAddress ${walletAddress}`
+            );
             return undefined;
         }
 
@@ -198,7 +203,7 @@ export async function getUserByMoxieId(
             },
             body: JSON.stringify({
                 query,
-                variables: { userId ,vestingContractRequired: true},
+                variables: { userId, vestingContractRequired: true },
             }),
         });
 
@@ -242,7 +247,9 @@ export async function getUserByWalletAddressMultiple(
 ): Promise<Map<string, MoxieUser>> {
     try {
         const results = await Promise.all(
-            walletAddresses.map((walletAddress) => getUserMoxieWalletAddress(walletAddress))
+            walletAddresses.map((walletAddress) =>
+                getUserMoxieWalletAddress(walletAddress)
+            )
         );
 
         const walletAddressToUser = new Map<string, MoxieUser>();
@@ -303,9 +310,7 @@ export interface SocialProfile {
     farcasterUserId?: string;
 }
 
-export async function getSocialProfilesByMoxieIdMultiple(
-    userIds: string[]
-) {
+export async function getSocialProfilesByMoxieIdMultiple(userIds: string[]) {
     const userIdToSocialProfile = new Map<string, SocialProfile>();
 
     try {
@@ -320,21 +325,26 @@ export async function getSocialProfilesByMoxieIdMultiple(
             const identities = user?.identities || [];
 
             for (const identity of identities) {
-                if (identity.type === "TWITTER" && identity.dataSource == 'PRIVY') {
+                if (
+                    identity.type === "TWITTER" &&
+                    identity.dataSource == "PRIVY"
+                ) {
                     twitterUsername = identity?.metadata?.username;
-                } else if (identity.type === "FARCASTER" && identity.dataSource == 'PRIVY') {
-
+                } else if (
+                    identity.type === "FARCASTER" &&
+                    identity.dataSource == "PRIVY"
+                ) {
                     farcasterUsername = identity?.metadata?.username;
-                    farcasterUserId = identity?.profileId
+                    farcasterUserId = identity?.profileId;
                 }
             }
-            const socialProfile:SocialProfile = {
+            const socialProfile: SocialProfile = {
                 twitterUsername: twitterUsername,
                 farcasterUsername: farcasterUsername,
                 farcasterUserId,
             };
 
-                userIdToSocialProfile.set(userId, socialProfile);
+            userIdToSocialProfile.set(userId, socialProfile);
         });
 
         return userIdToSocialProfile;
@@ -350,7 +360,9 @@ export async function getSocialProfilesByMoxieIdMultiple(
 
 // getSocialProfilesByMoxieIdMultiple(["M4"]).then(console.log)
 
-export async function getUserByPrivyBearerToken(bearerToken: string): Promise<MoxieUser> {
+export async function getUserByPrivyBearerToken(
+    bearerToken: string
+): Promise<MoxieUser> {
     const query = `
         query Me {
             Me {
@@ -393,29 +405,29 @@ export async function getUserByPrivyBearerToken(bearerToken: string): Promise<Mo
     `;
 
     try {
-      const response = await fetch(process.env.MOXIE_API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': bearerToken,
-        },
-        body: JSON.stringify({
-            query
-        }),
-      });
+        const response = await fetch(process.env.MOXIE_API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: bearerToken,
+            },
+            body: JSON.stringify({
+                query,
+            }),
+        });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-      const result = await response.json() as MeQueryResponse
+        const result = (await response.json()) as MeQueryResponse;
 
-      if (result.errors) {
-        throw new Error(result.errors[0].message);
-    }
-    return result.data.Me
+        if (result.errors) {
+            throw new Error(result.errors[0].message);
+        }
+        return result.data.Me;
     } catch (error) {
-      console.error('Error fetching user data:', error);
-      throw error;
+        console.error("Error fetching user data:", error);
+        throw error;
     }
-  }
+}

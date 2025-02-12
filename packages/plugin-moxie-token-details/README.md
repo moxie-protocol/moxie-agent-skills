@@ -1,4 +1,4 @@
-# @elizaos/plugin-moxie-token-details
+# @moxie-protocol/plugin-moxie-token-details
 
 A plugin for Eliza that enables fetching of base token details.
 

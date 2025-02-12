@@ -11,14 +11,14 @@ import {
 } from "@/components/ui/card";
 import { apiClient } from "@/lib/api";
 import { NavLink } from "react-router";
-import { UUID } from "@elizaos/core";
+import { UUID } from "@moxie-protocol/core";
 import { formatAgentName } from "@/lib/utils";
 
 export default function Home() {
     const query = useQuery({
         queryKey: ["agents"],
         queryFn: () => apiClient.getAgents(),
-        refetchInterval: 5_000
+        refetchInterval: 5_000,
     });
 
     const agents = query?.data?.agents;

@@ -18,16 +18,16 @@ import {
     settings,
     stringToUuid,
     validateCharacterConfig,
-} from "@elizaos/core";
-import { MoxieClient } from "@elizaos/client-moxie";
+} from "@moxie-protocol/core";
+import { MoxieClient } from "@moxie-protocol/client-moxie";
 import fs from "node:fs";
 import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import yargs from "yargs";
-// import moxieBigFanPlugin from "@elizaos/plugin-moxie-big-fan";
-// import moxieTokenDetailsPlugin from "@elizaos/plugin-moxie-token-details";
-// import { moxieSwapPlugin } from "@elizaos/plugin-moxie-swap";
+// import moxieBigFanPlugin from "@moxie-protocol/plugin-moxie-big-fan";
+// import moxieTokenDetailsPlugin from "@moxie-protocol/plugin-moxie-token-details";
+// import { moxieSwapPlugin } from "@moxie-protocol/plugin-moxie-swap";
 import elizaLogger from "../../packages/core/src/logger";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
@@ -246,7 +246,7 @@ async function handlePluginImporting(plugins: string[]) {
                     const importedPlugin = await import(plugin);
                     const functionName =
                         plugin
-                            .replace("@elizaos/plugin-", "")
+                            .replace("@moxie-protocol/plugin-", "")
                             .replace(/-./g, (x) => x[1].toUpperCase()) +
                         "Plugin"; // Assumes plugin function is camelCased with Plugin suffix
                     return (

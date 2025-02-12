@@ -1,4 +1,4 @@
-# @elizaos/plugin-moxie-balance
+# @moxie-protocol/plugin-moxie-balance
 
 A plugin for Eliza that enables portfolio balance checking for Moxie users' connected wallets.
 

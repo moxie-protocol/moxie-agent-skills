@@ -6,7 +6,7 @@ import {
     elizaLogger,
     messageCompletionFooter,
     type IDatabaseAdapter,
-} from "@elizaos/core";
+} from "@moxie-protocol/core";
 import { createMoxieApiRouter } from "./moxieApis.ts";
 
 export const messageHandlerTemplate =

@@ -1,50 +1,52 @@
-<!-- Use this template by filling in information and copying and pasting relevant items out of the HTML comments. -->
+# Relates Issues
 
-# Relates to
-
-<!-- LINK TO ISSUE OR TICKET -->
-
-<!-- This risks section must be filled out before the final review and merge. -->
-
-# Risks
-
-<!--
-Low, medium, large. List what kind of risks and what could be affected.
--->
+<!-- LINK TO ISSUE OR TICKET (IF ANY) -->
 
 # Background
 
-## What does this PR do?
-
-## What kind of change is this?
-
 <!--
-Bug fixes (non-breaking change which fixes an issue)
-Improvements (misc. changes to existing features)
-Features (non-breaking change which adds functionality)
-Updates (new versions of included code)
+Briefly write the motivation of creating this PR.
+
+Why are we doing this? Any context or related work?
 -->
 
-<!-- This "Why" section is most relevant if there are no linked issues explaining why. If there is a related issue, it might make sense to skip this why section. -->
-<!--
-## Why are we doing this? Any context or related work?
--->
-
-# Documentation changes needed?
+# PR Category
 
 <!--
-My changes do not require a change to the project documentation.
-My changes require a change to the project documentation.
-If documentation change is needed: I have updated the documentation accordingly.
+Please choose one of the following category that suits your PR the most.
+
+For bug fixes, please specify the severity level of the bug fixed.
 -->
 
-<!-- Please show how you tested the PR. This will really help if the PR needs to be retested and probably help the PR get merged quicker. -->
+- [] Register New Skills (first time adding new skills to moxie.xyz)
+- [] Bug Fixes (non-breaking change which fixes an issue)
+    - [] Low
+    - [] Medium
+    - [] High
+- [] Improvements (misc. changes to existing features)
+- [] New Features (non-breaking change which adds functionality)
+- [] Updates (new versions of included code)
 
-# Testing
+# Description
 
-## Where should a reviewer start?
+<!--
+Briefly provide bullet points on what kind of change is done in the PR.
+-->
 
-## Detailed testing steps
+<!--
+IF YOU ARE REGISTERING FOR NEW SKILLS, UNCOMMENT THIS AND MAKE SURE TO FULFILL ALL THE CHECKLIST BELOW:
+- [] Have tested the skills with the agent locally and working well
+- [] Have a well-writen README for the skills full description of the functionality along with detailed list of all actions, providers, evaluators, services, and clients.
+- [] Have added the new skill metadata to the `registry/src/skill.json` registry
+- [] Have not made changes to other aspects of the repository other than the folder containing the new skills
+- [] (Optional) Have environment variables and have requested the Moxie team through [this form](https://forms.gle/8hzDyCVKKLs4MkTEA) for environment variables submission.
+- [] Does not contain any code that simply transfers Moxie user's holdings to a fixed address
+- [] Does not contain any code that extracts Moxie user's private informations (e.g. wallets, private keys, etc.)
+- [] Does not contain any code that interacts with smart contracts that has not verified and published its source code.
+- [] Have audited smart contracts if the skills contain code that interacts with smart contracts has volume/balance above 100k USD.
+-->
+
+# Detailed Testing Steps <!-- COMMENT OUT OR DELETE IF REGISTERING NEW SKILLS -->
 
 <!--
 None: Automated tests are acceptable.
@@ -76,10 +78,4 @@ None: Automated tests are acceptable.
 <!--  Please specify deploy instructions if there is something more than the automated steps. -->
 <!--
 ## Deployment instructions
--->
-
-<!-- If you are on Discord, please join https://discord.gg/ai16z and state your Discord username here for the contributor role and join us in #development-feed -->
-<!--
-## Discord username
-
 -->

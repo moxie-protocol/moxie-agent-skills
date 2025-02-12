@@ -1,4 +1,4 @@
-import { elizaLogger } from "@elizaos/core";
+import { elizaLogger } from "@moxie-protocol/core";
 import { CastAddMessage, fromFarcasterTime } from "@farcaster/hub-nodejs";
 import axios from "axios";
 
@@ -136,7 +136,7 @@ export const fetchCastByFid = async (
             }
         );
 
-        const parsedMessages:Cast[] = response.data.casts.map((cast) => ({
+        const parsedMessages: Cast[] = response.data.casts.map((cast) => ({
             hash: cast.hash,
             threadHash: cast.thread_hash,
             parentHash: cast.parent_hash,

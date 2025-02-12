@@ -1,4 +1,9 @@
-import { generateText, ModelClass, parseJSONObjectFromText, elizaLogger } from "@elizaos/core";
+import {
+    generateText,
+    ModelClass,
+    parseJSONObjectFromText,
+    elizaLogger,
+} from "@moxie-protocol/core";
 import { getMoxieIdsFromMessage } from "./actions/utils";
 
 export const tweetSummary = `
@@ -84,7 +89,6 @@ If the question is about summarizing recent social media activity done by users 
     Farcaster Posts:
     {{farcasterPosts}}
 `;
-
 
 export const currentUserContext = `
 Given the following conversation, determine which moxie ids are relevant to the user.

@@ -1,18 +1,17 @@
-import axios from 'axios';
-import { Portfolio, PortfolioResponse } from '../types';
-import { IAgentRuntime } from '@elizaos/core';
-import { getMoxieCache, setMoxieCache } from '../util';
-
+import axios from "axios";
+import { Portfolio, PortfolioResponse } from "../types";
+import { IAgentRuntime } from "@moxie-protocol/core";
+import { getMoxieCache, setMoxieCache } from "../util";
 
 const API_KEY = process.env.ZAPPER_API_KEY;
 const encodedKey = btoa(API_KEY);
 
 const client = axios.create({
-  baseURL: 'https://public.zapper.xyz/graphql',
-  headers: {
-    'authorization': `Basic ${encodedKey}`,
-    'Content-Type': 'application/json'
-  }
+    baseURL: "https://public.zapper.xyz/graphql",
+    headers: {
+        authorization: `Basic ${encodedKey}`,
+        "Content-Type": "application/json",
+    },
 });
 
 const PortfolioQuery = `
@@ -63,35 +62,38 @@ const PortfolioQuery = `
   }
 `;
 
+export async function getPortfolioData(
+    addresses: string[],
+    networks: string[],
+    userId: string,
+    runtime: IAgentRuntime
+): Promise<Portfolio> {
+    try {
+        // Check cache first
+        const cacheKey = `PORTFOLIO-${userId}`;
+        const cachedPortfolio = await getMoxieCache(cacheKey, runtime);
 
+        if (cachedPortfolio) {
+            return JSON.parse(cachedPortfolio as string);
+        }
 
-export async function getPortfolioData(addresses: string[], networks: string[], userId: string, runtime: IAgentRuntime): Promise<Portfolio> {
-  try {
-    // Check cache first
-    const cacheKey = `PORTFOLIO-${userId}`;
-    const cachedPortfolio = await getMoxieCache(cacheKey, runtime);
+        // If not in cache, fetch from API
+        const portfolioData: PortfolioResponse = await client.post("", {
+            query: PortfolioQuery,
+            variables: {
+                addresses,
+                networks,
+            },
+        });
 
-    if (cachedPortfolio) {
-      return JSON.parse(cachedPortfolio as string);
+        const portfolio = portfolioData.data.data.portfolio;
+
+        // Cache the result
+        await setMoxieCache(JSON.stringify(portfolio), cacheKey, runtime);
+
+        return portfolio;
+    } catch (error) {
+        console.error("Error fetching portfolio data:", error);
+        throw error;
     }
-
-    // If not in cache, fetch from API
-    const portfolioData: PortfolioResponse = await client.post('', {
-      query: PortfolioQuery,
-      variables: {
-        addresses,
-        networks
-      }
-    });
-
-    const portfolio = portfolioData.data.data.portfolio;
-
-    // Cache the result
-    await setMoxieCache(JSON.stringify(portfolio), cacheKey, runtime);
-
-    return portfolio;
-  } catch (error) {
-    console.error('Error fetching portfolio data:', error);
-    throw error;
-  }
 }

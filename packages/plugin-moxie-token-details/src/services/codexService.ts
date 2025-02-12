@@ -1,7 +1,7 @@
 import { Codex } from "@codex-data/sdk";
-import { TokenDetails, LiquidityPool } from "../types"
+import { TokenDetails, LiquidityPool } from "../types";
 import { isValidBaseAddress } from "../util";
-import { elizaLogger } from "@elizaos/core";
+import { elizaLogger } from "@moxie-protocol/core";
 
 const codexApiKey = process.env.CODEX_API_KEY;
 
@@ -11,8 +11,11 @@ const MIN_LIQUIDITY = 50;
 const TOP_PAIRS_LIMIT = 3;
 const PAIRS_QUERY_LIMIT = 500;
 
-
-async function listPairsWithMetadataForToken(client: Codex, tokenAddress: string, priceUSD: number): Promise<{ pairs: LiquidityPool[], totalLiquiditySum: number }> {
+async function listPairsWithMetadataForToken(
+    client: Codex,
+    tokenAddress: string,
+    priceUSD: number
+): Promise<{ pairs: LiquidityPool[]; totalLiquiditySum: number }> {
     if (!isValidBaseAddress(tokenAddress)) {
         throw new Error(`Invalid Base address: ${tokenAddress}`);
     }
@@ -29,26 +32,35 @@ async function listPairsWithMetadataForToken(client: Codex, tokenAddress: string
         }
 
         const filteredPairs = pairs.listPairsWithMetadataForToken.results
-            .filter(pair => {
+            .filter((pair) => {
                 const pairAddress = pair.pair?.address;
                 const liquidity = Number(pair.liquidity || 0);
-                return pairAddress &&
-                    isValidBaseAddress(pairAddress) && liquidity > MIN_LIQUIDITY;
+                return (
+                    pairAddress &&
+                    isValidBaseAddress(pairAddress) &&
+                    liquidity > MIN_LIQUIDITY
+                );
             })
-            .map(pair => {
-                const isToken0 = pair.pair?.token0?.toLowerCase() === tokenAddress.toLowerCase();
-                const pooledAmount = isToken0 ?
-                    pair.pair?.pooled?.token0 :
-                    pair.pair?.pooled?.token1;
+            .map((pair) => {
+                const isToken0 =
+                    pair.pair?.token0?.toLowerCase() ===
+                    tokenAddress.toLowerCase();
+                const pooledAmount = isToken0
+                    ? pair.pair?.pooled?.token0
+                    : pair.pair?.pooled?.token1;
 
-                const tokenAmount = Number((Number(pooledAmount || 0) * priceUSD).toFixed(2));
+                const tokenAmount = Number(
+                    (Number(pooledAmount || 0) * priceUSD).toFixed(2)
+                );
 
                 // Find the exchange info for this pool
-                const exchange = pair.pair?.token0Data?.exchanges?.find(
-                    ex => ex.address === pair.pair?.exchangeHash
-                ) || pair.pair?.token1Data?.exchanges?.find(
-                    ex => ex.address === pair.pair?.exchangeHash
-                );
+                const exchange =
+                    pair.pair?.token0Data?.exchanges?.find(
+                        (ex) => ex.address === pair.pair?.exchangeHash
+                    ) ||
+                    pair.pair?.token1Data?.exchanges?.find(
+                        (ex) => ex.address === pair.pair?.exchangeHash
+                    );
 
                 return {
                     poolName: exchange?.name,
@@ -59,16 +71,23 @@ async function listPairsWithMetadataForToken(client: Codex, tokenAddress: string
             .sort((a, b) => b.liquidityUSD - a.liquidityUSD)
             .slice(0, TOP_PAIRS_LIMIT);
 
-        const totalLiquiditySum = filteredPairs.reduce((sum, item) => sum + item.liquidityUSD, 0);
+        const totalLiquiditySum = filteredPairs.reduce(
+            (sum, item) => sum + item.liquidityUSD,
+            0
+        );
 
         return { pairs: filteredPairs, totalLiquiditySum };
     } catch (error) {
-        elizaLogger.error(`Error fetching pairs for token ${tokenAddress}: ${error}`);
+        elizaLogger.error(
+            `Error fetching pairs for token ${tokenAddress}: ${error}`
+        );
         throw error;
     }
 }
 
-export async function getTokenDetailsFromCodex(tokenAddresses: string[]): Promise<TokenDetails[]> {
+export async function getTokenDetailsFromCodex(
+    tokenAddresses: string[]
+): Promise<TokenDetails[]> {
     if (!codexApiKey) {
         throw new Error("CODEX_API_KEY is not set");
     }
@@ -127,11 +146,12 @@ export async function getTokenDetailsFromCodex(tokenAddresses: string[]): Promis
                     volumeChange24Hours: token?.volumeChange24 ?? undefined,
                 };
 
-                const { pairs, totalLiquiditySum } = await listPairsWithMetadataForToken(
-                    client,
-                    token.token.info.address,
-                    Number(token?.priceUSD ?? 0)
-                );
+                const { pairs, totalLiquiditySum } =
+                    await listPairsWithMetadataForToken(
+                        client,
+                        token.token.info.address,
+                        Number(token?.priceUSD ?? 0)
+                    );
                 details.liquidityTop3PoolsUSD = totalLiquiditySum.toString();
                 details.liquidityPools = pairs;
                 return details;

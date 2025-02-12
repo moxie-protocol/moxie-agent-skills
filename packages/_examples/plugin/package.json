@@ -1,11 +1,11 @@
 {
-    "name": "@elizaos/plugin-sample",
-    "version": "0.1.5-alpha.5",
+    "name": "@moxie-protocol/plugin-sample",
+    "version": "0.0.1",
     "main": "dist/index.js",
     "type": "module",
     "types": "dist/index.d.ts",
     "dependencies": {
-        "@elizaos/core": "workspace:*"
+        "@moxie-protocol/core": "workspace:*"
     },
     "devDependencies": {
         "tsup": "8.3.5",

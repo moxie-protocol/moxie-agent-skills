@@ -9,8 +9,8 @@ import {
     composeContext,
     generateText,
     streamText,
-} from "@elizaos/core";
-import { moxieUserService } from "@elizaos/moxie-lib";
+} from "@moxie-protocol/core";
+import { moxieUserService } from "@moxie-protocol/moxie-lib";
 import { fetchFarcasterCastsByMoxieUserIds } from "./farcasterSummaryAction";
 import { fetchTweetsByMoxieUserIds } from "./twitterSummaryAction";
 import * as templates from "../templates";
@@ -79,7 +79,10 @@ export const creatorSocialSummary: Action = {
         const promises = [];
         if (userIdToFarcasterUser.size > 0) {
             promises.push(
-                fetchFarcasterCastsByMoxieUserIds(userIdToFarcasterUser, runtime)
+                fetchFarcasterCastsByMoxieUserIds(
+                    userIdToFarcasterUser,
+                    runtime
+                )
             );
         }
 

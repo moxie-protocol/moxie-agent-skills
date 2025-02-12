@@ -1,4 +1,4 @@
-import { elizaLogger, IAgentRuntime } from "@elizaos/core";
+import { elizaLogger, IAgentRuntime } from "@moxie-protocol/core";
 
 interface TopTrader {
     user_id: string;

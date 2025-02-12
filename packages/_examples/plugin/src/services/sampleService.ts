@@ -6,11 +6,11 @@ import {
     // State,
     elizaLogger,
     // stringToUuid,
-} from "@elizaos/core";
+} from "@moxie-protocol/core";
 // import { sampleProvider } from "../providers/sampleProvider"; // TODO: Uncomment this line to use the sampleProvider
 
 // Add SAMPLE to ServiceType enum in types.ts
-declare module "@elizaos/core" {
+declare module "@moxie-protocol/core" {
     export enum ServiceType {
         SAMPLE = "sample",
     }

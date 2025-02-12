@@ -1,4 +1,4 @@
-import { ActionExample } from "@elizaos/core";
+import { ActionExample } from "@moxie-protocol/core";
 
 export const portfolioExamples: ActionExample[][] = [
     [

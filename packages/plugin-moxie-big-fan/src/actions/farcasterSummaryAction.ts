@@ -9,9 +9,9 @@ import {
     State,
     elizaLogger,
     streamText,
-} from "@elizaos/core";
+} from "@moxie-protocol/core";
 
-import { moxieUserService } from "@elizaos/moxie-lib";
+import { moxieUserService } from "@moxie-protocol/moxie-lib";
 import * as templates from "../templates";
 import { Cast, fetchCastByFid } from "../services/farcasterService";
 import { getMoxieIdsFromMessage, streamTextByLines } from "./utils";

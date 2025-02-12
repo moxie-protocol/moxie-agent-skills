@@ -24,6 +24,26 @@ Once the client is running, you'll see a message like this:
 ➜  Local:   http://localhost:5173/
 ```
 
+## Stpes to run the registry
+
+1. Go to `registry folder`
+
+```sh
+cd registry
+```
+
+2. Install dependencies
+
+```sh
+npm i
+```
+
+3. Run the registry FE app
+
+```sh
+npm run dev
+```
+
 ## Troubleshoot
 
 1. If getting error related to sharp package `/node_modules/sharp` then set Env var

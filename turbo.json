@@ -4,60 +4,61 @@
         "check-types": {
             "dependsOn": ["build"]
         },
-        "@elizaos/agent#check-types": {
+        "@moxie-protocol/agent#check-types": {
             "dependsOn": [
-                "@elizaos/plugin-solana#build",
-                "@elizaos/plugin-direct#build"
+                "@moxie-protocol/plugin-solana#build",
+                "@moxie-protocol/plugin-direct#build"
             ]
         },
-        "@elizaos/moxie-agent#check-types": {
+        "@moxie-protocol/moxie-agent#check-types": {
             "dependsOn": [
-                "@elizaos/plugin-solana#build",
-                "@elizaos/plugin-direct#build"
+                "@moxie-protocol/plugin-solana#build",
+                "@moxie-protocol/plugin-direct#build"
             ]
         },
         "build": {
             "outputs": ["dist/**"],
-            "dependsOn": ["^@elizaos/core#build"]
+            "dependsOn": ["^@moxie-protocol/core#build"]
         },
         "@elizaos/client-direct#build": {
             "outputs": ["dist/**"],
             "dependsOn": [
-                "@elizaos/plugin-image-generation#build",
-                "@elizaos/plugin-tee-log#build"
+                "@moxie-protocol/plugin-image-generation#build",
+                "@moxie-protocol/plugin-tee-log#build"
             ]
         },
-        "@elizaos/plugin-solana#build": {
+        "@moxie-protocol/plugin-solana#build": {
             "outputs": ["dist/**"],
             "dependsOn": [
-                "@elizaos/plugin-trustdb#build",
-                "@elizaos/plugin-tee#build"
+                "@moxie-protocol/plugin-trustdb#build",
+                "@moxie-protocol/plugin-tee#build"
             ]
         },
-        "@elizaos/plugin-nft-generation#build": {
+        "@moxie-protocol/plugin-nft-generation#build": {
             "outputs": ["dist/**"],
-            "dependsOn": ["@elizaos/plugin-node#build"]
+            "dependsOn": ["@moxie-protocol/plugin-node#build"]
         },
-        "@elizaos/plugin-tee-verifiable-log#build": {
-            "outputs": ["dist/**"],
-            "dependsOn": ["@elizaos/core#build", "@elizaos/plugin-tee#build"]
-        },
-        "@elizaos/plugin-evm#build": {
-            "outputs": ["dist/**"],
-            "dependsOn": ["@elizaos/plugin-tee#build"]
-        },
-        "@elizaos/plugin-tee-log#build": {
+        "@moxie-protocol/plugin-tee-verifiable-log#build": {
             "outputs": ["dist/**"],
             "dependsOn": [
-                "@elizaos/plugin-tee#build",
-                "@elizaos/plugin-sgx#build"
+                "@moxie-protocol/core#build",
+                "@moxie-protocol/plugin-tee#build"
             ]
         },
-        "@elizaos/plugin-quai#build": {
+        "@moxie-protocol/plugin-evm#build": {
+            "outputs": ["dist/**"],
+            "dependsOn": ["@moxie-protocol/plugin-tee#build"]
+        },
+        "@moxie-protocol/plugin-tee-log#build": {
             "outputs": ["dist/**"],
             "dependsOn": [
-                "@elizaos/plugin-trustdb#build"
+                "@moxie-protocol/plugin-tee#build",
+                "@moxie-protocol/plugin-sgx#build"
             ]
+        },
+        "@moxie-protocol/plugin-quai#build": {
+            "outputs": ["dist/**"],
+            "dependsOn": ["@moxie-protocol/plugin-trustdb#build"]
         },
         "eliza-docs#build": {
             "outputs": ["build/**"]
