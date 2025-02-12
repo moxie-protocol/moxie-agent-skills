@@ -58,7 +58,39 @@ For further customization, you can refer to the Eliza docs [here](https://elizao
 
 ### Register Your Skills to Moxie
 
-To register your skills, commit all the changes you made on your branches and create a new [PR](https://github.com/moxie-protocol/moxie-agent-plugin/pulls) to the repository's `main` branch.
+Once you completed development on your skills, you can register your skills to the Skills Marketplace by the following steps:
+
+1. Add your Creator Agent Skills to `registry/src/skills.json` with the following fields and corresponding types:
+
+```ts
+interface Plugin {
+    pluginId: string; // Any UUID, must be unique
+    name: string; // Creator Agent Skills name (based on package.json)
+    version: string; // Creator Agent Skills Version (based on package.json)
+    description: string; // Description of what the Skills can do
+    author?: string | null; // Author/Creator of the Skills
+    githubUrl: string; // GitHub URL to your Skills folder under `/packages`
+    imageUrl?: string | null; // Image URL of your Skills, which should be located under the `/packages/<skills-folder>/<images>` folder
+}
+```
+
+2. If your Creator Agent Skill require environment variable for production purpose, then fill in [this form](https://forms.gle/8hzDyCVKKLs4MkTEA) to request submission. The Moxie team shall directly reach out to you either through **Email** ([support@airstack.xyz](mailto:support@airstack.xyz)) or **Farcaster** (group chat) for submission.
+
+3. Lastly, commit all the changes you made on your branches and create a new [PR](https://github.com/moxie-protocol/moxie-agent-plugin/pulls) to the repository's `main` branch.
+
+### General Guidelines For Skills Registration
+
+To ensure that your Skills is registered successfully to the Skills Marketplace, make sure to provide detailed descriptions on your Creator Agent Skills based on the [pre-written template](./.github/pull_request_template.md) and fulfillall the following requirements:
+
+1. Have tested the skills with the agent locally and working well
+2. Have a well-writen README for the skills full description of the functionality along with detailed list of all actions, providers, evaluators, services, and clients.
+3. Have added the new skill metadata to the `registry/src/skill.json` registry
+4. Have not made changes to other aspects of the repository other than the folder containing the new skills
+5. (Optional) Have environment variables and have requested the Moxie team through [this form](https://forms.gle/8hzDyCVKKLs4MkTEA) for environment variables submission.
+6. Does not contain any code that simply transfers Moxie user's holdings to a fixed address
+7. Does not contain any code that extracts Moxie user's private informations (e.g. wallets, private keys, etc.)
+8. Does not contain any code that interacts with smart contracts that has not verified and published its source code.
+9. Have audited smart contracts if the skills contain code that interacts with smart contracts has volume/balance above 100k USD.
 
 The Moxie team will review the newly created Creator Agent Skills and once merged, your Skills will automatically be registered to the Skills Marketplace where it's accessible for Moxie users to use.
 

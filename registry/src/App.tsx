@@ -92,9 +92,9 @@ const App = () => {
         name: string;
         version: string;
         description: string;
-        author: string | null;
+        author?: string | null;
         githubUrl: string;
-        // imageUrl: string;
+        imageUrl?: string | null;
     }
 
     const [plugins, setPlugins] = useState<Plugin[]>([]);
