@@ -63,14 +63,14 @@ Once you completed development on your skills, you can register your skills to t
 1. Add your Creator Agent Skills to `registry/src/skills.json` with the following fields and corresponding types:
 
 ```ts
-interface Plugin {
-    pluginId: string; // Any UUID, must be unique
+interface Skills {
+    pluginId: string; // Any UUID, must be unique, to generate one use this https://www.uuidgenerator.net/
     name: string; // Creator Agent Skills name (based on package.json)
     version: string; // Creator Agent Skills Version (based on package.json)
     description: string; // Description of what the Skills can do
     author?: string | null; // Author/Creator of the Skills
     githubUrl: string; // GitHub URL to your Skills folder under `/packages`
-    imageUrl?: string | null; // Image URL of your Skills, which should be located under the `/packages/<skills-folder>/<images>` folder
+    imageUrl?: string | null; // Image URL to logo.png (400x400 px) of your Skills, which should be located under the `/packages/<skills-folder>/images` folder
 }
 ```
 
