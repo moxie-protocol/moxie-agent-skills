@@ -1,5 +1,13 @@
-import { samplePlugin } from "./plugins/samplePlugin";
+import type { Plugin } from "@moxie-protocol/core";
 
-export * from "./plugins/samplePlugin";
+const samplePlugin: Plugin = {
+    name: "sample",
+    description: "Enables creation and management of generic resources",
+    actions: [],
+    providers: [],
+    evaluators: [],
+    services: [],
+    clients: [],
+};
 
 export default samplePlugin;
