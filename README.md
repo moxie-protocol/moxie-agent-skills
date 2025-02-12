@@ -50,11 +50,23 @@ Then, using the template under the `packages/_examples/plugin` folder, you can c
 cp ./packages/_examples/plugin ./packages/plugin-<skills-name>
 ```
 
-Make sure to name your skills with the format `plugin-<skills-name>`.
-
 To learn more on how to create your first skill, you can follow this tutorial [here](https://developer.moxie.xyz/creator-agents-and-skills-marketplace/quickstart/create-your-first-skill).
 
 For further customization, you can refer to the Eliza docs [here](https://elizaos.github.io/eliza/docs/packages/plugins/#available-plugins) as Creator Agent Skills are simply Eliza Plugins with additional functionalities.
+
+### General Guidelines For Skills Development
+
+1. Name your Creator Agent Skill folder with the following format `plugin-<skills-name>`
+2. Specify name & version in `package.json`:
+
+```json
+{
+    "name": "@moxie-protocol/plugin-<skills-name>",
+    "version": "0.0.1"
+}
+```
+
+3. Place image for your Creator Agent Skill to be displayed Skills Marketplace under `packages/plugin-<skills-name>/images/logo.png` with size 400x400 px.
 
 ### Register Your Skills to Moxie
 
