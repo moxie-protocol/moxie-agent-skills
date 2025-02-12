@@ -92,7 +92,7 @@ interface Skills {
 
 ### General Guidelines For Skills Registration
 
-To ensure that your Skills is registered successfully to the Skills Marketplace, make sure to provide detailed descriptions on your Creator Agent Skills based on the [pre-written template](./.github/pull_request_template.md) and fulfillall the following requirements:
+To ensure that your Skills is registered successfully to the Skills Marketplace, make sure to provide detailed descriptions on your Creator Agent Skills based on the [pre-written template](./.github/pull_request_template.md) and fulfill all the following requirements:
 
 1. Have tested the skills with the agent locally and working well
 2. Have a well-writen README for the skills full description of the functionality along with detailed list of all actions, providers, evaluators, services, and clients.
