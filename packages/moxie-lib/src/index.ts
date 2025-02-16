@@ -7,7 +7,3 @@ export { moxieUserService };
 export { ftaService };
 
 export { portfolioService };
-
-export { MoxieUser, MoxieWallet, MoxieIdentity } from "./services/moxieUserService";
-
-export { MoxiePortfolio } from "./services/portfolio";

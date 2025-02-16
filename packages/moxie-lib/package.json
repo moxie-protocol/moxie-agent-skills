@@ -5,7 +5,7 @@
     "type": "module",
     "types": "dist/index.d.ts",
     "dependencies": {
-        "@moxie-protocol/core": "workspace:*",
+        "@elizaos/core": "workspace:*",
         "axios": "^1.7.9",
         "tsup": "^8.3.5"
     },

@@ -1,88 +1,19 @@
-import { elizaLogger } from "@moxie-protocol/core";
-
-interface TwitterMetadata {
-    username: string;
-    name?: string;
-    type?: string;
-    subject?: string;
-    verifiedAt?: string;
-    firstVerifiedAt?: string;
-    latestVerifiedAt?: string;
-    profilePictureUrl?: string;
-}
-
-interface FarcasterMetadata {
-    bio: string;
-    username: string;
-    displayName: string;
-    profileTokenId: string;
-}
-
-export interface MoxieIdentity {
-    id: string;
-    userId: string;
-    type: string;
-    dataSource: string;
-    connectedIdentitiesFetchStatus: string;
-    metadata: TwitterMetadata | FarcasterMetadata;
-    profileId: string;
-    isActive: boolean;
-    createdAt: string;
-    updatedAt: string;
-}
-
-export interface MoxieWallet {
-    id: string;
-    userId: string;
-    walletAddress: string;
-    walletType: string;
-    dataSource?: string;
-    createdAt: string;
-    deletedAt?: string;
-}
-
-export interface MoxieUser {
-    id: string;
-    userName?: string;
-    name?: string;
-    bio?: string;
-    profileImageUrl?: string;
-    referralCode: string;
-    referrerId?: string;
-    moxieScore?: number;
-    moxieRank?: number;
-    totalUsers?: number;
-    primaryWalletId?: string;
-    communicationPreference?: string;
-    createdAt: string;
-    identities: MoxieIdentity[];
-    wallets: MoxieWallet[];
-    vestingContracts?: VestingContract[] | null;
-}
-
-export type VestingContract = {
-    beneficiaryAddress: string;
-    vestingContractAddress: string;
-};
-
-interface MeQueryResponse {
-    data: {
-        Me: MoxieUser;
-    };
-    errors?: Array<{
-        message: string;
-        locations?: Array<{
-            line: number;
-            column: number;
-        }>;
-    }>;
-}
-
-interface GetUserResponse {
-    data: {
-        GetUser: MoxieUser;
-    };
-}
+import { elizaLogger } from "@elizaos/core";
+import type {
+    MoxieUser,
+    GetUserResponse,
+    MeQueryResponse,
+    MoxieIdentity,
+    SignMessageResponse,
+    SignMessageInput,
+    SignTransactionInput,
+    SignTransactionResponse,
+    SignTypedDataInput,
+    SignTypedDataResponse,
+    SendTransactionInput,
+    SendTransactionResponse,
+    GetWalletDetailsOutput,
+} from "./types";
 
 export async function getUserMoxieWalletAddress(
     walletAddress: string
@@ -163,8 +94,8 @@ export async function getUserByMoxieId(
 ): Promise<MoxieUser | undefined> {
     try {
         const query = `
-            query GetUser($userId: String!, $vestingContractRequired: Boolean!) {
-                GetUser(input: { userId: $userId, vestingContractRequired: $vestingContractRequired }) {
+            query GetUser($userId: String!) {
+                GetUser(input: { userId: $userId }) {
                     id
                     userName
                     identities {
@@ -188,10 +119,6 @@ export async function getUserByMoxieId(
                         createdAt
                         deletedAt
                     }
-                    vestingContracts {
-                        beneficiaryAddress
-                        vestingContractAddress
-                    }
                 }
             }
         `;
@@ -203,7 +130,7 @@ export async function getUserByMoxieId(
             },
             body: JSON.stringify({
                 query,
-                variables: { userId, vestingContractRequired: true },
+                variables: { userId },
             }),
         });
 
@@ -325,15 +252,10 @@ export async function getSocialProfilesByMoxieIdMultiple(userIds: string[]) {
             const identities = user?.identities || [];
 
             for (const identity of identities) {
-                if (
-                    identity.type === "TWITTER" &&
-                    identity.dataSource == "PRIVY"
-                ) {
+                if (identity.type === "TWITTER") {
                     twitterUsername = identity?.metadata?.username;
-                } else if (
-                    identity.type === "FARCASTER" &&
-                    identity.dataSource == "PRIVY"
-                ) {
+                } else if (identity.type === "FARCASTER") {
+                    console.log({ Metadata: JSON.stringify(identity) });
                     farcasterUsername = identity?.metadata?.username;
                     farcasterUserId = identity?.profileId;
                 }
@@ -429,5 +351,316 @@ export async function getUserByPrivyBearerToken(
     } catch (error) {
         console.error("Error fetching user data:", error);
         throw error;
+    }
+}
+
+export async function GetWalletDetails(
+    bearerToken: string
+): Promise<GetWalletDetailsOutput> {
+    const query = `
+query GetWalletDetails {
+  GetWalletDetails {
+    privyId
+    success
+    wallet {
+      address
+      chainId
+      chainType
+      connectorType
+      hdWalletIndex
+      delegated
+      imported
+      walletClientType
+      walletType
+    }
+  }
+  }
+  `;
+    try {
+        const response = await fetch(process.env.MOXIE_API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: bearerToken,
+            },
+            body: JSON.stringify({ query }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = (await response.json()) as {
+            data?: {
+                GetWalletDetails: GetWalletDetailsOutput;
+            };
+            errors?: Array<{
+                message: string;
+                path?: string[];
+                extensions?: Record<string, any>;
+            }>;
+        };
+
+        if (data.errors?.length) {
+            const error = data.errors[0];
+            const errorMessage = error.message;
+            const errorPath = error.path?.join(".") || "unknown path";
+            throw new Error(`GraphQL error at ${errorPath}: ${errorMessage}`);
+        }
+
+        if (!data.data) {
+            throw new Error("No data returned from API");
+        }
+
+        return data.data.GetWalletDetails;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to get wallet details: ${error.message}`);
+        }
+        throw new Error(
+            "Failed to get wallet details: An unknown error occurred"
+        );
+    }
+}
+
+export async function SignMessage(
+    input: SignMessageInput,
+    bearerToken: string
+): Promise<SignMessageResponse> {
+    const query = `
+    query SignMessage($input: EthereumSignMessageInput!) {
+      SignMessage(input: $input) {
+        signature
+        encoding
+      }
+    }
+  `;
+    try {
+        const response = await fetch(process.env.MOXIE_API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: bearerToken,
+            },
+            body: JSON.stringify({
+                query,
+                variables: { input },
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = (await response.json()) as {
+            data: SignMessageResponse;
+            errors?: Array<{
+                message: string;
+                path?: string[];
+                extensions?: Record<string, any>;
+            }>;
+        };
+
+        if (data.errors?.length) {
+            const error = data.errors[0];
+            const errorMessage = error.message;
+            const errorPath = error.path?.join(".") || "unknown path";
+            throw new Error(`GraphQL error at ${errorPath}: ${errorMessage}`);
+        }
+
+        if (!data.data) {
+            throw new Error("No data returned from API");
+        }
+
+        return data.data;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to sign message: ${error.message}`);
+        }
+        throw new Error("Failed to sign message: An unknown error occurred");
+    }
+}
+
+export async function SignTransaction(
+    input: SignTransactionInput
+): Promise<SignTransactionResponse> {
+    const query = `
+    query SignTransaction($input: EthereumSignTransactionInput!) {
+      SignTransaction(input: $input) {
+        signature
+        encoding
+      }
+    }
+  `;
+    try {
+        const response = await fetch(process.env.MOXIE_API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                query,
+                variables: { input },
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = (await response.json()) as {
+            data: {
+                SignTransaction: SignTransactionResponse;
+            };
+            errors?: Array<{
+                message: string;
+                path?: string[];
+                extensions?: Record<string, any>;
+            }>;
+        };
+
+        if (data.errors?.length) {
+            const error = data.errors[0];
+            const errorMessage = error.message;
+            const errorPath = error.path?.join(".") || "unknown path";
+            throw new Error(`GraphQL error at ${errorPath}: ${errorMessage}`);
+        }
+
+        if (!data.data) {
+            throw new Error("No data returned from API");
+        }
+
+        return data.data.SignTransaction;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to sign transaction: ${error.message}`);
+        }
+        throw new Error(
+            "Failed to sign transaction: An unknown error occurred"
+        );
+    }
+}
+
+export async function SignTypedData(
+    input: SignTypedDataInput,
+    bearerToken: string
+): Promise<SignTypedDataResponse> {
+    const query = `
+    query SignTypedData($input: EthereumSignTypedDataInput!) {
+      SignTypedData(input: $input) {
+        signature
+        encoding
+      }
+    }
+  `;
+    try {
+        const response = await fetch(process.env.MOXIE_API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: bearerToken,
+            },
+            body: JSON.stringify({
+                query,
+                variables: { input },
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = (await response.json()) as {
+            data: {
+                SignTypedData: SignTypedDataResponse;
+            };
+            errors?: Array<{
+                message: string;
+                path?: string[];
+                extensions?: Record<string, any>;
+            }>;
+        };
+
+        if (data.errors?.length) {
+            const error = data.errors[0];
+            const errorMessage = error.message;
+            const errorPath = error.path?.join(".") || "unknown path";
+            throw new Error(`GraphQL error at ${errorPath}: ${errorMessage}`);
+        }
+
+        if (!data.data) {
+            throw new Error("No data returned from API");
+        }
+
+        return data.data.SignTypedData;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to sign typed data: ${error.message}`);
+        }
+        throw new Error("Failed to sign typed data: An unknown error occurred");
+    }
+}
+
+export async function sendTransaction(
+    input: SendTransactionInput,
+    bearerToken: string
+): Promise<SendTransactionResponse> {
+    const query = `
+    query SendTransaction($input: EthereumSendTransactionInput!) {
+      SendTransaction(input: $input) {
+        hash
+        caip2
+        code
+        message
+      }
+    }
+  `;
+    try {
+        const response = await fetch(process.env.MOXIE_API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: bearerToken,
+            },
+            body: JSON.stringify({
+                query,
+                variables: { input },
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = (await response.json()) as {
+            data: {
+                SendTransaction: SendTransactionResponse;
+            };
+            errors?: Array<{
+                message: string;
+                path?: string[];
+                extensions?: Record<string, any>;
+            }>;
+        };
+
+        if (data.errors?.length) {
+            const error = data.errors[0];
+            const errorMessage = error.message;
+            const errorPath = error.path?.join(".") || "unknown path";
+            throw new Error(`GraphQL error at ${errorPath}: ${errorMessage}`);
+        }
+
+        if (!data.data) {
+            throw new Error("No data returned from API");
+        }
+
+        return data.data.SendTransaction;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to send transaction: ${error.message}`);
+        }
+        throw new Error(
+            "Failed to send transaction: An unknown error occurred"
+        );
     }
 }
