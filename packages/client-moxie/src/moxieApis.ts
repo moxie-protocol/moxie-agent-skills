@@ -165,7 +165,10 @@ export function createMoxieApiRouter(
 
                 const moxieUserInfo: MoxieUser = mockMoxieUser;
                 const moxieUserId: string = moxieUserInfo.id;
-                const agentWallet: Wallet = undefined;
+                const agentWallet: Wallet = {
+                    address: "0x1234567890",
+                    chainType: "ethereum",
+                };
 
                 const userId = stringToUuid(moxieUserId);
 

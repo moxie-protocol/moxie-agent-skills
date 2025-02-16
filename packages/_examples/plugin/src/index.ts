@@ -1,9 +1,10 @@
 import type { Plugin } from "@moxie-protocol/core";
+import { transferAction } from "./actions/transferAction";
 
 const samplePlugin: Plugin = {
     name: "sample",
-    description: "Enables creation and management of generic resources",
-    actions: [],
+    description: "Execute sample onchain actions",
+    actions: [transferAction],
     providers: [],
     evaluators: [],
     services: [],

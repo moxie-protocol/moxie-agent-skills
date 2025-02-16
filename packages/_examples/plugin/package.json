@@ -5,7 +5,8 @@
     "type": "module",
     "types": "dist/index.d.ts",
     "dependencies": {
-        "@moxie-protocol/core": "workspace:*"
+        "@moxie-protocol/core": "workspace:*",
+        "@moxie-protocol/moxie-lib": "workspace:*"
     },
     "devDependencies": {
         "tsup": "8.3.5",

@@ -1,4 +1,4 @@
-import { elizaLogger } from "@elizaos/core";
+import { elizaLogger } from "@moxie-protocol/core";
 import type {
     MoxieUser,
     GetUserResponse,

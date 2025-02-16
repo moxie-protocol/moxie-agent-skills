@@ -177,7 +177,6 @@ export default function Page({ agentId }: { agentId: UUID }) {
                     {transitions((styles, message) => {
                         const variant = getMessageVariant(message?.user);
                         return (
-                            // @ts-expect-error
                             <animated.div
                                 style={styles}
                                 className="flex flex-col gap-2 p-4"
