@@ -4,14 +4,13 @@ import {
     type Memory,
     type HandlerCallback,
     type State,
-    composeContext,
-    generateObject,
-    ModelClass,
     elizaLogger,
     type ActionExample,
 } from "@moxie-protocol/core";
-// import { MoxieWalletClient, type MoxieWallet } from "@moxie-protocol/moxie-lib";
-import { parseEther } from "viem";
+import {
+    MoxieWalletClient,
+    type MoxieWallet,
+} from "@moxie-protocol/moxie-lib/src/wallet";
 
 export const transferAction: Action = {
     name: "TRANSFER_BASE_ETH",
@@ -48,23 +47,23 @@ export const transferAction: Action = {
             //     schema: CreateResourceSchema,
             // });
 
-            // const wallet = MoxieWalletClient(
-            //     (state.agentWallet as MoxieWallet).address
-            // );
-            // const { hash } = await wallet.sendTransaction(8543, {
-            //     to: "",
-            //     value: parseEther("1000000000000000000"),
-            // });
+            const wallet = new MoxieWalletClient(
+                (state.agentWallet as MoxieWallet).address
+            );
+            const { hash } = await wallet.sendTransaction("8543", {
+                toAddress: "0xc7486219881C780B676499868716B27095317416",
+                value: 1e15,
+            });
 
-            // elizaLogger.success(
-            //     `Transfer completed successfully! Transaction hash: ${hash}`
-            // );
-            // if (callback) {
-            //     callback({
-            //         text: `Transfer completed successfully! Transaction hash: ${hash}`,
-            //         content: {},
-            //     });
-            // }
+            elizaLogger.success(
+                `Transfer completed successfully! Transaction hash: ${hash}`
+            );
+            if (callback) {
+                callback({
+                    text: `Transfer completed successfully! Transaction hash: ${hash}`,
+                    content: {},
+                });
+            }
         } catch (error) {
             elizaLogger.error("Error transfering Base ETH:", error);
             callback(

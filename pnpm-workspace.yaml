@@ -1,7 +1,7 @@
 packages:
     - "docs"
     - "packages/*"
-    - "client"
     - "agent"
+    - "client"
     - "registry"
     - "packages/_examples/plugin"
