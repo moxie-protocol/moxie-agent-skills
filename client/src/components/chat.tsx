@@ -9,6 +9,7 @@ import { ChatMessageList } from "@/components/ui/chat/chat-message-list";
 import { useTransition, animated } from "@react-spring/web";
 import { Paperclip, Send, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+
 import type { Content, UUID } from "@moxie-protocol/core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api";
@@ -18,29 +19,40 @@ import CopyButton from "./copy-button";
 import ChatTtsButton from "./ui/chat/chat-tts-button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
-import AIWriter from "react-aiwriter";
 import { IAttachment } from "@/types";
 import { AudioRecorder } from "./audio-recorder";
 import { Badge } from "./ui/badge";
+import Message from './message';
 
 interface ExtraContentFields {
     user: string;
     createdAt: number;
     isLoading?: boolean;
+    attachments?: IAttachment[];
 }
 
 type ContentWithUser = Content & ExtraContentFields;
 
+interface StreamResponse {
+    stream: true;
+    [Symbol.asyncIterator](): AsyncIterator<{ text: string, id: number }>;
+}
+
+type MessageResponse = StreamResponse | Content[];
+
+const isStreamResponse = (response: MessageResponse): response is StreamResponse => {
+    return 'stream' in response;
+};
+
 export default function Page({ agentId }: { agentId: UUID }) {
     const { toast } = useToast();
+    const [messages, setMessages] = useState<ContentWithUser[]>([]);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [input, setInput] = useState("");
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
-
-    const queryClient = useQueryClient();
 
     const getMessageVariant = (role: string) =>
         role !== "user" ? "received" : "sent";
@@ -53,11 +65,7 @@ export default function Page({ agentId }: { agentId: UUID }) {
     };
     useEffect(() => {
         scrollToBottom();
-    }, [queryClient.getQueryData(["messages", agentId])]);
-
-    useEffect(() => {
-        scrollToBottom();
-    }, []);
+    }, [messages]);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey) {
@@ -77,6 +85,10 @@ export default function Page({ agentId }: { agentId: UUID }) {
                       url: URL.createObjectURL(selectedFile),
                       contentType: selectedFile.type,
                       title: selectedFile.name,
+                      id: "",
+                      source: "",
+                      description: "",
+                      text: "",
                   },
               ]
             : undefined;
@@ -96,10 +108,7 @@ export default function Page({ agentId }: { agentId: UUID }) {
             },
         ];
 
-        queryClient.setQueryData(
-            ["messages", agentId],
-            (old: ContentWithUser[] = []) => [...old, ...newMessages]
-        );
+        setMessages(prev => [...prev, ...newMessages]);
 
         sendMessageMutation.mutate({
             message: input,
@@ -126,21 +135,47 @@ export default function Page({ agentId }: { agentId: UUID }) {
             message: string;
             selectedFile?: File | null;
         }) => apiClient.sendMessage(agentId, message, selectedFile),
-        onSuccess: (newMessages: ContentWithUser[]) => {
-            console.log(newMessages);
-            queryClient.setQueryData(
-                ["messages", agentId],
-                (old: ContentWithUser[] = []) => [
-                    ...old.filter((msg) => !msg.isLoading),
-                    ...(typeof newMessages?.length === "number"
-                        ? newMessages
-                        : [newMessages]
-                    ).map((msg) => ({
+        onSuccess: async (response: MessageResponse) => {
+            if (isStreamResponse(response)) {
+                let fullText = "";
+                let streamingMessageId: number | null = null;
+                const currentTime = Date.now();
+                for await (const data of response) {
+                    fullText += data.text;
+                    setMessages(prevMessages => {
+                        let tempMessages = [...prevMessages];
+                        if (!streamingMessageId) {
+                            streamingMessageId = data.id;
+                            tempMessages = [
+                                ...messages.filter(msg => !msg.isLoading),
+                                {
+                                    id: streamingMessageId,
+                                    text: fullText,
+                                    user: "system",
+                                    isLoading: false,
+                                    createdAt: currentTime,
+                                }
+                            ];
+                        }
+                        tempMessages[tempMessages.length - 1] = {
+                            ...tempMessages[tempMessages.length - 1],
+                            text: fullText,
+                            isLoading: false,
+                        }
+                        return tempMessages;
+                    });
+                }
+            } else {
+                setMessages(prevMessages => [
+                    ...prevMessages.filter(msg => !msg.isLoading),
+                    ...(Array.isArray(response) ? response : [response]).map(msg => ({
                         ...msg,
+                        user: "system",
                         createdAt: Date.now(),
-                    })),
-                ]
-            );
+                        attachments: undefined,
+                    }))
+                ]);
+            }
         },
         onError: (e) => {
             toast({
@@ -148,7 +183,7 @@ export default function Page({ agentId }: { agentId: UUID }) {
                 title: "Unable to send message",
                 description: e.message,
             });
-        },
+        }
     });
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -158,13 +193,9 @@ export default function Page({ agentId }: { agentId: UUID }) {
         }
     };
 
-    const messages =
-        queryClient.getQueryData<ContentWithUser[]>(["messages", agentId]) ||
-        [];
-
     const transitions = useTransition(messages, {
         keys: (message) =>
-            `${message.createdAt}-${message.user}-${message.text}`,
+            `${message.createdAt}-${message.user}`,
         from: { opacity: 0, transform: "translateY(50px)" },
         enter: { opacity: 1, transform: "translateY(0px)" },
         leave: { opacity: 0, transform: "translateY(10px)" },
@@ -194,13 +225,7 @@ export default function Page({ agentId }: { agentId: UUID }) {
                                         <ChatBubbleMessage
                                             isLoading={message?.isLoading}
                                         >
-                                            {message?.user !== "user" ? (
-                                                <AIWriter>
-                                                    {message?.text}
-                                                </AIWriter>
-                                            ) : (
-                                                message?.text
-                                            )}
+                                            <Message text={message?.text} user={message?.user} />
                                             {/* Attachments */}
                                             <div>
                                                 {message?.attachments?.map(
