@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { VariantProps, cva } from "class-variance-authority";
+import { type VariantProps, cva } from "class-variance-authority";
 import { PanelLeft } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -88,6 +89,7 @@ const SidebarProvider = React.forwardRef<
         );
 
         // Helper to toggle the sidebar.
+        // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
         const toggleSidebar = React.useCallback(() => {
             return isMobile
                 ? setOpenMobile((open) => !open)
@@ -114,6 +116,7 @@ const SidebarProvider = React.forwardRef<
         // This makes it easier to style the sidebar with Tailwind classes.
         const state = open ? "expanded" : "collapsed";
 
+        // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
         const contextValue = React.useMemo<SidebarContext>(
             () => ({
                 state,
@@ -450,6 +453,7 @@ const SidebarGroupLabel = React.forwardRef<
     const Comp = asChild ? Slot : "div";
 
     return (
+        // @ts-expect-error
         <Comp
             ref={ref}
             data-sidebar="group-label"
@@ -471,6 +475,7 @@ const SidebarGroupAction = React.forwardRef<
     const Comp = asChild ? Slot : "button";
 
     return (
+        // @ts-expect-error
         <Comp
             ref={ref}
             data-sidebar="group-action"
@@ -569,7 +574,7 @@ const SidebarMenuButton = React.forwardRef<
         },
         ref
     ) => {
-        const Comp = asChild ? Slot : "button";
+        const Comp = "button";
         const { isMobile, state } = useSidebar();
 
         const button = (
@@ -621,6 +626,7 @@ const SidebarMenuAction = React.forwardRef<
     const Comp = asChild ? Slot : "button";
 
     return (
+        // @ts-expect-error
         <Comp
             ref={ref}
             data-sidebar="menu-action"
@@ -738,6 +744,7 @@ const SidebarMenuSubButton = React.forwardRef<
     const Comp = asChild ? Slot : "a";
 
     return (
+        // @ts-expect-error
         <Comp
             ref={ref}
             data-sidebar="menu-sub-button"

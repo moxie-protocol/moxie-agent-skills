@@ -9,8 +9,9 @@ import { ChatMessageList } from "@/components/ui/chat/chat-message-list";
 import { useTransition, animated } from "@react-spring/web";
 import { Paperclip, Send, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Content, UUID } from "@moxie-protocol/core";
-import { useMutation } from "@tanstack/react-query";
+
+import type { Content, UUID } from "@moxie-protocol/core";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api";
 import { cn, moment } from "@/lib/utils";
 import { Avatar, AvatarImage } from "./ui/avatar";
@@ -207,7 +208,6 @@ export default function Page({ agentId }: { agentId: UUID }) {
                     {transitions((styles, message) => {
                         const variant = getMessageVariant(message?.user);
                         return (
-                            // @ts-expect-error
                             <animated.div
                                 style={styles}
                                 className="flex flex-col gap-2 p-4"

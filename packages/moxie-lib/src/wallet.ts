@@ -1,22 +1,28 @@
-import { PrivyClient, EthereumSignMessageResponseType, EthereumSignTypedDataResponseType, EthereumSendTransactionResponseType } from "@privy-io/server-auth";
-import { TypedData } from "viem";
+import type {
+    EthereumSignMessageResponseType,
+    EthereumSignTypedDataResponseType,
+    EthereumSendTransactionResponseType,
+    EthereumSendTransactionInputType,
+    Wallet,
+    Hex,
+} from "@privy-io/server-auth";
+import { ethers } from "ethers";
+import { moxieUserService } from ".";
+import type { TransactionDetails } from "./services/types";
 
-
-
-export class MoxieWallet {
-
-    // Creating a singleton instance of PrivyClient
-    private static privyClient: PrivyClient;
+export class MoxieWalletClient {
     address: string;
+    wallet: ethers.Wallet;
+    private bearerToken: string;
 
-    constructor(address: string) {
+    constructor(address: string, bearerToken?: string) {
         this.address = address;
-        // Initialize the PrivyClient if it hasn't been initialized yet
-        if (!MoxieWallet.privyClient) {
-            MoxieWallet.privyClient = new PrivyClient(
-                process.env.PRIVY_APP_ID as string,
-                process.env.PRIVY_APP_SECRET as string,
+        this.bearerToken = bearerToken;
+        if (process.env.PRIVATE_KEY) {
+            this.wallet = new ethers.Wallet(process.env.PRIVATE_KEY).connect(
+                new ethers.JsonRpcProvider(process.env.RPC_URL)
             );
+            this.address = this.wallet.address;
         }
     }
 
@@ -25,12 +31,25 @@ export class MoxieWallet {
      * @param message - The message to sign
      * @returns The signature and encoding of the message
      */
-    async signMessage(message: string): Promise<MoxieWalletSignMessageResponseType> {
-        return await MoxieWallet.privyClient.walletApi.ethereum.signMessage({
-            message,
-            chainType: "ethereum",
-            address: this.address,
-        });
+    async signMessage(
+        message: string
+    ): Promise<MoxieWalletSignMessageResponseType> {
+        //Add validation that bearerToken or private key is present
+        if (!validateRequest(this.bearerToken)) {
+            throw new Error("Bearer token or private key is required");
+        }
+        if (process.env.PRIVATE_KEY) {
+            const signature = await this.wallet.signMessage(message);
+            return {
+                signature,
+                encoding: "utf8",
+            };
+        }
+
+        return await moxieUserService.SignMessage(
+            { message, address: this.address },
+            this.bearerToken
+        );
     }
 
     /**
@@ -41,60 +60,116 @@ export class MoxieWallet {
      * @param primaryType - The primary type of the typed data
      * @returns The signature and encoding of the typed data
      */
-    async signTypedDataMinimal(domain: Record<string, any>, types: Record<string, any>, message: Record<string, any>, primaryType: string): Promise<MoxieWalletSignTypedDataResponseType> {
-        return await MoxieWallet.privyClient.walletApi.ethereum.signTypedData({
-            typedData: {
+    async signTypedData(
+        domain: Record<string, any>,
+        types: Record<string, any>,
+        message: Record<string, any>,
+        primaryType: string
+    ): Promise<MoxieWalletSignTypedDataResponseType> {
+        if (!validateRequest(this.bearerToken)) {
+            throw new Error("Bearer token or private key is required");
+        }
+        if (process.env.PRIVATE_KEY) {
+            // Remove EIP712Domain from types if present
+            const { EIP712Domain, ...filteredTypes } = types;
+            const signature = await this.wallet.signTypedData(
                 domain,
-                types,
-                message,
+                filteredTypes,
+                message
+            );
+            return {
+                signature,
+                encoding: "utf8",
+            };
+        }
+        return await moxieUserService.SignTypedData(
+            {
+                domain: domain,
+                types: types,
+                message: message,
                 primaryType,
+                address: this.address,
             },
-            chainType: "ethereum",
-            address: this.address,
-        });
-    }
-
-
-    /**
-     * Sign typed data with the wallet
-     * @param typedData - The typed data to sign.
-     * @returns The signature and encoding of the typed data
-     */
-    async signTypedData(typedData: TypedData): Promise<MoxieWalletSignTypedDataResponseType> {
-        return await MoxieWallet.privyClient.walletApi.ethereum.signTypedData({
-            typedData: typedData,
-            chainType: "ethereum",
-            address: this.address,
-        });
+            this.bearerToken
+        );
     }
 
     /**
      * Send a transaction with the wallet
-     * @param chainId - The chain ID to send the transaction on
-     * @param toAddress - The address to send the transaction to
-     * @param value - The value of the transaction
-     * @param data - The data of the transaction
-     * @param gasLimit - The gas limit of the transaction
-     * @param gasPrice - The gas price of the transaction
-     * @returns The transaction hash and the chain ID of the transaction's network
+     * @param chainId - The chain ID of the network to send the transaction on
+     * @param transactionDetails - The transaction details object containing:
+     * @param transactionDetails.toAddress - The recipient address
+     * @param transactionDetails.value - The amount of native currency to send
+     * @param transactionDetails.data - (Optional) The transaction data payload
+     * @param transactionDetails.fromAddress - (Optional) The sender address
+     * @param transactionDetails.gasLimit - (Optional) The maximum gas units to consume
+     * @param transactionDetails.gasPrice - (Optional) The gas price in wei
+     * @param transactionDetails.maxFeePerGas - (Optional) The maximum total fee per gas for EIP-1559 transactions
+     * @param transactionDetails.maxPriorityFeePerGas - (Optional) The maximum priority fee per gas for EIP-1559 transactions
+     * @returns The transaction hash and the CAIP-2 chain identifier
      */
-    async sendTransaction(chainId: string, toAddress: string, value: number, data: string, gasLimit: number, gasPrice: number): Promise<MoxieWalletSendTransactionResponseType> {
-        return await MoxieWallet.privyClient.walletApi.ethereum.sendTransaction({
-            transaction: {
-                to: toAddress,
-                value: value,
-                data: data,
-                gasLimit: gasLimit,
-                gasPrice: gasPrice,
-                chainId: chainId,
+
+    async sendTransaction(
+        chainId: string,
+        transactionDetails: TransactionDetails
+    ): Promise<MoxieWalletSendTransactionResponseType> {
+        if (!validateRequest(this.bearerToken)) {
+            throw new Error("Bearer token or private key is required");
+        }
+        if (process.env.PRIVATE_KEY) {
+            const transaction = await this.wallet.sendTransaction({
+                to: transactionDetails.toAddress,
+                value: transactionDetails.value,
+                data: transactionDetails.data,
+                gasLimit: transactionDetails.gasLimit,
+                maxFeePerGas: transactionDetails.maxFeePerGas,
+                maxPriorityFeePerGas: transactionDetails.maxPriorityFeePerGas,
+            });
+            return {
+                hash: transaction.hash,
+                caip2: `eip155:${chainId}`,
+            };
+        }
+
+        let response = await moxieUserService.sendTransaction(
+            {
+                chainId: Number(chainId),
+                address: this.address,
+                from: transactionDetails.fromAddress,
+                to: transactionDetails.toAddress,
+                value: transactionDetails.value.toString(),
+                data: transactionDetails.data,
+                gasLimit: transactionDetails.gasLimit.toString(),
+                gasPrice: transactionDetails.gasPrice.toString(),
+                maxFeePerGas: transactionDetails.maxFeePerGas.toString(),
+                maxPriorityFeePerGas:
+                    transactionDetails.maxPriorityFeePerGas.toString(),
             },
-            chainType: "ethereum",
-            address: this.address,
+            this.bearerToken
+        );
+
+        return {
+            hash: response.hash,
             caip2: `eip155:${chainId}`,
-        });
+        };
     }
 }
 
-type MoxieWalletSignMessageResponseType = EthereumSignMessageResponseType;
-type MoxieWalletSignTypedDataResponseType = EthereumSignTypedDataResponseType;
-type MoxieWalletSendTransactionResponseType = EthereumSendTransactionResponseType;
+//Add validation that bearerToken or private key is present
+function validateRequest(bearerToken: string): boolean {
+    if (process.env.PRIVATE_KEY) {
+        return true;
+    }
+    return Boolean(bearerToken);
+}
+
+export type MoxieWalletSignMessageResponseType =
+    EthereumSignMessageResponseType;
+export type MoxieWalletSignTypedDataResponseType =
+    EthereumSignTypedDataResponseType;
+export type MoxieWalletSendTransactionResponseType =
+    EthereumSendTransactionResponseType;
+export type MoxieWalletSendTransactionInputType =
+    EthereumSendTransactionInputType;
+export type MoxieWallet = Wallet;
+export type MoxieHex = Hex;
