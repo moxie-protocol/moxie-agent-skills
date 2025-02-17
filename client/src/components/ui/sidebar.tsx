@@ -453,7 +453,6 @@ const SidebarGroupLabel = React.forwardRef<
     const Comp = asChild ? Slot : "div";
 
     return (
-        // @ts-expect-error
         <Comp
             ref={ref}
             data-sidebar="group-label"
@@ -475,7 +474,6 @@ const SidebarGroupAction = React.forwardRef<
     const Comp = asChild ? Slot : "button";
 
     return (
-        // @ts-expect-error
         <Comp
             ref={ref}
             data-sidebar="group-action"
@@ -626,7 +624,6 @@ const SidebarMenuAction = React.forwardRef<
     const Comp = asChild ? Slot : "button";
 
     return (
-        // @ts-expect-error
         <Comp
             ref={ref}
             data-sidebar="menu-action"
@@ -744,7 +741,6 @@ const SidebarMenuSubButton = React.forwardRef<
     const Comp = asChild ? Slot : "a";
 
     return (
-        // @ts-expect-error
         <Comp
             ref={ref}
             data-sidebar="menu-sub-button"
