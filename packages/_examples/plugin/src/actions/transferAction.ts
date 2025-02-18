@@ -10,9 +10,8 @@ import {
     generateObject,
     ModelClass,
 } from "@moxie-protocol/core";
-import {
-    MoxieWalletClient,
-    type MoxieWallet,
+import {    
+    MoxieWalletClient,  
 } from "@moxie-protocol/moxie-lib/src/wallet";
 import { transferEthTemplate } from "../templates";
 import { TransferEthSchema } from "../types";
@@ -55,12 +54,11 @@ export const transferAction: Action = {
                 toAddress: string;
                 amount: number;
             };
-
             elizaLogger.log(
                 `Transfering ${value} wei to address ${toAddress}...`
             );
             const wallet = new MoxieWalletClient(
-                (state.agentWallet as MoxieWallet).address
+                (state.agentWallet as MoxieWalletClient).address
             );
             const { hash } = await wallet.sendTransaction("8543", {
                 toAddress,
@@ -80,8 +78,7 @@ export const transferAction: Action = {
         } catch (error) {
             elizaLogger.error("Error transfering Base ETH:", error);
             callback(
-                { text: "Failed to transfer Base ETH. Please check the logs." },
-                []
+                { text: "Failed to transfer Base ETH. Please check the logs." }
             );
         }
     },

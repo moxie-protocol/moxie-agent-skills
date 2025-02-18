@@ -27,6 +27,7 @@
         "@moxie-protocol/plugin-moxie-big-fan": "workspace:*",
         "@moxie-protocol/plugin-moxie-token-details": "workspace:*",
         "@moxie-protocol/plugin-sample": "workspace:*",
+        "@moxie-protocol/plugin-bootstrap": "workspace:*",
         "readline": "1.3.0",
         "ws": "8.18.0",
         "yargs": "17.7.2",
