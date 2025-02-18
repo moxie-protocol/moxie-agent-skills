@@ -16,10 +16,31 @@ import {
 import { transferEthTemplate } from "../templates";
 import { TransferEthSchema } from "../types";
 
+
+import { ethers } from "ethers";
+
+async function resolveENS(ensName :string): Promise<string | null> {
+    try {
+        const provider = new ethers.JsonRpcProvider(`https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`);
+        const address = await provider.resolveName(ensName);
+        if (address) {
+            return address;
+        } else {
+            console.log(`No address found for ${ensName}`);     
+            return null;
+        }
+    } catch (error) {
+        console.error("Error resolving ENS:", error);
+        return null;
+    }
+}
+
+
+
 export const transferAction: Action = {
     name: "TRANSFER_BASE_ETH",
-    similes: ["TRANSFER_ETH_ON_BASE", "TRANSFER_NATIVE_ETH_ON_BASE"],
-    description: "Transfer ETH on Base from one wallet to another",
+    similes: ["TRANSFER_ETH_ON_BASE", "TRANSFER_NATIVE_ETH_ON_BASE", "TRANSFER_BASE_TOKEN"],
+    description: "Transfer ETH token on Base from one wallet to another",
     suppressInitialMessage: true,
     validate: async () => true,
     handler: async (
@@ -50,19 +71,42 @@ export const transferAction: Action = {
                 modelClass: ModelClass.SMALL,
                 schema: TransferEthSchema,
             });
-            const { toAddress, amount: value } = transferDetails.object as {
+            let { toAddress, amount: value, isENS } = transferDetails.object as {
                 toAddress: string;
                 amount: number;
+                isENS: boolean;
             };
+
+            if (isENS) {
+                toAddress = await resolveENS(toAddress);
+                if (!toAddress) {
+                    callback({ text: "Invalid ENS name" });
+                    return true;
+                }
+            }
+            // Validate amount is defined and greater than 0
+            if (!value || value <= 0) {
+                callback({ text: "Transfer amount must be greater than 0" });
+                return true;
+            }
+
+            const formattedValue = value * 1e18;
+            // Validate ethereum address format
+            const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+            if (!ethAddressRegex.test(toAddress)) {
+                callback({ text: "Invalid Ethereum address format" });
+                return true;
+            }
+
             elizaLogger.log(
-                `Transfering ${value} wei to address ${toAddress}...`
+                `Transfering ${formattedValue} wei to address ${toAddress}...`
             );
             const wallet = new MoxieWalletClient(
                 (state.agentWallet as MoxieWalletClient).address
             );
             const { hash } = await wallet.sendTransaction("8543", {
                 toAddress,
-                value,
+                value: formattedValue,
             });
 
             elizaLogger.success(
