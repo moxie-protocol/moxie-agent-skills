@@ -10,7 +10,7 @@
     },
     "devDependencies": {
         "tsup": "8.3.5",
-        "@types/node": "^20.0.0"
+        "@types/node": "^22.10.5"
     },
     "scripts": {
         "build": "tsup --format esm --dts",

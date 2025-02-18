@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Button } from "@/components/ui/button";
 import {
     ChatBubble,
@@ -208,7 +209,7 @@ export default function Page({ agentId }: { agentId: UUID }) {
                     {transitions((styles, message) => {
                         const variant = getMessageVariant(message?.user);
                         return (
-                            // @ts-expect-error
+                            // @ts-ignore
                             <animated.div
                                 style={styles}
                                 className="flex flex-col gap-2 p-4"

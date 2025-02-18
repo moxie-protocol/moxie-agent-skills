@@ -6,6 +6,7 @@
     "types": "dist/index.d.ts",
     "dependencies": {
         "@moxie-protocol/core": "workspace:*",
+        "@privy-io/server-auth": "^1.18.8",
         "axios": "^1.7.9",
         "tsup": "^8.3.5"
     },
