@@ -94,9 +94,10 @@ export const transferAction: Action = {
                 },
             },
             {
-                user: "{{agent}}",
+                user: "{{user2}}",
                 content: {
                     text: "Transfer completed successfully! Transaction hash: 0xdde850f9257365fffffc11324726ebdcf5b90b01c6eec9b3e7ab3e81fde6f14b",
+                    action: "TRANSFER_BASE_ETH",
                 },
             },
         ],
