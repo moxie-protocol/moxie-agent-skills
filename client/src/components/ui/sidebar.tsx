@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { type VariantProps, cva } from "class-variance-authority";
@@ -572,7 +571,7 @@ const SidebarMenuButton = React.forwardRef<
         },
         ref
     ) => {
-        const Comp = "button";
+        const Comp = asChild ? Slot : "button";
         const { isMobile, state } = useSidebar();
 
         const button = (
