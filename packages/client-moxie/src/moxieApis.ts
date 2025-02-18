@@ -16,13 +16,14 @@ import { stringToUuid } from "@moxie-protocol/core";
 import type { Content } from "@moxie-protocol/core";
 import type { UserAgentInfo, UserAgentInteraction } from "./types/types.ts";
 import { COMMON_AGENT_ID, mockMoxieUser } from "./constants/constants";
-import type { Wallet } from "@privy-io/server-auth";
 import { validateInputAgentInteractions } from "./helpers";
 import express from "express";
 import { ResponseHelper } from "./responseHelper.ts";
 import { traceIdMiddleware } from "./middleware/traceId.ts";
 import { ftaService } from "@moxie-protocol/moxie-lib";
-import type { MoxieUser } from "@moxie-protocol/moxie-lib";
+import type { MoxieTypes } from "@moxie-protocol/moxie-lib";  
+import { MoxieWalletClient } from "@moxie-protocol/moxie-lib";
+
 import multer from "multer";
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -163,12 +164,9 @@ export function createMoxieApiRouter(
                     return;
                 }
 
-                const moxieUserInfo: MoxieUser = mockMoxieUser;
+                const moxieUserInfo: MoxieTypes.MoxieUser = mockMoxieUser;
                 const moxieUserId: string = moxieUserInfo.id;
-                const agentWallet: Wallet = {
-                    address: "0x1234567890",
-                    chainType: "ethereum",
-                };
+                const agentWallet: MoxieWalletClient = new MoxieWalletClient(moxieUserInfo.wallets[0].walletAddress);
 
                 const userId = stringToUuid(moxieUserId);
 

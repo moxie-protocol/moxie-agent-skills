@@ -7,5 +7,13 @@ export default defineConfig({
     clean: true,
     format: ["esm"],
     dts: true,
-    external: ["dotenv", "fs", "path", "https", "http", "@anush008/tokenizers"],
+    external: [
+        "dotenv",
+        "fs",
+        "path",
+        "https",
+        "http",
+        "@anush008/tokenizers",
+        "ethers",
+    ],
 });
