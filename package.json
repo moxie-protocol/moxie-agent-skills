@@ -3,7 +3,6 @@
     "scripts": {
         "preinstall": "npx only-allow pnpm",
         "build": "turbo run build",
-        "build-moxie-agent": "turbo run build --filter=!eliza-docs --filter=!@moxie-protocol/plugin-anyone ",
         "build-docker": "turbo run build",
         "cleanstart": "if [ -f moxie-agent/data/db.sqlite ]; then rm moxie-agent/data/db.sqlite; fi && pnpm --dir moxie-agent start",
         "cleanstart:debug": "if [ -f moxie-agent/data/db.sqlite ]; then rm moxie-agent/data/db.sqlite; fi && cross-env NODE_ENV=development VERBOSE=true DEBUG=eliza:* pnpm --dir moxie-agent start --isRoot",
