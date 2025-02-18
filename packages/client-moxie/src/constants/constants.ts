@@ -1,3 +1,5 @@
+import type { MoxieTypes } from "@moxie-protocol/moxie-lib";
+
 export const MOXIE_BACKEND_GRAPHQL_ENDPOINT: string =
     process.env["MOXIE_BACKEND_GRAPHQL_ENDPOINT"] || "";
 export const CREATOR_AGENT_TOKEN_ADDRESS: string =
@@ -52,21 +54,103 @@ export const ME_QUERY = `
 /**
  * REUSABLE MOCK DATA STARTS BELOW
  */
-export const mockMoxieUser = {
-    id: "M0",
-    userName: "test-user",
-    name: "Test User",
-    bio: "This is a test user",
-    profileImageUrl: "https://test.com",
-    referralCode: "test-referral-code",
-    referrerId: "test-referrer-id",
-    moxieScore: 100,
-    moxieRank: 1,
-    totalUsers: 100,
-    primaryWalletId: "",
-    communicationPreference: "telegram",
-    createdAt: Date.now().toString(),
-    identities: [],
-    wallets: [],
-    vestingContracts: [],
-};
+export const mockMoxieUser: MoxieTypes.MoxieUser = {
+    "id": "M8",
+    "userName": "tokenstaker.eth",
+    "name": "tokenstaker.eth",
+    "bio": null,
+    "profileImageUrl": "https://i.imgur.com/Y1au7ZB.jpg",
+    "referralCode": "TTg=",
+    "referrerId": "M12",
+    "communicationPreference": "WARPCAST",
+    "primaryWalletId": "03463334-3c5c-4d08-9551-188f62b2586a",
+    "moxieScore": 545.5,
+    "moxieRank": 0,
+    "createdAt": "2024-12-20T14:37:34.348Z",
+    "moxieScoreResyncInfo": {
+        "status": "COMPLETED"
+    },
+    "identities": [
+        {
+            "id": "19b49f2a-8f57-4ebe-9897-a6dda30fb543",
+            "userId": "M8",
+            "type": "ENS",
+            "connectedIdentitiesFetchStatus": "SUCCESS",
+            "metadata": {
+                "ens": "tokenstaker.eth",
+                "expiryTimestamp": "2025-09-07T21:41:38.000Z",
+                "resolvedAddress": "0xcbfbcbfca74955b8ab75dec41f7b9ef36f329879"
+            },
+            "profileId": "tokenstaker.eth",
+            "isActive": true,
+            "createdAt": "2025-01-07T12:12:22.361Z",
+            "updatedAt": "2025-01-07T12:12:22.361Z",
+            "dataSource": "AIRSTACK"
+        },
+        {
+            "id": "fd14e2a4-11a2-4115-81b4-4b1d266ade64",
+            "userId": "M8",
+            "type": "FARCASTER",
+            "connectedIdentitiesFetchStatus": "SUCCESS",
+            "metadata": {
+                "bio": "Building Airstack & Moxie Protocol \nairstack.xyz |\nmoxie.xyz",
+                "fid": 3761,
+                "pfp": "https://i.imgur.com/Y1au7ZB.jpg",
+                "type": "farcaster",
+                "username": "tokenstaker.eth",
+                "verifiedAt": "2024-12-20T14:59:37.000Z",
+                "displayName": "SarveshⓂ️",
+                "ownerAddress": "0xA3A736379BFb4a9748c3e4dAf5f9aF0EDFCc6C1a",
+                "firstVerifiedAt": "2024-12-20T14:59:37.000Z",
+                "latestVerifiedAt": "2024-12-20T14:59:37.000Z"
+            },
+            "profileId": "3761",
+            "isActive": true,
+            "createdAt": "2025-01-07T12:12:05.833Z",
+            "updatedAt": "2025-01-07T12:12:05.833Z",
+            "dataSource": "PRIVY"
+        },
+        {
+            "id": "060e2d06-6fc4-45f8-8d51-3014a8406684",
+            "userId": "M8",
+            "type": "TWITTER",
+            "connectedIdentitiesFetchStatus": "SUCCESS",
+            "metadata": {
+                "name": "Sarvesh Jain (tokenstaker.eth)",
+                "type": "twitter_oauth",
+                "subject": "2893777598",
+                "username": "sarvesh_jain_",
+                "verifiedAt": "2025-01-06T19:28:06.000Z",
+                "firstVerifiedAt": "2025-01-06T19:28:06.000Z",
+                "latestVerifiedAt": "2025-01-06T19:28:06.000Z",
+                "profilePictureUrl": "https://pbs.twimg.com/profile_images/1864738557195091968/IbR3wGgp_normal.jpg"
+            },
+            "profileId": "sarvesh_jain_",
+            "isActive": true,
+            "createdAt": "2025-01-07T12:12:05.833Z",
+            "updatedAt": "2025-01-07T12:12:05.833Z",
+            "dataSource": "PRIVY"
+        }
+    ],
+    "wallets": [
+        {
+            "id": "03463334-3c5c-4d08-9551-188f62b2586a",
+            "userId": "M8",
+            "walletAddress": "0xcbfbcbfca74955b8ab75dec41f7b9ef36f329879",
+            "walletType": "injected",
+            "createdAt": "2025-01-07T12:12:05.852Z",
+            "deletedAt": null,
+            "dataSource": "PRIVY"
+        },
+        {
+            "id": "ef43dedc-9b17-49e0-93bf-94359d47f061",
+            "userId": "M8",
+            "walletAddress": "0xa5cc845ef113c4c0908d4c1f4616a000b9a67b80",
+            "walletType": "embedded",
+            "createdAt": "2025-01-07T12:12:05.852Z",
+            "deletedAt": null,
+            "dataSource": "PRIVY"
+        }
+    ]
+}
+;
