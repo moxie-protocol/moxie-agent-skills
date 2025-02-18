@@ -15,13 +15,17 @@ import { type MoxieClient, messageHandlerTemplate } from ".";
 import { stringToUuid } from "@moxie-protocol/core";
 import type { Content } from "@moxie-protocol/core";
 import type { UserAgentInfo, UserAgentInteraction } from "./types/types.ts";
-import { COMMON_AGENT_ID, mockMoxieUser } from "./constants/constants";
+import {
+    COMMON_AGENT_ID,
+    mockMoxieUser,
+    mockWallet,
+} from "./constants/constants";
 import { validateInputAgentInteractions } from "./helpers";
 import express from "express";
 import { ResponseHelper } from "./responseHelper.ts";
 import { traceIdMiddleware } from "./middleware/traceId.ts";
 import { ftaService } from "@moxie-protocol/moxie-lib";
-import type { MoxieTypes } from "@moxie-protocol/moxie-lib";  
+import type { MoxieTypes } from "@moxie-protocol/moxie-lib";
 import { MoxieWalletClient } from "@moxie-protocol/moxie-lib";
 
 import multer from "multer";
@@ -166,7 +170,7 @@ export function createMoxieApiRouter(
 
                 const moxieUserInfo: MoxieTypes.MoxieUser = mockMoxieUser;
                 const moxieUserId: string = moxieUserInfo.id;
-                const agentWallet: MoxieWalletClient = new MoxieWalletClient(moxieUserInfo.wallets[0].walletAddress);
+                const agentWallet: MoxieTypes.MoxieWallet = mockWallet;
 
                 const userId = stringToUuid(moxieUserId);
 

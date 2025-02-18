@@ -11,11 +11,23 @@ export interface TwitterMetadata {
     profilePictureUrl?: string;
 }
 
+export interface ENSMetadata {
+    ens: string;
+    expiryTimestamp: string;
+    resolvedAddress: string;
+}
+
 export interface FarcasterMetadata {
     bio: string;
+    fid: number;
+    pfp: string;
+    type: string;
     username: string;
+    verifiedAt: string;
     displayName: string;
-    profileTokenId: string;
+    ownerAddress: string;
+    firstVerifiedAt: string;
+    latestVerifiedAt: string;
 }
 
 export interface MoxieIdentity {
@@ -24,7 +36,7 @@ export interface MoxieIdentity {
     type: string;
     dataSource: string;
     connectedIdentitiesFetchStatus: string;
-    metadata: TwitterMetadata | FarcasterMetadata;
+    metadata: TwitterMetadata | FarcasterMetadata | ENSMetadata;
     profileId: string;
     isActive: boolean;
     createdAt: string;
@@ -45,7 +57,7 @@ export interface MoxieUser {
     id: string;
     userName?: string;
     name?: string;
-    bio?: string;
+    bio?: string | null;
     profileImageUrl?: string;
     referralCode: string;
     referrerId?: string;
@@ -55,6 +67,9 @@ export interface MoxieUser {
     primaryWalletId?: string;
     communicationPreference?: string;
     createdAt: string;
+    moxieScoreResyncInfo?: {
+        status: string;
+    };
     identities: MoxieIdentity[];
     wallets: MoxieWallet[];
 }
