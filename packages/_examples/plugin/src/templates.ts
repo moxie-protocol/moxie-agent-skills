@@ -1,57 +1,31 @@
-export const createResourceTemplate = `
-Extract the following details to create a new resource:
-- **name** (string): Name of the resource
-- **type** (string): Type of resource (document, image, video)
-- **description** (string): Description of the resource
-- **tags** (array): Array of tags to categorize the resource
+export const transferEthTemplate = `
+Extract the following details to transfer ETH on Base:
+- **amount** (Number): The amount of ETH on Base to transfer in wei.
+- **toAddress** (String): The address to transfer the ETH to on Base.
 
 Provide the values in the following JSON format:
 
 \`\`\`json
 {
-    "name": "<resource_name>",
-    "type": "<resource_type>",
-    "description": "<resource_description>",
-    "tags": ["<tag1>", "<tag2>"]
+    "amount": number,
+    "toAddress": string
 }
 \`\`\`
 
-Here are the recent user messages for context:
-{{recentMessages}}
-`;
+Here is an example message and it's corresponding response:
 
-export const readResourceTemplate = `
-Extract the following details to read a resource:
-- **id** (string): Unique identifier of the resource
-- **fields** (array): Specific fields to retrieve (optional)
+**Message**
 
-Provide the values in the following JSON format:
-
-\`\`\`json
-{
-    "id": "<resource_id>",
-    "fields": ["<field1>", "<field2>"]
-}
+\`\`\`
+Send 0.01 ETH to 0x114B242D931B47D5cDcEe7AF065856f70ee278C4
 \`\`\`
 
-Here are the recent user messages for context:
-{{recentMessages}}
-`;
-
-export const updateResourceTemplate = `
-Extract the following details to update a resource:
-- **id** (string): Unique identifier of the resource
-- **updates** (object): Key-value pairs of fields to update
-
-Provide the values in the following JSON format:
+**Response**
 
 \`\`\`json
 {
-    "id": "<resource_id>",
-    "updates": {
-        "<field1>": "<new_value1>",
-        "<field2>": "<new_value2>"
-    }
+    "amount": 1e16,
+    "toAddress": "0x114B242D931B47D5cDcEe7AF065856f70ee278C4"
 }
 \`\`\`
 

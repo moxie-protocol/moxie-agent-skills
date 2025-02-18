@@ -337,9 +337,7 @@ export function createMoxieApiRouter(
                         res.write(JSON.stringify(message));
                     }
                 } else {
-                    if (message && !messageFromActions) {
-                        res.write(JSON.stringify(message));
-                    }
+                    res.write(JSON.stringify(message));
                 }
                 res.end();
             } catch (error) {

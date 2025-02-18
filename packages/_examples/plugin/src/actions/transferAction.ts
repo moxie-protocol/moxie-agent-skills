@@ -6,11 +6,16 @@ import {
     type State,
     elizaLogger,
     type ActionExample,
+    composeContext,
+    generateObject,
+    ModelClass,
 } from "@moxie-protocol/core";
 import {
     MoxieWalletClient,
     type MoxieWallet,
 } from "@moxie-protocol/moxie-lib/src/wallet";
+import { transferEthTemplate } from "../templates";
+import { TransferEthSchema } from "../types";
 
 export const transferAction: Action = {
     name: "TRANSFER_BASE_ETH",
@@ -35,35 +40,43 @@ export const transferAction: Action = {
                 state = await runtime.updateRecentMessageState(state);
             }
 
-            // const context = composeContext({
-            //     state,
-            //     template: createResourceTemplate,
-            // });
+            const context = composeContext({
+                state,
+                template: transferEthTemplate,
+            });
 
-            // const resourceDetails = await generateObject({
-            //     runtime,
-            //     context,
-            //     modelClass: ModelClass.SMALL,
-            //     schema: CreateResourceSchema,
-            // });
+            const transferDetails = await generateObject({
+                runtime,
+                context,
+                modelClass: ModelClass.SMALL,
+                schema: TransferEthSchema,
+            });
+            const { toAddress, amount: value } = transferDetails.object as {
+                toAddress: string;
+                amount: number;
+            };
 
+            elizaLogger.log(
+                `Transfering ${value} wei to address ${toAddress}...`
+            );
             const wallet = new MoxieWalletClient(
                 (state.agentWallet as MoxieWallet).address
             );
             const { hash } = await wallet.sendTransaction("8543", {
-                toAddress: "0xc7486219881C780B676499868716B27095317416",
-                value: 1e15,
+                toAddress,
+                value,
             });
 
             elizaLogger.success(
                 `Transfer completed successfully! Transaction hash: ${hash}`
             );
-            if (callback) {
-                callback({
+            callback?.(
+                {
                     text: `Transfer completed successfully! Transaction hash: ${hash}`,
-                    content: {},
-                });
-            }
+                },
+                []
+            );
+            return true;
         } catch (error) {
             elizaLogger.error("Error transfering Base ETH:", error);
             callback(
@@ -81,16 +94,10 @@ export const transferAction: Action = {
                 },
             },
             {
-                user: "{{agent}}",
+                user: "{{user2}}",
                 content: {
-                    text: "Sure, I'll send 0.01 ETH to that address now.",
+                    text: "Transfer completed successfully! Transaction hash: 0xdde850f9257365fffffc11324726ebdcf5b90b01c6eec9b3e7ab3e81fde6f14b",
                     action: "TRANSFER_BASE_ETH",
-                },
-            },
-            {
-                user: "{{agent}}",
-                content: {
-                    text: "Successfully sent 0.01 ETH to 0x114B242D931B47D5cDcEe7AF065856f70ee278C4\nTransaction: 0xdde850f9257365fffffc11324726ebdcf5b90b01c6eec9b3e7ab3e81fde6f14b",
                 },
             },
         ],
