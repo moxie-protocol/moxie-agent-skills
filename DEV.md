@@ -1,4 +1,4 @@
-## Steps for local setup & run moxie-agent-plugin
+## Steps for local setup & run moxie-agent-skills
 
 1. Need node Node.js 23+
 2. pnpm 9+
@@ -6,8 +6,8 @@
     ```bash
     pnpm env use --global 23.3.0
     ```
-4. git clone git@github.com:moxie-protocol/moxie-agent-plugin.git
-5. cd moxie-agent-plugin
+4. git clone git@github.com:moxie-protocol/moxie-agent-skills.git
+5. cd moxie-agent-skills
 6. Create a new branch from `main`
     ```sh
     git checkout -b <new-branch>
@@ -26,23 +26,9 @@ Once the client is running, you'll see a message like this:
 
 ## Stpes to run the registry
 
-1. Go to `registry folder`
-
-```sh
-cd registry
-```
-
-2. Install dependencies
-
-```sh
-npm i
-```
-
-3. Run the registry FE app
-
-```sh
-npm run dev
-```
+1. `pnpm install --no-frozen-lockfile`
+2. `pnpm build`
+3. `pnpm start:registry`
 
 ## Troubleshoot
 

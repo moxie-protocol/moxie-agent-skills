@@ -2,18 +2,31 @@
 <a align="center" href="https://moxie.xyz" target="_blank">
     <img src="./assets/logo.avif" alt="code snippets" height=50/>
   </a>
-  <h1 align="center">Moxie Agent Plugin</h1>
+  <h1 align="center">Moxie Skills Framework</h1>
 
 📖 [Developer Docs](https://developer.moxie.xyz/) | 🎯 [Whitepaper](https://build.moxie.xyz/the-moxie-protocol)
 
 </div>
+
+## Table of Contents
+
+- [Table of Contents](#table-of-contents)
+- [🚀 Quick Start](#-quick-start)
+  - [Prerequisites](#prerequisites)
+  - [Get Started](#get-started)
+  - [Create Your First Skills](#create-your-first-skills)
+  - [General Guidelines For Skills Development](#general-guidelines-for-skills-development)
+  - [Register Your Skills to Moxie](#register-your-skills-to-moxie)
+- [📋 General Guidelines For Skills Registration](#-general-guidelines-for-skills-registration)
+- [💬 Community \& Contact](#-community--contact)
+- [👥 Contributors](#-contributors)
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
 - [Node.js 23+](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
-- [pnpm](https://pnpm.io/installation)
+- [pnpm 9+](https://pnpm.io/installation)
 
 ### Get Started
 
@@ -22,7 +35,7 @@ First, fork the repository and then clone it locally to your machine.
 Once you cloned the repository, you can setup your environment with the following scripts:
 
 ```bash
-cd moxie-agent-plugin
+cd moxie-agent-skills
 cp .env.example .env
 pnpm i && pnpm build && pnpm start --characters='characters/moxie.character.json'
 ```
@@ -47,7 +60,7 @@ git checkout -b <new-branch>
 Then, using the template under the `packages/_examples/plugin` folder, you can create a new Creator Agent Skills with the following script:
 
 ```sh
-cp ./packages/_examples/plugin ./packages/plugin-<skills-name>
+pnpm create:skills <skills-name>
 ```
 
 To learn more on how to create your first skill, you can follow this tutorial [here](https://developer.moxie.xyz/creator-agents-and-skills-marketplace/quickstart/create-your-first-skill).
@@ -72,7 +85,7 @@ For further customization, you can refer to the Eliza docs [here](https://elizao
 
 Once you completed development on your skills, you can register your skills to the Skills Marketplace by the following steps:
 
-1. Add your Creator Agent Skills to `registry/src/skills.json` with the following fields and corresponding types:
+1. Add your Creator Agent Skills to the Skills Registry in [`registry/src/skills.json`](./registry/src/skills.json) with the following fields and corresponding types:
 
 ```ts
 interface Skills {
@@ -86,11 +99,19 @@ interface Skills {
 }
 ```
 
+If you'd like to check if your skills is added properly, run the following command to start the Registry client app:
+
+```bash
+pnpm start:registry
+```
+
+You should see the skills you added in the Registry client app if the skills metadata is added properly.
+
 2. If your Creator Agent Skill require environment variable for production purpose, then fill in [this form](https://forms.gle/8hzDyCVKKLs4MkTEA) to request submission. The Moxie team shall directly reach out to you either through **Email** ([support@airstack.xyz](mailto:support@airstack.xyz)) or **Farcaster** (group chat) for submission.
 
-3. Lastly, commit all the changes you made on your branches and create a new [PR](https://github.com/moxie-protocol/moxie-agent-plugin/pulls) to the repository's `main` branch.
+3. Lastly, commit all the changes you made on your branches and create a new [PR](https://github.com/moxie-protocol/moxie-agent-skills/pulls) to the repository's `main` branch.
 
-### General Guidelines For Skills Registration
+## 📋 General Guidelines For Skills Registration
 
 To ensure that your Skills is registered successfully to the Skills Marketplace, make sure to provide detailed descriptions on your Creator Agent Skills based on the [pre-written template](./.github/pull_request_template.md) and fulfill all the following requirements:
 
@@ -106,13 +127,13 @@ To ensure that your Skills is registered successfully to the Skills Marketplace,
 
 The Moxie team will review the newly created Creator Agent Skills and once merged, your Skills will automatically be registered to the Skills Marketplace where it's accessible for Moxie users to use.
 
-### Community & Contact
+## 💬 Community & Contact
 
-- [GitHub Issues](https://github.com/moxie-protocol/moxie-agent-plugin/issues). Best for: bugs you encounter when developing new Creator Agent Skills, and feature proposals.
+- [GitHub Issues](https://github.com/moxie-protocol/moxie-agent-skills/issues). Best for: bugs you encounter when developing new Creator Agent Skills, and feature proposals.
 - [Telegram](https://t.me/+QVjX1VPh3SpmNjMx). Best for: sharing your Creator Agent Skills and hanging out with the Moxie Developer Community.
 
-## Contributors
+## 👥 Contributors
 
-<a href="https://github.com/moxie-protocol/moxie-agent-plugin/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=moxie-protocol/moxie-agent-plugin" />
+<a href="https://github.com/moxie-protocol/moxie-agent-skills/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=moxie-protocol/moxie-agent-skills" />
 </a>

@@ -5,8 +5,8 @@
         "version": "0.1.8+build.1",
         "author": null,
         "description": "A Skills for Creator Agents that enables portfolio balance checking for Moxie users' connected wallets.",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-plugin/tree/main/packages/plugin-moxie-balance",
-        "imageUrl": "https://github.com/moxie-protocol/moxie-agent-plugin/tree/main/packages/plugin-moxie-balance/images/logo.png"
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-balance",
+        "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-balance/images/logo.png"
     },
     {
         "pluginId": "2a24e22b-7636-5055-98fd-edd3af5e0152",
@@ -14,8 +14,8 @@
         "version": "0.1.8+build.1",
         "author": null,
         "description": "A Skills for Creator Agents to enable fetching cryptocurrency price data from the CoinGecko API.",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-plugin/tree/main/packages/plugin-moxie-big-fan",
-        "imageUrl": "https://github.com/moxie-protocol/moxie-agent-plugin/tree/main/packages/plugin-moxie-big-fan/images/logo.png"
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-big-fan",
+        "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-big-fan/images/logo.png"
     },
     {
         "pluginId": "a1aa9887-fc11-5f54-aa62-235c7536ba67",
@@ -23,7 +23,7 @@
         "version": "0.1.8+build.1",
         "author": null,
         "description": "A Skills for Creator Agents that enables fetching of base token details.",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-plugin/tree/main/packages/plugin-moxie-token-details",
-        "imageUrl": "https://github.com/moxie-protocol/moxie-agent-plugin/tree/main/packages/plugin-moxie-token-details/images/logo.png"
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details",
+        "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details/images/logo.png"
     }
 ]
