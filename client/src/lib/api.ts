@@ -82,6 +82,37 @@ export const apiClient = {
                 if (contentType === "audio/mpeg") {
                     return await resp.blob();
                 }
+                if (contentType?.includes('text/event-stream')) {
+                    const reader = resp.body?.getReader();
+                    const decoder = new TextDecoder();
+
+                    return {
+                        stream: true,
+                        async *[Symbol.asyncIterator]() {
+                            while (true) {
+                                const { done, value } = await reader!.read();
+                                if (done) break;
+
+                                const chunk = decoder.decode(value);
+                                // Match all JSON objects in the chunk
+                                const matches = chunk.match(/{[^}]+}/g);
+
+                                if (matches) {
+                                    for (const jsonStr of matches) {
+                                        try {
+                                            const data = JSON.parse(jsonStr);
+                                            yield data;
+                                        } catch (error) {
+                                            console.error('Failed to parse JSON:', jsonStr);
+                                            const errorMessage = error instanceof Error ? error.message : 'Failed to parse JSON';
+                                            throw new Error(errorMessage);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    };
+                }
                 return resp.json();
             }
 
