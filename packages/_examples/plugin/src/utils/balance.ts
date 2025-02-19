@@ -1,18 +1,4 @@
-import { createPublicClient, formatEther, http } from "viem";
-import { base } from "viem/chains";
 import request, { gql } from "graphql-request";
-
-export const getNativeBalance = async (address: `0x${string}`) => {
-    const publicClient = createPublicClient({
-        chain: base,
-        transport: http(),
-    });
-    const balance = await publicClient.getBalance({
-        address: address as `0x${string}`,
-    });
-    const balanceAsEther = formatEther(balance);
-    return balanceAsEther;
-};
 
 export const getTokenBalance = async (
     address: `0x${string}`,
