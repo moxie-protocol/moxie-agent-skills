@@ -37,7 +37,7 @@ Once you cloned the repository, you can setup your environment with the followin
 ```bash
 cd moxie-agent-skills
 cp .env.example .env
-pnpm i && pnpm build && pnpm start --characters='characters/moxie.character.json'
+pnpm i && pnpm build && pnpm start
 ```
 
 Once the agent is running, you should see the message to run "pnpm start:client" at the end.

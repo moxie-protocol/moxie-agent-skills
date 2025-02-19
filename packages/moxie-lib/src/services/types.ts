@@ -1,5 +1,3 @@
-import type { Wallet as PrivyWallet } from "@privy-io/server-auth";
-
 export interface TwitterMetadata {
     username: string;
     name?: string;
@@ -75,85 +73,6 @@ export interface MoxieUser {
     wallets: MoxieWallet[];
 }
 
-export interface MeQueryResponse {
-    data: {
-        Me: MoxieUser;
-    };
-    errors?: Array<{
-        message: string;
-        locations?: Array<{
-            line: number;
-            column: number;
-        }>;
-    }>;
-}
-
-export interface GetUserResponse {
-    data: {
-        GetUser: MoxieUser;
-    };
-}
-
-export type GetWalletDetailsOutput = {
-    success: boolean;
-    privyId: string;
-    wallet: undefined | PrivyWallet;
-};
-
-export interface SignMessageInput {
-    message: string;
-    address: string;
-}
-
-export interface SignMessageResponse {
-    signature: string;
-    encoding: string;
-}
-
-export type SignTransactionInput = {
-    from?: string;
-    to?: string;
-    nonce?: number;
-    chainId?: number;
-    data?: string;
-    value?: string;
-    type?: number;
-    gasLimit?: string;
-    gasPrice?: string;
-    maxFeePerGas?: string;
-    maxPriorityFeePerGas?: string;
-    address?: string;
-};
-
-export interface SignTransactionResponse {
-    signature: string;
-    encoding: string;
-}
-
-export type SignTypedDataInput = {
-    domain: Record<string, any>;
-    types: Record<string, any>;
-    message: Record<string, any>;
-    primaryType: string;
-    address: string;
-};
-
-export interface SignTypedDataResponse {
-    signature: string;
-    encoding: string;
-}
-
-export interface SendTransactionResponse {
-    hash: string;
-    caip2?: string;
-    code?: string;
-    message?: string;
-}
-
-export interface SendTransactionInput extends SignTransactionInput {
-    caip2?: string;
-}
-
 export interface TransactionDetails {
     fromAddress?: string;
     toAddress?: string;
@@ -163,4 +82,92 @@ export interface TransactionDetails {
     gasPrice?: number;
     maxFeePerGas?: number;
     maxPriorityFeePerGas?: number;
+}
+
+export type EthereumSignMessageResponseType = {
+    signature: string;
+    encoding: string;
+};
+
+export type EthereumSignTypedDataResponseType = {
+    signature: string;
+    encoding: string;
+};
+
+export type EthereumSignTransactionResponseType = {
+    signedTransaction: string;
+    encoding: string;
+};
+
+export type EthereumSendTransactionResponseType = {
+    hash: string;
+    caip2: EvmCaip2ChainId;
+};
+
+export type EthereumSendTransactionInputType = EthereumRpcWrapper<
+    EthereumBaseTransactionInputType & {
+        /** CAIP-2 chain ID for the network to broadcast the transaction on. */
+        caip2: EvmCaip2ChainId;
+    }
+>;
+
+type EthereumRpcWrapper<T> = WithOptionalIdempotencyKey<
+    WithWalletIdOrAddressChainType<T, "ethereum">
+>;
+
+type Prettify<T> = {
+    [K in keyof T]: T[K];
+} & {};
+
+type WithOptionalIdempotencyKey<T> = Prettify<
+    T & {
+        idempotencyKey?: string;
+    }
+>;
+
+type WithWalletIdOrAddressChainType<T, U extends "solana" | "ethereum"> =
+    | Prettify<
+          T & {
+              /** Address of the wallet. */
+              address: string;
+              /** Chain type of the wallet. */
+              chainType: U;
+          }
+      >
+    | Prettify<
+          T & {
+              /** ID of the wallet. */
+              walletId: string;
+          }
+      >;
+
+type EthereumBaseTransactionInputType = {
+    transaction: {
+        from?: Hex;
+        to?: Hex;
+        nonce?: Quantity;
+        chainId?: Quantity;
+        data?: Hex;
+        value?: Quantity;
+        gasLimit?: Quantity;
+        gasPrice?: Quantity;
+        maxFeePerGas?: Quantity;
+        maxPriorityFeePerGas?: Quantity;
+    };
+};
+
+export type EvmCaip2ChainId = `eip155:${string}`;
+export type Quantity = Hex | number;
+export type Hex = `0x${string}`;
+
+export interface Wallet {
+    address: string;
+    chainType: "ethereum" | "solana";
+    chainId?: string;
+    walletType?: string;
+    walletClientType?: string;
+    connectorType?: string;
+    hdWalletIndex?: number;
+    imported?: boolean;
+    delegated?: boolean;
 }

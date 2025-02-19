@@ -15,14 +15,18 @@ import { type MoxieClient, messageHandlerTemplate } from ".";
 import { stringToUuid } from "@moxie-protocol/core";
 import type { Content } from "@moxie-protocol/core";
 import type { UserAgentInfo, UserAgentInteraction } from "./types/types.ts";
-import { COMMON_AGENT_ID, mockMoxieUser } from "./constants/constants";
+import {
+    COMMON_AGENT_ID,
+    mockMoxieUser,
+    mockWallet,
+} from "./constants/constants";
 import { validateInputAgentInteractions } from "./helpers";
 import express from "express";
 import { ResponseHelper } from "./responseHelper.ts";
 import { traceIdMiddleware } from "./middleware/traceId.ts";
 import { ftaService } from "@moxie-protocol/moxie-lib";
-import type { MoxieTypes } from "@moxie-protocol/moxie-lib";
-import { MoxieWalletClient } from "@moxie-protocol/moxie-lib";
+import { walletService, MoxieUser } from "@moxie-protocol/moxie-lib";
+import { MoxieWalletClient } from "@moxie-protocol/moxie-lib/src/wallet";
 
 import multer from "multer";
 import * as fs from "node:fs";
@@ -164,11 +168,9 @@ export function createMoxieApiRouter(
                     return;
                 }
 
-                const moxieUserInfo: MoxieTypes.MoxieUser = mockMoxieUser;
+                const moxieUserInfo: MoxieUser = mockMoxieUser;
                 const moxieUserId: string = moxieUserInfo.id;
-                const agentWallet: MoxieWalletClient = new MoxieWalletClient(
-                    moxieUserInfo.wallets[0].walletAddress
-                );
+                const agentWallet: walletService.MoxieClientWallet = mockWallet;
 
                 const userId = stringToUuid(moxieUserId);
 
@@ -207,10 +209,16 @@ export function createMoxieApiRouter(
                 await runtime.messageManager.addEmbeddingToMemory(memory);
                 await runtime.messageManager.createMemory(memory);
 
+                const moxieWalletClient = new MoxieWalletClient(
+                    agentWallet.address,
+                    req.header("Authorization")
+                );
+
                 let state = await runtime.composeState(userMessage, {
                     agentName: runtime.character.name,
                     moxieUserInfo: moxieUserInfo,
                     agentWallet: agentWallet,
+                    moxieWalletClient: moxieWalletClient,
                 });
 
                 const context = composeContext({

@@ -7,12 +7,10 @@ import { ethers } from "ethers";
  * @throws Error if the API request fails
  */
 
-import { PortfolioInput, ValidationError } from "./types/types";
+import { ValidationError } from "./types/types";
 import {
     CREATOR_AGENT_TOKEN_ADDRESS,
-    ME_QUERY,
     MINIMUM_CREATOR_AGENT_COINS,
-    MOXIE_BACKEND_GRAPHQL_ENDPOINT,
     BASE_RPC_URL,
 } from "./constants/constants";
 import { elizaLogger, validateUuid } from "@moxie-protocol/core";

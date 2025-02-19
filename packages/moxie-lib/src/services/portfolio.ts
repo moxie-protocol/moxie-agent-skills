@@ -34,33 +34,39 @@ export async function fetchPortfolioByMoxieIdOrderByTVL(
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                // 'Authorization': process.env.AIRSTACK_API_KEY!,
             },
             body: JSON.stringify({
-                query: `
-          query GetPortfolio($moxieUserId: String!) {
-            MoxieUserPortfolios(input: {filter: {moxieUserId: { _eq: $moxieUserId }}, order: {totalTvl: DESC}, limit: ${limit}}) {
-              MoxieUserPortfolio {
-                currentPrice
-                fanTokenName
-                fanTokenSymbol
-                lockedTvl
-                protocolTokenInvested
-                tokenLockedTvl
-                tokenUnlockedTvl
-                totalLockedAmount
-                totalUnlockedAmount
-                walletAddresses
-                unlockedTvl
-                fanTokenAddress
-                totalTvl
-                fanTokenMoxieUserId
-              }
-            }
-          }
-        `,
+                query: /* GraphQL */ `
+                    query GetPortfolio($moxieId: String!, $limit: Int) {
+                        MoxieUserPortfolios(
+                            input: {
+                                filter: { moxieUserId: { _eq: $moxieId } }
+                                order: { totalTvl: DESC }
+                                limit: $limit
+                            }
+                        ) {
+                            MoxieUserPortfolio {
+                                currentPrice
+                                fanTokenName
+                                fanTokenSymbol
+                                lockedTvl
+                                protocolTokenInvested
+                                tokenLockedTvl
+                                tokenUnlockedTvl
+                                totalLockedAmount
+                                totalUnlockedAmount
+                                walletAddresses
+                                unlockedTvl
+                                fanTokenAddress
+                                totalTvl
+                                fanTokenMoxieUserId
+                            }
+                        }
+                    }
+                `,
                 variables: {
-                    moxieUserId: moxieId,
+                    moxieId,
+                    limit,
                 },
             }),
         });

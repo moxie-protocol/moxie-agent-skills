@@ -1,16 +1,23 @@
 import * as moxieUserService from "./services/moxieUserService";
 import * as ftaService from "./services/fta";
 import * as portfolioService from "./services/portfolio";
-import { MoxieWalletClient } from "./wallet";
-
-import type * as MoxieTypes from "./services/types";
+import * as walletService from "./wallet";
 
 export { moxieUserService };
 
 export { ftaService };
 
+export { walletService };
+
 export { portfolioService };
 
-export { MoxieWalletClient };
+export { MoxieWalletClient } from "./wallet";
 
-export type { MoxieTypes };
+export {
+    TwitterMetadata,
+    FarcasterMetadata,
+    MoxieIdentity,
+    MoxieWallet,
+    MoxieUser,
+    TransactionDetails,
+} from "./services/types";

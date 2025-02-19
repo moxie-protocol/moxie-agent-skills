@@ -1,11 +1,6 @@
-import type { walletService, MoxieUser } from "@moxie-protocol/moxie-lib";
+import { MoxieUser } from "../services/types";
+import { MoxieClientWallet } from "../wallet";
 
-export const CREATOR_AGENT_TOKEN_ADDRESS: string =
-    process.env["CREATOR_AGENT_TOKEN_ADDRESS"] || "";
-export const MINIMUM_CREATOR_AGENT_COINS: number =
-    Number(process.env["MINIMUM_CREATOR_AGENT_COINS"]) || 0;
-export const COMMON_AGENT_ID: string = process.env["COMMON_AGENT_ID"] || "";
-export const BASE_RPC_URL: string = process.env["BASE_RPC_URL"] || "";
 /**
  * REUSABLE MOCK DATA STARTS BELOW
  */
@@ -113,7 +108,7 @@ export const mockMoxieUser: MoxieUser = {
 };
 
 // Mock Moxie Wallet Data
-export const mockWallet: walletService.MoxieClientWallet = {
+export const mockWallet: MoxieClientWallet = {
     address: "0xa5cc845ef113c4c0908d4c1f4616a000b9a67b80",
     chainType: "ethereum",
     chainId: "8453",

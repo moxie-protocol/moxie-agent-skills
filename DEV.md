@@ -15,7 +15,7 @@
 7. `pnpm install --no-frozen-lockfile`
 8. `pnpm build`
 9. Setup .env file. By default, the Moxie Character uses OpenAI model thus need OpenAI API key
-10. Run agent `pnpm start --character="characters/moxie.character.json"`
+10. Run agent `pnpm start`
 11. Run client `pnpm start:client`
 
 Once the client is running, you'll see a message like this:

@@ -5,7 +5,7 @@ import type {
     EthereumSendTransactionInputType,
     Wallet,
     Hex,
-} from "@privy-io/server-auth";
+} from "./services/types";
 import { ethers } from "ethers";
 import { moxieUserService } from ".";
 import type { TransactionDetails } from "./services/types";
@@ -20,7 +20,7 @@ export class MoxieWalletClient {
         this.bearerToken = bearerToken;
         if (process.env.PRIVATE_KEY) {
             this.wallet = new ethers.Wallet(process.env.PRIVATE_KEY).connect(
-                new ethers.JsonRpcProvider(process.env.RPC_URL)
+                new ethers.JsonRpcProvider(process.env.MOXIE_LIB_RPC_URL)
             );
             this.address = this.wallet.address;
         }
@@ -34,22 +34,15 @@ export class MoxieWalletClient {
     async signMessage(
         message: string
     ): Promise<MoxieWalletSignMessageResponseType> {
-        //Add validation that bearerToken or private key is present
-        if (!validateRequest(this.bearerToken)) {
-            throw new Error("Bearer token or private key is required");
-        }
         if (process.env.PRIVATE_KEY) {
             const signature = await this.wallet.signMessage(message);
             return {
                 signature,
                 encoding: "utf8",
             };
+        } else {
+            throw new Error("Private key is required for local development");
         }
-
-        return await moxieUserService.SignMessage(
-            { message, address: this.address },
-            this.bearerToken
-        );
     }
 
     /**
@@ -69,29 +62,17 @@ export class MoxieWalletClient {
         if (!validateRequest(this.bearerToken)) {
             throw new Error("Bearer token or private key is required");
         }
-        if (process.env.PRIVATE_KEY) {
-            // Remove EIP712Domain from types if present
-            const { EIP712Domain, ...filteredTypes } = types;
-            const signature = await this.wallet.signTypedData(
-                domain,
-                filteredTypes,
-                message
-            );
-            return {
-                signature,
-                encoding: "utf8",
-            };
-        }
-        return await moxieUserService.SignTypedData(
-            {
-                domain: domain,
-                types: types,
-                message: message,
-                primaryType,
-                address: this.address,
-            },
-            this.bearerToken
+        // Remove EIP712Domain from types if present
+        const { EIP712Domain, ...filteredTypes } = types;
+        const signature = await this.wallet.signTypedData(
+            domain,
+            filteredTypes,
+            message
         );
+        return {
+            signature,
+            encoding: "utf8",
+        };
     }
 
     /**
@@ -116,40 +97,16 @@ export class MoxieWalletClient {
         if (!validateRequest(this.bearerToken)) {
             throw new Error("Bearer token or private key is required");
         }
-        if (process.env.PRIVATE_KEY) {
-            const transaction = await this.wallet.sendTransaction({
-                to: transactionDetails.toAddress,
-                value: transactionDetails.value,
-                data: transactionDetails.data,
-                gasLimit: transactionDetails.gasLimit,
-                maxFeePerGas: transactionDetails.maxFeePerGas,
-                maxPriorityFeePerGas: transactionDetails.maxPriorityFeePerGas,
-            });
-            return {
-                hash: transaction.hash,
-                caip2: `eip155:${chainId}`,
-            };
-        }
-
-        let response = await moxieUserService.sendTransaction(
-            {
-                chainId: Number(chainId),
-                address: this.address,
-                from: transactionDetails.fromAddress,
-                to: transactionDetails.toAddress,
-                value: transactionDetails.value.toString(),
-                data: transactionDetails.data,
-                gasLimit: transactionDetails.gasLimit.toString(),
-                gasPrice: transactionDetails.gasPrice.toString(),
-                maxFeePerGas: transactionDetails.maxFeePerGas.toString(),
-                maxPriorityFeePerGas:
-                    transactionDetails.maxPriorityFeePerGas.toString(),
-            },
-            this.bearerToken
-        );
-
+        const transaction = await this.wallet.sendTransaction({
+            to: transactionDetails.toAddress,
+            value: transactionDetails.value,
+            data: transactionDetails.data,
+            gasLimit: transactionDetails.gasLimit,
+            maxFeePerGas: transactionDetails.maxFeePerGas,
+            maxPriorityFeePerGas: transactionDetails.maxPriorityFeePerGas,
+        });
         return {
-            hash: response.hash,
+            hash: transaction.hash,
             caip2: `eip155:${chainId}`,
         };
     }
@@ -171,5 +128,5 @@ export type MoxieWalletSendTransactionResponseType =
     EthereumSendTransactionResponseType;
 export type MoxieWalletSendTransactionInputType =
     EthereumSendTransactionInputType;
-export type MoxieWallet = Wallet;
+export type MoxieClientWallet = Wallet;
 export type MoxieHex = Hex;
