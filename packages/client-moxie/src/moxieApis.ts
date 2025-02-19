@@ -21,7 +21,7 @@ import express from "express";
 import { ResponseHelper } from "./responseHelper.ts";
 import { traceIdMiddleware } from "./middleware/traceId.ts";
 import { ftaService } from "@moxie-protocol/moxie-lib";
-import type { MoxieTypes } from "@moxie-protocol/moxie-lib";  
+import type { MoxieTypes } from "@moxie-protocol/moxie-lib";
 import { MoxieWalletClient } from "@moxie-protocol/moxie-lib";
 
 import multer from "multer";
@@ -166,7 +166,9 @@ export function createMoxieApiRouter(
 
                 const moxieUserInfo: MoxieTypes.MoxieUser = mockMoxieUser;
                 const moxieUserId: string = moxieUserInfo.id;
-                const agentWallet: MoxieWalletClient = new MoxieWalletClient(moxieUserInfo.wallets[0].walletAddress);
+                const agentWallet: MoxieWalletClient = new MoxieWalletClient(
+                    moxieUserInfo.wallets[0].walletAddress
+                );
 
                 const userId = stringToUuid(moxieUserId);
 
@@ -337,7 +339,10 @@ export function createMoxieApiRouter(
                         res.write(JSON.stringify(message));
                     }
                 } else {
-                    res.write(JSON.stringify(message));
+                    // message from action is already written to the response stream
+                    if (message && !messageFromActions) {
+                        res.write(JSON.stringify(message));
+                    }
                 }
                 res.end();
             } catch (error) {
