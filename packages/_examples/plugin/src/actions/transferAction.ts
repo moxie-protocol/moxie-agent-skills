@@ -106,9 +106,8 @@ export const transferAction: Action = {
             elizaLogger.log(
                 `Transfering ${formattedValue} wei to address ${toAddress}...`
             );
-            const wallet = new MoxieWalletClient(
-                (state.agentWallet as MoxieWalletClient).address
-            );
+            const wallet = state.agentWallet as MoxieWalletClient;
+            
             const { hash } = await wallet.sendTransaction("8543", {
                 toAddress,
                 value: formattedValue,

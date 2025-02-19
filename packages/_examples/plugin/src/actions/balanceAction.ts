@@ -12,7 +12,7 @@ import {
 } from "@moxie-protocol/core";
 import { MoxieWalletClient } from "@moxie-protocol/moxie-lib/src/wallet";
 import { formatEther, http, createPublicClient } from "viem";
-import { baseSepolia } from "viem/chains";
+import { base } from "viem/chains";
 import { getTokenBalance } from "../utils/balance";
 
 export const balanceAction: Action = {
@@ -37,10 +37,11 @@ export const balanceAction: Action = {
         callback: HandlerCallback
     ) => {
         const publicClient = createPublicClient({
-            chain: baseSepolia,
+            chain: base,
             transport: http(),
         });
         const { address } = state.agentWallet as MoxieWalletClient;
+
         const balance = await publicClient.getBalance({
             address: address as `0x${string}`,
         });

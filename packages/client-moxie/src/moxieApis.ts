@@ -217,8 +217,7 @@ export function createMoxieApiRouter(
                 let state = await runtime.composeState(userMessage, {
                     agentName: runtime.character.name,
                     moxieUserInfo: moxieUserInfo,
-                    agentWallet: agentWallet,
-                    moxieWalletClient: moxieWalletClient,
+                    agentWallet: moxieWalletClient,
                 });
 
                 const context = composeContext({
