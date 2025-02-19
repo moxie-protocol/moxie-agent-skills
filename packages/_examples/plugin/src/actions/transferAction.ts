@@ -117,7 +117,7 @@ export const transferAction: Action = {
             elizaLogger.success(
                 `Transfer completed successfully! Transaction hash: ${hash}`
             );
-            callback?.(
+            await callback?.(
                 {
                     text: `Transfer completed successfully! Transaction hash: ${hash}`,
                 },

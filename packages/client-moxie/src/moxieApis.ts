@@ -339,10 +339,10 @@ export function createMoxieApiRouter(
                         res.write(JSON.stringify(message));
                     }
                 } else {
-                    // Remove this temporarily, must be enabled again for stream
-                    // if (message && !messageFromActions) {
-                    res.write(JSON.stringify(message));
-                    // }
+                    // message from action is already written to the response stream
+                    if (message && !messageFromActions) {
+                        res.write(JSON.stringify(message));
+                    }
                 }
                 res.end();
             } catch (error) {
