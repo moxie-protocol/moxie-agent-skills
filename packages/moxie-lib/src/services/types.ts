@@ -12,6 +12,7 @@ export interface TwitterMetadata {
 }
 
 export interface ENSMetadata {
+    username?: string;
     ens: string;
     expiryTimestamp: string;
     resolvedAddress: string;

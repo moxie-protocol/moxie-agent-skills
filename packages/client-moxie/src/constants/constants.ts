@@ -154,13 +154,3 @@ export const mockMoxieUser: MoxieTypes.MoxieUser = {
         },
     ],
 };
-
-export const mockWallet: MoxieTypes.MoxieWallet = {
-    id: "03463334-3c5c-4d08-9551-188f62b2586a",
-    userId: "M0",
-    walletAddress: "0xa5cc845ef113c4c0908d4c1f4616a000b9a67b80",
-    walletType: "injected",
-    createdAt: "2025-01-07T12:12:05.852Z",
-    deletedAt: null,
-    dataSource: "PRIVY",
-};
