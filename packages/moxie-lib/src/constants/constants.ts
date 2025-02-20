@@ -1,3 +1,4 @@
+import { Fta } from "../services/fta";
 import { MoxieUser } from "../services/types";
 import { MoxieClientWallet } from "../wallet";
 
@@ -117,4 +118,36 @@ export const mockWallet: MoxieClientWallet = {
     connectorType: "embedded",
     hdWalletIndex: 0,
     delegated: false,
+};
+
+export const mockFta: Fta = {
+    id: "1",
+    status: "COMPLETED",
+    entityId: "5650",
+    auctionId: "1",
+    entityType: "USER",
+    entityName: "vitalik.eth",
+    entityImage:
+        "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/341d47e1-f746-4f5c-8fbe-d9e56fa66100/original",
+    endTimestamp: "2024-11-21T09:23:13Z",
+    entitySymbol: "fid:5650",
+    initialSupply: 172,
+    followerCount: 1515,
+    followingCount: 681,
+    subjectAddress: "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+    startTimestamp: "2024-11-18T09:23:29Z",
+    earningsThisWeek: 1000,
+    allTimeEarnings: 10000,
+    earningsToday: null,
+    avgDailyEarnings: 1000,
+    entityDisplayName: "Vitalik Buterin",
+    allTimeEarningRank: 1,
+    userFansSharePercentage: 90,
+    moxieUserId: "M1",
+    imageURL: null,
+    priceCurve: 0,
+    launchCastUrl: null,
+    identityType: null,
+    isFeatured: false,
+    reserveRatio: 400000,
 };
