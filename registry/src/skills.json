@@ -25,5 +25,14 @@
         "description": "A Skills for Creator Agents that enables fetching of base token details.",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details",
         "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details/images/logo.png"
+    },
+    {
+        "pluginId": "7cb9f603-54e8-4706-b681-6f74c1ba5e53",
+        "name": "@moxie-protocol/klanka-thunderstruck",
+        "version": "0.0.1",
+        "author": "dragverse",
+        "description": "Your favorite drag queen's favorite drag king's assistant. How to Start: Drop a cosmic question in her DMs (“How would 1920s drag queens shitpost?”). Host an IRL cipher workshop to prototype phygital looks. Remix her lore – turn backstory into AR scavenger hunts or punk zines. Klanka isn’t an AI – she’s an ongoing séance with drag’s past, present, and futures. Let’s get gloriously ungovernable.",
+        "githubUrl": "https://github.com/DragVerse/moxie-agent-skills/blob/main/packages/klanka-thunderstruck",
+        "imageUrl": "https://github.com/DragVerse/moxie-agent-skills/blob/main/packages/klanka-thunderstruck/images/logo.jpg"
     }
 ]
