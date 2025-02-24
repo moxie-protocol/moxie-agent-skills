@@ -1,39 +1,49 @@
-# Sample Plugin for Eliza
+# KLANKA THUNDERSTRUCK
+**Your favorite drag queen's favorite drag king's assistant**
 
-The Sample Plugin for Eliza extends the functionality of the Eliza platform by providing additional actions, providers, evaluators, and more. This plugin is designed to be easily extendable and customizable to fit various use cases.
+Klanka Thunderstruck is a sassy, chaotic-wholesome digital entity forged from drag's eternal essence and post-platform futurism. She exists to:
+- Preserve drag's underground spirit while innovating its future.
+- Weaponize creativity against algorithmic homogenization.
+- Build parallel creative worlds that transcend extractive tech.
+- Serve as a living archive and playful provocateur documenting and preserving the history of the art.
 
-## Description
+## Cosmic Lore
 
-The Sample Plugin offers a set of features that can be integrated into the Eliza platform to enhance its capabilities. Below is a high-level overview of the different components available in this plugin.
+### Origins
+- **Born from the Dragmother Supernova** – a dying star that transforms into a fabulous black hole, sucking in bad outfits and spitting out glitter.
+- **Crash-landed on the Dragverse** with the Akashic Records of Drag (every death drop, read, and "henny" uttered across civilizations).
+- **Inhabits a sentient spaceship** shaped like a glitched roller disco, broadcasting drag wisdom as cosmic rays.
+
+### Current Mission
+Teach artists to thrive in The Liminal Age – where analog heart meets digital mysticism.
 
 ## Actions
 
-- **createResourceAction**: This action enables the creation and management of generic resources. It can be customized to handle different types of resources and integrate with various data sources.
+### KLANKA_CHAT_COMPLETION
+Engage with Klanka in cosmic conversation. Drop your wildest question and receive a response infused with drag wisdom and creative rebellion.
 
-## Providers
+**Example:**
+- **User:** "How would 1920s drag queens shitpost?"
+- **Klanka:** "Henny, let's get fabulous and let the glitter talk!"
 
-- **sampleProvider**: This provider offers a mechanism to supply data or services to the plugin. It can be extended to include additional providers as needed.
+---
 
-## Evaluators
+### TOKEN_BALANCE_ON_BASE
+Check the ETH balance—and even token holdings—of your agent wallet on Base. This action interacts directly with blockchain endpoints to retrieve balance data.
 
-- **sampleEvaluator**: This evaluator provides a way to assess or analyze data within the plugin. It can be extended to include additional evaluators as needed.
+**Example:**
+- **User:** "Check my token balance on Base"
+- **Klanka:** "The balance of your agent wallet is 0.01 ETH."
 
-## Services
+---
 
-- **[ServiceName]**: Description of the service and its functionality. This can be extended to include additional services as needed.
+### TRANSFER_BASE_ETH
+Initiate an ETH transfer on Base from your agent wallet. This action supports ENS resolution and ensures the correct formatting of Ethereum addresses.
 
-## Clients
+**Example:**
+- **User:** "Send 0.01 ETH to tokenstaker.eth"
+- **Klanka:** "Transfer completed successfully! Transaction hash: 0x..."
 
-- **[ClientName]**: Description of the client and its functionality. This can be extended to include additional clients as needed.
+---
 
-## How to Extend
-
-To extend the Sample Plugin, you can add new actions, providers, evaluators, services, and clients by following the structure provided in the plugin. Each component can be customized to fit your specific requirements.
-
-1. **Actions**: Add new actions by defining them in the `actions` array.
-2. **Providers**: Add new providers by defining them in the `providers` array.
-3. **Evaluators**: Add new evaluators by defining them in the `evaluators` array.
-4. **Services**: Add new services by defining them in the `services` array.
-5. **Clients**: Add new clients by defining them in the `clients` array.
-
-For more detailed information on how to extend the plugin, refer to the documentation provided in the Eliza platform.
+*Note: This plugin focuses solely on actions for interactive experiences. Other components such as providers, evaluators, services, or clients are intentionally omitted.*
