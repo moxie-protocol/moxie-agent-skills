@@ -135,6 +135,9 @@ importers:
       '@moxie-protocol/core':
         specifier: workspace:*
         version: link:../packages/core
+      '@moxie-protocol/klanka-thunderstruck':
+        specifier: workspace:*
+        version: link:../packages/klanka-thunderstruck
       '@moxie-protocol/plugin-bootstrap':
         specifier: workspace:*
         version: link:../packages/plugin-bootstrap
@@ -560,6 +563,28 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+
+  packages/klanka-thunderstruck:
+    dependencies:
+      '@moxie-protocol/core':
+        specifier: workspace:*
+        version: link:../core
+      '@moxie-protocol/moxie-lib':
+        specifier: workspace:*
+        version: link:../moxie-lib
+      ethers:
+        specifier: ^6.0.0
+        version: 6.13.5
+      graphql-request:
+        specifier: ^7.1.2
+        version: 7.1.2(graphql@16.10.0)
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.5
+        version: 22.13.5
+      tsup:
+        specifier: 8.3.5
+        version: 8.3.5(typescript@5.6.3)
 
   packages/moxie-lib:
     dependencies:
@@ -14054,8 +14079,8 @@ packages:
         optional: true
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
-      '@noble/curves': 1.7.0
-      '@noble/hashes': 1.6.1
+      '@noble/curves': 1.8.1
+      '@noble/hashes': 1.7.1
       '@scure/bip32': 1.6.0
       '@scure/bip39': 1.5.0
       abitype: 1.0.7(typescript@5.6.3)(zod@3.23.8)
@@ -17494,8 +17519,8 @@ packages:
   /webauthn-p256@0.0.10:
     resolution: {integrity: sha512-EeYD+gmIT80YkSIDb2iWq0lq2zbHo1CxHlQTeJ+KkCILWpVy3zASH3ByD4bopzfk0uCwXxLqKGLqp2W4O28VFA==}
     dependencies:
-      '@noble/curves': 1.7.0
-      '@noble/hashes': 1.6.1
+      '@noble/curves': 1.8.1
+      '@noble/hashes': 1.7.1
 
   /webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}

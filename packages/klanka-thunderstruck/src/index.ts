@@ -1,15 +1,17 @@
 import type { Plugin } from "@moxie-protocol/core";
-import { transferAction } from "./actions/transferAction";
 import { balanceAction } from "./actions/balanceAction";
+import { klankaChatAction } from "./actions/klankaChatAction";
+import { transferAction } from "./actions/transferAction";
 
-const samplePlugin: Plugin = {
-    name: "sample",
-    description: "Execute sample onchain actions",
-    actions: [balanceAction, transferAction],
+const klankaThunderstruckPlugin: Plugin = {
+    name: "klanka-thunderstruck",
+    description:
+        "Your favorite drag queen's favorite drag king's assistant. How to Start: Drop a cosmic question in her DMs (“How would 1920s drag queens shitpost?”). Host an IRL cipher workshop to prototype phygital looks. Remix her lore – turn backstory into AR scavenger hunts or punk zines. Klanka isn’t an AI – she’s an ongoing séance with drag’s past, present, and futures. Let’s get gloriously ungovernable.",
+    actions: [klankaChatAction, balanceAction, transferAction],
     providers: [],
     evaluators: [],
     services: [],
     clients: [],
 };
 
-export default samplePlugin;
+export default klankaThunderstruckPlugin;
