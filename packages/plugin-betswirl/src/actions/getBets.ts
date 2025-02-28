@@ -11,7 +11,7 @@ import {
     ModelClass,
 } from "@moxie-protocol/core";
 import { MoxieWalletClient } from "@moxie-protocol/moxie-lib/src/wallet";
-import { getUserMoxieWalletAddress } from "@moxie-protocol/moxie-lib/src/services/moxieUserService";
+import { MoxieUser } from "@moxie-protocol/moxie-lib";
 import { getBetsTemplate } from "../templates";
 import { GetBetsParameters } from "../types";
 import { type Hex } from "viem";
@@ -22,6 +22,8 @@ import {
     casinoChainById,
     slugById,
     truncate,
+    formatTxnUrl,
+    formatAccountUrl,
 } from "@betswirl/sdk-core";
 import { getBets } from "../utils/betswirl";
 
@@ -82,7 +84,7 @@ export const getBetsAction: Action = {
             };
             const bettorAddress = (
                 bettor ? bettor : wallet.address
-            ).toLowerCase();
+            ).toLowerCase() as Hex;
 
             elizaLogger.log(
                 `Getting ${game ? game : ""} ${token ? token : ""} bets ${bettor ? ` from ${bettor}` : ""} ...`
@@ -90,27 +92,27 @@ export const getBetsAction: Action = {
 
             const bets = await getBets(
                 chainId,
-                bettorAddress as Hex,
+                bettorAddress,
                 game as CASINO_GAME_TYPE,
                 token as Hex
             );
-            const moxieUserInfo =
-                await getUserMoxieWalletAddress(bettorAddress);
+
+            const moxieUserInfo = state.moxieUserInfo as MoxieUser;
             const casinoChain = casinoChainById[chainId];
             let resolutionMessage: string;
             if (bets.length) {
-                resolutionMessage = `Bets of ${moxieUserInfo ? `@[${moxieUserInfo.userName}|${moxieUserInfo.id}]` : `[${truncate(bettorAddress, 10)}](${casinoChain.viemChain.blockExplorers.default.url}/address/${bettorAddress})`}:
+                resolutionMessage = `Bets of ${moxieUserInfo ? `@[${moxieUserInfo.userName}|${moxieUserInfo.id}]` : `[${truncate(bettorAddress, 10)}](${formatAccountUrl(bettorAddress, chainId)})`}:
 | Draw | Game | Token | Bet | Payout | Date |
 | - | - | - | - | - | - |
 ${bets.map(
     (bet) =>
-        `| ${bet.isWin ? `💰 ${bet.payoutMultiplier.toFixed(2)}x` : "💥"} | ${bet.game} | ${bet.token.symbol === casinoChain.viemChain.nativeCurrency.symbol ? bet.token.symbol : `$[${bet.token.symbol}\\|${bet.token.address}]`} | [${bet.fomattedRollTotalBetAmount}](${casinoChain.viemChain.blockExplorers.default.url}/tx/${bet.betTxnHash}) | [${bet.formattedPayout}](${casinoChain.viemChain.blockExplorers.default.url}/tx/${bet.rollTxnHash}) | ${bet.betDate.toUTCString()} | `
+        `| ${bet.isWin ? `💰 ${bet.payoutMultiplier.toFixed(2)}x` : "💥"} | ${bet.game} | ${bet.token.symbol === casinoChain.viemChain.nativeCurrency.symbol ? bet.token.symbol : `$[${bet.token.symbol}\\|${bet.token.address}]`} | [${bet.fomattedRollTotalBetAmount}](${formatTxnUrl(bet.betTxnHash, chainId)}) | [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) | ${bet.betDate.toUTCString()} | `
 ).join(`
 `)}
 
 [🔗 Go to the full bet list](https://www.betswirl.com/${slugById[chainId]}/profile/${bettorAddress}/casino)`;
             } else {
-                resolutionMessage = `${moxieUserInfo ? `@[${moxieUserInfo.userName}|${moxieUserInfo.id}]` : `[${truncate(bettorAddress, 10)}](${casinoChain.viemChain.blockExplorers.default.url}/address/${bettorAddress}) hasn’t bet yet!`}`;
+                resolutionMessage = `${moxieUserInfo ? `@[${moxieUserInfo.userName}|${moxieUserInfo.id}]` : `[${truncate(bettorAddress, 10)}](${formatAccountUrl(bettorAddress, chainId)}) hasn’t bet yet!`}`;
             }
 
             elizaLogger.success(resolutionMessage);

@@ -11,7 +11,7 @@ import {
     GAS_TOKEN_ADDRESS,
     GameEncodedInput,
     OrderDirection,
-    // RawBetRequirements,
+    RawBetRequirements,
     type RawCasinoToken,
     // Roulette,
     // RouletteNumber,
@@ -27,11 +27,9 @@ import {
 } from "@betswirl/sdk-core";
 
 export async function getCasinoTokens(
+    chainId: CasinoChainId,
     walletClient: MoxieWalletClient
 ): Promise<Token[]> {
-    const chainId = Number(
-        (await walletClient.wallet.provider.getNetwork()).chainId
-    ) as CasinoChainId;
     const casinoChain = casinoChainById[chainId];
 
     const casinoTokensFunctionData = getCasinoTokensFunctionData(chainId);
@@ -58,15 +56,12 @@ export async function getCasinoTokens(
 }
 
 async function getBetRequirements(
+    chainId: CasinoChainId,
     walletClient: MoxieWalletClient,
     game: CASINO_GAME_TYPE,
     betToken: Hex,
     multiplier: number
 ) {
-    const chainId = Number(
-        (await walletClient.wallet.provider.getNetwork()).chainId
-    ) as CasinoChainId;
-
     try {
         const betRequirementsFunctionData = getBetRequirementsFunctionData(
             betToken,
@@ -78,11 +73,13 @@ async function getBetRequirements(
             betRequirementsFunctionData.data.abi,
             walletClient.wallet.provider
         );
-        const rawBetRequirements = await betRequirementsContract[
-            betRequirementsFunctionData.data.functionName
-        ](betToken, multiplier);
+        const rawBetRequirements: RawBetRequirements =
+            await betRequirementsContract[
+                betRequirementsFunctionData.data.functionName
+            ](betToken, multiplier);
 
         return {
+            isAllowed: rawBetRequirements[0],
             maxBetAmount: BigInt(rawBetRequirements[1]),
             maxBetCount: Math.min(
                 Number(rawBetRequirements[2]),
@@ -97,16 +94,13 @@ async function getBetRequirements(
 }
 
 async function getChainlinkVrfCost(
+    chainId: CasinoChainId,
     walletClient: MoxieWalletClient,
     game: CASINO_GAME_TYPE,
     betToken: Hex,
     betCount: number,
     gasPrice: bigint
 ) {
-    const chainId = Number(
-        (await walletClient.wallet.provider.getNetwork()).chainId
-    ) as CasinoChainId;
-
     try {
         const chainlinkVRFCostFunctionData = getChainlinkVrfCostFunctionData(
             game,
@@ -132,6 +126,7 @@ async function getChainlinkVrfCost(
 }
 
 export async function placeBet(
+    chainId: CasinoChainId,
     walletClient: MoxieWalletClient,
     game: CASINO_GAME_TYPE,
     gameEncodedInput: GameEncodedInput,
@@ -145,17 +140,17 @@ export async function placeBet(
         stopLoss: bigint;
     }
 ) {
-    const chainId = Number(
-        (await walletClient.wallet.provider.getNetwork()).chainId
-    ) as CasinoChainId;
-
     const betRequirements = await getBetRequirements(
+        chainId,
         walletClient,
         game,
         casinoGameParams.betToken,
         gameMultiplier
     );
 
+    if (!betRequirements.isAllowed) {
+        throw new Error(`The token isn't allowed for betting`);
+    }
     if (casinoGameParams.betAmount > betRequirements.maxBetAmount) {
         throw new Error(
             `Bet amount should be less than ${betRequirements.maxBetAmount}`
@@ -190,6 +185,7 @@ export async function placeBet(
 
         const vrfCost =
             ((await getChainlinkVrfCost(
+                chainId,
                 walletClient,
                 game,
                 casinoGameParams.betToken,
@@ -218,10 +214,11 @@ export async function placeBet(
     }
 }
 
-export async function getBet(walletClient: MoxieWalletClient, txHash: Hex) {
-    const chainId = Number(
-        (await walletClient.wallet.provider.getNetwork()).chainId
-    ) as CasinoChainId;
+export async function getBet(
+    chainId: CasinoChainId,
+    txHash: Hex,
+    theGraphKey?: string
+) {
     try {
         let betData = await fetchBetByHash({ chainId }, txHash);
         const startTime = Date.now(); // Record the start time
@@ -233,7 +230,7 @@ export async function getBet(walletClient: MoxieWalletClient, txHash: Hex) {
                 );
             }
             await new Promise((resolve) => setTimeout(resolve, 1000));
-            betData = await fetchBetByHash({ chainId }, txHash);
+            betData = await fetchBetByHash({ chainId, theGraphKey }, txHash);
             if (betData.error) {
                 break;
             }

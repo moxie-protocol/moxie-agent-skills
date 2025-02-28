@@ -6,6 +6,7 @@ import {
     MAX_SELECTABLE_ROULETTE_NUMBER,
     MIN_SELECTABLE_DICE_NUMBER,
     MIN_SELECTABLE_ROULETTE_NUMBER,
+    maxHarcodedBetCountByType,
 } from "@betswirl/sdk-core";
 
 const hexAddress = z
@@ -14,12 +15,6 @@ const hexAddress = z
 
 const casinoBetParams = {
     betAmount: z.string().describe("The bet amount"),
-    betCount: z
-        .number()
-        .positive()
-        .default(1)
-        .optional()
-        .describe("The number of bets to place"),
     token: z
         .string()
         .describe("Token symbol")
@@ -38,9 +33,22 @@ const casinoBetParams = {
     receiver: hexAddress.optional().describe("The payout receiver address"),
 };
 
+function getMaxBetCount(game: CASINO_GAME_TYPE) {
+    return {
+        betCount: z
+            .number()
+            .positive()
+            .max(maxHarcodedBetCountByType[game])
+            .default(1)
+            .optional()
+            .describe("The number of bets to place"),
+    };
+}
+
 export const CoinTossBetParameters = z.object({
     face: z.nativeEnum(COINTOSS_FACE).describe("The face of the coin"),
     ...casinoBetParams,
+    ...getMaxBetCount(CASINO_GAME_TYPE.COINTOSS),
 });
 
 export const DiceBetParameters = z.object({
@@ -51,6 +59,7 @@ export const DiceBetParameters = z.object({
         .max(MAX_SELECTABLE_DICE_NUMBER)
         .describe("The number above which you win"),
     ...casinoBetParams,
+    ...getMaxBetCount(CASINO_GAME_TYPE.DICE),
 });
 export const RouletteBetParameters = z.object({
     numbers: z
@@ -61,6 +70,7 @@ export const RouletteBetParameters = z.object({
         .array()
         .describe("The roulette numbers"),
     ...casinoBetParams,
+    ...getMaxBetCount(CASINO_GAME_TYPE.ROULETTE),
 });
 
 export const GetBetParameters = z.object({

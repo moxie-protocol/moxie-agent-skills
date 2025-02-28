@@ -22,6 +22,8 @@ import {
     casinoChainById,
     Token,
     slugById,
+    COINTOSS_FACE,
+    formatTxnUrl,
 } from "@betswirl/sdk-core";
 import { getCasinoTokens, placeBet, getBet } from "../utils/betswirl";
 import { ethers } from "ethers";
@@ -29,7 +31,7 @@ import { ethers } from "ethers";
 export const coinTossAction: Action = {
     name: "COIN_TOSS",
     similes: ["COIN_FLIP", "DOUBLE_OR_NOTHING", "TOSS_A_COIN"],
-    description: "Flip a coin on Base",
+    description: "Flip a coin on BetSwirl",
     suppressInitialMessage: true,
     validate: async (
         _runtime: IAgentRuntime,
@@ -83,7 +85,7 @@ export const coinTossAction: Action = {
             };
 
             const casinoChain = casinoChainById[chainId];
-            const casinoTokens = await getCasinoTokens(wallet);
+            const casinoTokens = await getCasinoTokens(chainId, wallet);
             let selectedToken: Token;
             if (token) {
                 // Validate the token
@@ -107,11 +109,16 @@ export const coinTossAction: Action = {
                 betAmount,
                 selectedToken.decimals
             );
-            if (betAmountInWei < 0n) {
+            if (betAmountInWei <= 0n) {
                 throw new Error("The bet amount must be greater than 0");
             }
             // Validate face is heads or tails
-            if (!face || !["HEADS", "TAILS"].includes(face)) {
+            if (
+                !face ||
+                ![COINTOSS_FACE.HEADS, COINTOSS_FACE.TAILS].includes(
+                    face as COINTOSS_FACE
+                )
+            ) {
                 throw new Error("Face must be heads or tails");
             }
 
@@ -119,6 +126,7 @@ export const coinTossAction: Action = {
                 `Tossing ${betAmount} ${selectedToken.symbol} on ${face}...`
             );
             const hash = await placeBet(
+                chainId,
                 wallet,
                 CASINO_GAME_TYPE.COINTOSS,
                 CoinToss.encodeInput(face),
@@ -133,15 +141,15 @@ export const coinTossAction: Action = {
                 }
             );
 
-            const bet = await getBet(wallet, hash);
+            const bet = await getBet(chainId, hash);
             const fullToken =
                 bet.token.symbol === casinoChain.viemChain.nativeCurrency.symbol
                     ? bet.token.symbol
                     : `$[${bet.token.symbol}\\|${bet.token.address}]`;
-            const resolutionMessage = `You bet [${bet.fomattedRollTotalBetAmount}](${casinoChain.viemChain.blockExplorers.default.url}/tx/${bet.betTxnHash}) ${fullToken} on ${face}...
+            const resolutionMessage = `You bet [${bet.fomattedRollTotalBetAmount}](${formatTxnUrl(bet.betTxnHash, chainId)}}) ${fullToken} on ${face}...
 
 and **${bet.isWin ? "Won" : "Lost"} ${bet.isWin ? `💰 ${bet.payoutMultiplier.toFixed(2)}x` : "💥"}**,
-Payout: [${bet.formattedPayout}](${casinoChain.viemChain.blockExplorers.default.url}/tx/${bet.rollTxnHash}) ${fullToken}
+Payout: [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) ${fullToken}
 
 
 [🔗 Go to more details](https://www.betswirl.com/${slugById[chainId]}/casino/${CASINO_GAME_TYPE.COINTOSS}/${bet.id})`;
