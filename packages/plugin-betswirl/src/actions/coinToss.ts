@@ -21,6 +21,7 @@ import {
     CoinToss,
     casinoChainById,
     Token,
+    slugById,
 } from "@betswirl/sdk-core";
 import { getCasinoTokens, placeBet, getBet } from "../utils/betswirl";
 import { ethers } from "ethers";
@@ -133,8 +134,17 @@ export const coinTossAction: Action = {
             );
 
             const bet = await getBet(wallet, hash);
+            const fullToken =
+                bet.token.symbol === casinoChain.viemChain.nativeCurrency.symbol
+                    ? bet.token.symbol
+                    : `$[${bet.token.symbol}\\|${bet.token.address}]`;
+            const resolutionMessage = `You bet [${bet.fomattedRollTotalBetAmount}](${casinoChain.viemChain.blockExplorers.default.url}/tx/${bet.betTxnHash}) ${fullToken} on ${face}...
 
-            const resolutionMessage = `You ${bet.isWin ? "Won" : "Lost"}, your Payout is ${bet.formattedPayout} ETH, Bet tx: ${bet.betTxnHash}, Resolution tx hash: ${bet.rollTxnHash}`;
+and **${bet.isWin ? "Won" : "Lost"} ${bet.isWin ? `💰 ${bet.payoutMultiplier.toFixed(2)}x` : "💥"}**,
+Payout: [${bet.formattedPayout}](${casinoChain.viemChain.blockExplorers.default.url}/tx/${bet.rollTxnHash}) ${fullToken}
+
+
+[🔗 Go to more details](https://www.betswirl.com/${slugById[chainId]}/casino/${CASINO_GAME_TYPE.COINTOSS}/${bet.id})`;
 
             elizaLogger.success(resolutionMessage);
             await callback({
