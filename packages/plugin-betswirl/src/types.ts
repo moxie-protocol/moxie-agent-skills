@@ -21,13 +21,11 @@ const casinoBetParams = {
         .optional()
         .describe("The token to bet with"),
     stopGain: z
-        .number()
-        .positive()
+        .string()
         .optional()
         .describe("The profit amount to stop betting"),
     stopLoss: z
-        .number()
-        .positive()
+        .string()
         .optional()
         .describe("The loss amount to stop betting"),
     receiver: hexAddress.optional().describe("The payout receiver address"),
