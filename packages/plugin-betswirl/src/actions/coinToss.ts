@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { type Hex } from "viem";
 import {
     type Action,
@@ -15,15 +16,13 @@ import { MoxieWalletClient } from "@moxie-protocol/moxie-lib/src/wallet";
 import {
     CASINO_GAME_TYPE,
     CoinToss,
-    slugById,
     COINTOSS_FACE,
+    slugById,
     formatTxnUrl,
 } from "@betswirl/sdk-core";
-import { coinTossTemplate } from "../templates";
-import { CoinTossBetParameters } from "../types";
+import { casinoBetParams, getMaxBetCountParam } from "../types";
 import {
     getChainIdFromWallet,
-    checkGamePausedStatus,
     getBetToken,
     placeBet,
     getBet,
@@ -31,6 +30,66 @@ import {
 } from "../utils/betswirl";
 import { formatTokenForMoxieTerminal } from "../utils/moxie";
 
+export const CoinTossBetParameters = z.object({
+    face: z.nativeEnum(COINTOSS_FACE).describe("The face of the coin"),
+    ...casinoBetParams,
+    ...getMaxBetCountParam(CASINO_GAME_TYPE.COINTOSS),
+});
+export const coinTossTemplate = `
+Extract the following details to flip a coin:
+- **betAmount** (String): The amount to wager.
+- **face** (String): The side of the coin to bet on. Can be either:
+  - HEADS
+  - TAILS
+- **token** (String): The optional token symbol.
+
+Provide the values in the following JSON format:
+
+\`\`\`json
+{
+    "betAmount": string,
+    "face": string,
+    "token": string
+}
+\`\`\`
+
+Here are example messages and their corresponding responses:
+
+**Message 1**
+
+\`\`\`
+Bet 0.01 ETH on heads
+\`\`\`
+
+**Response 1**
+
+\`\`\`json
+{
+    "betAmount": "0.01",
+    "face": "heads",
+    "token" "ETH"
+}
+\`\`\`
+
+**Message 2**
+
+\`\`\`
+Double or nothing 0.5 on heads
+\`\`\`
+
+**Response 2**
+
+\`\`\`json
+{
+    "betAmount": "0.5",
+    "face": "HEADS",
+    "token": "",
+}
+\`\`\`
+
+Here are the recent user messages for context:
+{{recentMessages}}
+`;
 export const coinTossAction: Action = {
     name: "COIN_TOSS",
     similes: ["COIN_FLIP", "DOUBLE_OR_NOTHING", "TOSS_A_COIN"],
@@ -102,13 +161,6 @@ export const coinTossAction: Action = {
             await callback({
                 text: ` with ${betAmount} ${tokenForMoxieTerminal}...`,
             });
-
-            // Validate that the game isn't paused
-            await checkGamePausedStatus(
-                chainId,
-                wallet,
-                CASINO_GAME_TYPE.COINTOSS
-            );
 
             elizaLogger.log(
                 `Tossing ${betAmount} ${selectedToken.symbol} on ${face}...`

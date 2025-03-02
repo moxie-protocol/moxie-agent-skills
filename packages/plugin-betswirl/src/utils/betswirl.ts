@@ -4,26 +4,23 @@ import { MoxieWalletClient } from "@moxie-protocol/moxie-lib/src/wallet";
 import {
     casinoChainIds,
     casinoChainById,
-    Bet_OrderBy,
-    CASINO_GAME_TYPE,
-    type CasinoChainId,
     GAS_TOKEN_ADDRESS,
-    GameEncodedInput,
+    Bet_OrderBy,
     OrderDirection,
-    RawBetRequirements,
-    type RawCasinoToken,
-    Token,
+    type CASINO_GAME_TYPE,
+    type CasinoChainId,
+    type GameEncodedInput,
+    type RawBetRequirements,
+    type Token,
     fetchBetByHash,
     fetchBets,
     getBetRequirementsFunctionData,
-    getCasinoTokensFunctionData,
     getChainlinkVrfCostFunctionData,
     getPlaceBetFunctionData,
     maxGameBetCountByType,
-    rawTokenToToken,
-    getGamePausedFunctionData,
     fetchTokens,
 } from "@betswirl/sdk-core";
+import { getCasinoTokens } from "../providers/casinoTokens";
 
 export async function getChainIdFromWallet(wallet: MoxieWalletClient) {
     const chainId = Number(
@@ -35,24 +32,6 @@ export async function getChainIdFromWallet(wallet: MoxieWalletClient) {
         );
     }
     return chainId;
-}
-
-export async function checkGamePausedStatus(
-    chainId: CasinoChainId,
-    walletClient: MoxieWalletClient,
-    game: CASINO_GAME_TYPE
-) {
-    const gamePausedFunctionData = getGamePausedFunctionData(game, chainId);
-    const gameContract = new ethers.Contract(
-        gamePausedFunctionData.data.to,
-        gamePausedFunctionData.data.abi,
-        walletClient.wallet.provider
-    );
-    const rawGamePaused: boolean =
-        await gameContract[gamePausedFunctionData.data.functionName]();
-    if (rawGamePaused) {
-        throw new Error(game + " game is paused on this chain");
-    }
 }
 
 export async function getBetToken(
@@ -89,26 +68,6 @@ export function getBetAmountInWei(betAmount: string, token: Token) {
         throw new Error("The bet amount must be greater than 0");
     }
     return betAmountInWei;
-}
-
-export async function getCasinoTokens(
-    chainId: CasinoChainId,
-    walletClient: MoxieWalletClient
-): Promise<Token[]> {
-    const casinoTokensFunctionData = getCasinoTokensFunctionData(chainId);
-    const casinoTokensContract = new ethers.Contract(
-        casinoTokensFunctionData.data.to,
-        casinoTokensFunctionData.data.abi,
-        walletClient.wallet.provider
-    );
-    const rawCasinoTokens: RawCasinoToken[] =
-        await casinoTokensContract[
-            casinoTokensFunctionData.data.functionName
-        ]();
-
-    return rawCasinoTokens
-        .filter((rawToken) => rawToken.token.allowed && !rawToken.token.paused)
-        .map((rawToken) => rawTokenToToken(rawToken, chainId));
 }
 
 async function getBetRequirements(
@@ -302,7 +261,7 @@ export async function getBet(
     }
 }
 
-export async function getBets(
+export async function getSubgraphBets(
     chainId: CasinoChainId,
     bettor: Hex,
     game: CASINO_GAME_TYPE,
@@ -335,7 +294,10 @@ export async function getBets(
     }
 }
 
-export async function getTokens(chainId: CasinoChainId, theGraphKey?: string) {
+export async function getSubgraphTokens(
+    chainId: CasinoChainId,
+    theGraphKey?: string
+) {
     try {
         const tokens = await fetchTokens({ chainId, theGraphKey });
         if (tokens.error) {

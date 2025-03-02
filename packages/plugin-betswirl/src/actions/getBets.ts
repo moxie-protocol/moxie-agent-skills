@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { type Hex } from "viem";
 import {
     type Action,
@@ -21,10 +22,109 @@ import {
     formatAccountUrl,
     Token,
 } from "@betswirl/sdk-core";
-import { getBetsTemplate } from "../templates";
-import { GetBetsParameters } from "../types";
-import { getChainIdFromWallet, getTokens, getBets } from "../utils/betswirl";
+import { hexAddress } from "../types";
+import {
+    getChainIdFromWallet,
+    getSubgraphTokens,
+    getSubgraphBets,
+} from "../utils/betswirl";
 import { formatTokenForMoxieTerminal } from "../utils/moxie";
+
+export const GetBetsParameters = z.object({
+    bettor: z.union([hexAddress, z.literal("")]).describe("The bettor address"),
+    game: z
+        .union([z.nativeEnum(CASINO_GAME_TYPE), z.literal("")])
+        .describe("The game to get the bets for"),
+    token: z.union([z.string(), z.literal("")]).describe("The token symbol"),
+});
+export const getBetsTemplate = `
+Extract the following details to get the bets:
+- **bettor** (String): The address of the player.
+- **game** (String): The game. Can be either:
+  - coin-toss
+  - dice
+  - roulette
+  - keno
+- **token** (String): The token symbol.
+
+Provide the values in the following JSON format:
+
+\`\`\`json
+{
+    "bettor": string,
+    "game": string,
+    "token": string
+}
+\`\`\`
+
+Here are example messages and their corresponding responses:
+
+**Message 1**
+
+\`\`\`
+Get bets
+\`\`\`
+
+**Response 1**
+
+\`\`\`json
+{
+    "bettor": "",
+    "game": "",
+    "token" ""
+}
+\`\`\`
+
+**Message 2**
+
+\`\`\`
+Get dice bets
+\`\`\`
+
+**Response 2**
+
+\`\`\`json
+{
+    "bettor": "",
+    "game": "dice",
+    "token" ""
+}
+\`\`\`
+
+**Message 3**
+
+\`\`\`
+Get dice bets of 0x057BcBF736DADD774A8A45A185c1697F4cF7517D
+\`\`\`
+
+**Response 3**
+
+\`\`\`json
+{
+    "bettor": "0x057BcBF736DADD774A8A45A185c1697F4cF7517D",
+    "game": "dice",
+    "token" ""
+}
+\`\`\`
+**Message 4**
+
+\`\`\`
+Get PEPE dice bets of 0x057BcBF736DADD774A8A45A185c1697F4cF7517D
+\`\`\`
+
+**Response 4**
+
+\`\`\`json
+{
+    "bettor": "0x057BcBF736DADD774A8A45A185c1697F4cF7517D",
+    "game": "dice",
+    "token" "PEPE"
+}
+\`\`\`
+
+Here are the recent user messages for context:
+{{recentMessages}}
+`;
 
 export const getBetsAction: Action = {
     name: "GET_BETS",
@@ -88,7 +188,7 @@ export const getBetsAction: Action = {
             // Validate the token
             let token: Token;
             if (tokenSymbol) {
-                const tokens = await getTokens(
+                const tokens = await getSubgraphTokens(
                     chainId,
                     process.env.BETSWIRL_THEGRAPH_KEY
                 );
@@ -101,7 +201,6 @@ export const getBetsAction: Action = {
                     );
                 }
             }
-            // const casinoChain = casinoChainById[chainId];
             await callback({
                 text:
                     (token
@@ -112,7 +211,7 @@ export const getBetsAction: Action = {
             elizaLogger.log(
                 `Getting ${game ? game : "all"} ${token ? token.symbol : ""} bets from ${bettorAddress}...`
             );
-            const bets = await getBets(
+            const bets = await getSubgraphBets(
                 chainId,
                 bettorAddress,
                 game as CASINO_GAME_TYPE,

@@ -1,7 +1,6 @@
 import { z } from "zod";
 import {
     CASINO_GAME_TYPE,
-    COINTOSS_FACE,
     MAX_SELECTABLE_DICE_NUMBER,
     MAX_SELECTABLE_ROULETTE_NUMBER,
     MIN_SELECTABLE_DICE_NUMBER,
@@ -9,11 +8,11 @@ import {
     maxGameBetCountByType,
 } from "@betswirl/sdk-core";
 
-const hexAddress = z
+export const hexAddress = z
     .string()
     .regex(/^0x[a-fA-F0-9]{40}$/, "The address must be a valid EVM address");
 
-const casinoBetParams = {
+export const casinoBetParams = {
     betAmount: z.string().describe("The bet amount"),
     token: z
         .string()
@@ -28,7 +27,7 @@ const casinoBetParams = {
     receiver: hexAddress.optional().describe("The payout receiver address"),
 };
 
-function getMaxBetCount(game: CASINO_GAME_TYPE) {
+export function getMaxBetCountParam(game: CASINO_GAME_TYPE) {
     return {
         betCount: z
             .number()
@@ -40,12 +39,6 @@ function getMaxBetCount(game: CASINO_GAME_TYPE) {
     };
 }
 
-export const CoinTossBetParameters = z.object({
-    face: z.nativeEnum(COINTOSS_FACE).describe("The face of the coin"),
-    ...casinoBetParams,
-    ...getMaxBetCount(CASINO_GAME_TYPE.COINTOSS),
-});
-
 export const DiceBetParameters = z.object({
     cap: z
         .number()
@@ -54,7 +47,7 @@ export const DiceBetParameters = z.object({
         .max(MAX_SELECTABLE_DICE_NUMBER)
         .describe("The number above which you win"),
     ...casinoBetParams,
-    ...getMaxBetCount(CASINO_GAME_TYPE.DICE),
+    ...getMaxBetCountParam(CASINO_GAME_TYPE.DICE),
 });
 export const RouletteBetParameters = z.object({
     numbers: z
@@ -65,25 +58,5 @@ export const RouletteBetParameters = z.object({
         .array()
         .describe("The roulette numbers"),
     ...casinoBetParams,
-    ...getMaxBetCount(CASINO_GAME_TYPE.ROULETTE),
-});
-
-export const GetBetParameters = z.object({
-    hash: z
-        .string()
-        .regex(
-            /^0x[a-fA-F0-9]{64}$/,
-            "Transaction hash must be a valid hex string"
-        )
-        .describe(
-            "Transaction hash to check status for (hash got when placing the bet)"
-        ),
-});
-
-export const GetBetsParameters = z.object({
-    bettor: z.union([hexAddress, z.literal("")]).describe("The bettor address"),
-    game: z
-        .union([z.nativeEnum(CASINO_GAME_TYPE), z.literal("")])
-        .describe("The game to get the bets for"),
-    token: z.union([z.string(), z.literal("")]).describe("The token symbol"),
+    ...getMaxBetCountParam(CASINO_GAME_TYPE.ROULETTE),
 });
