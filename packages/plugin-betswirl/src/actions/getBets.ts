@@ -24,8 +24,10 @@ import {
     truncate,
     formatTxnUrl,
     formatAccountUrl,
+    Token,
+    CasinoChain,
 } from "@betswirl/sdk-core";
-import { getBets } from "../utils/betswirl";
+import { getTokens, getBets } from "../utils/betswirl";
 
 export const getBetsAction: Action = {
     name: "GET_BETS",
@@ -77,42 +79,64 @@ export const getBetsAction: Action = {
             }
 
             // Validates the inputs
-            const { bettor, game, token } = coinTossDetails.object as {
+            const {
+                bettor,
+                game,
+                token: tokenSymbol,
+            } = coinTossDetails.object as {
                 bettor: string;
                 game: string;
                 token: string;
             };
+            // Validate the token
+            let token: Token;
+            if (tokenSymbol) {
+                const tokens = await getTokens(
+                    chainId,
+                    process.env.BETSWIRL_THEGRAPH_KEY
+                );
+                token = tokens.find(
+                    (token) => token.symbol === tokenSymbol.toUpperCase()
+                );
+                if (!token) {
+                    throw new Error(
+                        `The token must be one of ${tokens.map((token) => token.symbol).join(", ")}`
+                    );
+                }
+            }
+
             const bettorAddress = (
                 bettor ? bettor : wallet.address
             ).toLowerCase() as Hex;
 
             elizaLogger.log(
-                `Getting ${game ? game : ""} ${token ? token : ""} bets ${bettor ? ` from ${bettor}` : ""} ...`
+                `Getting ${game ? game : "all"} ${token ? token.symbol : ""} bets from ${bettorAddress}...`
             );
 
             const bets = await getBets(
                 chainId,
                 bettorAddress,
                 game as CASINO_GAME_TYPE,
-                token as Hex
+                token,
+                process.env.BETSWIRL_THEGRAPH_KEY
             );
 
             const moxieUserInfo = state.moxieUserInfo as MoxieUser;
             const casinoChain = casinoChainById[chainId];
             let resolutionMessage: string;
             if (bets.length) {
-                resolutionMessage = `Bets of ${moxieUserInfo ? `@[${moxieUserInfo.userName}|${moxieUserInfo.id}]` : `[${truncate(bettorAddress, 10)}](${formatAccountUrl(bettorAddress, chainId)})`}:
+                resolutionMessage = `${token ? formatTokenForMoxieTerminal(token, casinoChain) : "All"} bets of ${moxieUserInfo ? `@[${moxieUserInfo.userName}|${moxieUserInfo.id}]` : `[${truncate(bettorAddress, 10)}](${formatAccountUrl(bettorAddress, chainId)})`}:
 | Draw | Game | Token | Bet | Payout | Date |
 | - | - | - | - | - | - |
 ${bets.map(
     (bet) =>
-        `| ${bet.isWin ? `💰 ${bet.payoutMultiplier.toFixed(2)}x` : "💥"} | ${bet.game} | ${bet.token.symbol === casinoChain.viemChain.nativeCurrency.symbol ? bet.token.symbol : `$[${bet.token.symbol}\\|${bet.token.address}]`} | [${bet.fomattedRollTotalBetAmount}](${formatTxnUrl(bet.betTxnHash, chainId)}) | [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) | ${bet.betDate.toUTCString()} | `
+        `| ${bet.isWin ? `💰 ${bet.payoutMultiplier.toFixed(2)}x` : "💥"} | ${bet.game} | ${formatTokenForMoxieTerminal(bet.token, casinoChain)} | [${bet.fomattedRollTotalBetAmount}](${formatTxnUrl(bet.betTxnHash, chainId)}) | [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) | ${bet.betDate.toUTCString()} | `
 ).join(`
 `)}
 
 [🔗 Go to the full bet list](https://www.betswirl.com/${slugById[chainId]}/profile/${bettorAddress}/casino)`;
             } else {
-                resolutionMessage = `${moxieUserInfo ? `@[${moxieUserInfo.userName}|${moxieUserInfo.id}]` : `[${truncate(bettorAddress, 10)}](${formatAccountUrl(bettorAddress, chainId)}) hasn’t bet yet!`}`;
+                resolutionMessage = `${moxieUserInfo ? `@[${moxieUserInfo.userName}|${moxieUserInfo.id}]` : `[${truncate(bettorAddress, 10)}](${formatAccountUrl(bettorAddress, chainId)})`} hasn’t bet yet ${token ? "on " + formatTokenForMoxieTerminal(token, casinoChain) : ""}!`;
             }
 
             elizaLogger.success(resolutionMessage);
@@ -144,3 +168,9 @@ ${bets.map(
         ],
     ] as ActionExample[][],
 };
+
+function formatTokenForMoxieTerminal(token: Token, casinoChain: CasinoChain) {
+    return token.symbol === casinoChain.viemChain.nativeCurrency.symbol
+        ? token.symbol
+        : `$[${token.symbol}\\|${token.address}]`;
+}

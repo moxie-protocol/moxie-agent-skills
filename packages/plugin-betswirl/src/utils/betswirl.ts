@@ -16,22 +16,38 @@ import {
     // Roulette,
     // RouletteNumber,
     Token,
-    casinoChainById,
     fetchBetByHash,
     fetchBets,
     getBetRequirementsFunctionData,
     getCasinoTokensFunctionData,
     getChainlinkVrfCostFunctionData,
     getPlaceBetFunctionData,
-    maxHarcodedBetCountByType,
+    maxGameBetCountByType,
+    rawTokenToToken,
+    getGamePausedFunctionData,
+    fetchTokens,
 } from "@betswirl/sdk-core";
+
+export async function isGamePaused(
+    chainId: CasinoChainId,
+    walletClient: MoxieWalletClient,
+    game: CASINO_GAME_TYPE
+) {
+    const gamePausedFunctionData = getGamePausedFunctionData(game, chainId);
+    const gameContract = new ethers.Contract(
+        gamePausedFunctionData.data.to,
+        gamePausedFunctionData.data.abi,
+        walletClient.wallet.provider
+    );
+    const rawGamePaused: boolean =
+        await gameContract[gamePausedFunctionData.data.functionName]();
+    return rawGamePaused;
+}
 
 export async function getCasinoTokens(
     chainId: CasinoChainId,
     walletClient: MoxieWalletClient
 ): Promise<Token[]> {
-    const casinoChain = casinoChainById[chainId];
-
     const casinoTokensFunctionData = getCasinoTokensFunctionData(chainId);
     const casinoTokensContract = new ethers.Contract(
         casinoTokensFunctionData.data.to,
@@ -45,14 +61,7 @@ export async function getCasinoTokens(
 
     return rawCasinoTokens
         .filter((rawToken) => rawToken.token.allowed && !rawToken.token.paused)
-        .map((rawToken) => ({
-            address: rawToken.tokenAddress,
-            symbol:
-                rawToken.tokenAddress === GAS_TOKEN_ADDRESS
-                    ? casinoChain.viemChain.nativeCurrency.symbol
-                    : rawToken.symbol,
-            decimals: rawToken.decimals,
-        }));
+        .map((rawToken) => rawTokenToToken(rawToken, chainId));
 }
 
 async function getBetRequirements(
@@ -83,7 +92,7 @@ async function getBetRequirements(
             maxBetAmount: BigInt(rawBetRequirements[1]),
             maxBetCount: Math.min(
                 Number(rawBetRequirements[2]),
-                maxHarcodedBetCountByType[game]
+                maxGameBetCountByType[game]
             ),
         };
     } catch (error) {
@@ -220,7 +229,7 @@ export async function getBet(
     theGraphKey?: string
 ) {
     try {
-        let betData = await fetchBetByHash({ chainId }, txHash);
+        let betData = await fetchBetByHash(txHash, { chainId, theGraphKey });
         const startTime = Date.now(); // Record the start time
         const timeout = 60000; // 1 minute timeout
         while ((!betData.bet || !betData.bet.isResolved) && !betData.error) {
@@ -230,7 +239,7 @@ export async function getBet(
                 );
             }
             await new Promise((resolve) => setTimeout(resolve, 1000));
-            betData = await fetchBetByHash({ chainId, theGraphKey }, txHash);
+            betData = await fetchBetByHash(txHash, { chainId, theGraphKey });
             if (betData.error) {
                 break;
             }
@@ -250,17 +259,16 @@ export async function getBets(
     chainId: CasinoChainId,
     bettor: Hex,
     game: CASINO_GAME_TYPE,
-    _token: Hex
+    token: Token,
+    theGraphKey?: string
 ) {
     try {
         const bets = await fetchBets(
-            { chainId },
+            { chainId, theGraphKey },
             {
                 bettor,
                 game,
-                // token: {
-                //     address: token
-                // }
+                token,
             },
             undefined,
             5,
@@ -277,5 +285,19 @@ export async function getBets(
         return bets.bets;
     } catch (error) {
         throw new Error(`An error occured while getting the bet: ${error}`);
+    }
+}
+
+export async function getTokens(chainId: CasinoChainId, theGraphKey?: string) {
+    try {
+        const tokens = await fetchTokens({ chainId, theGraphKey });
+        if (tokens.error) {
+            throw new Error(
+                `[${tokens.error.code}] Error fetching tokens: ${tokens.error.message}`
+            );
+        }
+        return tokens.tokens;
+    } catch (error) {
+        throw new Error(`An error occured while getting tokens: ${error}`);
     }
 }

@@ -6,7 +6,7 @@ import {
     MAX_SELECTABLE_ROULETTE_NUMBER,
     MIN_SELECTABLE_DICE_NUMBER,
     MIN_SELECTABLE_ROULETTE_NUMBER,
-    maxHarcodedBetCountByType,
+    maxGameBetCountByType,
 } from "@betswirl/sdk-core";
 
 const hexAddress = z
@@ -24,10 +24,7 @@ const casinoBetParams = {
         .string()
         .optional()
         .describe("The profit amount to stop betting"),
-    stopLoss: z
-        .string()
-        .optional()
-        .describe("The loss amount to stop betting"),
+    stopLoss: z.string().optional().describe("The loss amount to stop betting"),
     receiver: hexAddress.optional().describe("The payout receiver address"),
 };
 
@@ -36,7 +33,7 @@ function getMaxBetCount(game: CASINO_GAME_TYPE) {
         betCount: z
             .number()
             .positive()
-            .max(maxHarcodedBetCountByType[game])
+            .max(maxGameBetCountByType[game])
             .default(1)
             .optional()
             .describe("The number of bets to place"),
@@ -88,5 +85,5 @@ export const GetBetsParameters = z.object({
     game: z
         .union([z.nativeEnum(CASINO_GAME_TYPE), z.literal("")])
         .describe("The game to get the bets for"),
-    token: z.union([hexAddress, z.literal("")]).describe("The token address"),
+    token: z.union([z.string(), z.literal("")]).describe("The token symbol"),
 });

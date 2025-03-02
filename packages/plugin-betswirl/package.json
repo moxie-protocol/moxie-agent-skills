@@ -5,7 +5,7 @@
     "type": "module",
     "types": "dist/index.d.ts",
     "dependencies": {
-        "@betswirl/sdk-core": "0.0.1-beta-17",
+        "@betswirl/sdk-core": "0.0.1-beta-19",
         "@moxie-protocol/core": "workspace:*",
         "@moxie-protocol/moxie-lib": "workspace:*",
         "ethers": "^6.13.5"

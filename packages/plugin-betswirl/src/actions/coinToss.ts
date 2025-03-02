@@ -25,7 +25,12 @@ import {
     COINTOSS_FACE,
     formatTxnUrl,
 } from "@betswirl/sdk-core";
-import { getCasinoTokens, placeBet, getBet } from "../utils/betswirl";
+import {
+    isGamePaused,
+    getCasinoTokens,
+    placeBet,
+    getBet,
+} from "../utils/betswirl";
 import { ethers } from "ethers";
 
 export const coinTossAction: Action = {
@@ -76,7 +81,18 @@ export const coinTossAction: Action = {
                     `The chain id must be one of ${casinoChainIds.join(", ")}`
                 );
             }
-
+            // Validate that the game isn't paused
+            if (chainId) {
+                if (
+                    await isGamePaused(
+                        chainId,
+                        wallet,
+                        CASINO_GAME_TYPE.COINTOSS
+                    )
+                ) {
+                    throw new Error("Coin toss game is paused on this chain");
+                }
+            }
             // Validates the inputs
             const { face, betAmount, token } = coinTossDetails.object as {
                 face: string;
@@ -141,7 +157,11 @@ export const coinTossAction: Action = {
                 }
             );
 
-            const bet = await getBet(chainId, hash);
+            const bet = await getBet(
+                chainId,
+                hash,
+                process.env.BETSWIRL_THEGRAPH_KEY
+            );
             const fullToken =
                 bet.token.symbol === casinoChain.viemChain.nativeCurrency.symbol
                     ? bet.token.symbol

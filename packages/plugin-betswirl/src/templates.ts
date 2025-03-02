@@ -62,7 +62,7 @@ Extract the following details to get the bets:
   - dice
   - roulette
   - keno
-- **token** (String): The token address.
+- **token** (String): The token symbol.
 
 Provide the values in the following JSON format:
 
@@ -126,7 +126,7 @@ Get dice bets of 0x057BcBF736DADD774A8A45A185c1697F4cF7517D
 **Message 4**
 
 \`\`\`
-Get 0x0000000000000000000000000000000000000000 dice bets of 0x057BcBF736DADD774A8A45A185c1697F4cF7517D
+Get PEPE dice bets of 0x057BcBF736DADD774A8A45A185c1697F4cF7517D
 \`\`\`
 
 **Response 4**
@@ -135,7 +135,7 @@ Get 0x0000000000000000000000000000000000000000 dice bets of 0x057BcBF736DADD774A
 {
     "bettor": "0x057BcBF736DADD774A8A45A185c1697F4cF7517D",
     "game": "dice",
-    "token" "0x0000000000000000000000000000000000000000"
+    "token" "PEPE"
 }
 \`\`\`
 
