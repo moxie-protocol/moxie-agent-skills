@@ -1,20 +1,17 @@
-// import { elizaLogger } from "@moxie-protocol/core";
-import { MoxieWalletClient } from "@moxie-protocol/moxie-lib/src/wallet";
 import { type Hex } from "viem";
 import { ethers } from "ethers";
+import { MoxieWalletClient } from "@moxie-protocol/moxie-lib/src/wallet";
 import {
+    casinoChainIds,
+    casinoChainById,
     Bet_OrderBy,
     CASINO_GAME_TYPE,
     type CasinoChainId,
-    // Dice,
-    // DiceNumber,
     GAS_TOKEN_ADDRESS,
     GameEncodedInput,
     OrderDirection,
     RawBetRequirements,
     type RawCasinoToken,
-    // Roulette,
-    // RouletteNumber,
     Token,
     fetchBetByHash,
     fetchBets,
@@ -28,7 +25,19 @@ import {
     fetchTokens,
 } from "@betswirl/sdk-core";
 
-export async function isGamePaused(
+export async function getChainIdFromWallet(wallet: MoxieWalletClient) {
+    const chainId = Number(
+        (await wallet.wallet.provider.getNetwork()).chainId
+    ) as CasinoChainId;
+    if (!casinoChainIds.includes(chainId)) {
+        throw new Error(
+            `The chain id must be one of ${casinoChainIds.join(", ")}`
+        );
+    }
+    return chainId;
+}
+
+export async function checkGamePausedStatus(
     chainId: CasinoChainId,
     walletClient: MoxieWalletClient,
     game: CASINO_GAME_TYPE
@@ -41,7 +50,45 @@ export async function isGamePaused(
     );
     const rawGamePaused: boolean =
         await gameContract[gamePausedFunctionData.data.functionName]();
-    return rawGamePaused;
+    if (rawGamePaused) {
+        throw new Error(game + " game is paused on this chain");
+    }
+}
+
+export async function getBetToken(
+    chainId: CasinoChainId,
+    wallet: MoxieWalletClient,
+    tokenSymbolInput: string
+) {
+    const casinoChain = casinoChainById[chainId];
+    const casinoTokens = await getCasinoTokens(chainId, wallet);
+    let selectedToken: Token;
+    if (tokenSymbolInput) {
+        // Validate the token
+        selectedToken = casinoTokens.find(
+            (casinoToken) => casinoToken.symbol === tokenSymbolInput
+        );
+        if (!selectedToken) {
+            throw new Error(
+                `The token must be one of ${casinoTokens.map((casinoToken) => casinoToken.symbol).join(", ")}`
+            );
+        }
+    } else {
+        selectedToken = casinoTokens.find(
+            (casinoToken) =>
+                casinoToken.symbol ===
+                casinoChain.viemChain.nativeCurrency.symbol
+        );
+    }
+    return selectedToken;
+}
+
+export function getBetAmountInWei(betAmount: string, token: Token) {
+    const betAmountInWei = ethers.parseUnits(betAmount, token.decimals);
+    if (betAmountInWei <= 0n) {
+        throw new Error("The bet amount must be greater than 0");
+    }
+    return betAmountInWei;
 }
 
 export async function getCasinoTokens(

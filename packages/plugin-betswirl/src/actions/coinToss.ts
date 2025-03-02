@@ -1,3 +1,4 @@
+import { type Hex } from "viem";
 import {
     type Action,
     type IAgentRuntime,
@@ -11,27 +12,24 @@ import {
     ModelClass,
 } from "@moxie-protocol/core";
 import { MoxieWalletClient } from "@moxie-protocol/moxie-lib/src/wallet";
-import { coinTossTemplate } from "../templates";
-import { CoinTossBetParameters } from "../types";
-import { type Hex } from "viem";
 import {
     CASINO_GAME_TYPE,
-    CasinoChainId,
-    casinoChainIds,
     CoinToss,
-    casinoChainById,
-    Token,
     slugById,
     COINTOSS_FACE,
     formatTxnUrl,
 } from "@betswirl/sdk-core";
+import { coinTossTemplate } from "../templates";
+import { CoinTossBetParameters } from "../types";
 import {
-    isGamePaused,
-    getCasinoTokens,
+    getChainIdFromWallet,
+    checkGamePausedStatus,
+    getBetToken,
     placeBet,
     getBet,
+    getBetAmountInWei,
 } from "../utils/betswirl";
-import { ethers } from "ethers";
+import { formatTokenForMoxieTerminal } from "../utils/moxie";
 
 export const coinTossAction: Action = {
     name: "COIN_TOSS",
@@ -53,6 +51,10 @@ export const coinTossAction: Action = {
         try {
             elizaLogger.log("Starting COIN_TOSS handler...");
 
+            // Validate the chain
+            const wallet = state.agentWallet as MoxieWalletClient;
+            const chainId = await getChainIdFromWallet(wallet);
+
             // Initialize or update state
             if (!state) {
                 state = (await runtime.composeState(message)) as State;
@@ -63,71 +65,18 @@ export const coinTossAction: Action = {
                 state,
                 template: coinTossTemplate,
             });
-
             const coinTossDetails = await generateObject({
                 runtime,
                 context,
                 modelClass: ModelClass.SMALL,
                 schema: CoinTossBetParameters,
             });
-
-            // Validate the chain
-            const wallet = state.agentWallet as MoxieWalletClient;
-            const chainId = Number(
-                (await wallet.wallet.provider.getNetwork()).chainId
-            ) as CasinoChainId;
-            if (!casinoChainIds.includes(chainId)) {
-                throw new Error(
-                    `The chain id must be one of ${casinoChainIds.join(", ")}`
-                );
-            }
-            // Validate that the game isn't paused
-            if (chainId) {
-                if (
-                    await isGamePaused(
-                        chainId,
-                        wallet,
-                        CASINO_GAME_TYPE.COINTOSS
-                    )
-                ) {
-                    throw new Error("Coin toss game is paused on this chain");
-                }
-            }
-            // Validates the inputs
             const { face, betAmount, token } = coinTossDetails.object as {
                 face: string;
                 betAmount: string;
                 token: string;
             };
 
-            const casinoChain = casinoChainById[chainId];
-            const casinoTokens = await getCasinoTokens(chainId, wallet);
-            let selectedToken: Token;
-            if (token) {
-                // Validate the token
-                selectedToken = casinoTokens.find(
-                    (casinoToken) => casinoToken.symbol === token
-                );
-                if (!selectedToken) {
-                    throw new Error(
-                        `The token must be one of ${casinoTokens.map((casinoToken) => casinoToken.symbol).join(", ")}`
-                    );
-                }
-            } else {
-                selectedToken = casinoTokens.find(
-                    (casinoToken) =>
-                        casinoToken.symbol ===
-                        casinoChain.viemChain.nativeCurrency.symbol
-                );
-            }
-            // Validate the bet amount
-            const betAmountInWei = ethers.parseUnits(
-                betAmount,
-                selectedToken.decimals
-            );
-            if (betAmountInWei <= 0n) {
-                throw new Error("The bet amount must be greater than 0");
-            }
             // Validate face is heads or tails
             if (
                 !face ||
@@ -137,6 +86,29 @@ export const coinTossAction: Action = {
             ) {
                 throw new Error("Face must be heads or tails");
             }
+            await callback({
+                text: "Betting on " + face,
+            });
+
+            // Get the bet token from the user input
+            const selectedToken = await getBetToken(chainId, wallet, token);
+
+            // Validate the bet amount
+            const betAmountInWei = getBetAmountInWei(betAmount, selectedToken);
+            const tokenForMoxieTerminal = formatTokenForMoxieTerminal(
+                chainId,
+                selectedToken
+            );
+            await callback({
+                text: ` with ${betAmount} ${tokenForMoxieTerminal}...`,
+            });
+
+            // Validate that the game isn't paused
+            await checkGamePausedStatus(
+                chainId,
+                wallet,
+                CASINO_GAME_TYPE.COINTOSS
+            );
 
             elizaLogger.log(
                 `Tossing ${betAmount} ${selectedToken.symbol} on ${face}...`
@@ -156,21 +128,18 @@ export const coinTossAction: Action = {
                     stopLoss: 0n,
                 }
             );
+            await callback({
+                text: ` [placed!](${formatTxnUrl(hash, chainId)}), now rolling...`,
+            });
 
             const bet = await getBet(
                 chainId,
                 hash,
                 process.env.BETSWIRL_THEGRAPH_KEY
             );
-            const fullToken =
-                bet.token.symbol === casinoChain.viemChain.nativeCurrency.symbol
-                    ? bet.token.symbol
-                    : `$[${bet.token.symbol}\\|${bet.token.address}]`;
-            const resolutionMessage = `You bet [${bet.fomattedRollTotalBetAmount}](${formatTxnUrl(bet.betTxnHash, chainId)}}) ${fullToken} on ${face}...
-
-and **${bet.isWin ? "Won" : "Lost"} ${bet.isWin ? `💰 ${bet.payoutMultiplier.toFixed(2)}x` : "💥"}**,
-Payout: [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) ${fullToken}
-
+            const resolutionMessage = `
+You **${bet.isWin ? "Won" : "Lost"} ${bet.isWin ? `💰 ${bet.payoutMultiplier.toFixed(2)}x` : "💥"}**,
+Payout: [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) ${tokenForMoxieTerminal}
 
 [🔗 Go to more details](https://www.betswirl.com/${slugById[chainId]}/casino/${CASINO_GAME_TYPE.COINTOSS}/${bet.id})`;
 
@@ -181,7 +150,7 @@ Payout: [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) ${fu
         } catch (error) {
             elizaLogger.error(error.message);
             await callback({
-                text: error.message,
+                text: " Error: " + error.message,
             });
         }
     },

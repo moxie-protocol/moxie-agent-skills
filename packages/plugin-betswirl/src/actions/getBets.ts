@@ -1,3 +1,4 @@
+import { type Hex } from "viem";
 import {
     type Action,
     type IAgentRuntime,
@@ -10,24 +11,20 @@ import {
     generateObject,
     ModelClass,
 } from "@moxie-protocol/core";
-import { MoxieWalletClient } from "@moxie-protocol/moxie-lib/src/wallet";
 import { MoxieUser } from "@moxie-protocol/moxie-lib";
-import { getBetsTemplate } from "../templates";
-import { GetBetsParameters } from "../types";
-import { type Hex } from "viem";
+import { MoxieWalletClient } from "@moxie-protocol/moxie-lib/src/wallet";
 import {
     CASINO_GAME_TYPE,
-    CasinoChainId,
-    casinoChainIds,
-    casinoChainById,
     slugById,
     truncate,
     formatTxnUrl,
     formatAccountUrl,
     Token,
-    CasinoChain,
 } from "@betswirl/sdk-core";
-import { getTokens, getBets } from "../utils/betswirl";
+import { getBetsTemplate } from "../templates";
+import { GetBetsParameters } from "../types";
+import { getChainIdFromWallet, getTokens, getBets } from "../utils/betswirl";
+import { formatTokenForMoxieTerminal } from "../utils/moxie";
 
 export const getBetsAction: Action = {
     name: "GET_BETS",
@@ -49,6 +46,10 @@ export const getBetsAction: Action = {
         try {
             elizaLogger.log("Starting GET_BETS handler...");
 
+            // Validate the chain
+            const wallet = state.agentWallet as MoxieWalletClient;
+            const chainId = await getChainIdFromWallet(wallet);
+
             // Initialize or update state
             if (!state) {
                 state = (await runtime.composeState(message)) as State;
@@ -59,7 +60,7 @@ export const getBetsAction: Action = {
                 state,
                 template: getBetsTemplate,
             });
-            const coinTossDetails = await generateObject({
+            const getBetsDetails = await generateObject({
                 runtime,
                 context,
                 modelClass: ModelClass.SMALL,
@@ -69,29 +70,17 @@ export const getBetsAction: Action = {
                 bettor,
                 game,
                 token: tokenSymbol,
-            } = coinTossDetails.object as {
+            } = getBetsDetails.object as {
                 bettor: string;
                 game: string;
                 token: string;
             };
-
-            // Validate the chain
-            const wallet = state.agentWallet as MoxieWalletClient;
-            const chainId = Number(
-                (await wallet.wallet.provider.getNetwork()).chainId
-            ) as CasinoChainId;
-            if (!casinoChainIds.includes(chainId)) {
-                throw new Error(
-                    `The chain id must be one of ${casinoChainIds.join(", ")}`
-                );
-            }
 
             // Send some text
             const bettorAddress = (
                 bettor ? bettor : wallet.address
             ).toLowerCase() as Hex;
             const moxieUserInfo = state.moxieUserInfo as MoxieUser;
-            const casinoChain = casinoChainById[chainId];
             await callback({
                 text: `List of ${moxieUserInfo ? `@[${moxieUserInfo.userName}|${moxieUserInfo.id}]` : `[${truncate(bettorAddress, 10)}](${formatAccountUrl(bettorAddress, chainId)})`} bets`,
             });
@@ -112,8 +101,12 @@ export const getBetsAction: Action = {
                     );
                 }
             }
+            // const casinoChain = casinoChainById[chainId];
             await callback({
-                text: (token ? ` (${formatTokenForMoxieTerminal(token, casinoChain)} token only)` : '') + ': ',
+                text:
+                    (token
+                        ? ` (${formatTokenForMoxieTerminal(chainId, token)} token only)`
+                        : "") + ": ",
             });
 
             elizaLogger.log(
@@ -134,7 +127,7 @@ export const getBetsAction: Action = {
 | - | - | - | - | - | - |
 ${bets.map(
     (bet) =>
-        `| ${bet.isWin ? `💰 ${bet.payoutMultiplier.toFixed(2)}x` : "💥"} | ${bet.game} | ${formatTokenForMoxieTerminal(bet.token, casinoChain)} | [${bet.fomattedRollTotalBetAmount}](${formatTxnUrl(bet.betTxnHash, chainId)}) | [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) | ${bet.betDate.toUTCString()} | `
+        `| ${bet.isWin ? `💰 ${bet.payoutMultiplier.toFixed(2)}x` : "💥"} | ${bet.game} | ${formatTokenForMoxieTerminal(chainId, bet.token)} | [${bet.fomattedRollTotalBetAmount}](${formatTxnUrl(bet.betTxnHash, chainId)}) | [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) | ${bet.betDate.toUTCString()} | `
 ).join(`
 `)}
 
@@ -150,7 +143,7 @@ ${bets.map(
         } catch (error) {
             elizaLogger.error(error.message);
             await callback({
-                text: error.message,
+                text: " Error: " + error.message,
             });
         }
     },
@@ -172,9 +165,3 @@ ${bets.map(
         ],
     ] as ActionExample[][],
 };
-
-function formatTokenForMoxieTerminal(token: Token, casinoChain: CasinoChain) {
-    return token.symbol === casinoChain.viemChain.nativeCurrency.symbol
-        ? token.symbol
-        : `$[${token.symbol}\\|${token.address}]`;
-}
