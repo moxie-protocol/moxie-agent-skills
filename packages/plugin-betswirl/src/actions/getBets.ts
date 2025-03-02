@@ -59,13 +59,21 @@ export const getBetsAction: Action = {
                 state,
                 template: getBetsTemplate,
             });
-
             const coinTossDetails = await generateObject({
                 runtime,
                 context,
                 modelClass: ModelClass.SMALL,
                 schema: GetBetsParameters,
             });
+            const {
+                bettor,
+                game,
+                token: tokenSymbol,
+            } = coinTossDetails.object as {
+                bettor: string;
+                game: string;
+                token: string;
+            };
 
             // Validate the chain
             const wallet = state.agentWallet as MoxieWalletClient;
@@ -78,16 +86,16 @@ export const getBetsAction: Action = {
                 );
             }
 
-            // Validates the inputs
-            const {
-                bettor,
-                game,
-                token: tokenSymbol,
-            } = coinTossDetails.object as {
-                bettor: string;
-                game: string;
-                token: string;
-            };
+            // Send some text
+            const bettorAddress = (
+                bettor ? bettor : wallet.address
+            ).toLowerCase() as Hex;
+            const moxieUserInfo = state.moxieUserInfo as MoxieUser;
+            const casinoChain = casinoChainById[chainId];
+            await callback({
+                text: `List of ${moxieUserInfo ? `@[${moxieUserInfo.userName}|${moxieUserInfo.id}]` : `[${truncate(bettorAddress, 10)}](${formatAccountUrl(bettorAddress, chainId)})`} bets`,
+            });
+
             // Validate the token
             let token: Token;
             if (tokenSymbol) {
@@ -104,15 +112,13 @@ export const getBetsAction: Action = {
                     );
                 }
             }
-
-            const bettorAddress = (
-                bettor ? bettor : wallet.address
-            ).toLowerCase() as Hex;
+            await callback({
+                text: (token ? ` (${formatTokenForMoxieTerminal(token, casinoChain)} token only)` : '') + ': ',
+            });
 
             elizaLogger.log(
                 `Getting ${game ? game : "all"} ${token ? token.symbol : ""} bets from ${bettorAddress}...`
             );
-
             const bets = await getBets(
                 chainId,
                 bettorAddress,
@@ -121,11 +127,9 @@ export const getBetsAction: Action = {
                 process.env.BETSWIRL_THEGRAPH_KEY
             );
 
-            const moxieUserInfo = state.moxieUserInfo as MoxieUser;
-            const casinoChain = casinoChainById[chainId];
             let resolutionMessage: string;
             if (bets.length) {
-                resolutionMessage = `${token ? formatTokenForMoxieTerminal(token, casinoChain) : "All"} bets of ${moxieUserInfo ? `@[${moxieUserInfo.userName}|${moxieUserInfo.id}]` : `[${truncate(bettorAddress, 10)}](${formatAccountUrl(bettorAddress, chainId)})`}:
+                resolutionMessage = `
 | Draw | Game | Token | Bet | Payout | Date |
 | - | - | - | - | - | - |
 ${bets.map(
@@ -136,7 +140,7 @@ ${bets.map(
 
 [🔗 Go to the full bet list](https://www.betswirl.com/${slugById[chainId]}/profile/${bettorAddress}/casino)`;
             } else {
-                resolutionMessage = `${moxieUserInfo ? `@[${moxieUserInfo.userName}|${moxieUserInfo.id}]` : `[${truncate(bettorAddress, 10)}](${formatAccountUrl(bettorAddress, chainId)})`} hasn’t bet yet ${token ? "on " + formatTokenForMoxieTerminal(token, casinoChain) : ""}!`;
+                resolutionMessage = `\nEmpty`;
             }
 
             elizaLogger.success(resolutionMessage);
