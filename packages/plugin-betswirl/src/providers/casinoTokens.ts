@@ -16,7 +16,7 @@ import {
 } from "@betswirl/sdk-core";
 
 const CACHE_KEY = "betswirl:tokens";
-const CACHE_TTL = 15 * 60; // 5 minutes
+const CACHE_TTL = 15 * 60; // 15 minutes
 
 function formatTokensContext(tokens: Token[]): string {
     return `Available casino tokens:

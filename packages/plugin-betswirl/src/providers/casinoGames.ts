@@ -15,7 +15,7 @@ import {
 } from "@betswirl/sdk-core";
 
 const CACHE_KEY = "betswirl:games";
-const CACHE_TTL = 15 * 60; // 5 minutes
+const CACHE_TTL = 15 * 60; // 15 minutes
 
 function formatGamesContext(games: string[]): string {
     return `Available casino games:
