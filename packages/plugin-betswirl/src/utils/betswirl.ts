@@ -5,15 +5,12 @@ import {
     casinoChainIds,
     casinoChainById,
     GAS_TOKEN_ADDRESS,
-    Bet_OrderBy,
-    OrderDirection,
     type CASINO_GAME_TYPE,
     type CasinoChainId,
     type GameEncodedInput,
     type RawBetRequirements,
     type Token,
     fetchBetByHash,
-    fetchBets,
     getBetRequirementsFunctionData,
     getChainlinkVrfCostFunctionData,
     getPlaceBetFunctionData,
@@ -258,37 +255,6 @@ export async function getBet(
             );
         }
         return betData.bet;
-    } catch (error) {
-        throw new Error(`An error occured while getting the bet: ${error}`);
-    }
-}
-
-export async function getSubgraphBets(
-    chainId: CasinoChainId,
-    bettor: Hex,
-    game: CASINO_GAME_TYPE,
-    theGraphKey?: string
-) {
-    try {
-        const bets = await fetchBets(
-            { chainId, theGraphKey },
-            {
-                bettor,
-                game,
-            },
-            undefined,
-            5,
-            {
-                key: Bet_OrderBy.BetTimestamp,
-                order: OrderDirection.Desc,
-            }
-        );
-        if (bets.error) {
-            throw new Error(
-                `[${bets.error.code}] Error fetching bets: ${bets.error.message}`
-            );
-        }
-        return bets.bets;
     } catch (error) {
         throw new Error(`An error occured while getting the bet: ${error}`);
     }

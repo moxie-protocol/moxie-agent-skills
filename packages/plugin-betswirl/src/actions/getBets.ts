@@ -20,9 +20,13 @@ import {
     truncate,
     formatTxnUrl,
     formatAccountUrl,
+    CasinoChainId,
+    fetchBets,
+    Bet_OrderBy,
+    OrderDirection,
 } from "@betswirl/sdk-core";
 import { hexAddress } from "../types";
-import { getChainIdFromWallet, getSubgraphBets } from "../utils/betswirl";
+import { getChainIdFromWallet } from "../utils/betswirl";
 import { formatTokenForMoxieTerminal } from "../utils/moxie";
 
 export const GetBetsParameters = z.object({
@@ -103,7 +107,8 @@ Here are the recent user messages for context:
 export const getBetsAction: Action = {
     name: "GET_BETS",
     similes: ["RETRIEVE_BETS", "SHOW_BETS", "LAST_BETS"],
-    description: "Get bets from BetSwirl. If no player is specified its listing the current connected player bets. If no game is specified its listing all games bets.",
+    description:
+        "Get bets from BetSwirl. If no player is specified its listing the current connected player bets. If no game is specified its listing all games bets.",
     suppressInitialMessage: true,
     validate: async (
         _runtime: IAgentRuntime,
@@ -209,3 +214,34 @@ ${bets.map(
         ],
     ] as ActionExample[][],
 };
+
+async function getSubgraphBets(
+    chainId: CasinoChainId,
+    bettor: Hex,
+    game: CASINO_GAME_TYPE,
+    theGraphKey?: string
+) {
+    try {
+        const bets = await fetchBets(
+            { chainId, theGraphKey },
+            {
+                bettor,
+                game,
+            },
+            undefined,
+            5,
+            {
+                key: Bet_OrderBy.BetTimestamp,
+                order: OrderDirection.Desc,
+            }
+        );
+        if (bets.error) {
+            throw new Error(
+                `[${bets.error.code}] Error fetching bets: ${bets.error.message}`
+            );
+        }
+        return bets.bets;
+    } catch (error) {
+        throw new Error(`An error occured while getting the bet: ${error}`);
+    }
+}
