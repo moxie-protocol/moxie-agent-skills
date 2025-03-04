@@ -18,7 +18,7 @@ import {
     getChainlinkVrfCostFunctionData,
     getPlaceBetFunctionData,
     maxGameBetCountByType,
-    fetchTokens,
+    chainNativeCurrencyToToken,
 } from "@betswirl/sdk-core";
 import { getCasinoTokens } from "../providers/casinoTokens";
 
@@ -40,9 +40,12 @@ export async function getBetToken(
     tokenSymbolInput: string
 ) {
     const casinoChain = casinoChainById[chainId];
-    const casinoTokens = await getCasinoTokens(chainId, wallet);
     let selectedToken: Token;
-    if (tokenSymbolInput) {
+    if (
+        tokenSymbolInput &&
+        tokenSymbolInput !== casinoChain.viemChain.nativeCurrency.symbol
+    ) {
+        const casinoTokens = await getCasinoTokens(chainId, wallet);
         // Validate the token
         selectedToken = casinoTokens.find(
             (casinoToken) => casinoToken.symbol === tokenSymbolInput
@@ -53,10 +56,8 @@ export async function getBetToken(
             );
         }
     } else {
-        selectedToken = casinoTokens.find(
-            (casinoToken) =>
-                casinoToken.symbol ===
-                casinoChain.viemChain.nativeCurrency.symbol
+        selectedToken = chainNativeCurrencyToToken(
+            casinoChain.viemChain.nativeCurrency
         );
     }
     return selectedToken;
@@ -91,7 +92,7 @@ async function getBetRequirements(
         const rawBetRequirements: RawBetRequirements =
             await betRequirementsContract[
                 betRequirementsFunctionData.data.functionName
-            ](betToken, multiplier);
+            ](...betRequirementsFunctionData.data.args);
 
         return {
             isAllowed: rawBetRequirements[0],
@@ -123,16 +124,17 @@ async function getChainlinkVrfCost(
             betCount,
             chainId
         );
-        const vrfCost = await walletClient.wallet.call({
-            to: chainlinkVRFCostFunctionData.data.to,
-            data: chainlinkVRFCostFunctionData.encodedData,
+        const chainlinkVRFCostContract = new ethers.Contract(
+            chainlinkVRFCostFunctionData.data.to,
+            chainlinkVRFCostFunctionData.data.abi,
+            walletClient.wallet.provider
+        );
+        const chainlinkVRFCost: bigint = await chainlinkVRFCostContract[
+            chainlinkVRFCostFunctionData.data.functionName
+        ](...chainlinkVRFCostFunctionData.data.args, {
             gasPrice,
         });
-
-        if (!vrfCost) {
-            return 0n;
-        }
-        return BigInt(vrfCost || 0n);
+        return chainlinkVRFCost;
     } catch (error) {
         throw new Error(
             `An error occured while getting the chainlink vrf cost: ${error.shortMessage}`
@@ -224,7 +226,7 @@ export async function placeBet(
         return betHash as Hex;
     } catch (error) {
         throw new Error(
-            `An error occured while placing the bet: ${error.shortMessage}`
+            `An error occured while placing the bet: ${error.shortMessage || error.message}`
         );
     }
 }
@@ -265,7 +267,6 @@ export async function getSubgraphBets(
     chainId: CasinoChainId,
     bettor: Hex,
     game: CASINO_GAME_TYPE,
-    token: Token,
     theGraphKey?: string
 ) {
     try {
@@ -274,7 +275,6 @@ export async function getSubgraphBets(
             {
                 bettor,
                 game,
-                token,
             },
             undefined,
             5,
@@ -291,22 +291,5 @@ export async function getSubgraphBets(
         return bets.bets;
     } catch (error) {
         throw new Error(`An error occured while getting the bet: ${error}`);
-    }
-}
-
-export async function getSubgraphTokens(
-    chainId: CasinoChainId,
-    theGraphKey?: string
-) {
-    try {
-        const tokens = await fetchTokens({ chainId, theGraphKey });
-        if (tokens.error) {
-            throw new Error(
-                `[${tokens.error.code}] Error fetching tokens: ${tokens.error.message}`
-            );
-        }
-        return tokens.tokens;
-    } catch (error) {
-        throw new Error(`An error occured while getting tokens: ${error}`);
     }
 }
