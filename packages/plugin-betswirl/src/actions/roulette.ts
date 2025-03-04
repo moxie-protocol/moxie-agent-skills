@@ -100,7 +100,7 @@ Here are the recent user messages for context:
 export const rouletteAction: Action = {
     name: "ROULETTE",
     similes: [],
-    description: "Play the BetSwirl Roulette",
+    description: "Play the BetSwirl Roulette. The player is betting that the rolled number will be one of the chosen numbers.",
     suppressInitialMessage: true,
     validate: async (
         _runtime: IAgentRuntime,
@@ -221,7 +221,7 @@ Payout: [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) ${to
             {
                 user: "{{user2}}",
                 content: {
-                    text: "You Lost, your Payout is 0.00003 ETH, Bet tx: 0x6ba8a0c3e861b036f052709f56412084806376fbaf24b15bce4920a8a53095af, Resolution tx hash: 0x8ed5541c45b6c7083b3e5795f52f92827748e93e6562ec126f4a1cf22b433f77",
+                    text: "You Won, your Payout is 0.00003 ETH, Bet tx: 0x6ba8a0c3e861b036f052709f56412084806376fbaf24b15bce4920a8a53095af, Resolution tx hash: 0x8ed5541c45b6c7083b3e5795f52f92827748e93e6562ec126f4a1cf22b433f77",
                     action: "ROULETTE",
                 },
             },
