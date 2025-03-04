@@ -191,6 +191,7 @@ export const coinTossAction: Action = {
             );
             const resolutionMessage = `
 You **${bet.isWin ? "Won" : "Lost"} ${bet.isWin ? `💰 ${bet.payoutMultiplier.toFixed(2)}x` : "💥"}**,
+Rolled face: ${bet.decodedRolled}
 Payout: [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) ${tokenForMoxieTerminal}
 
 [🔗 Go to more details](https://www.betswirl.com/${slugById[chainId]}/casino/${CASINO_GAME_TYPE.COINTOSS}/${bet.id})`;
