@@ -20,14 +20,9 @@ import {
     truncate,
     formatTxnUrl,
     formatAccountUrl,
-    Token,
 } from "@betswirl/sdk-core";
 import { hexAddress } from "../types";
-import {
-    getChainIdFromWallet,
-    getSubgraphTokens,
-    getSubgraphBets,
-} from "../utils/betswirl";
+import { getChainIdFromWallet, getSubgraphBets } from "../utils/betswirl";
 import { formatTokenForMoxieTerminal } from "../utils/moxie";
 
 export const GetBetsParameters = z.object({
@@ -35,7 +30,6 @@ export const GetBetsParameters = z.object({
     game: z
         .union([z.nativeEnum(CASINO_GAME_TYPE), z.literal("")])
         .describe("The game to get the bets for"),
-    token: z.union([z.string(), z.literal("")]).describe("The token symbol"),
 });
 export const getBetsTemplate = `
 Extract the following details to get the bets:
@@ -45,15 +39,13 @@ Extract the following details to get the bets:
   - dice
   - roulette
   - keno
-- **token** (String): The token symbol.
 
 Provide the values in the following JSON format:
 
 \`\`\`json
 {
     "bettor": string,
-    "game": string,
-    "token": string
+    "game": string
 }
 \`\`\`
 
@@ -70,8 +62,7 @@ Get bets
 \`\`\`json
 {
     "bettor": "",
-    "game": "",
-    "token" ""
+    "game": ""
 }
 \`\`\`
 
@@ -86,8 +77,7 @@ Get dice bets
 \`\`\`json
 {
     "bettor": "",
-    "game": "dice",
-    "token" ""
+    "game": "dice"
 }
 \`\`\`
 
@@ -102,23 +92,7 @@ Get dice bets of 0x057BcBF736DADD774A8A45A185c1697F4cF7517D
 \`\`\`json
 {
     "bettor": "0x057BcBF736DADD774A8A45A185c1697F4cF7517D",
-    "game": "dice",
-    "token" ""
-}
-\`\`\`
-**Message 4**
-
-\`\`\`
-Get PEPE dice bets of 0x057BcBF736DADD774A8A45A185c1697F4cF7517D
-\`\`\`
-
-**Response 4**
-
-\`\`\`json
-{
-    "bettor": "0x057BcBF736DADD774A8A45A185c1697F4cF7517D",
-    "game": "dice",
-    "token" "PEPE"
+    "game": "dice"
 }
 \`\`\`
 
@@ -166,14 +140,9 @@ export const getBetsAction: Action = {
                 modelClass: ModelClass.SMALL,
                 schema: GetBetsParameters,
             });
-            const {
-                bettor,
-                game,
-                token: tokenSymbol,
-            } = getBetsDetails.object as {
+            const { bettor, game } = getBetsDetails.object as {
                 bettor: string;
                 game: string;
-                token: string;
             };
 
             // Send some text
@@ -182,40 +151,16 @@ export const getBetsAction: Action = {
             ).toLowerCase() as Hex;
             const moxieUserInfo = state.moxieUserInfo as MoxieUser;
             await callback({
-                text: `List of ${moxieUserInfo ? `@[${moxieUserInfo.userName}|${moxieUserInfo.id}]` : `[${truncate(bettorAddress, 10)}](${formatAccountUrl(bettorAddress, chainId)})`} bets`,
-            });
-
-            // Validate the token
-            let token: Token;
-            if (tokenSymbol) {
-                const tokens = await getSubgraphTokens(
-                    chainId,
-                    process.env.BETSWIRL_THEGRAPH_KEY
-                );
-                token = tokens.find(
-                    (token) => token.symbol === tokenSymbol.toUpperCase()
-                );
-                if (!token) {
-                    throw new Error(
-                        `The token must be one of ${tokens.map((token) => token.symbol).join(", ")}`
-                    );
-                }
-            }
-            await callback({
-                text:
-                    (token
-                        ? ` (${formatTokenForMoxieTerminal(chainId, token)} token only)`
-                        : "") + ": ",
+                text: `List of ${moxieUserInfo ? `@[${moxieUserInfo.userName}|${moxieUserInfo.id}]` : `[${truncate(bettorAddress, 10)}](${formatAccountUrl(bettorAddress, chainId)})`} bets:`,
             });
 
             elizaLogger.log(
-                `Getting ${game ? game : "all"} ${token ? token.symbol : ""} bets from ${bettorAddress}...`
+                `Getting ${game ? game : "all"} bets from ${bettorAddress}...`
             );
             const bets = await getSubgraphBets(
                 chainId,
                 bettorAddress,
                 game as CASINO_GAME_TYPE,
-                token,
                 process.env.BETSWIRL_THEGRAPH_KEY
             );
 
