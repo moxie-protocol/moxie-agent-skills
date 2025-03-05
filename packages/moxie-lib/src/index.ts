@@ -21,3 +21,9 @@ export {
     MoxieUser,
     TransactionDetails,
 } from "./services/types";
+
+export {
+    getMoxiePortfolioInfo,
+    MoxiePortfolioInfo,
+    getMoxiePortfolioInfoByCreatorTokenDetails,
+} from "./services/portfolioService";
