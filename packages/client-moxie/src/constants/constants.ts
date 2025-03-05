@@ -1,11 +1,13 @@
 import type { walletService, MoxieUser } from "@moxie-protocol/moxie-lib";
 
 export const CREATOR_AGENT_TOKEN_ADDRESS: string =
-    process.env["CREATOR_AGENT_TOKEN_ADDRESS"] || "";
+    process.env["CREATOR_AGENT_TOKEN_ADDRESS"] ||
+    "0x838cc7f24a2696c796f90516c89369fbdcf7c575";
 export const MINIMUM_CREATOR_AGENT_COINS: number =
     Number(process.env["MINIMUM_CREATOR_AGENT_COINS"]) || 0;
 export const COMMON_AGENT_ID: string = process.env["COMMON_AGENT_ID"] || "";
-export const BASE_RPC_URL: string = process.env["BASE_RPC_URL"] || "";
+export const BASE_RPC_URL: string =
+    process.env["BASE_RPC_URL"] || "https://mainnet.base.org";
 /**
  * REUSABLE MOCK DATA STARTS BELOW
  */

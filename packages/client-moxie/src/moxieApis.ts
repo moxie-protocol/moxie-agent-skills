@@ -80,6 +80,13 @@ function validateUUIDParams(
     return { agentId };
 }
 
+const builtinActions = [
+    "NONE",
+    "IGNORE",
+    "FOLLOW_ROOM",
+    "CONTINUE",
+    "MUTE_ROOM",
+];
 export function createMoxieApiRouter(
     agents: Map<string, AgentRuntime>,
     moxieClient: MoxieClient
@@ -105,6 +112,7 @@ export function createMoxieApiRouter(
         upload.single("file"),
         async (req: express.Request, res: express.Response) => {
             try {
+                const startTime = new Date().getTime();
                 elizaLogger.debug("/v1 message api is started", {
                     traceId: req.traceId,
                 });
@@ -174,6 +182,27 @@ export function createMoxieApiRouter(
 
                 const userId = stringToUuid(moxieUserId);
 
+                // check the roomId is belongs to this user or not.
+                const participants =
+                    await runtime.databaseAdapter.getParticipantsForRoom(
+                        roomId
+                    );
+                if (
+                    participants &&
+                    participants.length > 0 &&
+                    !participants.includes(userId)
+                ) {
+                    res.status(403).json(
+                        ResponseHelper.error<null>(
+                            "INVALID_REQUEST",
+                            `user doesn't belong to this roomId`,
+                            req.path,
+                            req.traceId
+                        )
+                    );
+                    return;
+                }
+
                 await runtime.ensureConnection(
                     userId,
                     roomId,
@@ -195,9 +224,11 @@ export function createMoxieApiRouter(
                     roomId,
                     agentId: runtime.agentId,
                 };
-
+                const userQuestionMessageId = stringToUuid(
+                    messageId + "-" + userId
+                );
                 const memory: Memory = {
-                    id: stringToUuid(`${messageId}-${userId}`),
+                    id: userQuestionMessageId,
                     ...userMessage,
                     agentId: runtime.agentId,
                     userId,
@@ -218,6 +249,7 @@ export function createMoxieApiRouter(
                     agentName: runtime.character.name,
                     moxieUserInfo: moxieUserInfo,
                     agentWallet: moxieWalletClient,
+                    moxieWalletClient: moxieWalletClient,
                 });
 
                 const context = composeContext({
@@ -260,15 +292,13 @@ export function createMoxieApiRouter(
                     createdAt: Date.now(),
                 };
 
-                // if the response contains action field, then we dont need to save the memory
-                if (!response.action) {
+                // if the response contains action field and it's a builtin action, save the memory
+                if (
+                    !response.action ||
+                    builtinActions?.includes(response.action)
+                ) {
                     await runtime.messageManager.createMemory(responseMessage);
                     state = await runtime.updateRecentMessageState(state);
-                }
-                // check if the user has explicitly provided the action in the request. e.g, this could be for followup actions
-                // then overwrite the action in the response
-                if (req.body.action) {
-                    response.action = req.body.action;
                 }
 
                 let message = null as Content | null;
@@ -283,6 +313,11 @@ export function createMoxieApiRouter(
                 let messageFromActions = false;
                 let newContext = "";
                 let newAction = undefined;
+                const processingActionsStartTime = new Date().getTime();
+                elizaLogger.debug(
+                    req.traceId,
+                    `processing action: ${response.action} started at ${processingActionsStartTime}`
+                );
                 await runtime.processActions(
                     memory,
                     [responseMessage],
@@ -292,41 +327,45 @@ export function createMoxieApiRouter(
                         message = newMessages;
                         newAction = newMessages.action;
                         newContext += newMessages.text;
-
-                        await new Promise((resolve) =>
-                            setTimeout(resolve, 100)
-                        ); // sleep for 100ms to avoid sending multiple chunks in a single request
                         res.write(JSON.stringify(newMessages));
                         return [memory];
                     }
                 );
+                elizaLogger.debug(
+                    req.traceId,
+                    `processing action: ${response.action} ended at ${new Date().getTime()}. total time taken: ${new Date().getTime() - processingActionsStartTime} ms`
+                );
 
-                const newMessageId = stringToUuid(Date.now().toString());
-                const newContent: Content = {
-                    text: newContext,
-                    inReplyTo: memory.id,
-                    action: newAction,
-                };
+                console.log("New Context", newContext);
+                if (newContext != "") {
+                    const newMessageId = stringToUuid(Date.now().toString());
+                    const newContent: Content = {
+                        text: newContext,
+                        inReplyTo: userQuestionMessageId,
+                        action: newAction,
+                    };
 
-                const agentMessage = {
-                    content: newContent,
-                    userId: runtime.agentId,
-                    roomId,
-                    agentId: runtime.agentId,
-                };
+                    const agentMessage = {
+                        content: newContent,
+                        userId: runtime.agentId,
+                        roomId,
+                        agentId: runtime.agentId,
+                    };
 
-                const newMemory: Memory = {
-                    id: newMessageId,
-                    ...agentMessage,
-                    agentId: runtime.agentId,
-                    userId: runtime.agentId,
-                    roomId,
-                    content,
-                    createdAt: Date.now(),
-                };
+                    const newMemory: Memory = {
+                        id: stringToUuid(newMessageId + "-" + runtime.agentId),
+                        ...agentMessage,
+                        agentId: runtime.agentId,
+                        userId: runtime.agentId,
+                        roomId,
+                        createdAt: Date.now(),
+                    };
 
-                await runtime.messageManager.addEmbeddingToMemory(newMemory);
-                await runtime.messageManager.createMemory(newMemory);
+                    await runtime.messageManager.addEmbeddingToMemory(
+                        newMemory
+                    );
+                    await runtime.messageManager.createMemory(newMemory);
+                }
 
                 await runtime.evaluate(memory, state);
 
@@ -340,8 +379,6 @@ export function createMoxieApiRouter(
                 if (!shouldSuppressInitialMessage) {
                     // write the response to the response stream
                     res.write(JSON.stringify(response));
-                    // sleep for 100ms to avoid sending multiple chunks in a single request
-                    await new Promise((resolve) => setTimeout(resolve, 100));
                     if (message && !messageFromActions) {
                         res.write(JSON.stringify(message));
                     }
@@ -351,6 +388,12 @@ export function createMoxieApiRouter(
                         res.write(JSON.stringify(message));
                     }
                 }
+                elizaLogger.debug(
+                    req.traceId,
+                    `/v1 message api is ended with params: ${JSON.stringify(req.body)} and action: ${response.action} at ${new Date().getTime()}. total time taken: ${
+                        new Date().getTime() - startTime
+                    } ms`
+                );
                 res.end();
             } catch (error) {
                 elizaLogger.error(error, { traceId: req.traceId });
