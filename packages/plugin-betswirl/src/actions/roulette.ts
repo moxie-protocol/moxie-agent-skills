@@ -100,7 +100,8 @@ Here are the recent user messages for context:
 export const rouletteAction: Action = {
     name: "ROULETTE",
     similes: [],
-    description: "Play the BetSwirl Roulette. The player is betting that the rolled number will be one of the chosen numbers.",
+    description:
+        "Play the BetSwirl Roulette. The player is betting that the rolled number will be one of the chosen numbers.",
     suppressInitialMessage: true,
     validate: async (
         _runtime: IAgentRuntime,
@@ -176,7 +177,7 @@ export const rouletteAction: Action = {
                 Roulette.getMultiplier(numbers),
                 {
                     betAmount: betAmountInWei,
-                    betToken: selectedToken.address,
+                    betToken: selectedToken,
                     betCount: 1,
                     receiver: wallet.address as Hex,
                     stopGain: 0n,

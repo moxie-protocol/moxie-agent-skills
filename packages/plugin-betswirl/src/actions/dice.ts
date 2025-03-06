@@ -173,7 +173,7 @@ export const diceAction: Action = {
                 Dice.getMultiplier(number),
                 {
                     betAmount: betAmountInWei,
-                    betToken: selectedToken.address,
+                    betToken: selectedToken,
                     betCount: 1,
                     receiver: wallet.address as Hex,
                     stopGain: 0n,

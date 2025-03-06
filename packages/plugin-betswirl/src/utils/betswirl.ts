@@ -4,7 +4,6 @@ import { MoxieWalletClient } from "@moxie-protocol/moxie-lib/src/wallet";
 import {
     casinoChainIds,
     casinoChainById,
-    GAS_TOKEN_ADDRESS,
     type CASINO_GAME_TYPE,
     type CasinoChainId,
     type GameEncodedInput,
@@ -14,7 +13,7 @@ import {
     getBetRequirementsFunctionData,
     getChainlinkVrfCostFunctionData,
     getPlaceBetFunctionData,
-    maxGameBetCountByType,
+    parseRawBetRequirements,
     chainNativeCurrencyToToken,
 } from "@betswirl/sdk-core";
 import { getCasinoTokens } from "../providers/casinoTokens";
@@ -72,12 +71,12 @@ async function getBetRequirements(
     chainId: CasinoChainId,
     walletClient: MoxieWalletClient,
     game: CASINO_GAME_TYPE,
-    betToken: Hex,
+    betToken: Token,
     multiplier: number
 ) {
     try {
         const betRequirementsFunctionData = getBetRequirementsFunctionData(
-            betToken,
+            betToken.address,
             multiplier,
             chainId
         );
@@ -91,14 +90,13 @@ async function getBetRequirements(
                 betRequirementsFunctionData.data.functionName
             ](...betRequirementsFunctionData.data.args);
 
-        return {
-            isAllowed: rawBetRequirements[0],
-            maxBetAmount: BigInt(rawBetRequirements[1]),
-            maxBetCount: Math.min(
-                Number(rawBetRequirements[2]),
-                maxGameBetCountByType[game]
-            ),
-        };
+        return parseRawBetRequirements(
+            rawBetRequirements,
+            betToken,
+            multiplier,
+            game,
+            chainId
+        );
     } catch (error) {
         throw new Error(
             `An error occured while getting the bet requirements: ${error.shortMessage}`
@@ -147,7 +145,7 @@ export async function placeBet(
     gameMultiplier: number,
     casinoGameParams: {
         betAmount: bigint;
-        betToken: Hex;
+        betToken: Token;
         betCount: number;
         receiver: Hex;
         stopGain: bigint;
@@ -184,7 +182,7 @@ export async function placeBet(
             gameEncodedInput: gameEncodedInput,
             receiver: casinoGameParams.receiver,
             betCount: casinoGameParams.betCount,
-            tokenAddress: casinoGameParams.betToken,
+            tokenAddress: casinoGameParams.betToken.address,
             stopGain: casinoGameParams.stopGain,
             stopLoss: casinoGameParams.stopLoss,
         },
@@ -202,7 +200,7 @@ export async function placeBet(
                 chainId,
                 walletClient,
                 game,
-                casinoGameParams.betToken,
+                casinoGameParams.betToken.address,
                 casinoGameParams.betCount,
                 gasPrice
             )) *
@@ -213,9 +211,9 @@ export async function placeBet(
             {
                 toAddress: functionData.data.to,
                 data: functionData.encodedData,
-                value: (casinoGameParams.betToken === GAS_TOKEN_ADDRESS
-                    ? functionData.formattedData.totalBetAmount + vrfCost
-                    : vrfCost) as unknown as number,
+                value: functionData.extraData.getValue(
+                    vrfCost
+                ) as unknown as number,
                 gasPrice: Number(gasPrice),
             }
         );

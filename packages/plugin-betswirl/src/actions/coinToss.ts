@@ -93,7 +93,8 @@ Here are the recent user messages for context:
 export const coinTossAction: Action = {
     name: "COIN_TOSS",
     similes: ["COIN_FLIP", "DOUBLE_OR_NOTHING", "TOSS_A_COIN"],
-    description: "Flip a coin on BetSwirl. The player is betting that the rolled face will be the one chosen.",
+    description:
+        "Flip a coin on BetSwirl. The player is betting that the rolled face will be the one chosen.",
     suppressInitialMessage: true,
     validate: async (
         _runtime: IAgentRuntime,
@@ -173,7 +174,7 @@ export const coinTossAction: Action = {
                 CoinToss.getMultiplier(face),
                 {
                     betAmount: betAmountInWei,
-                    betToken: selectedToken.address,
+                    betToken: selectedToken,
                     betCount: 1,
                     receiver: wallet.address as Hex,
                     stopGain: 0n,
