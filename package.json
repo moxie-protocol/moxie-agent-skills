@@ -12,7 +12,7 @@
         "start:registry": "pnpm --dir registry dev",
         "start:debug": "cross-env NODE_ENV=development VERBOSE=true DEBUG=eliza:* pnpm --dir moxie-agent start --isRoot",
         "start-broadcaster:debug": "cross-env NODE_ENV=development VERBOSE=true DEBUG=eliza:* pnpm --dir moxie-broadcasting-agent start --isRoot",
-        "dev": "bash ./scripts/dev.sh",
+        "dev": "bash ./scripts/dev.sh --character=\"characters/moxie.character.json\"",
         "dev-broadcaster": "bash ./scripts/dev-broadcaster.sh",
         "lint": "bash ./scripts/lint.sh",
         "prettier-check": "npx prettier --check --cache .",

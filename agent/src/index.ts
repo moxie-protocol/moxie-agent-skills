@@ -28,7 +28,7 @@ import yargs from "yargs";
 // import moxieBigFanPlugin from "@moxie-protocol/plugin-moxie-big-fan";
 // import moxieTokenDetailsPlugin from "@moxie-protocol/plugin-moxie-token-details";
 // import { moxieSwapPlugin } from "@moxie-protocol/plugin-moxie-swap";
-import samplePlugin from "@moxie-protocol/plugin-sample";
+import betswirlPlugin from "@moxie-protocol/plugin-betswirl";
 import bootstrapPlugin from "@moxie-protocol/plugin-bootstrap";
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -493,7 +493,7 @@ export async function createAgent(
         evaluators: [],
         character,
         // character.plugins are handled when clients are added
-        plugins: [samplePlugin, bootstrapPlugin].filter(Boolean),
+        plugins: [betswirlPlugin, bootstrapPlugin].filter(Boolean),
         providers: [],
         actions: [],
         services: [],

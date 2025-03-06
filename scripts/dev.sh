@@ -74,18 +74,18 @@ if [ ! -d "$PACKAGES_DIR" ]; then
 fi
 
 # List of working folders to watch (relative to $PACKAGES_DIR)
-WORKING_FOLDERS=("client-direct") # Core is handled separately
+WORKING_FOLDERS=("plugin-betswirl") # Core is handled separately
 
 # Initialize an array to hold package-specific commands
 COMMANDS=()
 
 # Ensure "core" package runs first
-CORE_PACKAGE="$PACKAGES_DIR/core"
-if [ -d "$CORE_PACKAGE" ]; then
-  COMMANDS+=("pnpm --dir $CORE_PACKAGE dev -- $*")
-else
-  echo "Warning: 'core' package not found in $PACKAGES_DIR."
-fi
+# CORE_PACKAGE="$PACKAGES_DIR/core"
+# if [ -d "$CORE_PACKAGE" ]; then
+#   COMMANDS+=("pnpm --dir $CORE_PACKAGE dev -- $*")
+# else
+#   echo "Warning: 'core' package not found in $PACKAGES_DIR."
+# fi
 
 # Process remaining working folders
 for FOLDER in "${WORKING_FOLDERS[@]}"; do
@@ -106,16 +106,16 @@ else
   echo "Warning: 'client' directory not found."
 fi
 
-if [ -d "./moxie-agent" ]; then
+if [ -d "./agent" ]; then
   # Build the watch paths dynamically from WORKING_FOLDERS
   WATCH_PATHS=()
   for FOLDER in "${WORKING_FOLDERS[@]}"; do
     WATCH_PATHS+=("--watch './packages/$FOLDER/dist'")
   done
 
-  COMMANDS+=("nodemon ${WATCH_PATHS[@]} -e js,json,map --delay 2 --exec 'pnpm --dir moxie-agent dev -- $*'")
+  COMMANDS+=("nodemon ${WATCH_PATHS[@]} -e js,json,map --delay 5 --exec 'pnpm --dir agent dev -- $*'")
 else
-  echo "Warning: 'moxie-agent' directory not found."
+  echo "Warning: 'agent' directory not found."
 fi
 
 # Run build command first

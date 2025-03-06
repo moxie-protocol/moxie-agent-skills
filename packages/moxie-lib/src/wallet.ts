@@ -103,6 +103,7 @@ export class MoxieWalletClient {
             gasLimit: transactionDetails.gasLimit,
             maxFeePerGas: transactionDetails.maxFeePerGas,
             maxPriorityFeePerGas: transactionDetails.maxPriorityFeePerGas,
+            gasPrice: transactionDetails.gasPrice,
         });
         return {
             hash: transaction.hash,

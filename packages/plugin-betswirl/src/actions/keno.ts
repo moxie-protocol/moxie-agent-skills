@@ -15,10 +15,10 @@ import {
 import { MoxieWalletClient } from "@moxie-protocol/moxie-lib/src/wallet";
 import {
     CASINO_GAME_TYPE,
-    Roulette,
-    RouletteNumber,
-    MIN_SELECTABLE_ROULETTE_NUMBER,
-    MAX_SELECTABLE_ROULETTE_NUMBER,
+    Keno,
+    KenoNumber,
+    MIN_SELECTABLE_KENO_NUMBER,
+    MAX_SELECTABLE_KENO_NUMBER,
     slugById,
     formatTxnUrl,
 } from "@betswirl/sdk-core";
@@ -32,22 +32,22 @@ import {
 } from "../utils/betswirl";
 import { formatTokenForMoxieTerminal } from "../utils/moxie";
 
-export const RouletteBetParameters = z.object({
+export const KenoBetParameters = z.object({
     numbers: z
         .number()
-        .gte(MIN_SELECTABLE_ROULETTE_NUMBER)
-        .lte(MAX_SELECTABLE_ROULETTE_NUMBER)
+        .gte(MIN_SELECTABLE_KENO_NUMBER)
+        .lte(MAX_SELECTABLE_KENO_NUMBER)
         .array()
-        .min(1)
-        .max(MAX_SELECTABLE_ROULETTE_NUMBER)
+        .min(MIN_SELECTABLE_KENO_NUMBER)
+        .max(MAX_SELECTABLE_KENO_NUMBER)
         .describe("The numbers to bet on"),
     ...casinoBetParams,
-    ...getMaxBetCountParam(CASINO_GAME_TYPE.ROULETTE),
+    ...getMaxBetCountParam(CASINO_GAME_TYPE.KENO),
 });
-export const rouletteTemplate = `
-Extract the following details to play on Roulette:
+export const kenoTemplate = `
+Extract the following details to play on Keno:
 - **betAmount** (String): The amount to wager.
-- **numbers** (Array<number>): The numbers to bet on. Can be several unique numbers from ${MIN_SELECTABLE_ROULETTE_NUMBER} to ${MAX_SELECTABLE_ROULETTE_NUMBER}.
+- **numbers** (Array<number>): The numbers to bet on. Can be several unique numbers from ${MIN_SELECTABLE_KENO_NUMBER} to ${MAX_SELECTABLE_KENO_NUMBER}.
 - **token** (String): The optional token symbol.
 
 Provide the values in the following JSON format:
@@ -97,11 +97,11 @@ Bet 0.01 ETH on 8 11 3 9
 Here are the recent user messages for context:
 {{recentMessages}}
 `;
-export const rouletteAction: Action = {
-    name: "ROULETTE",
+export const kenoAction: Action = {
+    name: "KENO",
     similes: [],
     description:
-        "Play the BetSwirl Roulette. The player is betting that the rolled number will be one of the chosen numbers.",
+        "Play the BetSwirl Keno. The player is betting that the rolled number will be one of the chosen numbers.",
     suppressInitialMessage: true,
     validate: async (
         _runtime: IAgentRuntime,
@@ -116,7 +116,7 @@ export const rouletteAction: Action = {
         callback: HandlerCallback
     ) => {
         try {
-            elizaLogger.log("Starting ROULETTE handler...");
+            elizaLogger.log("Starting KENO handler...");
 
             // Validate the chain
             const wallet = state.agentWallet as MoxieWalletClient;
@@ -130,16 +130,16 @@ export const rouletteAction: Action = {
             }
             const context = composeContext({
                 state,
-                template: rouletteTemplate,
+                template: kenoTemplate,
             });
-            const rouletteDetails = await generateObject({
+            const kenoDetails = await generateObject({
                 runtime,
                 context,
                 modelClass: ModelClass.SMALL,
-                schema: RouletteBetParameters,
+                schema: KenoBetParameters,
             });
-            const { numbers, betAmount, token } = rouletteDetails.object as {
-                numbers: Array<RouletteNumber>;
+            const { numbers, betAmount, token } = kenoDetails.object as {
+                numbers: Array<KenoNumber>;
                 betAmount: string;
                 token: string;
             };
@@ -150,7 +150,7 @@ export const rouletteAction: Action = {
             }
             const formattedNumbers = numbers.join(", ");
             await callback({
-                text: "Placing a Roulette bet on " + formattedNumbers,
+                text: "Placing a Keno bet on " + formattedNumbers,
             });
 
             // Get the bet token from the user input
@@ -172,12 +172,12 @@ export const rouletteAction: Action = {
             const hash = await placeBet(
                 chainId,
                 wallet,
-                CASINO_GAME_TYPE.ROULETTE,
-                Roulette.encodeInput(numbers),
-                Roulette.getMultiplier(numbers),
+                CASINO_GAME_TYPE.KENO,
+                Keno.encodeInput(numbers),
+                Keno.getMultiplier(numbers),
                 {
                     betAmount: betAmountInWei,
-                    betToken: selectedToken,
+                    betToken: selectedToken.address,
                     betCount: 1,
                     receiver: wallet.address as Hex,
                     stopGain: 0n,
@@ -198,7 +198,7 @@ You **${bet.isWin ? "Won" : "Lost"} ${bet.isWin ? `💰 ${bet.payoutMultiplier.t
 Rolled number: ${bet.decodedRolled}
 Payout: [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) ${tokenForMoxieTerminal}
 
-[🔗 Go to more details](https://www.betswirl.com/${slugById[chainId]}/casino/${CASINO_GAME_TYPE.ROULETTE}/${bet.id})`;
+[🔗 Go to more details](https://www.betswirl.com/${slugById[chainId]}/casino/${CASINO_GAME_TYPE.KENO}/${bet.id})`;
 
             elizaLogger.success(resolutionMessage);
             await callback({
@@ -223,7 +223,7 @@ Payout: [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) ${to
                 user: "{{user2}}",
                 content: {
                     text: "You Won, your Payout is 0.00003 ETH, Bet tx: 0x6ba8a0c3e861b036f052709f56412084806376fbaf24b15bce4920a8a53095af, Resolution tx hash: 0x8ed5541c45b6c7083b3e5795f52f92827748e93e6562ec126f4a1cf22b433f77",
-                    action: "ROULETTE",
+                    action: "KENO",
                 },
             },
         ],
