@@ -7,7 +7,6 @@ import type {
     Hex,
 } from "./services/types";
 import { ethers } from "ethers";
-import { moxieUserService } from ".";
 import type { TransactionDetails } from "./services/types";
 
 export class MoxieWalletClient {

@@ -107,7 +107,7 @@ export const transferAction: Action = {
                 `Transfering ${formattedValue} wei to address ${toAddress}...`
             );
             const wallet = state.agentWallet as MoxieWalletClient;
-            
+
             const { hash } = await wallet.sendTransaction("8543", {
                 toAddress,
                 value: formattedValue,
