@@ -25,5 +25,14 @@
         "description": "A Skills for Creator Agents that enables fetching of base token details.",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details",
         "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details/images/logo.png"
+    },
+    {
+        "pluginId": "ba2e0746-d089-4539-a23b-84882bc8eafd",
+        "name": "@moxie-protocol/plugin-betswirl",
+        "version": "0.0.1",
+        "author": "Romuald Hog <romuald@betswirl.com>",
+        "description": "The BetSwirl plugin offers a seamless way to interact with the BetSwirl betting platform. It includes actions for placing bets on games and retrieving bets information.",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-betswirl",
+        "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-betswirl/images/logo.png"
     }
 ]
