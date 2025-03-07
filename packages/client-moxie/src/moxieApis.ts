@@ -182,27 +182,6 @@ export function createMoxieApiRouter(
 
                 const userId = stringToUuid(moxieUserId);
 
-                // check the roomId is belongs to this user or not.
-                const participants =
-                    await runtime.databaseAdapter.getParticipantsForRoom(
-                        roomId
-                    );
-                if (
-                    participants &&
-                    participants.length > 0 &&
-                    !participants.includes(userId)
-                ) {
-                    res.status(403).json(
-                        ResponseHelper.error<null>(
-                            "INVALID_REQUEST",
-                            `user doesn't belong to this roomId`,
-                            req.path,
-                            req.traceId
-                        )
-                    );
-                    return;
-                }
-
                 await runtime.ensureConnection(
                     userId,
                     roomId,
