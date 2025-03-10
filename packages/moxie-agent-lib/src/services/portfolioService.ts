@@ -23,6 +23,9 @@ export interface MoxiePortfolioInfo {
 }
 
 interface MoxiePortfolioResponse {
+    errors?: Array<{
+        message: string;
+    }>;
     data: {
         MoxieUserPortfolios: {
             MoxieUserPortfolio: MoxiePortfolioInfo[];
@@ -71,7 +74,7 @@ export async function getMoxiePortfolioInfo(
         while (attempts < maxAttempts) {
             try {
                 const response = await fetch(
-                    "https://api.airstack.xyz/graphql",
+                    process.env.AIRSTACK_GRAPHQL_ENDPOINT,
                     {
                         method: "POST",
                         headers: {
@@ -220,7 +223,7 @@ export async function getMoxiePortfolioInfoByCreatorTokenDetails(
         while (attempts < maxAttempts) {
             try {
                 const response = await fetch(
-                    "https://api.airstack.xyz/graphql",
+                    process.env.AIRSTACK_GRAPHQL_ENDPOINT,
                     {
                         method: "POST",
                         headers: {
@@ -239,6 +242,16 @@ export async function getMoxiePortfolioInfoByCreatorTokenDetails(
 
                 const result =
                     (await response.json()) as MoxiePortfolioResponse;
+
+                if (result.errors) {
+                    elizaLogger.error(
+                        `Error fetching portfolio info for user ${moxieUserId}:`,
+                        result.errors
+                    );
+                    throw new Error(
+                        `Error fetching portfolio info for user ${moxieUserId}: ${result.errors[0].message}`
+                    );
+                }
 
                 if (!result.data?.MoxieUserPortfolios?.MoxieUserPortfolio) {
                     elizaLogger.error(
@@ -260,7 +273,7 @@ export async function getMoxiePortfolioInfoByCreatorTokenDetails(
                         `[getMoxiePortfolioInfoByCreatorTokenDetails] [${moxieUserId}] Failed after ${maxAttempts} attempts:`,
                         error
                     );
-                    return undefined;
+                    throw error;
                 }
                 elizaLogger.warn(
                     `[getMoxiePortfolioInfoByCreatorTokenDetails] [${moxieUserId}] API call failed, attempt ${attempts}/${maxAttempts}. Retrying...`
@@ -275,6 +288,6 @@ export async function getMoxiePortfolioInfoByCreatorTokenDetails(
             `[getMoxiePortfolioInfoByCreatorTokenDetails] [${moxieUserId}] Error fetching portfolio info:`,
             error
         );
-        return undefined;
+        throw error;
     }
 }

@@ -24,9 +24,9 @@ import { validateInputAgentInteractions } from "./helpers";
 import express from "express";
 import { ResponseHelper } from "./responseHelper.ts";
 import { traceIdMiddleware } from "./middleware/traceId.ts";
-import { ftaService } from "@moxie-protocol/moxie-lib";
-import { walletService, MoxieUser } from "@moxie-protocol/moxie-lib";
-import { MoxieWalletClient } from "@moxie-protocol/moxie-lib/src/wallet";
+import { ftaService } from "@moxie-protocol/moxie-agent-lib";
+import { walletService, MoxieUser } from "@moxie-protocol/moxie-agent-lib";
+import { MoxieWalletClient } from "@moxie-protocol/moxie-agent-lib/src/wallet";
 
 import multer from "multer";
 import * as fs from "node:fs";

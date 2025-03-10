@@ -1,13 +1,17 @@
 {
-    "name": "@moxie-protocol/moxie-lib",
+    "name": "@moxie-protocol/moxie-agent-lib",
     "version": "0.1.8+build.1",
     "main": "dist/index.js",
     "type": "module",
     "types": "dist/index.d.ts",
     "dependencies": {
         "@moxie-protocol/core": "workspace:*",
-        "axios": "^1.7.9",
-        "tsup": "^8.3.5"
+        "@codex-data/sdk": "^1.0.3",
+        "@elizaos/adapter-postgres": "workspace:*",
+        "ioredis": "5.4.2",
+        "axios" :"^1.7.9",
+        "tsup": "^8.3.5",
+        "@privy-io/server-auth": "^1.16.6"
     },
     "scripts": {
         "build": "tsup --format esm --dts",
