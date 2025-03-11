@@ -17,7 +17,7 @@ import { elizaLogger, validateUuid, IAgentRuntime } from "@moxie-protocol/core";
 import {
     MoxieWallet,
     getMoxiePortfolioInfoByCreatorTokenDetails,
-} from "@moxie-protocol/moxie-lib";
+} from "@moxie-protocol/moxie-agent-lib";
 
 /**
  * Fetches the balance of fan tokens for a given wallet address

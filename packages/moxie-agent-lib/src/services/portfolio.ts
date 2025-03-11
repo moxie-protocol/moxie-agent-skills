@@ -23,7 +23,7 @@ interface MoxiePortfolioResponse {
     };
 }
 
-const AIRSTACK_API_ENDPOINT = "https://api.airstack.xyz/graphql";
+const AIRSTACK_API_ENDPOINT = process.env.AIRSTACK_GRAPHQL_ENDPOINT;
 
 export async function fetchPortfolioByMoxieIdOrderByTVL(
     moxieId: string,

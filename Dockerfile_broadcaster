@@ -22,7 +22,7 @@ COPY packages/adapter-redis/ ./packages/adapter-redis/
 COPY packages/adapter-postgres/ ./packages/adapter-postgres/
 COPY packages/core/ ./packages/core/
 COPY packages/client-twitter/ ./packages/client-twitter/
-COPY packages/moxie-lib/ ./packages/moxie-lib/
+COPY packages/moxie-agent-lib/ ./packages/moxie-agent-lib/
 COPY moxie-broadcasting-agent/ ./moxie-broadcasting-agent/
 
 COPY scripts ./scripts

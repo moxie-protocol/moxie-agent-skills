@@ -6,14 +6,13 @@ export default defineConfig({
     sourcemap: true,
     clean: true,
     format: ["esm"],
-    dts: true,
     external: [
         "dotenv",
         "fs",
         "path",
+        "@reflink/reflink",
         "https",
         "http",
-        "@anush008/tokenizers",
-        "ethers",
+        "agentkeepalive",
     ],
 });
