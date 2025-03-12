@@ -12,8 +12,8 @@ import {
     generateObject,
     ModelClass,
 } from "@moxie-protocol/core";
-import { MoxieUser } from "@moxie-protocol/moxie-lib";
-import { MoxieWalletClient } from "@moxie-protocol/moxie-lib/src/wallet";
+import { MoxieUser } from "@moxie-protocol/moxie-agent-lib/src";
+import { MoxieWalletClient } from "@moxie-protocol/moxie-agent-lib/src/wallet";
 import {
     CASINO_GAME_TYPE,
     slugById,

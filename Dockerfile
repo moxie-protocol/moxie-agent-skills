@@ -22,7 +22,7 @@ COPY packages/adapter-redis/ ./packages/adapter-redis/
 COPY packages/adapter-postgres/ ./packages/adapter-postgres/
 COPY packages/core/ ./packages/core/
 COPY packages/client-twitter/ ./packages/client-twitter/
-COPY packages/moxie-lib/ ./packages/moxie-lib/
+COPY packages/moxie-agent-lib/ ./packages/moxie-agent-lib/
 COPY packages/plugin-bootstrap/ ./packages/plugin-bootstrap/
 COPY packages/client-moxie/ ./packages/client-moxie/
 COPY packages/client-auto/ ./packages/client-auto/
@@ -39,7 +39,7 @@ COPY characters ./characters
 COPY client ./client
 COPY docs ./docs
 COPY moxie-agent ./moxie-agent
-RUN cd ./packages/moxie-lib && pnpm install --no-frozen-lockfile && pnpm run build && cd ../../
+RUN cd ./packages/moxie-agent-lib && pnpm install --no-frozen-lockfile && pnpm run build && cd ../../
 
 
 # Install dependencies and build the project

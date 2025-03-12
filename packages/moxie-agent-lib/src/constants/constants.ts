@@ -20,9 +20,6 @@ export const mockMoxieUser: MoxieUser = {
     moxieScore: 1000,
     moxieRank: 0,
     createdAt: "2024-12-20T14:37:34.348Z",
-    moxieScoreResyncInfo: {
-        status: "COMPLETED",
-    },
     identities: [
         {
             id: "19b49f2a-8f57-4ebe-9897-a6dda30fb543",
@@ -106,6 +103,7 @@ export const mockMoxieUser: MoxieUser = {
             dataSource: "PRIVY",
         },
     ],
+    vestingContracts: [],
 };
 
 // Mock Moxie Wallet Data

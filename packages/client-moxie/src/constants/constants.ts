@@ -1,4 +1,4 @@
-import type { walletService, MoxieUser } from "@moxie-protocol/moxie-lib";
+import type { walletService, MoxieUser, MoxieClientWallet } from "@moxie-protocol/moxie-agent-lib";
 
 export const CREATOR_AGENT_TOKEN_ADDRESS: string =
     process.env["CREATOR_AGENT_TOKEN_ADDRESS"] ||
@@ -26,9 +26,6 @@ export const mockMoxieUser: MoxieUser = {
     moxieScore: 1000,
     moxieRank: 0,
     createdAt: "2024-12-20T14:37:34.348Z",
-    moxieScoreResyncInfo: {
-        status: "COMPLETED",
-    },
     identities: [
         {
             id: "19b49f2a-8f57-4ebe-9897-a6dda30fb543",
@@ -82,8 +79,7 @@ export const mockMoxieUser: MoxieUser = {
                 verifiedAt: "2025-01-06T19:28:06.000Z",
                 firstVerifiedAt: "2025-01-06T19:28:06.000Z",
                 latestVerifiedAt: "2025-01-06T19:28:06.000Z",
-                profilePictureUrl:
-                    "https://pbs.twimg.com/profile_images/1880759276169224192/rXpjZO0A_400x400.jpg",
+                profilePictureUrl: "https://pbs.twimg.com/profile_images/1880759276169224192/rXpjZO0A_400x400.jpg",
             },
             profileId: "VitalikButerin",
             isActive: true,
@@ -112,10 +108,11 @@ export const mockMoxieUser: MoxieUser = {
             dataSource: "PRIVY",
         },
     ],
+    vestingContracts: []
 };
 
 // Mock Moxie Wallet Data
-export const mockWallet: walletService.MoxieClientWallet = {
+export const mockWallet: MoxieClientWallet = {
     address: "0xa5cc845ef113c4c0908d4c1f4616a000b9a67b80",
     chainType: "ethereum",
     chainId: "8453",

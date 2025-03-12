@@ -12,7 +12,7 @@ import {
     generateObject,
     ModelClass,
 } from "@moxie-protocol/core";
-import { MoxieWalletClient } from "@moxie-protocol/moxie-lib/src/wallet";
+import { MoxieWalletClient } from "@moxie-protocol/moxie-agent-lib/src/wallet";
 import {
     CASINO_GAME_TYPE,
     Roulette,
