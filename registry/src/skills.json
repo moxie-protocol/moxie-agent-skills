@@ -1,29 +1,166 @@
 [
-    {
-        "pluginId": "b5622f90-987e-51d1-bea9-5b1471bb9379",
-        "name": "@moxie-protocol/plugin-moxie-balance",
-        "version": "0.1.8+build.1",
-        "author": null,
-        "description": "A Skills for Creator Agents that enables portfolio balance checking for Moxie users' connected wallets.",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-balance",
-        "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-balance/images/logo.png"
+  {
+    "pluginId": "b5622f90-987e-51d1-bea9-5b1471bb9379",
+    "name": "@moxie-protocol/plugin-moxie-balance",
+    "displayName": "Moxie Balance",
+    "version": "0.1.8+build.1",
+    "author": null,
+    "description": "A Skills for Creator Agents that enables portfolio balance checking for Moxie users' connected wallets.",
+    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-balance",
+    "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-balance/images/logo.png",
+    "settings": {
+      "wallet_address": "0x0000000000000000000000000000000000000000"
     },
-    {
-        "pluginId": "2a24e22b-7636-5055-98fd-edd3af5e0152",
-        "name": "@moxie-protocol/plugin-moxie-big-fan",
-        "version": "0.1.8+build.1",
-        "author": null,
-        "description": "A Skills for Creator Agents to enable fetching cryptocurrency price data from the CoinGecko API.",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-big-fan",
-        "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-big-fan/images/logo.png"
+    "capabilities": [
+      "Analyze my portfolio",
+      "Analyze someone else’s portfolio (using Social Alpha skll)",
+      "Compare several portfolios"
+    ],
+    "starterQuestions": [
+      "Analyze my portfolio",
+      "Analyze @maretus portfolio",
+      "Compare portfolios of @betashop.eth @macster @sgniwder"
+    ],
+    "mediaUrls": [
+      "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-balance/images/logo.png"
+    ],
+    "actions": [
+      "PORTFOLIO",
+      "PORTFOLIO_SUMMARY",
+      "TOTAL_BALANCE",
+      "ALL_POSITIONS",
+      "ASSET_OVERVIEW",
+      "HOLDINGS_SUMMARY",
+      "WALLET_BALANCE",
+      "INVESTMENT_SUMMARY",
+      "ASSET_POSITIONS",
+      "PORTFOLIO_OVERVIEW",
+      "PORTFOLIO_STATUS",
+      "CREATOR_COIN_BALANCE",
+      "CREATOR_COIN",
+      "CREATOR_COIN_BALANCE",
+      "CREATOR_COIN_PRICE",
+      "CREATOR_COIN_POSITION",
+      "FAN_TOKEN",
+      "FAN_TOKEN_BALANCE",
+      "FAN_TOKEN_POSITION",
+      "FAN_TOKEN_PRICE"
+    ],
+    "isPremium": false,
+    "freeQueries": 0,
+    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
+    "minimumSkillBalance": 0,
+    "status": "ACTIVE",
+    "isDefault": false
+  },
+  {
+    "pluginId": "2a24e22b-7636-5055-98fd-edd3af5e0152",
+    "name": "@moxie-protocol/plugin-moxie-big-fan",
+    "displayName": "Moxie Big Fan",
+    "version": "0.1.8+build.1",
+    "author": null,
+    "description": "A Skills for Creator Agents to enable fetching cryptocurrency price data from the CoinGecko API.",
+    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-big-fan",
+    "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-big-fan/images/logo.png",
+    "settings": {
+      "coin_id": "bitcoin"
     },
-    {
-        "pluginId": "a1aa9887-fc11-5f54-aa62-235c7536ba67",
-        "name": "@moxie-protocol/plugin-moxie-token-details",
-        "version": "0.1.8+build.1",
-        "author": null,
-        "description": "A Skills for Creator Agents that enables fetching of base token details.",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details",
-        "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details/images/logo.png"
-    }
+    "capabilities": [
+      "price",
+      "balance"
+    ],
+    "starterQuestions": [
+      "What is the price of Bitcoin?",
+      "What is my balance?"
+    ],
+    "mediaUrls": [
+      "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-big-fan/images/logo.png"
+    ],
+    "actions": [
+      "TWEET_SUMMARY",
+      "TWEET_HISTORY",
+      "TWITTER_ACTIVITY",
+      "TWITTER_UPDATES",
+      "FARCASTER_SUMMARY",
+      "FARCASTER_HISTORY",
+      "FARCASTER_ACTIVITY",
+      "FARCASTER_UPDATES",
+      "FARCASTER_CASTS",
+      "TRENDING_TOKENS",
+      "TOKEN_PURCHASES",
+      "TOKEN_RECOMMENDATIONS",
+      "BUY_RECOMMENDATIONS",
+      "TRENDING_CRYPTOCURRENCIES",
+      "TOKEN_SWAP_SUMMARIES",
+      "SOCIAL_SUMMARY",
+      "FARCASTER_AND_TWITTER_SUMMARY",
+      "FARCASTER_AND_TWITTER_ACTIVITY",
+      "FARCASTER_AND_TWITTER_UPDATES",
+      "SOCIAL_POSTS",
+      "TRENDING_CREATOR_COINS",
+      "CREATOR_COIN_PURCHASES",
+      "CREATOR_COIN_RECOMMENDATIONS",
+      "CREATOR_COIN_BUY_RECOMMENDATIONS",
+      "CREATOR_COIN_TRENDING_CRYPTOCURRENCIES",
+      "CREATOR_COIN_SWAP_SUMMARIES"
+    ],
+    "isPremium": false,
+    "freeQueries": 0,
+    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
+    "minimumSkillBalance": 0,
+    "status": "ACTIVE",
+    "isDefault": false
+  },
+  {
+    "pluginId": "a1aa9887-fc11-5f54-aa62-235c7536ba67",
+    "name": "@moxie-protocol/plugin-moxie-token-details",
+    "displayName": "Moxie Token Details",
+    "version": "0.1.8+build.1",
+    "author": null,
+    "description": "A Skills for Creator Agents that enables fetching of base token details.",
+    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details",
+    "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details/images/logo.png",
+    "settings": {
+      "token_address": "0x0000000000000000000000000000000000000000"
+    },
+    "capabilities": [
+      "Token prices",
+      "Market caps",
+      "Liquidity",
+      "Holders"
+    ],
+    "starterQuestions": [
+      "Show token details for $moxie",
+      "Compare $moxie and $bnkr"
+    ],
+    "mediaUrls": [
+      "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details/images/logo.png"
+    ],
+    "actions": [
+      "TOKEN_DETAILS",
+      "TOKEN_DETAILS_SUMMARY",
+      "BASE_TOKEN_DETAIL",
+      "BASE_TOKEN_DETAILS",
+      "BASE_TOKEN_DETAILS_SUMMARY",
+      "TOKEN_SUMMARY",
+      "ERC20_DETAILS",
+      "ERC20_DETAILS_SUMMARY",
+      "ERC20_TOKEN_DETAILS",
+      "ERC20_TOKEN_DETAILS_SUMMARY",
+      "TOKEN_INFO",
+      "TOKEN_PORTFOLIO",
+      "TOKEN_PRICE",
+      "TOKEN_MARKET_CAP",
+      "TOKEN_HOLDINGS",
+      "TOKEN_LIQUIDITY",
+      "TOKEN_MARKET_PERFORMANCE",
+      "TOKEN_MARKET_SENTIMENT"
+    ],
+    "isPremium": false,
+    "freeQueries": 0,
+    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
+    "minimumSkillBalance": 0,
+    "status": "ACTIVE",
+    "isDefault": false
+  }
 ]
