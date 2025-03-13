@@ -9,7 +9,7 @@
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-balance",
     "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-balance/images/logo.png",
     "settings": {
-      "wallet_address": "0x0000000000000000000000000000000000000000"
+     
     },
     "capabilities": [
       "Analyze my portfolio",
@@ -63,7 +63,7 @@
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-big-fan",
     "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-big-fan/images/logo.png",
     "settings": {
-      "coin_id": "bitcoin"
+     
     },
     "capabilities": [
       "price",
@@ -121,7 +121,7 @@
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details",
     "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details/images/logo.png",
     "settings": {
-      "token_address": "0x0000000000000000000000000000000000000000"
+     
     },
     "capabilities": [
       "Token prices",
