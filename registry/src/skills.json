@@ -119,7 +119,7 @@
     "author": null,
     "description": "A Skills for Creator Agents that enables fetching of base token details.",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details",
-    "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details/images/logo.png",
+    "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details/images/logo.svg",
     "settings": {
      
     },
