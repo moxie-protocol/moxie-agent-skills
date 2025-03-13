@@ -7,7 +7,7 @@
     "author": null,
     "description": "A Skills for Creator Agents that enables portfolio balance checking for Moxie users' connected wallets.",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-balance",
-    "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-balance/images/logo.png",
+    "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
     "settings": {
      
     },
@@ -22,7 +22,7 @@
       "Compare portfolios of @betashop.eth @macster @sgniwder"
     ],
     "mediaUrls": [
-      "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-balance/images/logo.png"
+      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
     ],
     "actions": [
       "PORTFOLIO",
@@ -61,7 +61,7 @@
     "author": null,
     "description": "A Skills for Creator Agents to enable fetching cryptocurrency price data from the CoinGecko API.",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-big-fan",
-    "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-big-fan/images/logo.png",
+    "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
     "settings": {
      
     },
@@ -74,7 +74,7 @@
       "What is my balance?"
     ],
     "mediaUrls": [
-      "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-big-fan/images/logo.png"
+      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
     ],
     "actions": [
       "TWEET_SUMMARY",
@@ -119,7 +119,7 @@
     "author": null,
     "description": "A Skills for Creator Agents that enables fetching of base token details.",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details",
-    "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details/images/logo.svg",
+    "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
     "settings": {
      
     },
@@ -134,7 +134,7 @@
       "Compare $moxie and $bnkr"
     ],
     "mediaUrls": [
-      "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details/images/logo.png"
+      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
     ],
     "actions": [
       "TOKEN_DETAILS",
