@@ -182,7 +182,7 @@ ${bets.map(
 
 [🔗 Go to the full bet list](https://www.betswirl.com/${slugById[chainId]}/profile/${bettorAddress}/casino)`;
             } else {
-                resolutionMessage = `\nEmpty`;
+                resolutionMessage = `\nNo bets were placed! You can place coin toss, dice or roulette bets from here.`;
             }
 
             elizaLogger.success(resolutionMessage);
