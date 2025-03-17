@@ -92,7 +92,7 @@ Here are the recent user messages for context:
 `;
 export const coinTossAction: Action = {
     name: "COIN_TOSS",
-    similes: ["COIN_FLIP", "DOUBLE_OR_NOTHING", "TOSS_A_COIN"],
+    similes: ["COIN_FLIP", "DOUBLE_OR_NOTHING", "TOSS_A_COIN", "BETSWIRL_COIN_TOSS"],
     description:
         "Flip a coin on BetSwirl. The player is betting that the rolled face will be the one chosen.",
     suppressInitialMessage: true,

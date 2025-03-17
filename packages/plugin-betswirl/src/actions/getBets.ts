@@ -106,7 +106,7 @@ Here are the recent user messages for context:
 
 export const getBetsAction: Action = {
     name: "GET_BETS",
-    similes: ["RETRIEVE_BETS", "SHOW_BETS", "LAST_BETS"],
+    similes: ["RETRIEVE_BETS", "SHOW_BETS", "LAST_BETS", "GET_BETSWIRL_BETS"],
     description:
         "Get bets from BetSwirl. If no player is specified its listing the current connected player bets. If no game is specified its listing all games bets.",
     suppressInitialMessage: true,
