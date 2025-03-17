@@ -1,23 +1,33 @@
 [
   {
-    "pluginId": "0ad0731e-698b-04bf-abeb-5d29cc36759f",
+    "pluginId": "b5622f90-987e-51d1-bea9-5b1471bb9379",
     "name": "@moxie-protocol/plugin-moxie-balance",
     "displayName": "Moxie Balance",
     "version": "0.1.8+build.1",
-    "author": null,
+    "author": "M4",
     "description": "A Skills for Creator Agents that enables portfolio balance checking for Moxie users' connected wallets.",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-balance",
     "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
-    "settings": {},
+    "settings": {
+    },
     "capabilities": [
       "Analyze my portfolio",
       "Analyze someone else’s portfolio (using Social Alpha skll)",
       "Compare several portfolios"
     ],
     "starterQuestions": [
-      "Analyze my portfolio",
-      "Analyze @maretus portfolio",
-      "Compare portfolios of @betashop.eth @macster @sgniwder"
+      {
+        "label": "Analyze my portfolio",
+        "value": "Analyze my portfolio"
+      },
+      {
+        "label": "Analyze @maretus portfolio",
+        "value": "Analyze @maretus portfolio"
+      },
+      {
+        "label": "Compare portfolios of @betashop.eth @macster @sgniwder",
+        "value": "Compare portfolios of @betashop.eth @macster @sgniwder"
+      }
     ],
     "mediaUrls": [
       "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
@@ -34,6 +44,7 @@
       "ASSET_POSITIONS",
       "PORTFOLIO_OVERVIEW",
       "PORTFOLIO_STATUS",
+
       "CREATOR_COIN_BALANCE",
       "CREATOR_COIN",
       "CREATOR_COIN_BALANCE",
@@ -44,32 +55,102 @@
       "FAN_TOKEN_POSITION",
       "FAN_TOKEN_PRICE"
     ],
+    "isPremium": true,
+    "freeQueries": 0,
+    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
+    "minimumSkillBalance": 0,
+    "status": "ACTIVE",
+    "isDefault": true,
+    "isFeatured": true
+  },
+  {
+    "pluginId": "2a24e22b-7636-5055-98fd-edd3af5e0152",
+    "name": "@moxie-protocol/plugin-moxie-big-fan",
+    "displayName": "Moxie Big Fan",
+    "version": "0.1.8+build.1",
+    "author": null,
+    "description": "A Skills for Creator Agents to enable fetching cryptocurrency price data from the CoinGecko API.",
+    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-big-fan",
+    "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+    "settings": {
+      "coin_id": "bitcoin"
+    },
+    "capabilities": ["price", "balance"],
+    "starterQuestions": [
+      {
+        "label": "What is the price of Bitcoin?",
+        "value": "What is the price of Bitcoin?"
+      },
+      {
+        "label": "What is my balance?",
+        "value": "What is my balance?"
+      }
+    ],
+    "mediaUrls": [
+      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
+    ],
+    "actions": [
+      "TWEET_SUMMARY",
+      "TWEET_HISTORY",
+      "TWITTER_ACTIVITY",
+      "TWITTER_UPDATES",
+
+      "FARCASTER_SUMMARY",
+      "FARCASTER_HISTORY",
+      "FARCASTER_ACTIVITY",
+      "FARCASTER_UPDATES",
+      "FARCASTER_CASTS",
+
+      "TRENDING_TOKENS",
+      "TOKEN_PURCHASES",
+      "TOKEN_RECOMMENDATIONS",
+      "BUY_RECOMMENDATIONS",
+      "TRENDING_CRYPTOCURRENCIES",
+      "TOKEN_SWAP_SUMMARIES",
+
+      "SOCIAL_SUMMARY",
+      "FARCASTER_AND_TWITTER_SUMMARY",
+      "FARCASTER_AND_TWITTER_ACTIVITY",
+      "FARCASTER_AND_TWITTER_UPDATES",
+      "SOCIAL_POSTS",
+
+      "TRENDING_CREATOR_COINS",
+      "CREATOR_COIN_PURCHASES",
+      "CREATOR_COIN_RECOMMENDATIONS",
+      "CREATOR_COIN_BUY_RECOMMENDATIONS",
+      "CREATOR_COIN_TRENDING_CRYPTOCURRENCIES",
+      "CREATOR_COIN_SWAP_SUMMARIES"
+    ],
     "isPremium": false,
     "freeQueries": 0,
     "skillCoinAddress": "0x0000000000000000000000000000000000000000",
     "minimumSkillBalance": 0,
     "status": "ACTIVE",
-    "isDefault": true
+    "isDefault": true,
+    "isFeatured": true
   },
   {
-    "pluginId": "",
+    "pluginId": "a1aa9887-fc11-5f54-aa62-235c7536ba67",
     "name": "@moxie-protocol/plugin-moxie-token-details",
     "displayName": "Moxie Token Details",
     "version": "0.1.8+build.1",
-    "author": null,
+    "author": "M7",
     "description": "A Skills for Creator Agents that enables fetching of base token details.",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details",
     "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
-    "settings": {},
-    "capabilities": [
-      "Token prices",
-      "Market caps",
-      "Liquidity",
-      "Holders"
-    ],
+    "settings": {
+      "token_address": "0x0000000000000000000000000000000000000000"
+    },
+    "capabilities": ["Token prices", "Market caps", "Liquidity", "Holders"],
     "starterQuestions": [
-      "Show token details for $moxie",
-      "Compare $moxie and $bnkr"
+      {
+        "label": "Show token details for $moxie",
+        "value": "Show token details for $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527]"
+      },
+      {
+        "label": "Compare $moxie and $bnkr",
+        "value": "Compare $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] and $[BNKR|0x22af33fe49fd1fa80c7149773dde5890d3c76f3b]"
+      }
     ],
     "mediaUrls": [
       "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
@@ -99,157 +180,158 @@
     "skillCoinAddress": "0x0000000000000000000000000000000000000000",
     "minimumSkillBalance": 0,
     "status": "ACTIVE",
-    "isDefault": true
-  },
-  {
-    "pluginId": "",
-    "name": "@moxie-protocol/plugin-moxie-swap",
-    "displayName": "Moxie Swap",
-    "version": "0.1.8+build.1",
-    "author": null,
-    "description": "A Skills for Creator Agents that enables swapping of tokens.",
-    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-swap",
-    "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
-    "settings": {},
-    "capabilities": [],
-    "starterQuestions": [],
-    "mediaUrls": [
-      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
-    ],
-    "actions": [
-      "SWAP_TOKENS",
-      "CREATOR_TOKEN_SWAP",
-      "CREATOR_COIN_SWAP",
-      "EXCHANGE_CREATOR_COINS",
-      "TRADE_CREATOR_TOKENS",
-      "BUY_CREATOR_TOKENS",
-      "BUY_CREATOR_COINS",
-      "PURCHASE_CREATOR_COINS",
-      "PURCHASE_ERC20_TOKENS",
-      "SWAP_ERC20_TOKENS"
-    ],
-    "isPremium": false,
-    "freeQueries": 0,
-    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
-    "minimumSkillBalance": 0,
-    "status": "ACTIVE",
-    "isDefault": true
-  },
-  {
-    "pluginId": "5d3b79e2-ac61-0bb6-a3ba-b0e00b943614",
-    "name": "@moxie-protocol/plugin-moxie-social-alpha",
-    "displayName": "Moxie Big Fan",
-    "version": "0.1.8+build.1",
-    "author": null,
-    "description": "Provides insights about your favorite creators' activities, including Twitter and Farcaster posts, token swaps, and creator coin transactions",
-    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-social-alpha",
-    "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
-    "settings": {},
-    "capabilities": [],
-    "starterQuestions": [],
-    "mediaUrls": [
-      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
-    ],
-    "actions": [
-      "TWEET_SUMMARY",
-      "TWEET_HISTORY",
-      "TWITTER_ACTIVITY",
-      "TWITTER_UPDATES",
-      "FARCASTER_SUMMARY",
-      "FARCASTER_HISTORY",
-      "FARCASTER_ACTIVITY",
-      "FARCASTER_UPDATES",
-      "FARCASTER_CASTS",
-      "TRENDING_TOKENS",
-      "TOKEN_PURCHASES",
-      "TOKEN_RECOMMENDATIONS",
-      "BUY_RECOMMENDATIONS",
-      "TRENDING_CRYPTOCURRENCIES",
-      "TOKEN_SWAP_SUMMARIES",
-      "SOCIAL_SUMMARY",
-      "FARCASTER_AND_TWITTER_SUMMARY",
-      "FARCASTER_AND_TWITTER_ACTIVITY",
-      "FARCASTER_AND_TWITTER_UPDATES",
-      "SOCIAL_POSTS",
-      "TRENDING_CREATOR_COINS",
-      "CREATOR_COIN_PURCHASES",
-      "CREATOR_COIN_RECOMMENDATIONS",
-      "CREATOR_COIN_BUY_RECOMMENDATIONS",
-      "CREATOR_COIN_TRENDING_CRYPTOCURRENCIES",
-      "CREATOR_COIN_SWAP_SUMMARIES"
-    ],
-    "isPremium": false,
-    "freeQueries": 0,
-    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
-    "minimumSkillBalance": 0,
-    "status": "ACTIVE",
-    "isDefault": true
-  },
-  {
-    "pluginId": "",
-    "name": "@moxie-protocol/plugin-moxie-token-transfer",
-    "displayName": "Moxie Token Transfer",
-    "version": "0.1.8+build.1",
-    "author": null,
-    "description": "A Skills for Creator Agents that enables token transfer.",
-    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-transfer",
-    "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
-    "settings": {},
-    "capabilities": [],
-    "starterQuestions": [],
-    "mediaUrls": [
-      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
-    ],
-    "actions": [
-      "TOKEN_TRANSFERS",
-      "SEND_TOKENS",
-      "SEND_COINS",
-      "SEND_CRYPTO",
-      "SEND_FUNDS",
-      "SEND_PAYMENT",
-      "SEND_CREATOR_COIN",
-      "SEND_ERC20",
-      "SEND_TOKEN",
-      "TRANSFER_PAYMENT",
-      "TRANSFER_CREATOR_COIN",
-      "TRANSFER_ERC20",
-      "TRANSFER_TOKENS"
-    ],
-    "isPremium": false,
-    "freeQueries": 0,
-    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
-    "minimumSkillBalance": 0,
-    "status": "ACTIVE",
-    "isDefault": true
-  },
-  {
-    "pluginId": "",
-    "name": "@moxie-protocol/plugin-moxie-whale-hunter",
-    "displayName": "Moxie Whale Hunter",
-    "version": "0.1.8+build.1",
-    "author": null,
-    "description": "Offers insights into the leading/top holders of non-creator coins/tokens (ERC20), as well as the top traders on Base and other ERC20 tokens on the platform",
-    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-whale-hunter",
-    "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
-    "settings": {},
-    "capabilities": [],
-    "starterQuestions": [],
-    "mediaUrls": [
-      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
-    ],
-    "actions": [
-      "TOP_TRADERS",
-      "TOP_WHALES",
-      "TOP_TRADER_OF_A_TOKEN",
-      "TOP_TOKEN_HOLDERS",
-      "WHALE_HUNTER",
-      "WHALE_TOKEN_HOLDERS"
-    ],
-    "isPremium": false,
-    "freeQueries": 0,
-    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
-    "minimumSkillBalance": 0,
-    "status": "UPCOMING",
-    "isDefault": true
-  }
+    "isDefault": true,
+    "isFeatured": true
+    },
+    {
+      "pluginId": "",
+      "name": "@moxie-protocol/plugin-moxie-swap",
+      "displayName": "Moxie Swap",
+      "version": "0.1.8+build.1",
+      "author": null,
+      "description": "A Skills for Creator Agents that enables swapping of tokens.",
+      "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-swap",
+      "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+      "settings": {},
+      "capabilities": [],
+      "starterQuestions": [],
+      "mediaUrls": [
+        "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
+      ],
+      "actions": [
+        "SWAP_TOKENS",
+        "CREATOR_TOKEN_SWAP",
+        "CREATOR_COIN_SWAP",
+        "EXCHANGE_CREATOR_COINS",
+        "TRADE_CREATOR_TOKENS",
+        "BUY_CREATOR_TOKENS",
+        "BUY_CREATOR_COINS",
+        "PURCHASE_CREATOR_COINS",
+        "PURCHASE_ERC20_TOKENS",
+        "SWAP_ERC20_TOKENS"
+      ],
+      "isPremium": false,
+      "freeQueries": 0,
+      "skillCoinAddress": "0x0000000000000000000000000000000000000000",
+      "minimumSkillBalance": 0,
+      "status": "ACTIVE",
+      "isDefault": true
+    },
+    {
+      "pluginId": "5d3b79e2-ac61-0bb6-a3ba-b0e00b943614",
+      "name": "@moxie-protocol/plugin-moxie-social-alpha",
+      "displayName": "Moxie Big Fan",
+      "version": "0.1.8+build.1",
+      "author": null,
+      "description": "Provides insights about your favorite creators' activities, including Twitter and Farcaster posts, token swaps, and creator coin transactions",
+      "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-social-alpha",
+      "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+      "settings": {},
+      "capabilities": [],
+      "starterQuestions": [],
+      "mediaUrls": [
+        "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
+      ],
+      "actions": [
+        "TWEET_SUMMARY",
+        "TWEET_HISTORY",
+        "TWITTER_ACTIVITY",
+        "TWITTER_UPDATES",
+        "FARCASTER_SUMMARY",
+        "FARCASTER_HISTORY",
+        "FARCASTER_ACTIVITY",
+        "FARCASTER_UPDATES",
+        "FARCASTER_CASTS",
+        "TRENDING_TOKENS",
+        "TOKEN_PURCHASES",
+        "TOKEN_RECOMMENDATIONS",
+        "BUY_RECOMMENDATIONS",
+        "TRENDING_CRYPTOCURRENCIES",
+        "TOKEN_SWAP_SUMMARIES",
+        "SOCIAL_SUMMARY",
+        "FARCASTER_AND_TWITTER_SUMMARY",
+        "FARCASTER_AND_TWITTER_ACTIVITY",
+        "FARCASTER_AND_TWITTER_UPDATES",
+        "SOCIAL_POSTS",
+        "TRENDING_CREATOR_COINS",
+        "CREATOR_COIN_PURCHASES",
+        "CREATOR_COIN_RECOMMENDATIONS",
+        "CREATOR_COIN_BUY_RECOMMENDATIONS",
+        "CREATOR_COIN_TRENDING_CRYPTOCURRENCIES",
+        "CREATOR_COIN_SWAP_SUMMARIES"
+      ],
+      "isPremium": false,
+      "freeQueries": 0,
+      "skillCoinAddress": "0x0000000000000000000000000000000000000000",
+      "minimumSkillBalance": 0,
+      "status": "ACTIVE",
+      "isDefault": true
+    },
+    {
+      "pluginId": "",
+      "name": "@moxie-protocol/plugin-moxie-token-transfer",
+      "displayName": "Moxie Token Transfer",
+      "version": "0.1.8+build.1",
+      "author": null,
+      "description": "A Skills for Creator Agents that enables token transfer.",
+      "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-transfer",
+      "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+      "settings": {},
+      "capabilities": [],
+      "starterQuestions": [],
+      "mediaUrls": [
+        "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
+      ],
+      "actions": [
+        "TOKEN_TRANSFERS",
+        "SEND_TOKENS",
+        "SEND_COINS",
+        "SEND_CRYPTO",
+        "SEND_FUNDS",
+        "SEND_PAYMENT",
+        "SEND_CREATOR_COIN",
+        "SEND_ERC20",
+        "SEND_TOKEN",
+        "TRANSFER_PAYMENT",
+        "TRANSFER_CREATOR_COIN",
+        "TRANSFER_ERC20",
+        "TRANSFER_TOKENS"
+      ],
+      "isPremium": false,
+      "freeQueries": 0,
+      "skillCoinAddress": "0x0000000000000000000000000000000000000000",
+      "minimumSkillBalance": 0,
+      "status": "ACTIVE",
+      "isDefault": true
+    },
+    {
+      "pluginId": "",
+      "name": "@moxie-protocol/plugin-moxie-whale-hunter",
+      "displayName": "Moxie Whale Hunter",
+      "version": "0.1.8+build.1",
+      "author": null,
+      "description": "Offers insights into the leading/top holders of non-creator coins/tokens (ERC20), as well as the top traders on Base and other ERC20 tokens on the platform",
+      "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-whale-hunter",
+      "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+      "settings": {},
+      "capabilities": [],
+      "starterQuestions": [],
+      "mediaUrls": [
+        "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
+      ],
+      "actions": [
+        "TOP_TRADERS",
+        "TOP_WHALES",
+        "TOP_TRADER_OF_A_TOKEN",
+        "TOP_TOKEN_HOLDERS",
+        "WHALE_HUNTER",
+        "WHALE_TOKEN_HOLDERS"
+      ],
+      "isPremium": false,
+      "freeQueries": 0,
+      "skillCoinAddress": "0x0000000000000000000000000000000000000000",
+      "minimumSkillBalance": 0,
+      "status": "UPCOMING",
+      "isDefault": true
+    }
 ]
