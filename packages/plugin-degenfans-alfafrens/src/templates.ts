@@ -5,7 +5,8 @@ Extract the following details to recommend staking options:
   - A valid Ethereum address following regex format: ^0x[a-fA-F0-9]{40}$
   - A user name in format: degenfans
 - **mysubs** (Boolean): Search only on my existing subscriptions.
-- **mytake** (Boolean): Search only on my existing stakes.
+- **mystake** (Boolean): Search only on my existing stakes.
+- **minsubs** (Number): minimum subscriber count.
 
 Provide the values in the following JSON format:
 
@@ -14,7 +15,8 @@ Provide the values in the following JSON format:
     "amount": number,
     "userAddress":string,
     "mysubs": boolean,
-    "mytake": boolean
+    "mytake": boolean,
+    "minsubs":number
 }
 \`\`\`
 
@@ -33,7 +35,8 @@ I (0x114B242D931B47D5cDcEe7AF065856f70ee278C4) want to stake 50000 AF
     "amount": 50000,
     "userAddress": "0x114B242D931B47D5cDcEe7AF065856f70ee278C4",
     "mysubs": false,
-    "mytake": false
+    "mytake": false,
+    "minsubs":null
 }
 \`\`\`
 
@@ -50,7 +53,8 @@ I (degenfans) want to stake 42000 AF at my subscriptions
     "amount": 42000,
     "userAddress": "degenfans",
     "mysubs": true,
-    "mytake": false
+    "mytake": false,
+    "minsubs":null
 }
 \`\`\`
 
@@ -61,33 +65,53 @@ I (degenfans) want to stake 42000 AF at my subscriptions
 I want to stake 7000 AF at my stakes
 \`\`\`
 
-**Response 2**
+**Response 3**
 
 \`\`\`json
 {
     "amount": 7000,
     "userAddress": "",
     "mysubs": false,
-    "mytake": true
+    "mytake": true,
+    "minsubs":null
 }
 \`\`\`
 
 
 
-**Message 3**
+**Message 4**
 
 \`\`\`
 I want to stake 9000 AF at my stakes and subscriptions
 \`\`\`
 
-**Response 2**
+**Response 4**
 
 \`\`\`json
 {
     "amount": 9000,
     "userAddress": "",
     "mysubs": true,
-    "mytake": true
+    "mytake": true,
+    "minsubs":null
+}
+\`\`\`
+
+**Message 5**
+
+\`\`\`
+I want to stake 4600 AF with minimum subscriptions 10
+\`\`\`
+
+**Response 5**
+
+\`\`\`json
+{
+    "amount": 4600,
+    "userAddress": "",
+    "mysubs": true,
+    "mytake": true,
+    "minsubs":10
 }
 \`\`\`
 
