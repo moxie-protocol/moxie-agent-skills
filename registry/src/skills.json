@@ -368,5 +368,48 @@
     "minimumSkillBalance": 0,
     "status": "ACTIVE",
     "isDefault": true
+  },
+     {
+    "pluginId": "a8c0c53a-e4e5-0848-b69b-a17af97d64dd",
+    "name": "@moxie-protocol/plugin-moxie-whale-hunter DDDD",
+    "displayName": "Whale Hunter DDDD",
+    "version": "0.1.8+build.1",
+    "author": null,
+    "description": "Discover Base whales with Moxie AI! ",
+    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-whale-hunter",
+    "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+    "settings": {},
+    "capabilities": [],
+    "starterQuestions": [
+      {
+        "label": "Who are the top traders today on Base?",
+        "value": "Who are the top traders today on Base?"
+      },
+      {
+        "label": "Show today’s trending tokens on Base along with the top traders",
+        "value": "Show today’s trending tokens on Base along with the top traders"
+      },
+      {
+        "label": "Who are the biggest $bnkr whales?",
+        "value": "Who are the biggest $[BNKR|0x22af33fe49fd1fa80c7149773dde5890d3c76f3b] whales?"
+      }
+    ],
+    "mediaUrls": [
+      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
+    ],
+    "actions": [
+      "TOP_TRADERS",
+      "TOP_WHALES",
+      "TOP_TRADER_OF_A_TOKEN",
+      "TOP_TOKEN_HOLDERS",
+      "WHALE_HUNTER",
+      "WHALE_TOKEN_HOLDERS"
+    ],
+    "isPremium": true,
+    "freeQueries": 8,
+    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
+    "minimumSkillBalance": 0,
+    "status": "UPCOMING",
+    "isDefault": true
   }
 ]
