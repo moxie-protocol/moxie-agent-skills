@@ -25,19 +25,16 @@ import {
     Bet_OrderBy,
     OrderDirection,
 } from "@betswirl/sdk-core";
-import { hexAddress } from "../types";
 import { getChainIdFromWallet } from "../utils/betswirl";
 import { formatTokenForMoxieTerminal } from "../utils/moxie";
 
 export const GetBetsParameters = z.object({
-    bettor: z.union([hexAddress, z.literal("")]).describe("The bettor address"),
     game: z
         .union([z.nativeEnum(CASINO_GAME_TYPE), z.literal("")])
         .describe("The game to get the bets for"),
 });
 export const getBetsTemplate = `
 Extract the following details to get the bets:
-- **bettor** (String): The address of the player.
 - **game** (String): The game. Can be either:
   - coin-toss
   - dice
@@ -48,7 +45,6 @@ Provide the values in the following JSON format:
 
 \`\`\`json
 {
-    "bettor": string,
     "game": string
 }
 \`\`\`
@@ -65,7 +61,6 @@ Get bets
 
 \`\`\`json
 {
-    "bettor": "",
     "game": ""
 }
 \`\`\`
@@ -80,22 +75,6 @@ Get dice bets
 
 \`\`\`json
 {
-    "bettor": "",
-    "game": "dice"
-}
-\`\`\`
-
-**Message 3**
-
-\`\`\`
-Get dice bets of 0x057BcBF736DADD774A8A45A185c1697F4cF7517D
-\`\`\`
-
-**Response 3**
-
-\`\`\`json
-{
-    "bettor": "0x057BcBF736DADD774A8A45A185c1697F4cF7517D",
     "game": "dice"
 }
 \`\`\`
@@ -108,7 +87,7 @@ export const getBetsAction: Action = {
     name: "GET_BETS",
     similes: ["RETRIEVE_BETS", "SHOW_BETS", "LAST_BETS", "GET_BETSWIRL_BETS"],
     description:
-        "Get bets from BetSwirl. If no player is specified its listing the current connected player bets. If no game is specified its listing all games bets.",
+        "Get bets from BetSwirl. If no game is specified its listing all games bets.",
     suppressInitialMessage: true,
     validate: async (
         _runtime: IAgentRuntime,
@@ -145,14 +124,13 @@ export const getBetsAction: Action = {
                 modelClass: ModelClass.SMALL,
                 schema: GetBetsParameters,
             });
-            const { bettor, game } = getBetsDetails.object as {
-                bettor: string;
+            const { game } = getBetsDetails.object as {
                 game: string;
             };
 
             // Send some text
             const bettorAddress = (
-                bettor ? bettor : wallet.address
+                wallet.address
             ).toLowerCase() as Hex;
             const moxieUserInfo = state.moxieUserInfo as MoxieUser;
             await callback({
