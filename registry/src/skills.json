@@ -336,5 +336,37 @@
     "minimumSkillBalance": 0,
     "status": "UPCOMING",
     "isDefault": true
-  }
+  },
+  {
+    "pluginId": "36c9a919-5a55-4645-9008-cfd32ec4b5a2",
+    "name": "@moxie-protocol/plugin-moxie-limit-order",
+    "displayName": "Limit Order",
+    "version": "0.1.8+build.1",
+    "author": null,
+    "description": "Enables your agent to setup limit orders",
+    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-limit-order",
+    "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+    "settings": {},
+    "capabilities": [
+      "Buy on dip — buy a token when the price drops"
+    ],
+    "starterQuestions": [
+      {
+        "label": "Buy me $25 worth of MOXIE if the price dips by 5%",
+        "value": "Buy me $25 worth of MOXIE if the price dips by 5%"
+      }
+    ],
+    "mediaUrls": [
+      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
+    ],
+    "actions": [
+     "LIMIT_ORDERS"
+    ],
+    "isPremium": false,
+    "freeQueries": 0,
+    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
+    "minimumSkillBalance": 0,
+    "status": "ACTIVE",
+    "isDefault": true
+  },
 ]
