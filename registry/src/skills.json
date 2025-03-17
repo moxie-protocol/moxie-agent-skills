@@ -409,7 +409,7 @@
     "freeQueries": 8,
     "skillCoinAddress": "0x0000000000000000000000000000000000000000",
     "minimumSkillBalance": 0,
-    "status": "UPCOMING",
+    "status": "ACTIVE",
     "isDefault": true
   }
 ]
