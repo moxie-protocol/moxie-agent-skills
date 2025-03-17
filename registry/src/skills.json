@@ -1,5 +1,5 @@
 [
-    {
+  {
     "pluginId": "927fb66c-2ebc-48e1-82a8-907c6e54e379",
     "name": "@moxie-protocol/plugin-moxie-token-transfer",
     "displayName": "Moxie Token Transfer",
@@ -251,7 +251,12 @@
     "settings": {
       "token_address": "0x0000000000000000000000000000000000000000"
     },
-    "capabilities": ["Token prices", "Market caps", "Liquidity", "Holders"],
+    "capabilities": [
+      "Token prices",
+      "Market caps",
+      "Liquidity",
+      "Holders"
+    ],
     "starterQuestions": [
       {
         "label": "Show token details for $moxie",
@@ -293,7 +298,6 @@
     "isDefault": true,
     "isFeatured": true
   },
-
   {
     "pluginId": "a8c0c53a-e4e5-0848-b69b-a17af97d64dd",
     "name": "@moxie-protocol/plugin-moxie-whale-hunter",
@@ -360,7 +364,7 @@
       "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
     ],
     "actions": [
-     "LIMIT_ORDERS"
+      "LIMIT_ORDERS"
     ],
     "isPremium": false,
     "freeQueries": 0,
@@ -369,7 +373,7 @@
     "status": "ACTIVE",
     "isDefault": true
   },
-     {
+  {
     "pluginId": "87135640-9c45-4459-98d0-86c2ebb7680b",
     "name": "@moxie-protocol/plugin-moxie-whale-hunter DDDD",
     "displayName": "Whale Hunter DDDD",
