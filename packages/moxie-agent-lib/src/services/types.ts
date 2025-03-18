@@ -1,3 +1,8 @@
+import { State } from "@moxie-protocol/core";
+import { IAgentRuntime } from "@moxie-protocol/core";
+import { Wallet as PrivyWallet } from "@privy-io/server-auth";
+import { ethers } from "ethers";
+import { MoxieClientWallet, MoxieWalletClient } from "../wallet";
 export interface TwitterMetadata {
     username: string;
     name?: string;
@@ -9,24 +14,11 @@ export interface TwitterMetadata {
     profilePictureUrl?: string;
 }
 
-export interface ENSMetadata {
-    username?: string;
-    ens: string;
-    expiryTimestamp: string;
-    resolvedAddress: string;
-}
-
 export interface FarcasterMetadata {
     bio: string;
-    fid: number;
-    pfp: string;
-    type: string;
     username: string;
-    verifiedAt: string;
     displayName: string;
-    ownerAddress: string;
-    firstVerifiedAt: string;
-    latestVerifiedAt: string;
+    profileTokenId: string;
 }
 
 export interface MoxieIdentity {
@@ -35,7 +27,7 @@ export interface MoxieIdentity {
     type: string;
     dataSource: string;
     connectedIdentitiesFetchStatus: string;
-    metadata: TwitterMetadata | FarcasterMetadata | ENSMetadata;
+    metadata: TwitterMetadata | FarcasterMetadata;
     profileId: string;
     isActive: boolean;
     createdAt: string;
@@ -98,7 +90,7 @@ export interface GetUserResponse {
 export type GetWalletDetailsOutput = {
     success: boolean;
     privyId: string;
-    wallet: undefined | Wallet;
+    wallet: undefined | PrivyWallet;
 };
 
 export interface SignMessageInput {
@@ -112,19 +104,19 @@ export interface SignMessageResponse {
 }
 
 export type SignTransactionInput = {
-    from?: string;
-    to?: string;
-    nonce?: number;
-    chainId?: number;
-    data?: string;
-    value?: string;
-    type?: number;
-    gasLimit?: string;
-    gasPrice?: string;
-    maxFeePerGas?: string;
-    maxPriorityFeePerGas?: string;
-    address?: string;
-};
+    from?: string
+    to?: string
+    nonce?: number
+    chainId?: number
+    data?: string
+    value?: string
+    type?: number
+    gasLimit?: string
+    gasPrice?: string
+    maxFeePerGas?: string
+    maxPriorityFeePerGas?: string
+    address?: string
+  }
 
 export interface SignTransactionResponse {
     signature: string;
@@ -132,12 +124,12 @@ export interface SignTransactionResponse {
 }
 
 export type SignTypedDataInput = {
-    domain: Record<string, any>;
-    types: Record<string, any>;
-    message: Record<string, any>;
-    primaryType: string;
-    address: string;
-};
+    domain: Record<string, any>
+    types: Record<string, any>
+    message: Record<string, any>
+    primaryType: string
+    address: string
+  }
 
 export interface SignTypedDataResponse {
     signature: string;
@@ -164,94 +156,6 @@ export interface TransactionDetails {
     gasPrice?: number;
     maxFeePerGas?: number;
     maxPriorityFeePerGas?: number;
-}
-
-export type EthereumSignMessageResponseType = {
-    signature: string;
-    encoding: string;
-};
-
-export type EthereumSignTypedDataResponseType = {
-    signature: string;
-    encoding: string;
-};
-
-export type EthereumSignTransactionResponseType = {
-    signedTransaction: string;
-    encoding: string;
-};
-
-export type EthereumSendTransactionResponseType = {
-    hash: string;
-    caip2: EvmCaip2ChainId;
-};
-
-export type EthereumSendTransactionInputType = EthereumRpcWrapper<
-    EthereumBaseTransactionInputType & {
-        /** CAIP-2 chain ID for the network to broadcast the transaction on. */
-        caip2: EvmCaip2ChainId;
-    }
->;
-
-type EthereumRpcWrapper<T> = WithOptionalIdempotencyKey<
-    WithWalletIdOrAddressChainType<T, "ethereum">
->;
-
-type Prettify<T> = {
-    [K in keyof T]: T[K];
-} & {};
-
-type WithOptionalIdempotencyKey<T> = Prettify<
-    T & {
-        idempotencyKey?: string;
-    }
->;
-
-type WithWalletIdOrAddressChainType<T, U extends "solana" | "ethereum"> =
-    | Prettify<
-          T & {
-              /** Address of the wallet. */
-              address: string;
-              /** Chain type of the wallet. */
-              chainType: U;
-          }
-      >
-    | Prettify<
-          T & {
-              /** ID of the wallet. */
-              walletId: string;
-          }
-      >;
-
-type EthereumBaseTransactionInputType = {
-    transaction: {
-        from?: Hex;
-        to?: Hex;
-        nonce?: Quantity;
-        chainId?: Quantity;
-        data?: Hex;
-        value?: Quantity;
-        gasLimit?: Quantity;
-        gasPrice?: Quantity;
-        maxFeePerGas?: Quantity;
-        maxPriorityFeePerGas?: Quantity;
-    };
-};
-
-export type EvmCaip2ChainId = `eip155:${string}`;
-export type Quantity = Hex | number;
-export type Hex = `0x${string}`;
-
-export interface Wallet {
-    address: string;
-    chainType: "ethereum" | "solana";
-    chainId?: string;
-    walletType?: string;
-    walletClientType?: string;
-    connectorType?: string;
-    hdWalletIndex?: number;
-    imported?: boolean;
-    delegated?: boolean;
 }
 
 export interface LiquidityPool {
@@ -294,4 +198,64 @@ export interface TokenDetails {
     volumeChange12Hours?: string;
     volumeChange24Hours?: string;
     liquidityPools?: LiquidityPool[];
+}
+
+export interface MoxiePortfolioInfo {
+    fanTokenSymbol: string;
+    fanTokenName: string;
+    fanTokenAddress: string;
+    totalLockedAmount: number;
+    totalUnlockedAmount: number;
+    totalAmount: number;
+    totalTvl: number;
+    walletAddresses: string[];
+    currentPrice: number;
+    lockedTvl: number;
+    unlockedTvl: number;
+    totalTvlInUSD: number;
+    lockedTvlInUSD: number;
+    unlockedTvlInUSD: number;
+    fanTokenMoxieUserId: string;
+    displayLabel: string;
+    holdingPercentage: number;
+}
+
+export interface MoxiePortfolioResponse {
+    errors?: Array<{
+        message: string;
+    }>;
+    data: {
+        MoxieUserPortfolios: {
+            MoxieUserPortfolio: MoxiePortfolioInfo[];
+        };
+    };
+}
+
+export interface Skill {
+    id: string;
+    name: string;
+    displayName: string;
+    version: string;
+    author: string;
+    description: string;
+    githubUrl: string;
+    logoUrl: string;
+    status: string;
+    settings: any;
+    capabilities: string[];
+    starterQuestions: StarterQuestion[];
+    mediaUrls: string[];
+    actions: string[];
+    isPremium: boolean;
+    freeQueries: number;
+    skillCoinAddress: string;
+    minimumSkillBalance: number;
+    installedStatus?: string;
+    isDefault: boolean;
+    isFeatured: boolean;
+}
+
+export interface StarterQuestion {
+    label: string;
+    value: string;
 }

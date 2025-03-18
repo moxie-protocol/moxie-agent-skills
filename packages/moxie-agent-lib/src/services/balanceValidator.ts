@@ -110,7 +110,7 @@ export async function getEligibleMoxieIds(moxieUserInfo: MoxieUser, new_remainin
         pluginTokenGate.forEach((token) => {
             if (token.requiredTokens > 0) {
                 ineligibleMoxieUsers.push({
-                    requiredMoxieAmountInUSD: roundToDecimalPlaces(token.requiredMoxieAmountInUSD, 4),
+                    requiredMoxieAmountInUSD: roundToDecimalPlaces(token.requiredMoxieAmountInUSD, 2),
                     requiredTokens: roundToDecimalPlaces(token.requiredTokens, 4),
                     label: `@[${token.fanTokenName}|${token.creatorMoxieId}]`,
                 });

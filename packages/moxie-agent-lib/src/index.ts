@@ -1,6 +1,6 @@
 import * as moxieUserService from "./services/moxieUserService";
 import * as ftaService from "./services/fta";
-import * as portfolioService from "./services/portfolioService";
+import * as portfolioService from "./services/portfolio";
 import * as walletService from "./wallet";
 
 export { moxieUserService };
@@ -13,13 +13,14 @@ export { portfolioService };
 
 export { RedisClient } from "./services/RedisClient";
 
+export { MoxiePortfolio } from "./services/portfolio";
 export { getMoxiePortfolioInfoByCreatorTokenDetails } from "./services/portfolioService";
 
 export { MoxieAgentDBAdapter } from "./services/MoxieAgentDBAdapter";
 
 export { getTokenDetails } from "./services/tokenDetails";
 
-export type {
+export {
     TwitterMetadata,
     FarcasterMetadata,
     MoxieIdentity,
@@ -42,13 +43,12 @@ export type {
 } from "./services/types";
 
 
-export type { MoxieWalletSignMessageResponseType, MoxieWalletSignTypedDataResponseType, MoxieWalletSendTransactionResponseType, MoxieWalletSendTransactionInputType, MoxieHex, MoxieClientWallet, MoxieWalletClient } from "./wallet";
+export { MoxieWalletSignMessageResponseType, MoxieWalletSignTypedDataResponseType, MoxieWalletSendTransactionResponseType, MoxieWalletSendTransactionInputType, MoxieHex, MoxieClientWallet, MoxieWalletClient } from "./wallet";
 
-export { getMoxiePortfolioInfo } from "./services/portfolioService";
-export type { MoxiePortfolioInfo } from "./services/portfolioService";
+export { getMoxiePortfolioInfo, MoxiePortfolioInfo } from "./services/portfolioService";
 
-export {  getPortfolioData, getPortfolioV2Data } from "./services/zapperService";
-export type { Portfolio, PortfolioV2Data } from "./services/zapperService";
+export { Portfolio, getPortfolioData, getPortfolioV2Data, PortfolioV2Data } from "./services/zapperService";
 
-export { validateMoxieUserTokens , fetchPluginTokenGate, getEligibleMoxieIds } from "./services/balanceValidator"
-export type { PluginToken } from "./services/balanceValidator"
+export { validateMoxieUserTokens, PluginToken , fetchPluginTokenGate, getEligibleMoxieIds } from "./services/balanceValidator"
+
+export { deleteLimitOrders } from "./services/cowService";
