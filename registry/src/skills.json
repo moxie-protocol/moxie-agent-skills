@@ -172,7 +172,7 @@
       "CREATOR_COIN_SWAP_SUMMARIES"
     ],
     "isPremium": false,
-    "freeQueries": 5,
+    "freeQueries": 10,
     "skillCoinAddress": "0x0000000000000000000000000000000000000000",
     "minimumSkillBalance": 0,
     "status": "ACTIVE",
@@ -284,7 +284,7 @@
       "FAN_TOKEN_PRICE"
     ],
     "isPremium": false,
-    "freeQueries": 0,
+    "freeQueries": 10,
     "skillCoinAddress": "0x0000000000000000000000000000000000000000",
     "minimumSkillBalance": 0,
     "status": "ACTIVE",
