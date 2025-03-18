@@ -1,5 +1,59 @@
 [
   {
+    "pluginId": "a1aa9887-fc11-5f54-aa62-235c7536ba67",
+    "name": "@moxie-protocol/plugin-moxie-token-details",
+    "displayName": "Moxie Token Details",
+    "version": "0.1.8+build.1",
+    "author": "M7",
+    "description": "A Skills for Creator Agents that enables fetching of base token details.",
+    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details",
+    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+    "settings": {
+      "token_address": "0x0000000000000000000000000000000000000000"
+    },
+    "capabilities": ["Token prices", "Market caps", "Liquidity", "Holders"],
+    "starterQuestions": [
+      {
+        "label": "Show token details for $moxie",
+        "value": "Show token details for $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527]"
+      },
+      {
+        "label": "Compare $moxie and $bnkr",
+        "value": "Compare $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] and $[BNKR|0x22af33fe49fd1fa80c7149773dde5890d3c76f3b]"
+      }
+    ],
+    "mediaUrls": [
+      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
+    ],
+    "actions": [
+      "TOKEN_DETAILS",
+      "TOKEN_DETAILS_SUMMARY",
+      "BASE_TOKEN_DETAIL",
+      "BASE_TOKEN_DETAILS",
+      "BASE_TOKEN_DETAILS_SUMMARY",
+      "TOKEN_SUMMARY",
+      "ERC20_DETAILS",
+      "ERC20_DETAILS_SUMMARY",
+      "ERC20_TOKEN_DETAILS",
+      "ERC20_TOKEN_DETAILS_SUMMARY",
+      "TOKEN_INFO",
+      "TOKEN_PORTFOLIO",
+      "TOKEN_PRICE",
+      "TOKEN_MARKET_CAP",
+      "TOKEN_HOLDINGS",
+      "TOKEN_LIQUIDITY",
+      "TOKEN_MARKET_PERFORMANCE",
+      "TOKEN_MARKET_SENTIMENT"
+    ],
+    "isPremium": false,
+    "freeQueries": 0,
+    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
+    "minimumSkillBalance": 0,
+    "status": "ACTIVE",
+    "isDefault": true,
+    "isFeatured": true
+  },
+  {
     "pluginId": "927fb66c-2ebc-48e1-82a8-907c6e54e379",
     "name": "@moxie-protocol/plugin-moxie-token-transfer",
     "displayName": "Moxie Token Transfer",
@@ -7,7 +61,7 @@
     "author": null,
     "description": "A Skills for Creator Agents that enables token transfer.",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-transfer",
-    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-transfer/images/logo.svg",
     "settings": {},
     "capabilities": [
       "Send tokens to yourself",
@@ -25,7 +79,7 @@
       }
     ],
     "mediaUrls": [
-      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
+      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-transfer/images/logo.svg"
     ],
     "actions": [
       "TOKEN_TRANSFERS",
@@ -57,7 +111,7 @@
     "author": null,
     "description": "In-depth analysis on Base users, including trades, portfolios, and posts on Farcaster and X. Buy user’s coins to add them to your Social Alpha list.",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-social-alpha",
-    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-social-alpha/images/logo.svg",
     "settings": {},
     "capabilities": [
       "AI Intelligence across onchain activity and social media",
@@ -89,7 +143,7 @@
       }
     ],
     "mediaUrls": [
-      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
+      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-social-alpha/images/logo.svg"
     ],
     "actions": [
       "TWEET_SUMMARY",
@@ -134,7 +188,7 @@
     "author": null,
     "description": "Enables your agent to trade and swap for you onchain using your Agent Wallet",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-swap",
-    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-swap/images/logo.svg",
     "settings": {},
     "capabilities": [
       "Swap any token on Base. 💡Pro Tip: use “$” to auto-complete token names",
@@ -156,7 +210,7 @@
       }
     ],
     "mediaUrls": [
-      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
+      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-swap/images/logo.svg"
     ],
     "actions": [
       "SWAP_TOKENS",
@@ -185,7 +239,7 @@
     "author": "M4",
     "description": "Enables your agent to fetch portfolio details for thousands of wallets indexed by Moxie",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-balance",
-    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-balance/images/logo.svg",
     "settings": {},
     "capabilities": [
       "Analyze my portfolio",
@@ -207,7 +261,7 @@
       }
     ],
     "mediaUrls": [
-      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
+      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-balance/images/logo.svg"
     ],
     "actions": [
       "PORTFOLIO",
@@ -240,65 +294,6 @@
     "isFeatured": true
   },
   {
-    "pluginId": "a1aa9887-fc11-5f54-aa62-235c7536ba67",
-    "name": "@moxie-protocol/plugin-moxie-token-details",
-    "displayName": "Moxie Token Details",
-    "version": "0.1.8+build.1",
-    "author": "M7",
-    "description": "A Skills for Creator Agents that enables fetching of base token details.",
-    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details",
-    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
-    "settings": {
-      "token_address": "0x0000000000000000000000000000000000000000"
-    },
-    "capabilities": [
-      "Token prices",
-      "Market caps",
-      "Liquidity",
-      "Holders"
-    ],
-    "starterQuestions": [
-      {
-        "label": "Show token details for $moxie",
-        "value": "Show token details for $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527]"
-      },
-      {
-        "label": "Compare $moxie and $bnkr",
-        "value": "Compare $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] and $[BNKR|0x22af33fe49fd1fa80c7149773dde5890d3c76f3b]"
-      }
-    ],
-    "mediaUrls": [
-      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
-    ],
-    "actions": [
-      "TOKEN_DETAILS",
-      "TOKEN_DETAILS_SUMMARY",
-      "BASE_TOKEN_DETAIL",
-      "BASE_TOKEN_DETAILS",
-      "BASE_TOKEN_DETAILS_SUMMARY",
-      "TOKEN_SUMMARY",
-      "ERC20_DETAILS",
-      "ERC20_DETAILS_SUMMARY",
-      "ERC20_TOKEN_DETAILS",
-      "ERC20_TOKEN_DETAILS_SUMMARY",
-      "TOKEN_INFO",
-      "TOKEN_PORTFOLIO",
-      "TOKEN_PRICE",
-      "TOKEN_MARKET_CAP",
-      "TOKEN_HOLDINGS",
-      "TOKEN_LIQUIDITY",
-      "TOKEN_MARKET_PERFORMANCE",
-      "TOKEN_MARKET_SENTIMENT"
-    ],
-    "isPremium": false,
-    "freeQueries": 0,
-    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
-    "minimumSkillBalance": 0,
-    "status": "ACTIVE",
-    "isDefault": true,
-    "isFeatured": true
-  },
-  {
     "pluginId": "a8c0c53a-e4e5-0848-b69b-a17af97d64dd",
     "name": "@moxie-protocol/plugin-moxie-whale-hunter",
     "displayName": "Whale Hunter",
@@ -306,7 +301,7 @@
     "author": null,
     "description": "Discover Base whales with Moxie AI! ",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-whale-hunter",
-    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-whale-hunter/images/logo.svg",
     "settings": {},
     "capabilities": [],
     "starterQuestions": [
@@ -324,7 +319,7 @@
       }
     ],
     "mediaUrls": [
-      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
+      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-whale-hunter/images/logo.svg"
     ],
     "actions": [
       "TOP_TRADERS",
@@ -349,68 +344,33 @@
     "author": null,
     "description": "Enables your agent to setup limit orders",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-limit-order",
-    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-limit-order/images/logo.svg",
     "settings": {},
-    "capabilities": [
-      "Buy on dip — buy a token when the price drops"
-    ],
+    "capabilities": ["Buy on dip — buy a token when the price drops"],
     "starterQuestions": [
       {
-        "label": "Buy me $25 worth of MOXIE if the price dips by 5%",
-        "value": "Buy me $25 worth of MOXIE if the price dips by 5%"
+        "label": "Buy me $25 worth of $moxie if the price dips by 5%",
+        "value": "Buy me $25 worth of $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] if the price dips by 5%"
+      },
+      {
+        "label": "Buy $25 worth of $moxie if the price increases by 10%",
+        "value": "Buy $25 worth of $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] if the price increases by 10%"
+      },
+      {
+        "label": "Sell 10% of my $bnkr if the price increases by 10%",
+        "value": "Sell 10% of my $[BNKR|0x22af33fe49fd1fa80c7149773dde5890d3c76f3b] if the price increases by 10%"
+      },
+      {
+        "label": "Sell 20% of my $vvv if the price dips by 10%",
+        "value": "Sell 20% of my $[VVV|0xacfe6019ed1a7dc6f7b508c02d1b04ec88cc21bf] if the price dips by 10%"
       }
     ],
     "mediaUrls": [
-      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
+      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-limit-order/images/logo.svg"
     ],
-    "actions": [
-      "LIMIT_ORDERS"
-    ],
+    "actions": ["LIMIT_ORDERS"],
     "isPremium": false,
     "freeQueries": 0,
-    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
-    "minimumSkillBalance": 0,
-    "status": "ACTIVE",
-    "isDefault": true
-  },
-  {
-    "pluginId": "87135640-9c45-4459-98d0-86c2ebb7680b",
-    "name": "@moxie-protocol/plugin-moxie-whale-hunter DDDD",
-    "displayName": "Whale Hunter DDDD",
-    "version": "0.1.8+build.1",
-    "author": null,
-    "description": "Discover Base whales with Moxie AI! ",
-    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-whale-hunter",
-    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
-    "settings": {},
-    "capabilities": [],
-    "starterQuestions": [
-      {
-        "label": "Who are the top traders today on Base?",
-        "value": "Who are the top traders today on Base?"
-      },
-      {
-        "label": "Show today’s trending tokens on Base along with the top traders",
-        "value": "Show today’s trending tokens on Base along with the top traders"
-      },
-      {
-        "label": "Who are the biggest $bnkr whales?",
-        "value": "Who are the biggest $[BNKR|0x22af33fe49fd1fa80c7149773dde5890d3c76f3b] whales?"
-      }
-    ],
-    "mediaUrls": [
-      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
-    ],
-    "actions": [
-      "TOP_TRADERS",
-      "TOP_WHALES",
-      "TOP_TRADER_OF_A_TOKEN",
-      "TOP_TOKEN_HOLDERS",
-      "WHALE_HUNTER",
-      "WHALE_TOKEN_HOLDERS"
-    ],
-    "isPremium": true,
-    "freeQueries": 8,
     "skillCoinAddress": "0x0000000000000000000000000000000000000000",
     "minimumSkillBalance": 0,
     "status": "ACTIVE",
