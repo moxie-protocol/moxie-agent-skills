@@ -5,7 +5,7 @@ export interface Staking {
     amount: number,
     userAddress?: string,
     mysubs: boolean,
-    mytake: boolean,
+    mystake: boolean,
     minsubs?:number,
   }
   
@@ -14,6 +14,6 @@ export const StakingSchema = z.object({
     amount: z.number().min(1),
     userAddress: z.string().optional(),
     mysubs: z.boolean(),
-    mytake: z.boolean(),
+    mystake: z.boolean(),
     minsubs: z.number().optional(),
 });

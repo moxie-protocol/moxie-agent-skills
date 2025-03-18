@@ -35,8 +35,7 @@ I (0x114B242D931B47D5cDcEe7AF065856f70ee278C4) want to stake 50000 AF
     "amount": 50000,
     "userAddress": "0x114B242D931B47D5cDcEe7AF065856f70ee278C4",
     "mysubs": false,
-    "mytake": false,
-    "minsubs":null
+    "mytake": false
 }
 \`\`\`
 
@@ -53,8 +52,7 @@ I (degenfans) want to stake 42000 AF at my subscriptions
     "amount": 42000,
     "userAddress": "degenfans",
     "mysubs": true,
-    "mytake": false,
-    "minsubs":null
+    "mytake": false
 }
 \`\`\`
 
@@ -72,8 +70,7 @@ I want to stake 7000 AF at my stakes
     "amount": 7000,
     "userAddress": "",
     "mysubs": false,
-    "mytake": true,
-    "minsubs":null
+    "mytake": true
 }
 \`\`\`
 
@@ -92,8 +89,7 @@ I want to stake 9000 AF at my stakes and subscriptions
     "amount": 9000,
     "userAddress": "",
     "mysubs": true,
-    "mytake": true,
-    "minsubs":null
+    "mytake": true
 }
 \`\`\`
 

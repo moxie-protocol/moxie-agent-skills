@@ -138,6 +138,9 @@ importers:
       '@moxie-protocol/plugin-bootstrap':
         specifier: workspace:*
         version: link:../packages/plugin-bootstrap
+      '@moxie-protocol/plugin-degenfans-alfafrens':
+        specifier: workspace:*
+        version: link:../packages/plugin-degenfans-alfafrens
       '@moxie-protocol/plugin-sample':
         specifier: workspace:*
         version: link:../packages/_examples/plugin
@@ -593,6 +596,28 @@ importers:
       whatwg-url:
         specifier: 7.1.0
         version: 7.1.0
+
+  packages/plugin-degenfans-alfafrens:
+    dependencies:
+      '@moxie-protocol/core':
+        specifier: workspace:*
+        version: link:../core
+      '@moxie-protocol/moxie-agent-lib':
+        specifier: workspace:*
+        version: link:../moxie-agent-lib
+      ethers:
+        specifier: ^6.0.0
+        version: 6.13.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      graphql-request:
+        specifier: ^7.1.2
+        version: 7.1.2(graphql@16.10.0)
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.5
+        version: 22.13.10
+      tsup:
+        specifier: 8.3.5
+        version: 8.3.5(@swc/core@1.11.8(@swc/helpers@0.5.15))(jiti@1.21.7)(postcss@8.5.3)(tsx@4.19.3)(typescript@5.6.3)(yaml@2.7.0)
 
   packages/plugin-moxie-token-details:
     dependencies:

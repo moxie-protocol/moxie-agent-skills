@@ -12,7 +12,9 @@ import {
 } from "@moxie-protocol/core";
 
 import { stakingConsultantTemplate } from "../templates";
-import { StakingSchema } from "../types";
+import { Staking, StakingSchema } from "../types";
+import { MoxieUser } from "@moxie-protocol/moxie-agent-lib";
+import { getStakingOptions } from "../utils/degenfansApi";
 
 export const stakingConsultantAction: Action = {
     name: "GET_ALFAFRENS_STAKING_RECOMENDATION",
@@ -30,7 +32,7 @@ export const stakingConsultantAction: Action = {
         callback: HandlerCallback
     ) => {
         
-          elizaLogger.log("Starting TRANSFER_BASE_ETH handler...");
+          elizaLogger.log("Starting GET_ALFAFRENS_STAKING_RECOMENDATION handler...");
         
                     // Initialize or update state
                     if (!state) {
@@ -54,15 +56,32 @@ export const stakingConsultantAction: Action = {
                         userAddress,
                         amount,
                         mysubs,
-                        mytake,
+                        mystake,
+                        minsubs,
                     } = transferDetails.object as {
                             amount: number;
-                            userAddress:string;
+                            userAddress: string;
                             mysubs: boolean;
-                            mytake: boolean;
+                            mystake: boolean;
+                            minsubs: number;
                     };
+              const moxieUserInfo: MoxieUser = state.moxieUserInfo as MoxieUser;
+              const wallets = moxieUserInfo.wallets.map((x) => x.walletAddress);
+              const stakingData:Staking={amount:amount,userAddress:userAddress,mysubs:mysubs,mystake:mystake,minsubs:minsubs};
+              const  resp =   await  getStakingOptions(moxieUserInfo.id,wallets,stakingData);  
+              let tbl:string="\n";
+              if(resp.status==200){
+ 
+                tbl+="|rank|AlfaFrens Channel|ROI Spark/mo|current stake|\n";
+                tbl+="|------:|:--------|----:|------|\n";
+                if(resp.data){
+                    resp.data.forEach(e=>{
+                        tbl+="#"+e.rank+"|["+e.name+"|https://alfafrens.com/channel/"+e.channelAddress+"]|"+e.roi+"|"+e.currentStake+"|\n";
+                    });
+                }
+            }
         await callback?.({
-            text: `The staking amount is ${amount} AF.`,
+            text: resp.message+tbl,
         });
     },
     examples: [
@@ -70,7 +89,7 @@ export const stakingConsultantAction: Action = {
             {
                 user: "{{user1}}",
                 content: {
-                    text: "Can you check my token balance on Base?",
+                    text: "I (0x114B242D931B47D5cDcEe7AF065856f70ee278C4) want to stake 50000 AF",
                 },
             },
             {

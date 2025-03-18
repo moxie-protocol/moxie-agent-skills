@@ -29,7 +29,7 @@ import yargs from "yargs";
 // import moxieTokenDetailsPlugin from "@moxie-protocol/plugin-moxie-token-details";
 // import { moxieSwapPlugin } from "@moxie-protocol/plugin-moxie-swap";
 import samplePlugin from "@moxie-protocol/plugin-sample";
-import bootstrapPlugin from "@moxie-protocol/plugin-bootstrap";
+import degenfansAlfaFrensPlugin from "@moxie-protocol/plugin-degenfans-alfafrens";
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
 
@@ -493,7 +493,7 @@ export async function createAgent(
         evaluators: [],
         character,
         // character.plugins are handled when clients are added
-        plugins: [samplePlugin, bootstrapPlugin].filter(Boolean),
+        plugins: [degenfansAlfaFrensPlugin].filter(Boolean),
         providers: [],
         actions: [],
         services: [],

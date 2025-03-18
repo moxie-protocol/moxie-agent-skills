@@ -25,5 +25,14 @@
         "description": "A Skills for Creator Agents that enables fetching of base token details.",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details",
         "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details/images/logo.png"
+    },
+    {
+        "pluginId": "79449cd9-0590-4ccc-9d9f-12f99438c17b",
+        "name": "@moxie-protocol/plugin-degenfans-alfafrens",
+        "version": "0.1.8+build.1",
+        "author": "DegenFans",
+        "description": "A Skills for AlfaFrens user to get staking recommendations.",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-degenfans-alfafrens",
+        "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-degenfans-alfafrens/images/logo.png"
     }
 ]
