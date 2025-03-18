@@ -8,9 +8,7 @@
     "description": "A Skills for Creator Agents that enables fetching of base token details.",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details",
     "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
-    "settings": {
-      "token_address": "0x0000000000000000000000000000000000000000"
-    },
+    "settings": {},
     "capabilities": ["Token prices", "Market caps", "Liquidity", "Holders"],
     "starterQuestions": [
       {
