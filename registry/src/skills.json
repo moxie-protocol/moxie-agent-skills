@@ -7,7 +7,7 @@
     "author": null,
     "description": "A Skills for Creator Agents that enables token transfer.",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-transfer",
-    "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
     "settings": {},
     "capabilities": [
       "Send tokens to yourself",
@@ -57,7 +57,7 @@
     "author": null,
     "description": "In-depth analysis on Base users, including trades, portfolios, and posts on Farcaster and X. Buy user’s coins to add them to your Social Alpha list.",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-social-alpha",
-    "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
     "settings": {},
     "capabilities": [
       "AI Intelligence across onchain activity and social media",
@@ -134,7 +134,7 @@
     "author": null,
     "description": "Enables your agent to trade and swap for you onchain using your Agent Wallet",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-swap",
-    "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
     "settings": {},
     "capabilities": [
       "Swap any token on Base. 💡Pro Tip: use “$” to auto-complete token names",
@@ -185,7 +185,7 @@
     "author": "M4",
     "description": "Enables your agent to fetch portfolio details for thousands of wallets indexed by Moxie",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-balance",
-    "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
     "settings": {},
     "capabilities": [
       "Analyze my portfolio",
@@ -247,7 +247,7 @@
     "author": "M7",
     "description": "A Skills for Creator Agents that enables fetching of base token details.",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details",
-    "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
     "settings": {
       "token_address": "0x0000000000000000000000000000000000000000"
     },
@@ -306,7 +306,7 @@
     "author": null,
     "description": "Discover Base whales with Moxie AI! ",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-whale-hunter",
-    "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
     "settings": {},
     "capabilities": [],
     "starterQuestions": [
@@ -349,7 +349,7 @@
     "author": null,
     "description": "Enables your agent to setup limit orders",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-limit-order",
-    "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
     "settings": {},
     "capabilities": [
       "Buy on dip — buy a token when the price drops"
@@ -381,7 +381,7 @@
     "author": null,
     "description": "Discover Base whales with Moxie AI! ",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-whale-hunter",
-    "imageUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
     "settings": {},
     "capabilities": [],
     "starterQuestions": [
