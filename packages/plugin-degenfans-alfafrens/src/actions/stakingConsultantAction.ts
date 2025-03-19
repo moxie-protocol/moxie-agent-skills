@@ -66,7 +66,8 @@ export const stakingConsultantAction: Action = {
                             minsubs: number;
                     };
               const moxieUserInfo: MoxieUser = state.moxieUserInfo as MoxieUser;
-              const wallets = moxieUserInfo.wallets.map((x) => x.walletAddress);
+              let wallets = moxieUserInfo.wallets.map((x) => x.walletAddress);
+
               const stakingData:Staking={amount:amount,userAddress:userAddress,mysubs:mysubs,mystake:mystake,minsubs:minsubs};
               const  resp =   await  getStakingOptions(moxieUserInfo.id,wallets,stakingData);  
               let tbl:string="\n";
