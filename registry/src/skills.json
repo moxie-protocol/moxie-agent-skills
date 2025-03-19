@@ -43,12 +43,12 @@
       "TOKEN_MARKET_PERFORMANCE",
       "TOKEN_MARKET_SENTIMENT"
     ],
-    "isPremium": false,
-    "freeQueries": 0,
-    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
-    "minimumSkillBalance": 0,
+    "isPremium": true,
+    "freeQueries": 6,
+    "skillCoinAddress": "0xda7e153bbe75902bd23496284fe0c4b90c9ace7b",
+    "minimumSkillBalance": 1,
     "status": "ACTIVE",
-    "isDefault": true,
+    "isDefault": false,
     "isFeatured": true
   },
   {
