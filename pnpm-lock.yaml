@@ -138,9 +138,6 @@ importers:
       '@moxie-protocol/plugin-bootstrap':
         specifier: workspace:*
         version: link:../packages/plugin-bootstrap
-      '@moxie-protocol/plugin-degenfans-alfafrens':
-        specifier: workspace:*
-        version: link:../packages/plugin-degenfans-alfafrens
       '@moxie-protocol/plugin-sample':
         specifier: workspace:*
         version: link:../packages/_examples/plugin
