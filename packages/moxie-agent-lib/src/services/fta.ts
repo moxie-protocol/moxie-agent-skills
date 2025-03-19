@@ -1,4 +1,4 @@
-import { mockFta } from "../constants/constants";
+import { mockFta } from "./constants";
 
 export interface Fta {
     id: string;

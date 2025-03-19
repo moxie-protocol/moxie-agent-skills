@@ -2,9 +2,9 @@ import {
     SqliteDatabaseAdapter,
     loadVecExtensions,
 } from "@elizaos/adapter-sqlite";
-import { SqlJsDatabaseAdapter } from "@moxie-protocol/adapter-sqljs";
-import { SupabaseDatabaseAdapter } from "@moxie-protocol/adapter-supabase";
-import { PGLiteDatabaseAdapter } from "@moxie-protocol/adapter-pglite";
+import { SqlJsDatabaseAdapter } from "@elizaos/adapter-sqljs";
+import { SupabaseDatabaseAdapter } from "@elizaos/adapter-supabase";
+import { PGLiteDatabaseAdapter } from "@elizaos/adapter-pglite";
 import { DatabaseAdapter } from "../database.ts";
 import { getEndpoint } from "../models.ts";
 import { AgentRuntime } from "../runtime.ts";

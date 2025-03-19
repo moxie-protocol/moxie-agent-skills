@@ -1,6 +1,6 @@
 import * as moxieUserService from "./services/moxieUserService";
 import * as ftaService from "./services/fta";
-import * as portfolioService from "./services/portfolioService";
+import * as portfolioService from "./services/portfolio";
 import * as walletService from "./wallet";
 
 export { moxieUserService };
@@ -13,6 +13,7 @@ export { portfolioService };
 
 export { RedisClient } from "./services/RedisClient";
 
+export type { MoxiePortfolio } from "./services/portfolio";
 export { getMoxiePortfolioInfoByCreatorTokenDetails } from "./services/portfolioService";
 
 export { MoxieAgentDBAdapter } from "./services/MoxieAgentDBAdapter";
@@ -41,14 +42,32 @@ export type {
     LiquidityPool,
 } from "./services/types";
 
+export type {
+    MoxieWalletSignMessageResponseType,
+    MoxieWalletSignTypedDataResponseType,
+    MoxieWalletSendTransactionResponseType,
+    MoxieWalletSendTransactionInputType,
+    MoxieHex,
+    MoxieClientWallet,
+    MoxieWalletClient,
+} from "./wallet";
 
-export type { MoxieWalletSignMessageResponseType, MoxieWalletSignTypedDataResponseType, MoxieWalletSendTransactionResponseType, MoxieWalletSendTransactionInputType, MoxieHex, MoxieClientWallet, MoxieWalletClient } from "./wallet";
+export {
+    getMoxiePortfolioInfo,
+    type MoxiePortfolioInfo,
+} from "./services/portfolioService";
 
-export { getMoxiePortfolioInfo } from "./services/portfolioService";
-export type { MoxiePortfolioInfo } from "./services/portfolioService";
+export {
+    type Portfolio,
+    getPortfolioData,
+    getPortfolioV2Data,
+    type PortfolioV2Data,
+} from "./services/zapperService";
 
-export {  getPortfolioData, getPortfolioV2Data } from "./services/zapperService";
-export type { Portfolio, PortfolioV2Data } from "./services/zapperService";
+export {
+    validateMoxieUserTokens,
+    type PluginToken,
+    fetchPluginTokenGate,
+} from "./services/balanceValidator";
 
-export { validateMoxieUserTokens , fetchPluginTokenGate, getEligibleMoxieIds } from "./services/balanceValidator"
-export type { PluginToken } from "./services/balanceValidator"
+export { deleteLimitOrders } from "./services/cowService";
