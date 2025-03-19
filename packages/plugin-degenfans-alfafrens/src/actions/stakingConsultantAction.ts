@@ -66,19 +66,21 @@ export const stakingConsultantAction: Action = {
                             minsubs: number;
                     };
               const moxieUserInfo: MoxieUser = state.moxieUserInfo as MoxieUser;
+           
               let wallets = moxieUserInfo.wallets.map((x) => x.walletAddress);
 
               const stakingData:Staking={amount:amount,userAddress:userAddress,mysubs:mysubs,mystake:mystake,minsubs:minsubs};
-              const  resp =   await  getStakingOptions(moxieUserInfo.id,wallets,stakingData);  
+              const  resp =   await  getStakingOptions(null,wallets,stakingData);  
               let tbl:string="\n";
               if(resp.status==200){
- 
-                tbl+="|rank|AlfaFrens Channel|ROI Spark/mo|current stake|\n";
-                tbl+="|------:|:--------|----:|------|\n";
-                if(resp.data){
+                if(resp.data && resp.data.length > 0){
+                    tbl+="|rank|AlfaFrens Channel|ROI Spark/mo|current stake|\n";
+                    tbl+="|------:|:--------|----:|------|\n";
                     resp.data.forEach(e=>{
                         tbl+="#"+e.rank+"|["+e.name+"|https://alfafrens.com/channel/"+e.channelAddress+"]|"+e.roi+"|"+e.currentStake+"|\n";
                     });
+                }else{
+                    tbl+="no staking options found";
                 }
             }
         await callback?.({
