@@ -17,9 +17,8 @@ import { portfolioExamples } from "./examples";
 import { mutiplePortfolioSummary, portfolioSummary } from "./template";
 import { portfolioUserIdsExtractionTemplate } from "../../commonTemplate";
 import { getMoxiePortfolioInfo, MoxieUser, moxieUserService, getPortfolioData, Portfolio, getPortfolioV2Data, PortfolioV2Data, MoxiePortfolioInfo, MoxieAgentDBAdapter } from "@moxie-protocol/moxie-agent-lib";
-import { getCommonHoldings, getMoxieCache, getMoxieToUSD, getWalletAddresses, setMoxieCache, handleIneligibleMoxieUsers, getEligibleMoxieIds, formatMessages } from "../../util";
+import { getCommonHoldings, getMoxieCache, getMoxieToUSD, getWalletAddresses, setMoxieCache, handleIneligibleMoxieUsers, formatMessages } from "../../util";
 import { PortfolioUserRequested } from "../../types";
-
 
 export interface PortfolioSummary {
     [userName: string]: {
@@ -193,7 +192,7 @@ export default {
             const moxieUserInfoState = state.moxieUserInfo as MoxieUser
             const moxieUserId = (state.moxieUserInfo as MoxieUser)?.id
 
-            let moxieUserInfo: MoxieUser = await moxieUserService.getUserByMoxieId(moxieUserId)
+            let moxieUserInfo: MoxieUser = await moxieUserService.getUserByPrivyBearerToken(state.authorizationHeader as string)
             let moxieUserInfoMultiple: MoxieUser[];
             let isSelfPortolioRequested = false
 
@@ -253,22 +252,17 @@ export default {
                 }
 
                 // Fetch user info for all requested IDs
-                moxieUserInfoMultiple = await Promise.all(
-                    requestedMoxieUserIds.map(id => moxieUserService.getUserByMoxieId(id))
-                );
-
-                if (moxieUserInfoMultiple.some(user => !user)) {
-                    await callback({
-                        text: "Could not find one or more provided userss",
-                        action: "PORTFOLIO_ERROR"
-                    });
-                    return false;
+                const ineligibleMoxieUsers = [];
+                const eligibleMoxieIds = [];
+                const userInfoBatchOutput = await moxieUserService.getUserByMoxieIdMultipleTokenGate(requestedMoxieUserIds, state.authorizationHeader as string, stringToUuid("PORTFOLIOS"));
+                for (const userInfo of userInfoBatchOutput.users) {
+                    if (userInfo.errorDetails) {
+                        ineligibleMoxieUsers.push(userInfo.errorDetails);
+                    } else {
+                        eligibleMoxieIds.push(userInfo.user.id);
+                        moxieUserInfoMultiple.push(userInfo.user);
+                    }
                 }
-
-                const moxieIds = moxieUserInfoMultiple.map(user => user.id)
-                await (runtime.databaseAdapter as MoxieAgentDBAdapter).getFreeTrailBalance(moxieUserInfoState.id, stringToUuid("PORTFOLIOS"));
-                const { total_free_queries, remaining_free_queries: new_remaining_free_queries } = await (runtime.databaseAdapter as MoxieAgentDBAdapter).deductFreeTrail(moxieUserInfoState.id, stringToUuid("PORTFOLIOS"));
-                const { eligibleMoxieIds, ineligibleMoxieUsers } = await getEligibleMoxieIds(moxieUserInfoState, new_remaining_free_queries, moxieIds);
 
                 if (ineligibleMoxieUsers.length > 0) {
                     await handleIneligibleMoxieUsers(ineligibleMoxieUsers, callback);
@@ -308,10 +302,17 @@ export default {
             elizaLogger.info("[Portfolio-TokenGate] isSelfPortolioRequested", isSelfPortolioRequested, "requestedMoxieUserIds", requestedMoxieUserIds);
 
             if (!isSelfPortolioRequested && requestedMoxieUserIds?.length === 1) {
-                moxieUserInfo = await moxieUserService.getUserByMoxieId(requestedMoxieUserIds[0])
-                await (runtime.databaseAdapter as MoxieAgentDBAdapter).getFreeTrailBalance(moxieUserInfoState.id, stringToUuid("PORTFOLIOS"));
-                const { total_free_queries, remaining_free_queries: new_remaining_free_queries } = await (runtime.databaseAdapter as MoxieAgentDBAdapter).deductFreeTrail(moxieUserInfoState.id, stringToUuid("PORTFOLIOS"));
-                const { eligibleMoxieIds, ineligibleMoxieUsers } = await getEligibleMoxieIds(moxieUserInfoState, new_remaining_free_queries, [moxieUserInfo.id]);
+                const ineligibleMoxieUsers = [];
+                const eligibleMoxieIds = [];
+                const userInfoBatchOutput = await moxieUserService.getUserByMoxieIdMultipleTokenGate(requestedMoxieUserIds, state.authorizationHeader as string, stringToUuid("PORTFOLIOS"));
+                for (const userInfo of userInfoBatchOutput.users) {
+                    if (userInfo.errorDetails) {
+                        ineligibleMoxieUsers.push(userInfo.errorDetails);
+                    } else {
+                        eligibleMoxieIds.push(userInfo.user.id);
+                        moxieUserInfo = userInfo.user;
+                    }
+                }
                 if (ineligibleMoxieUsers.length > 0) {
                     await handleIneligibleMoxieUsers(ineligibleMoxieUsers, callback);
                     return false;

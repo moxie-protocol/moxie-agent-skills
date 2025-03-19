@@ -143,7 +143,7 @@ export function roundToDecimalPlaces(num: number, decimalPlaces: number): number
       // If decimal part has more than 4 digits, round up to 4 decimal places
       if (decimalPart.length > decimalPlaces) {
         // Use Math.ceil with appropriate multiplier/divisor to round up to 4 decimal places
-        return Math.ceil(num * 10000) / 10000;
+        return Math.ceil(num * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces);
       }
     }
 

@@ -7,7 +7,7 @@ import {
     elizaLogger
 } from "@moxie-protocol/core";
 import { MoxieUser } from "@moxie-protocol/moxie-agent-lib";
-
+import { ErrorDetails } from "@moxie-protocol/moxie-agent-lib/src/services/types";
 const CACHE_EXPIRATION = 120000; // 2 minutes in milliseconds
 
 import { FREEMIUM_TRENDING_CREATORS } from "./config";
@@ -151,54 +151,7 @@ export function roundToDecimalPlaces(
     return num;
 }
 
-export async function getEligibleMoxieIds(
-    moxieUserInfo: MoxieUser,
-    new_remaining_free_queries: number,
-    moxieIds: string[]
-) {
-    let eligibleMoxieIds = [];
-    let ineligibleMoxieUsers = [];
-
-    elizaLogger.info(`[Portfolio-getEligibleMoxieIds-TokenGate], new_remaining_free_queries: ${new_remaining_free_queries} , moxieUserInfo: ${moxieUserInfo}, moxieIds: ${moxieIds}  `)
-
-    if (new_remaining_free_queries < 0) {
-        const pluginTokenGate = await fetchPluginTokenGate({
-            currentUserMoxieId: moxieUserInfo.id,
-            moxieIds: moxieIds,
-        });
-        pluginTokenGate.forEach((token) => {
-            if (token.requiredTokens > 0) {
-                ineligibleMoxieUsers.push({
-                    username: token.fanTokenName,
-                    moxieId: token.creatorMoxieId,
-                    currentBalance: token.currentBalance,
-                    minimumRequiredToken: token.minTokenRequiredForCreator,
-                    requiredTokens: roundToDecimalPlaces(
-                        token.requiredTokens,
-                        4
-                    ),
-                    label: `@[${token.fanTokenName}|${token.creatorMoxieId}]`,
-                    requiredMoxieAmountInUSD: token.requiredMoxieAmountInUSD ? roundToDecimalPlaces(token.requiredMoxieAmountInUSD, 4) : ''
-                });
-            }
-        });
-        eligibleMoxieIds = moxieIds.filter(
-            (id) => !ineligibleMoxieUsers.some((user) => user.moxieId === id)
-        );
-    } else {
-        if (moxieIds.length > 0) {
-            eligibleMoxieIds = moxieIds;
-        } else {
-            eligibleMoxieIds = FREEMIUM_TRENDING_CREATORS_LIST.slice(0, 3);
-        }
-    }
-    return {
-        eligibleMoxieIds,
-        ineligibleMoxieUsers,
-    };
-}
-
-export async function handleIneligibleMoxieUsers(ineligibleMoxieUsers, callback, breakLine = false) {
+export async function handleIneligibleMoxieUsers(ineligibleMoxieUsers: ErrorDetails[], callback, breakLine = false) {
     const messageParts = [];
 
     if (breakLine === true) {
@@ -207,24 +160,24 @@ export async function handleIneligibleMoxieUsers(ineligibleMoxieUsers, callback,
     }
 
     if (ineligibleMoxieUsers.length == 1) {
-        const userprofileLinkText = `[@${ineligibleMoxieUsers[0].username}](https://moxie.xyz/profile/${ineligibleMoxieUsers[0].moxieId})`;
+        const userprofileLinkText = `[@${ineligibleMoxieUsers[0].requestedUserName}](https://moxie.xyz/profile/${ineligibleMoxieUsers[0].requestedId})`;
 
         if (breakLine === true) {
             messageParts.push(`I can also get you that portfolio on ${userprofileLinkText}, but you’ll need some ${userprofileLinkText} coins to unlock it.\n\n`);
         } else {
         messageParts.push(`I can get you that portfolio on ${userprofileLinkText}, but you’ll need some ${userprofileLinkText} coins to unlock it.\n\n`);
         }
-        if (ineligibleMoxieUsers[0].currentBalance > 0) {
-            messageParts.push(`It costs ${ineligibleMoxieUsers[0].minimumRequiredToken} ${userprofileLinkText} to access, and right now, you have only ${ineligibleMoxieUsers[0].currentBalance} ${userprofileLinkText} in your wallet. Want me to grab them for you now? Just say the word, and I’ll handle it! 🚀`);
+        if (ineligibleMoxieUsers[0].actualCreatorCoinBalance > 0) {
+            messageParts.push(`It costs ${ineligibleMoxieUsers[0].expectedCreatorCoinBalance}(~$${roundToDecimalPlaces(ineligibleMoxieUsers[0].requiredMoxieAmountInUSD, 2)}) ${userprofileLinkText} to access, and right now, you have only ${ineligibleMoxieUsers[0].actualCreatorCoinBalance} ${userprofileLinkText} in your wallet. Want me to grab them for you now? Just say the word, and I’ll handle it! 🚀`);
         } else {
-            messageParts.push(`It costs ${ineligibleMoxieUsers[0].minimumRequiredToken} ${userprofileLinkText} to access, you don’t have any in your wallet. Want me to grab them for you now? Just say the word, and I’ll handle it! 🚀`);
+            messageParts.push(`It costs ${ineligibleMoxieUsers[0].expectedCreatorCoinBalance}(~$${roundToDecimalPlaces(ineligibleMoxieUsers[0].requiredMoxieAmountInUSD, 2)}) ${userprofileLinkText} to access, you don’t have any in your wallet. Want me to grab them for you now? Just say the word, and I’ll handle it! 🚀`);
         }
 
         for (const part of messageParts) {
             callback({ text: part  });
         }
     } else if (ineligibleMoxieUsers.length > 1) {
-        const userLinks = ineligibleMoxieUsers.map((user) => `[@${user.username}](https://moxie.xyz/profile/${user.moxieId})`).join(", ");
+        const userLinks = ineligibleMoxieUsers.map((user) => `[@${user.requestedUserName}](https://moxie.xyz/profile/${user})`).join(", ");
 
         if (breakLine === true) {
             messageParts.push(`I can also get you that portfolio on ${userLinks} - we just need to grab some of their coins first. Head over to the skill page and you can easily add them! `);

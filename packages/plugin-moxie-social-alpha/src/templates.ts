@@ -74,6 +74,7 @@ If the question is about summarizing recent Twitter (X) activity, follow these i
 - **Use formatting (bullet points, bold text) to enhance readability.**
 - Always summarize the overall insights at the top not the bottom of the response. Group the response by topics more than just by users.
 - At the bottom of the response always suggest that users can request a "deep dive" on any user or post to get more details.
+- **Ensure data accuracy** by carefully matching each tweet to its original creator and verifying the content matches before including in summary.
 
 3. **Handling Special Cases:**
 - If no relevant posts are found, **provide a user-friendly response** instead of an error message.
@@ -120,6 +121,7 @@ If the question is about summarizing recent posts (also known as casts) on **Far
    - **Include actionable insights** where applicable (e.g., upcoming events, investment trends, important community votes).
    - **Hyperlink each creator's username** to their **Farcaster profile page**.
    - **Use formatting and section headers** to improve clarity.
+   - **Ensure data accuracy** by carefully matching each post/cast to its original creator and verifying the content matches before including in summary.
 
 2. **Handling Special Cases:**
     - If no relevant posts are found, **provide a user-friendly response** instead of an error message.
@@ -167,6 +169,7 @@ If the question is about summarizing recent social media activity by users the u
 - **Use formatting (bullet points, bold text) to enhance readability.**
 - always link to the original post on Warpcast or X
 - Always summarize the overall insights at the top not the bottom of the response.
+- **Ensure data accuracy** by carefully matching each tweet to its original creator and verifying the content matches before including in summary.
 - Always suggest at the bottom of the response that users can request a "deep dive" on any user or post to get more details.
 
 ### **Handling Special Cases:**
@@ -191,15 +194,66 @@ If the question is about summarizing recent social media activity by users the u
 // Swap Summary prompt template ------------------------------------------------------------
 
 
-export const getSwapSummaryPrompt = (displayFreeQueriesHeader: boolean) => {
+export const getCreatorCoinSummaryPrompt = (displayFreeQueriesHeader: boolean) => {
     return headerPrompt +
     (displayFreeQueriesHeader ? commonPrompt : '') +
     `
 - Current Time: {{currentDate}}
 
-If the question is about summarizing recent token purchase activity by users the user follows, follow these instructions:
+If the question is about summarizing recent creator coin/token purchase activity by users the user follows, follow these instructions:
 
-## Swaps data:
+## Creator coin swaps data:
+{{swaps}}
+
+## Ineligible Moxie Users:
+{{ineligibleMoxieUsers}}
+
+**Overview**
+- The trending swaps data reflects onchain activity from tens of thousands of Base users' wallets indexed by Moxie.
+- If specific users are mentioned, adjust the context to highlight only those users' trading activity.
+- Rank the trending tokens in the response by: (1) Highest total buy volume, (2) Highest total volume,  (3) Highest percentage gains.  Do not prioritize tokens with heavy negative trends.
+
+**Data Presentation**
+-Always try to reply with at least 8 tokens, preferably 10 (if there are that many)
+- For each token in the summary, always include:
+    - Token name
+    - Token symbol (case-sensitive, prefixed with $)
+    - Full token_address in the format: [<token_address>](https://basescan.org/token/<token_address>) format e.g. [0x...](https://basescan.org/token/0x...)
+	- Unique buyers & sellers count if available.
+	- Total buy and sell volume (formatted as $[value] in USD).
+	- Notable Moxie users who swapped the token. Mention them by name and link to them using the markdown format:  [username](https://moxie.xyz/profile/user_id) format
+
+**Action-Specific Conditions**
+- If the user requests trending swaps for specific users, provide only those users' results. Do not rank users vs, each other.
+- If the user asks explicitly for buys or sells, exclude the other. Otherwise, include both.
+- If a mentioned user is in the ineligibleMoxieUsers list, exclude them from the response.
+- If an invalid mention format error occurs, prompt the user to select a user by pressing @ instead of fabricating a response.
+
+**Limitations**
+- Only the last 24 hours of swaps are considered. Other timeframes cannot be requested.
+- Swaps = Trades (terms are interchangeable).
+- The only available dataset is swaps. Queries like "find trending swaps from my portfolio" or "based on market cap/liquidity" are not supported. For these queries, you can should mention that the sell and buy volume is for tracked wallets only.
+- No pagination is available (e.g., "show me the next set of trending swaps" is unsupported).
+- If a request falls outside these limitations, explain the specific reason why the agent cannot provide the summary.
+
+**Final Notes**
+- If the user asks for Trending Tokens overall, at the top of each response, always start with: This is analysis is based on tens of thousands of Base users' wallets indexed by Moxie.
+- If the user asks for Trending Tokens or token swaps from specific users, always start with: Here are the trending tokens or swaps from these users (cite them by name).
+- At the end of each response, ask the user if you can help the buy any of the tokens
+
+`
++ footerPrompt;
+}
+
+export const getNonCreatorCoinSummaryPrompt = (displayFreeQueriesHeader: boolean) => {
+    return headerPrompt +
+    (displayFreeQueriesHeader ? commonPrompt : '') +
+    `
+- Current Time: {{currentDate}}
+
+If the question is about summarizing recent token purchases (ERC20) activity by users the user follows, follow these instructions:
+
+## Trading/Swaps data:
 {{swaps}}
 
 ## Token details data:
@@ -214,14 +268,17 @@ If the question is about summarizing recent token purchase activity by users the
 - Rank the trending tokens in the response by: (1) Highest total buy volume, (2) Highest total volume,  (3) Highest percentage gains.  Do not prioritize tokens with heavy negative trends.
 
 **Data Presentation**
--Always try to reply with at least 8 tokens, preferably 10
+- Always try to reply with at least 8 tokens, preferably 10
 - For each token in the summary, always include:
-    - Token name, token symbol (case-sensitive, prefixed with $), and full token address
-    - Current price, 24-hour % price change, fully diluted market cap
-	- Unique holders count
-	- Number of Moxie users holding the token
-	- Total buy and sell volume (formatted as $[value] in USD)
-	- Trending activity based on trading patterns
+    - **Token name**
+    - **Token symbol (case-sensitive, prefixed with $)**
+    - **Full token_address in the format: [<token_address>](https://basescan.org/token/<token_address>) format e.g. [0x...](https://basescan.org/token/0x...)**
+    - **Current price**
+    - **24-hour % price change**
+    - **Fully diluted market cap**
+	- **Unique holders count**
+    - **Total buy volume (tracked wallets only)**  (formatted as $[value] in USD)e.g **Total Buy Volume (tracked wallets only)**: $210,299.60
+    - **Total sell volume (tracked wallets only)** (formatted as $[value] in USD)
 	- Notable Moxie users who swapped the token. Mention them by name and link to them using the markdown format:  [username](https://moxie.xyz/profile/user_id) format
 
 **Action-Specific Conditions**
@@ -231,7 +288,7 @@ If the question is about summarizing recent token purchase activity by users the
 - If an invalid mention format error occurs, prompt the user to select a user by pressing @ instead of fabricating a response.
 
 **Limitations**
-- Only the last 48 hours of swaps are considered. Other timeframes cannot be requested.
+- Only the last 24 hours of swaps are considered. Other timeframes cannot be requested.
 - Swaps = Trades (terms are interchangeable).
 - The only available dataset is swaps. Queries like "find trending swaps from my portfolio" or "based on market cap/liquidity" are not supported. For these queries, you can should mention that the sell and buy volume is for tracked wallets only.
 - No pagination is available (e.g., "show me the next set of trending swaps" is unsupported).
@@ -241,7 +298,6 @@ If the question is about summarizing recent token purchase activity by users the
 - If the user asks for Trending Tokens overall, at the top of each response, always start with: This is analysis is based on tens of thousands of Base users' wallets indexed by Moxie.
 - If the user asks for Trending Tokens or token swaps from specific users, always start with: Here are the trending tokens or swaps from these users (cite them by name).
 - At the end of each response, ask the user if you can help the buy any of the tokens
-
 `
 + footerPrompt;
 }
@@ -490,23 +546,26 @@ export const socialSummaryInputContextExtraction = `Please analyze the message b
     \`\`\`json
     {
     "isTopTokenOwnersQuery": true/false,
+    "selfQuery": true/false,
     }
     \`\`\`
 
     If the user is asking for a specific user, then isTopTokenOwnersQuery should be false.
 
     Consider these examples for guidance:
-    - "What's the news today?" should result in: isTopTokenOwnersQuery: true
-    - "What is the social activity of my creators?" should result in: isTopTokenOwnersQuery: true
-    - "What is the hot on social media?" should result in: isTopTokenOwnersQuery: true
-    - "What are my friends upto?" should result in: isTopTokenOwnersQuery: true
-    - "What's new on social media?" should result in: isTopTokenOwnersQuery: true
-    - "What is @[betashop.eth|M4], @[jessepollak|M1245] doing on farcaster?" should result in: isTopTokenOwnersQuery: false
-    - "What is @[betashop.eth|M4], @[jessepollak|M1245] doing on twitter?" should result in: isTopTokenOwnersQuery: false
-    - "What is @[betashop.eth|M4], @[jessepollak|M1245] doing?" should result in: isTopTokenOwnersQuery: false
-    - "What is betashop.eth is doing on social media?" should result in: isTopTokenOwnersQuery: false
-    - "What is betashop.eth doing on farcaster?" should result in: isTopTokenOwnersQuery: false
-    - "What is betashop.eth doing on twitter?" should result in: isTopTokenOwnersQuery: false
+    - "What's the news today?" should result in: isTopTokenOwnersQuery: true, selfQuery: false
+    - "What is the social activity of my creators?" should result in: isTopTokenOwnersQuery: true, selfQuery: false
+    - "What is the hot on social media?" should result in: isTopTokenOwnersQuery: true, selfQuery: false
+    - "What are my friends upto?" should result in: isTopTokenOwnersQuery: true, selfQuery: false
+    - "What's new on social media?" should result in: isTopTokenOwnersQuery: true, selfQuery: false
+    - "What is @[betashop.eth|M4], @[jessepollak|M1245] doing on farcaster?" should result in: isTopTokenOwnersQuery: false, selfQuery: false
+    - "What is @[betashop.eth|M4], @[jessepollak|M1245] doing on twitter?" should result in: isTopTokenOwnersQuery: false, selfQuery: false
+    - "What is @[betashop.eth|M4], @[jessepollak|M1245] doing?" should result in: isTopTokenOwnersQuery: false, selfQuery: false
+    - "What is betashop.eth is doing on social media?" should result in: isTopTokenOwnersQuery: false, selfQuery: false
+    - "What is betashop.eth doing on farcaster?" should result in: isTopTokenOwnersQuery: false, selfQuery: false
+    - "What is betashop.eth doing on twitter?" should result in: isTopTokenOwnersQuery: false, selfQuery: false
+    - "Show my social summary?" should result in: isTopTokenOwnersQuery: false, selfQuery: true
+    - "What is my social media activity?" should result in: isTopTokenOwnersQuery: false, selfQuery: true
 `;
 
 export const swapSummaryInputContextExtraction = `Please analyze the message below to extract essential details about the swap request: {{message}}
@@ -517,6 +576,7 @@ export const swapSummaryInputContextExtraction = `Please analyze the message bel
     \`\`\`json
     {
     "isGeneralQuery": true/false,
+    "selfQuery": true/false,
     "onlyIncludeSpecifiedMoxieIds": true/false,
     "isTopTokenOwnersQuery": true/false,
     "timeFilter": {
@@ -527,13 +587,14 @@ export const swapSummaryInputContextExtraction = `Please analyze the message bel
     \`\`\`
 
     Consider these examples for guidance:
-    - "Show me trending tokens" should result in: isGeneralQuery: true, onlyIncludeSpecifiedMoxieIds: false, isTopTokenOwnersQuery: false
-    - "Show swaps for M3 and M5" should result in: isGeneralQuery: false, onlyIncludeSpecifiedMoxieIds: true, isTopTokenOwnersQuery: false
-    - "Show my trades/swaps?" should result in: isGeneralQuery: false, onlyIncludeSpecifiedMoxieIds: true, isTopTokenOwnersQuery: false
-    - "Show all swaps from last week" should result in: isGeneralQuery: true, with appropriate timeFilter, isTopTokenOwnersQuery: false
-    - "Show M3's swaps from yesterday" should result in: isGeneralQuery: false, onlyIncludeSpecifiedMoxieIds: true, with appropriate timeFilter, isTopTokenOwnersQuery: false
-    - "What is M4 doing?" should result in: isGeneralQuery: false, onlyIncludeSpecifiedMoxieIds: true, isTopTokenOwnersQuery: false
-    - "What are my top fan tokens doing in the market" should result in: isGeneralQuery: false, onlyIncludeSpecifiedMoxieIds: false, isTopTokenOwnersQuery: true
-    - "What are my favorite creators doing?" should result in: isGeneralQuery: false, onlyIncludeSpecifiedMoxieIds: false, isTopTokenOwnersQuery: true
-    - "What are the trending tokens among my top creators?" should result in: isGeneralQuery: false, onlyIncludeSpecifiedMoxieIds: false, isTopTokenOwnersQuery: true
-    - "Show me what my biggest token holders are trading" should result in: isGeneralQuery: true, onlyIncludeSpecifiedMoxieIds: false, isTopTokenOwnersQuery: true`;
+    - "Show me trending tokens" should result in: isGeneralQuery: true, selfQuery: false, onlyIncludeSpecifiedMoxieIds: false, isTopTokenOwnersQuery: false
+    - "Show swaps for M3 and M5" should result in: isGeneralQuery: false, selfQuery: false, onlyIncludeSpecifiedMoxieIds: true, isTopTokenOwnersQuery: false
+    - "Show my trades/swaps?" should result in: isGeneralQuery: false, selfQuery: true, onlyIncludeSpecifiedMoxieIds: true, isTopTokenOwnersQuery: false
+    - "Show all swaps from last week" should result in: isGeneralQuery: true, with appropriate timeFilter, selfQuery: false, isTopTokenOwnersQuery: false
+    - "Show M3's swaps from yesterday" should result in: isGeneralQuery: false, selfQuery: false, onlyIncludeSpecifiedMoxieIds: true, with appropriate timeFilter, isTopTokenOwnersQuery: false
+    - "What is M4 doing?" should result in: isGeneralQuery: false, selfQuery: false, onlyIncludeSpecifiedMoxieIds: true, isTopTokenOwnersQuery: false
+    - "What are my top fan tokens doing in the market" should result in: isGeneralQuery: false, selfQuery: false, onlyIncludeSpecifiedMoxieIds: false, isTopTokenOwnersQuery: true
+    - "What are my favorite creators doing?" should result in: isGeneralQuery: false, selfQuery: false, onlyIncludeSpecifiedMoxieIds: false, isTopTokenOwnersQuery: true
+    - "What are the trending tokens among my top creators?" should result in: isGeneralQuery: false, selfQuery: false, onlyIncludeSpecifiedMoxieIds: false, isTopTokenOwnersQuery: true
+    - "Show me what my biggest token holders are trading" should result in: isGeneralQuery: true, selfQuery: false, onlyIncludeSpecifiedMoxieIds: false, isTopTokenOwnersQuery: true
+    - "can you display my recent trades ?" should result in: isGeneralQuery: false, selfQuery: true, onlyIncludeSpecifiedMoxieIds: true, isTopTokenOwnersQuery: false`;

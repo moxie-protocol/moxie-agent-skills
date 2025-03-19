@@ -17,9 +17,8 @@ import {
 import * as templates from "../templates";
 import { fetchSwapData } from "../utils";
 import { TOP_CREATORS_COUNT } from "../config";
-import { getEligibleMoxieIds, getMoxieIdsFromMessage, streamTextByLines, handleIneligibleMoxieUsers } from "./utils";
+import { getMoxieIdsFromMessage, streamTextByLines, handleIneligibleMoxieUsers } from "./utils";
 import { getTokenDetails, MoxieAgentDBAdapter, MoxieUser, moxieUserService } from "@moxie-protocol/moxie-agent-lib";
-
 export const tokenSwapSummary: Action = {
     name: "TRENDING_TOKENS",
     suppressInitialMessage: true,
@@ -251,26 +250,32 @@ async function swapSummaryHandler(
 
     const {
         isGeneralQuery,
+        selfQuery,
         onlyIncludeSpecifiedMoxieIds,
         isTopTokenOwnersQuery,
         timeFilter,
     } = responseJson;
 
     elizaLogger.debug(
-        `--- >> isGeneralQuery: ${isGeneralQuery}, onlyIncludeSpecifiedMoxieIds: ${onlyIncludeSpecifiedMoxieIds}, isTopTokenOwnersQuery: ${isTopTokenOwnersQuery}, timeFilter: ${timeFilter}`
+        `--- >> isGeneralQuery: ${isGeneralQuery}, selfQuery: ${selfQuery}, onlyIncludeSpecifiedMoxieIds: ${onlyIncludeSpecifiedMoxieIds}, isTopTokenOwnersQuery: ${isTopTokenOwnersQuery}, timeFilter: ${timeFilter}`
     );
 
     let moxieIds: string[] = [];
     if (!isGeneralQuery) {
         try {
-            moxieIds = await getMoxieIdsFromMessage(
-                message,
-                templates.topCreatorsSwapExamples,
-                state,
-                runtime,
-                isTopTokenOwnersQuery,
-                TOP_CREATORS_COUNT
-            );
+            if (selfQuery === true) {
+                const moxieUserId = (state.moxieUserInfo as MoxieUser)?.id;
+                moxieIds = [moxieUserId];
+            } else {
+                moxieIds = await getMoxieIdsFromMessage(
+                    message,
+                    templates.topCreatorsSwapExamples,
+                    state,
+                    runtime,
+                    isTopTokenOwnersQuery,
+                    TOP_CREATORS_COUNT
+                );
+            }
 
             if (moxieIds.length === 0) {
                 callback({
@@ -315,17 +320,20 @@ async function swapSummaryHandler(
     let newstate;
     let totalFreeQueries;
     let usedFreeQueries;
-    const moxieUserInfo: MoxieUser = state.moxieUserInfo as MoxieUser;
     let eligibleMoxieIds: string[] = [], ineligibleMoxieUsers = []
 
     if (!isGeneralQuery) {
-        await (runtime.databaseAdapter as MoxieAgentDBAdapter).getFreeTrailBalance(moxieUserInfo.id, stringToUuid("SOCIAL_ALPHA"));
-        const { total_free_queries, remaining_free_queries: new_remaining_free_queries } = await (runtime.databaseAdapter as MoxieAgentDBAdapter).deductFreeTrail(moxieUserInfo.id, stringToUuid("SOCIAL_ALPHA"));
-        elizaLogger.debug(`total_free_queries: ${total_free_queries}, new_remaining_free_queries: ${new_remaining_free_queries}`);
-        const getEligibleMoxieIdsOutput = await getEligibleMoxieIds(moxieUserInfo, new_remaining_free_queries, moxieIds);
 
-        eligibleMoxieIds = getEligibleMoxieIdsOutput.eligibleMoxieIds;
-        ineligibleMoxieUsers = getEligibleMoxieIdsOutput.ineligibleMoxieUsers;
+        let userInfoBatchOutput = await moxieUserService.getUserByMoxieIdMultipleTokenGate(moxieIds, state.authorizationHeader as string, stringToUuid("SOCIAL_ALPHA"));
+        totalFreeQueries = userInfoBatchOutput.freeTrialLimit;
+        usedFreeQueries = userInfoBatchOutput.freeTrialLimit - userInfoBatchOutput.remainingFreeTrialCount;
+        for (const userInfo of userInfoBatchOutput.users) {
+            if (userInfo.errorDetails) {
+                ineligibleMoxieUsers.push(userInfo.errorDetails);
+            } else {
+                eligibleMoxieIds.push(userInfo.user.id);
+            }
+        }
 
         elizaLogger.debug(`eligibleMoxieIds: ${eligibleMoxieIds}, ineligibleMoxieUsers: ${ineligibleMoxieUsers}`);
 
@@ -333,9 +341,6 @@ async function swapSummaryHandler(
             await handleIneligibleMoxieUsers(ineligibleMoxieUsers, callback);
             return false;
         }
-
-        totalFreeQueries = total_free_queries;
-        usedFreeQueries = total_free_queries - new_remaining_free_queries;
 
     } else {
         eligibleMoxieIds = moxieIds;
@@ -349,7 +354,13 @@ async function swapSummaryHandler(
 
     if (allSwaps.length === 0) {
         if (eligibleMoxieIds.length <= 3) {
-            const userProfiles = await moxieUserService.getUserByMoxieIdMultiple(eligibleMoxieIds);
+            const userProfiles = []
+            let userProfilesOutput = await moxieUserService.getUserByMoxieIdMultipleTokenGate(eligibleMoxieIds, state.authorizationHeader as string, stringToUuid("SOCIAL_ALPHA"));
+            for (const userInfo of userProfilesOutput.users) {
+                if (userInfo.user) {
+                    userProfiles.push(userInfo.user);
+                }
+            }
             const totalWallets = Array.from(userProfiles.values()).reduce((sum, profile) => sum + profile.wallets.length, 0);
             const userLinks = Array.from(userProfiles.values()).map(profile => `[@${profile.userName}](https://moxie.xyz/profile/${profile.id})`).join(", ");
             callback({
@@ -394,14 +405,25 @@ async function swapSummaryHandler(
         previousConversations: memoryContents.length > 1 ? memoryContents : "",
     });
 
-    // const { remaining_free_queries } = await (runtime.databaseAdapter as MoxieAgentDBAdapter).getFreeTrailBalance(moxieUserInfo.id, "1234");
-
 
     // Create a summary context for the model
-    const swapSummaryContext = composeContext({
-        state: newstate,
-        template: templates.getSwapSummaryPrompt(false),
-    });
+    let swapSummaryContext;
+    if (tokenType === "CREATOR_COIN") {
+        swapSummaryContext = composeContext({
+            state: newstate,
+            template: templates.getCreatorCoinSummaryPrompt(false),
+        });
+    } else if (tokenType === "NON_CREATOR_COIN") {
+        swapSummaryContext = composeContext({
+            state: newstate,
+            template: templates.getNonCreatorCoinSummaryPrompt(false),
+        });
+    } else {
+        callback({
+            text: "I couldn't understand your request. Please try again.",
+        });
+        return false;
+    }
 
     // Generate summary using the model
     const summaryStream = streamText({

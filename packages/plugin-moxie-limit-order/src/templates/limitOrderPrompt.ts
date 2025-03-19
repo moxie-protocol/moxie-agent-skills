@@ -94,6 +94,27 @@ Please follow these steps to process the limit order intent:
    - type: determined based on user's intention:
     * "BUY" - when user specifies direct token amount to receive (e.g. "buy 100 ETH")
     * "SELL" - when user specifies amount in terms of USD or another token (e.g. "buy $500 worth of ETH" or "buy ETH with 1000 USDC")
+   - Check for stop loss orders (CRITICAL - DO NOT MISS THIS CHECK):
+    * ALWAYS scan for stop loss indicators before any other processing
+    * Must analyze order intent for stop loss behavior:
+     - Check for explicit stop loss phrases:
+       * "stop loss", "stop-loss", "stoploss"
+     - Analyze order logic for stop loss patterns:
+       * Selling triggered by price decrease
+       * Price target below current market price
+       * Conditional sell orders based on price drops
+       * Orders combining price floors with sells
+     - Evaluate full order context:
+       * Compare target price to current price
+       * Check if sell is conditional on price decrease
+       * Look for protective selling behavior
+       * Identify downside risk management intent
+    * If ANY of these indicators are detected:
+     - IMMEDIATELY halt all other processing
+     - Return this EXACT error message with no modifications:
+       "\n**Stop Orders (sell below market) aren't supported yet—but they're coming soon!**  \nSoon, I'll be able to **protect your downside automatically**. 🚀"
+    * Double-check this scan runs on the FULL message text
+    * Never proceed with order processing if stop loss is detected
 
 
 2. Handle special cases and defaults:

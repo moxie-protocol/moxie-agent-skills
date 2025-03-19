@@ -17,11 +17,10 @@ import {
 
 import { moxieUserService, MoxieAgentDBAdapter, MoxieUser } from "@moxie-protocol/moxie-agent-lib";
 import * as templates from "../templates";
-import { getEligibleMoxieIds, getMoxieIdsFromMessage, streamTextByLines, handleIneligibleMoxieUsers } from "./utils";
+import { getMoxieIdsFromMessage, streamTextByLines, handleIneligibleMoxieUsers } from "./utils";
 import { FIVE_MINS, getTweetsCacheKey, ONE_HOUR } from "../cache";
 import { Tweet } from "agent-twitter-client";
 import { TOP_CREATORS_COUNT } from "../config";
-
 function formatTweets(tweets: Tweet[]) {
     return tweets.map((tweet) => ({
         text: tweet.text,
@@ -105,7 +104,6 @@ async function fetchAndValidateTweets(
     state: State | undefined,
     callback: HandlerCallback,
     runtime: IAgentRuntime,
-    new_remaining_free_queries: number
 ) {
     const context = composeContext({
         state: {
@@ -127,30 +125,25 @@ async function fetchAndValidateTweets(
         callback({
             text: "I couldn't understand your request. Please try again.",
         });
-        return false;
+        return null;
     }
 
     const {
         isTopTokenOwnersQuery,
+        selfQuery,
     } = responseJson;
 
-    const moxieIds: string[] = await getMoxieIdsFromMessage(message,templates.topCreatorsTwitterExamples, state, runtime, isTopTokenOwnersQuery, TOP_CREATORS_COUNT);
+    let moxieIds: string[] = [];
+    if (selfQuery === true) {
+        const moxieUserId = (state.moxieUserInfo as MoxieUser)?.id;
+        moxieIds = [moxieUserId];
+    } else {
+        moxieIds = await getMoxieIdsFromMessage(message,templates.topCreatorsTwitterExamples, state, runtime, isTopTokenOwnersQuery, TOP_CREATORS_COUNT);
+    }
     const moxieUserInfo: MoxieUser = state.moxieUserInfo as MoxieUser;
-    const { eligibleMoxieIds, ineligibleMoxieUsers } = await getEligibleMoxieIds(moxieUserInfo, new_remaining_free_queries, moxieIds);
 
-    elizaLogger.debug(`eligibleMoxieIds: ${eligibleMoxieIds}, ineligibleMoxieUsers: ${ineligibleMoxieUsers}`);
-
-    if (ineligibleMoxieUsers.length > 0 && eligibleMoxieIds.length == 0) {
-        await handleIneligibleMoxieUsers(ineligibleMoxieUsers, callback);
-        return false;
-    }
-
-    if (eligibleMoxieIds.length === 0 && moxieIds.length === 0) {
-        callback({
-            text: "I couldn't find your favorite creators. Please buy creator tokens to get started.",
-        });
-        return false;
-    }
+    const ineligibleMoxieUsers = [];
+    const eligibleMoxieIds = [];
 
     // if (moxieIds.length === 0) {
     //     callback({
@@ -159,18 +152,41 @@ async function fetchAndValidateTweets(
     //     return null;
     // }
     // Get Twitter usernames for all Moxie IDs
+
     const socialProfiles =
-        await moxieUserService.getSocialProfilesByMoxieIdMultiple(eligibleMoxieIds);
+        await moxieUserService.getSocialProfilesByMoxieIdMultiple(moxieIds, state.authorizationHeader as string, stringToUuid("SOCIAL_ALPHA"));
     const userIdToTwitterUsernames = new Map<string, string>();
     const userIdToFarcasterUsernames = new Map<string, string>();
-    socialProfiles.forEach((profile, userId) => {
+    socialProfiles.userIdToSocialProfile.forEach((profile, userId) => {
         if (profile.twitterUsername) {
             userIdToTwitterUsernames.set(userId, profile.twitterUsername);
         }
         if (profile.farcasterUsername) {
             userIdToFarcasterUsernames.set(userId, profile.farcasterUsername);
         }
+        eligibleMoxieIds.push(userId);
     });
+
+    socialProfiles.errorDetails.forEach((errorDetails, userId) => {
+        if (errorDetails) {
+            ineligibleMoxieUsers.push(errorDetails);
+        }
+    });
+
+
+    elizaLogger.debug(`eligibleMoxieIds: ${eligibleMoxieIds}, ineligibleMoxieUsers: ${ineligibleMoxieUsers}`);
+
+    if (ineligibleMoxieUsers.length > 0 && eligibleMoxieIds.length == 0) {
+        await handleIneligibleMoxieUsers(ineligibleMoxieUsers, callback);
+        return null;
+    }
+
+    if (eligibleMoxieIds.length === 0 && moxieIds.length === 0) {
+        callback({
+            text: "I couldn't find your favorite creators. Please buy creator tokens to get started.",
+        });
+        return null;
+    }
 
     if (userIdToTwitterUsernames.size === 0) {
         callback({
@@ -191,7 +207,7 @@ async function fetchAndValidateTweets(
         return null;
     }
 
-    return { allTweets, ineligibleMoxieUsers };
+    return { allTweets, ineligibleMoxieUsers, totalFreeQueries: socialProfiles.freeTrialLimit, newRemainingFreeQueries: socialProfiles.remainingFreeTrialCount };
 }
 
 export const creatorTweetSummary: Action = {
@@ -215,37 +231,29 @@ export const creatorTweetSummary: Action = {
         callback?: HandlerCallback
     ) => {
 
-
         const moxieUserInfo: MoxieUser = state.moxieUserInfo as MoxieUser;
-
-        await (runtime.databaseAdapter as MoxieAgentDBAdapter).getFreeTrailBalance(moxieUserInfo.id, stringToUuid("SOCIAL_ALPHA"));
-
-        const { total_free_queries, remaining_free_queries: new_remaining_free_queries } = await (runtime.databaseAdapter as MoxieAgentDBAdapter).deductFreeTrail(moxieUserInfo.id, stringToUuid("SOCIAL_ALPHA"));
-
-        elizaLogger.debug(`total_free_queries: ${total_free_queries}, new_remaining_free_queries: ${new_remaining_free_queries}`);
 
         const response = await fetchAndValidateTweets(
             message,
             state,
             callback,
             runtime,
-            new_remaining_free_queries
         );
 
         if (response === null) {
             return false;
         }
 
-        const { allTweets, ineligibleMoxieUsers } = response;
+        const { allTweets, ineligibleMoxieUsers, totalFreeQueries, newRemainingFreeQueries } = response;
 
-        const displayFreeQueriesHeader = Number(total_free_queries) - Number(new_remaining_free_queries) < Number(total_free_queries);
+        const displayFreeQueriesHeader = Number(totalFreeQueries) - Number(newRemainingFreeQueries) < Number(totalFreeQueries);
 
         const newstate = await runtime.composeState(message, {
             tweets: JSON.stringify(allTweets),
             message: message.content.text,
             currentDate: new Date().toLocaleString(),
-            totalFreeQueries: total_free_queries,
-            usedFreeQueries: Number(total_free_queries) - Number(new_remaining_free_queries),
+            totalFreeQueries: totalFreeQueries,
+            usedFreeQueries: Number(totalFreeQueries) - Number(newRemainingFreeQueries),
             topCreatorsCount: TOP_CREATORS_COUNT,
             displayFreeQueriesHeader: displayFreeQueriesHeader,
             ineligibleMoxieUsers: JSON.stringify(ineligibleMoxieUsers),

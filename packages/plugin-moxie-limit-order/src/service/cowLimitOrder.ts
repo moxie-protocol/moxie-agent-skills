@@ -17,6 +17,7 @@ const TRANSACTION_RECEIPT_TIMEOUT = process.env.TRANSACTION_RECEIPT_TIMEOUT ? Nu
 const Erc20Abi = [
     'function approve(address spender, uint256 amount) external returns (bool)',
     'function allowance(address owner, address spender) external view returns (uint256)',
+    'function balanceOf(address account) external view returns (uint256)'
   ]
 
 const cowVaultRelayerAddress = process.env.COW_PROTOCOL_VAULT_RELAYER_ADDRESS
@@ -111,6 +112,22 @@ export async function createCowLimitOrder(
         const agentWallet = (context.state.agentWallet as MoxieClientWallet).address;
         elizaLogger.debug(traceId, '[createCowLimitOrder] Using agent wallet:', agentWallet);
 
+        // Check token balance to ensure sufficient funds
+        const balance = await tokenContract.balanceOf(agentWallet);
+        elizaLogger.debug(
+            traceId,
+            `[createCowLimitOrder] Current balance for token ${orderParams.sellToken}:`,
+            balance.toString()
+        );
+
+        if (balance == 0) { // If balance is 0, throw an error. Cow protocol supports to create limit order when balance is > 0
+            elizaLogger.error(
+                traceId,
+                `[createCowLimitOrder] Insufficient ${orderParams.sellToken} balance to create limit order`
+            );
+            throw new Error(`Insufficient ${orderParams.sellToken} balance to create limit order`);
+        }
+
         // Check and handle token approval
         const allowance = await tokenContract.allowance(agentWallet, cowVaultRelayerAddress);
         elizaLogger.debug(
@@ -149,7 +166,7 @@ export async function createCowLimitOrder(
 
         // Get order signature and prepare final order parameters
         const signatureData = await signTypedDataFromEmbeddedWallet(context, orderParams);
-        elizaLogger.debug(traceId, '[createCowLimitOrder] Order signature data:', JSON.stringify(signatureData, null, 2));
+        elizaLogger.debug(traceId, '[createCowLimitOrder] Order signature data:', JSON.stringify(signatureData));
 
         if (!signatureData?.signature) {
             throw new Error('Failed to obtain valid signature for order');
@@ -162,7 +179,7 @@ export async function createCowLimitOrder(
         elizaLogger.debug(
             traceId,
             '[createCowLimitOrder] Final order parameters:',
-            JSON.stringify(finalOrderParams, null, 2)
+            JSON.stringify(finalOrderParams)
         );
 
         // Send order to cow
@@ -343,7 +360,7 @@ async function signTypedDataFromEmbeddedWallet(
         elizaLogger.debug(
             traceId,
             '[signTypedDataFromEmbeddedWallet] orderData:',
-            JSON.stringify(orderData, null, 2)
+            JSON.stringify(orderData)
         );
 
         const signatureData = await moxieWalletClient.signTypedData(
@@ -355,7 +372,7 @@ async function signTypedDataFromEmbeddedWallet(
         elizaLogger.debug(
             traceId,
             '[signTypedDataFromEmbeddedWallet] signatureData:',
-            JSON.stringify(signatureData, null, 2)
+            JSON.stringify(signatureData)
         );
 
         return signatureData;

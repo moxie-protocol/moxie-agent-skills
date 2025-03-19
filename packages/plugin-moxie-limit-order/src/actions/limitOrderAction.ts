@@ -8,7 +8,7 @@ import { MoxieAgentDBAdapter, MoxieClientWallet, MoxieHex, MoxieUser, MoxieWalle
 import { limitOrderPromptTemplate } from "../templates/limitOrderPrompt";
 import { Wallet } from "@privy-io/server-auth";
 import { decodeTokenTransfer, getERC20Balance, getERC20Decimals, getNativeTokenBalance } from "../service/erc20";
-import { ETH_ADDRESS, MOXIE_TOKEN_DECIMALS, USDC, WETH, WETH_ADDRESS } from "../constants";
+import { ETH_ADDRESS, LIMIT_ORDER_EXPIRY_HOURS, MOXIE_TOKEN_DECIMALS, USDC, WETH, WETH_ADDRESS } from "../constants";
 import { USDC_ADDRESS, USDC_TOKEN_DECIMALS } from "../constants";
 import { extractTokenDetails, handleTransactionStatus, handleTransactionStatusSwap } from "../utils/common";
 import { fetchPriceWithRetry, getPrice } from "../utils/cowUsdPrice";
@@ -24,7 +24,7 @@ import { createCowLimitOrder } from "../service/cowLimitOrder";
 export const limitOrderAction = {
     suppressInitialMessage: true,
     name: "LIMIT_ORDERS",
-    description: "**This action facilitates the creation of advanced limit orders for cryptocurrency trading with precise execution parameters. Users can establish limit orders by defining specific token pairs (using either symbols or addresses), setting exact price targets (in USD or as percentage deviations), specifying order quantities (as absolute values or portfolio percentages), and configuring optional time-based expiration parameters. The system supports comprehensive order management with partial fill capabilities and precise execution controls.**\n\n**Always use this when a purchasing a token with a specific price or percentage condition is included in the request.**",
+    description: "This action handles creating limit orders for token purchases and sales. Pay attention to the question structure - particularly any mention of price movement (either a percentage or USD value) and an action (buy/sell).",
     handler: async (
         runtime: IAgentRuntime,
         _message: Memory,
@@ -158,6 +158,14 @@ async function preValidateRequiredData(context: Context): Promise<boolean> {
         throw new Error("COW_PROTOCOL_VERIFIER_CONTRACT_ADDRESS environment variable is not set");
     }
 
+    if (!process.env.LIMIT_ORDER_EXPIRY_HOURS) {
+        throw new Error("LIMIT_ORDER_EXPIRY_HOURS environment variable is not set");
+    }
+
+    if (Number(process.env.LIMIT_ORDER_EXPIRY_HOURS) <= 0) {
+        throw new Error("LIMIT_ORDER_EXPIRY_HOURS must be greater than 0");
+    }
+
     return true;
 }
 
@@ -202,6 +210,7 @@ async function processMessage(
 
     // Return early if confirmation required
     if (limitOrderOptions.confirmation_required) {
+        elizaLogger.debug(context.traceId, `[limitOrder] [${context.moxieUserId}] confirmation_required: ${JSON.stringify(limitOrderOptions.confirmation_required)}`);
         return {
             callBackTemplate: {
                 text: limitOrderOptions.confirmation_message,
@@ -216,11 +225,11 @@ async function processMessage(
 
     // Return early if there are errors
     if (limitOrderOptions.error) {
+        elizaLogger.debug(context.traceId, `[limitOrder] [${context.moxieUserId}] error: ${JSON.stringify(limitOrderOptions.error)}`);
         return {
             callBackTemplate: {
                 text: limitOrderOptions.error.prompt_message,
                 content: {
-                    error: limitOrderOptions.error.missing_fields.join(", "),
                     action: "LIMIT_ORDERS",
                     inReplyTo: message.id
                 }
@@ -388,65 +397,6 @@ async function processLimitOrder(context: Context, data: LimitOrderResponse) {
                     currentWalletBalanceForBalanceBasedSwaps
                 );
             }
-            // } else if (limitOrder.execution_type === 'IMMEDIATE') {
-
-            //     // we need to call swap directly
-            //     const updatedMessage = context.message as Memory;
-            //     updatedMessage.content.text = limitOrder.operation_description;
-            //     let messageFromActions = false;
-            //     let newAction = "";
-            //     let newContext = "";
-
-            //     const responseMessageMemory: Memory = {
-            //         userId: updatedMessage.userId,
-            //         agentId: updatedMessage.agentId,
-            //         content: {
-            //             action: "SWAP_TOKENS",
-            //             text: limitOrder.operation_description
-            //         },
-            //         roomId: updatedMessage.roomId,
-            //     }
-            //     let message = null as Content | null;
-
-            //     await context.runtime.processActions(
-            //         updatedMessage,
-            //         [responseMessageMemory],
-            //         context.state,
-            //         async (newMessages) => {
-            //             messageFromActions = true;
-            //             message = newMessages;
-            //             newAction = newMessages.action;
-            //             newContext += newMessages.text;
-            //             return [updatedMessage];
-            //         }
-            //     );
-
-            //     if (newContext != "") {
-            //         const newMessageId = stringToUuid(Date.now().toString());
-            //         const newContent: Content = {
-            //             text: newContext,
-            //             inReplyTo: updatedMessage.id,
-            //             action: newAction,
-            //         };
-
-            //         const agentMessage = {
-            //             content: newContent,
-            //             userId: context.runtime.agentId,
-            //             roomId: updatedMessage.roomId,
-            //             agentId: context.runtime.agentId,
-            //         };
-
-            //         const newMemory: Memory = {
-            //             id: stringToUuid(newMessageId + "-" + context.runtime.agentId),
-            //             ...agentMessage,
-            //             createdAt: Date.now(),
-            //         };
-
-            //         await context.runtime.messageManager.addEmbeddingToMemory(newMemory);
-            //         await context.runtime.messageManager.createMemory(newMemory);
-            //     }
-            // }
-
             // Handle error case
             if (result.callBackTemplate) {
                 elizaLogger.error(
@@ -466,7 +416,8 @@ async function processLimitOrder(context: Context, data: LimitOrderResponse) {
                 );
                 await context.callback({
                     content: result.data.content,
-                    text: result.data.text
+                    text: result.data.text,
+                    cta: result.data.cta || undefined
                 });
             }
 
@@ -645,7 +596,7 @@ async function processSingleLimitOrder(
            receiver: agentWallet.address,
            sellAmount: sellTokenAmountInWEI.toString(),
            buyAmount: buyTokenAmountInWEI.toString(),
-           validTo: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7, // 1 week from now
+           validTo: Math.floor(Date.now() / 1000) + 60 * 60 * LIMIT_ORDER_EXPIRY_HOURS,
            feeAmount: '0',
            kind: type === 'SELL' ? OrderKind.SELL : OrderKind.BUY,
            partiallyFillable: true,

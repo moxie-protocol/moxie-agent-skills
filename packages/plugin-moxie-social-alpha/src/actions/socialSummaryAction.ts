@@ -18,8 +18,7 @@ import { fetchFarcasterCastsByMoxieUserIds } from "./farcasterSummaryAction";
 import { fetchTweetsByMoxieUserIds } from "./twitterSummaryAction";
 import * as templates from "../templates";
 import { TOP_CREATORS_COUNT } from "../config";
-import { getEligibleMoxieIds, getMoxieIdsFromMessage, streamTextByLines, handleIneligibleMoxieUsers } from "./utils";
-
+import { getMoxieIdsFromMessage, streamTextByLines, handleIneligibleMoxieUsers } from "./utils";
 export const creatorSocialSummary: Action = {
     name: "SOCIAL_SUMMARY",
     suppressInitialMessage: true,
@@ -71,17 +70,24 @@ export const creatorSocialSummary: Action = {
 
         const {
             isTopTokenOwnersQuery,
+            selfQuery,
         } = responseJson;
 
+        let moxieIds: string[] = [];
+        if (selfQuery === true) {
+            const moxieUserId = (state.moxieUserInfo as MoxieUser)?.id;
+            moxieIds = [moxieUserId];
+        } else {
+            moxieIds = await getMoxieIdsFromMessage(
+                message,
+                templates.topCreatorsFarcasterExamples,
+                state,
+                runtime,
+                isTopTokenOwnersQuery,
+                TOP_CREATORS_COUNT,
+            );
+        }
 
-        const moxieIds: string[] = await getMoxieIdsFromMessage(
-            message,
-            templates.socialSummaryExamples,
-            state,
-            runtime,
-            isTopTokenOwnersQuery,
-            TOP_CREATORS_COUNT,
-        );
         elizaLogger.debug(
             `searching for social posts for moxieIds: ${moxieIds}`
         );
@@ -91,13 +97,33 @@ export const creatorSocialSummary: Action = {
         //     });
         //     return false;
         // }
-        const moxieUserInfo: MoxieUser = state.moxieUserInfo as MoxieUser;
 
-        await (runtime.databaseAdapter as MoxieAgentDBAdapter).getFreeTrailBalance(moxieUserInfo.id, stringToUuid("SOCIAL_ALPHA"));
-        const { total_free_queries, remaining_free_queries: new_remaining_free_queries } = await (runtime.databaseAdapter as MoxieAgentDBAdapter).deductFreeTrail(moxieUserInfo.id, stringToUuid("SOCIAL_ALPHA"));
+        const ineligibleMoxieUsers = [];
+        const eligibleMoxieIds = [];
 
-        elizaLogger.debug(`total_free_queries: ${total_free_queries}, new_remaining_free_queries: ${new_remaining_free_queries}`);
-        const { eligibleMoxieIds, ineligibleMoxieUsers } = await getEligibleMoxieIds(moxieUserInfo, new_remaining_free_queries, moxieIds);
+        const socialProfiles =
+            await moxieUserService.getSocialProfilesByMoxieIdMultiple(moxieIds, state.authorizationHeader as string, stringToUuid("SOCIAL_ALPHA"));
+        const userIdToTwitterUsernames = new Map<string, string>();
+        const userIdToFarcasterUser = new Map<
+            string,
+            { userName: string; userId: string }
+        >();
+        socialProfiles.userIdToSocialProfile.forEach((profile, userId) => {
+            if (profile.twitterUsername) {
+                userIdToTwitterUsernames.set(userId, profile.twitterUsername);
+            }
+            if (profile.farcasterUsername) {
+                userIdToFarcasterUser.set(userId, {
+                    userName: profile.farcasterUsername,
+                    userId: profile.farcasterUserId,
+                });
+            }
+            eligibleMoxieIds.push(userId);
+        });
+
+        socialProfiles.errorDetails.forEach((errorDetails, userId) => {
+            ineligibleMoxieUsers.push(errorDetails);
+        });
 
         elizaLogger.debug(`eligibleMoxieIds: ${eligibleMoxieIds}, ineligibleMoxieUsers: ${ineligibleMoxieUsers}`);
 
@@ -112,25 +138,6 @@ export const creatorSocialSummary: Action = {
             });
             return false;
         }
-
-        const socialProfiles =
-            await moxieUserService.getSocialProfilesByMoxieIdMultiple(eligibleMoxieIds);
-        const userIdToTwitterUsernames = new Map<string, string>();
-        const userIdToFarcasterUser = new Map<
-            string,
-            { userName: string; userId: string }
-        >();
-        socialProfiles.forEach((profile, userId) => {
-            if (profile.twitterUsername) {
-                userIdToTwitterUsernames.set(userId, profile.twitterUsername);
-            }
-            if (profile.farcasterUsername) {
-                userIdToFarcasterUser.set(userId, {
-                    userName: profile.farcasterUsername,
-                    userId: profile.farcasterUserId,
-                });
-            }
-        });
 
         const promises = [];
         if (userIdToFarcasterUser.size > 0) {
@@ -151,15 +158,15 @@ export const creatorSocialSummary: Action = {
         const farcasterPosts = results[0];
         const twitterPosts = results[1];
 
-        const displayFreeQueriesHeader = Number(total_free_queries) - Number(new_remaining_free_queries) < Number(total_free_queries);
+        const displayFreeQueriesHeader = (Number(socialProfiles.freeTrialLimit) - Number(socialProfiles.remainingFreeTrialCount)) < Number(socialProfiles.freeTrialLimit);
 
         const newstate = await runtime.composeState(message, {
             twitterPosts: JSON.stringify(twitterPosts),
             farcasterPosts: JSON.stringify(farcasterPosts),
             message: message.content.text,
             currentDate: new Date().toLocaleString(),
-            totalFreeQueries: total_free_queries,
-            usedFreeQueries: Number(total_free_queries) - Number(new_remaining_free_queries),
+            totalFreeQueries: socialProfiles.freeTrialLimit,
+            usedFreeQueries: Number(socialProfiles.freeTrialLimit) - Number(socialProfiles.remainingFreeTrialCount),
             displayFreeQueriesHeader: displayFreeQueriesHeader,
             topCreatorsCount: TOP_CREATORS_COUNT,
             ineligibleMoxieUsers: JSON.stringify(ineligibleMoxieUsers),
@@ -191,7 +198,7 @@ export const creatorSocialSummary: Action = {
         }
 
         if (ineligibleMoxieUsers.length > 0) {
-            handleIneligibleMoxieUsers(ineligibleMoxieUsers, callback, true);
+            await handleIneligibleMoxieUsers(ineligibleMoxieUsers, callback, true);
         }
 
         // const summary = await generateText({

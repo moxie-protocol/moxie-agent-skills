@@ -17,9 +17,11 @@ import {
 import { moxieUserService, MoxieAgentDBAdapter, MoxieUser } from "@moxie-protocol/moxie-agent-lib";
 import * as templates from "../templates";
 import { Cast, fetchCastByFid } from "../services/farcasterService";
-import { getEligibleMoxieIds, getMoxieIdsFromMessage, streamTextByLines, handleIneligibleMoxieUsers } from "./utils";
+import { getMoxieIdsFromMessage, streamTextByLines, handleIneligibleMoxieUsers } from "./utils";
 import { FIVE_MINS, getFarcasterCastsCacheKey, ONE_HOUR } from "../cache";
 import { TOP_CREATORS_COUNT } from "../config";
+
+const SOCIAL_ALPHA = "SOCIAL_ALPHA";
 
 export async function fetchFarcasterCastsByMoxieUserIds(
     userIdToFarcasterUsernames: Map<
@@ -160,17 +162,25 @@ export const creatorFarcasterSummary: Action = {
 
         const {
             isTopTokenOwnersQuery,
+            selfQuery,
         } = responseJson;
 
+        let moxieIds: string[] = [];
+        if (selfQuery === true) {
+            const moxieUserId = (state.moxieUserInfo as MoxieUser)?.id;
+            moxieIds = [moxieUserId];
+        } else {
+            moxieIds = await getMoxieIdsFromMessage(
+                message,
+                templates.topCreatorsFarcasterExamples,
+                state,
+                runtime,
+                isTopTokenOwnersQuery,
+                TOP_CREATORS_COUNT,
+            );
+        }
 
-        const moxieIds: string[] = await getMoxieIdsFromMessage(
-            message,
-            templates.topCreatorsFarcasterExamples,
-            state,
-            runtime,
-            isTopTokenOwnersQuery,
-            TOP_CREATORS_COUNT,
-        );
+
         elizaLogger.debug(
             `searching for farcaster casts for moxieIds: ${moxieIds}`
         );
@@ -181,14 +191,30 @@ export const creatorFarcasterSummary: Action = {
         //     return false;
         // }
 
-        const moxieUserInfo: MoxieUser = state.moxieUserInfo as MoxieUser;
-        await (runtime.databaseAdapter as MoxieAgentDBAdapter).getFreeTrailBalance(moxieUserInfo.id, stringToUuid("SOCIAL_ALPHA"));
-        const { total_free_queries, remaining_free_queries: new_remaining_free_queries } = await (runtime.databaseAdapter as MoxieAgentDBAdapter).deductFreeTrail(moxieUserInfo.id, stringToUuid("SOCIAL_ALPHA"));
-        elizaLogger.debug(`total_free_queries: ${total_free_queries}, new_remaining_free_queries: ${new_remaining_free_queries}`);
+        // Get Twitter usernames for all Moxie IDs
+        const socialProfiles =
+            await moxieUserService.getSocialProfilesByMoxieIdMultiple(moxieIds, state.authorizationHeader as string, stringToUuid(SOCIAL_ALPHA));
+        const userIdToFarcasterUser = new Map<
+            string,
+            { userName: string; userId: string }
+        >();
+        const ineligibleMoxieUsers = [];
+        const eligibleMoxieIds = [];
+        socialProfiles.userIdToSocialProfile.forEach((profile, userId) => {
+            if (profile.farcasterUserId) {
+                userIdToFarcasterUser.set(userId, {
+                    userName: profile.farcasterUsername,
+                    userId: profile.farcasterUserId,
+                });
+            }
+            eligibleMoxieIds.push(userId);
+        });
 
-        const { eligibleMoxieIds, ineligibleMoxieUsers } = await getEligibleMoxieIds(moxieUserInfo, new_remaining_free_queries, moxieIds);
-
-        elizaLogger.debug(`eligibleMoxieIds: ${eligibleMoxieIds}, ineligibleMoxieUsers: ${ineligibleMoxieUsers}`);
+        socialProfiles.errorDetails.forEach((errorDetails, userId) => {
+            if (errorDetails) {
+                ineligibleMoxieUsers.push(errorDetails);
+            }
+        });
 
         if (ineligibleMoxieUsers.length > 0 && eligibleMoxieIds.length == 0) {
             await handleIneligibleMoxieUsers(ineligibleMoxieUsers, callback, false);
@@ -202,21 +228,6 @@ export const creatorFarcasterSummary: Action = {
             return false;
         }
 
-        // Get Twitter usernames for all Moxie IDs
-        const socialProfiles =
-            await moxieUserService.getSocialProfilesByMoxieIdMultiple(eligibleMoxieIds);
-        const userIdToFarcasterUser = new Map<
-            string,
-            { userName: string; userId: string }
-        >();
-        socialProfiles.forEach((profile, userId) => {
-            if (profile.farcasterUserId) {
-                userIdToFarcasterUser.set(userId, {
-                    userName: profile.farcasterUsername,
-                    userId: profile.farcasterUserId,
-                });
-            }
-        });
         if (userIdToFarcasterUser.size === 0) {
             callback({
                 text: "I couldn't find any Farcaster accounts linked to these Moxie users",
@@ -236,15 +247,15 @@ export const creatorFarcasterSummary: Action = {
             return false;
         }
 
-        const displayFreeQueriesHeader = Number(total_free_queries) - Number(new_remaining_free_queries) < Number(total_free_queries);
+        const displayFreeQueriesHeader = (Number(socialProfiles.freeTrialLimit) - Number(socialProfiles.remainingFreeTrialCount)) < Number(socialProfiles.freeTrialLimit);
 
         const newstate = await runtime.composeState(message, {
             tweets: JSON.stringify(allCasts),
             ineligibleMoxieUsers: JSON.stringify(ineligibleMoxieUsers),
             message: message.content.text,
             currentDate: new Date().toLocaleString(),
-            totalFreeQueries: total_free_queries,
-            usedFreeQueries: Number(total_free_queries) - Number(new_remaining_free_queries),
+            totalFreeQueries: socialProfiles.freeTrialLimit,
+            usedFreeQueries: Number(socialProfiles.freeTrialLimit) - Number(socialProfiles.remainingFreeTrialCount),
             topCreatorsCount: TOP_CREATORS_COUNT,
             displayFreeQueriesHeader: displayFreeQueriesHeader
         });

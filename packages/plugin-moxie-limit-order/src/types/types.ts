@@ -16,6 +16,7 @@ export interface ErrorDetails {
 
 export interface CallbackTemplate {
     text: string;
+    cta?: string[] | string;
     content?: {
         error?: string;
         details?: string;

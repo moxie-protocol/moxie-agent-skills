@@ -35,16 +35,17 @@ export const INSUFFICIENT_BALANCE = (tokenSymbol: string, currentBalance: string
 
 export const INSUFFICIENT_BALANCE_GENERIC = (tokenSymbol: string) => {
     return {
-        text: `\nInsufficient ${tokenSymbol} balance in your agent wallet to complete this transaction. \nPlease add more funds to your agent wallet and try again.`,
+        text: `\nInsufficient ${tokenSymbol} balance in your agent wallet to complete this transaction. \nPlease add more funds and try again.`,
     }
 }
 
 export const LIMIT_ORDER_SUCCESSFUL = (orderId: string, isAlertsNotEnabled: boolean) => {
     return {
-        text: `\nLimit order created successfully. View order details on [Cow Explorer](https://explorer.cow.fi/base/orders/${orderId})`,
+        text: `\nLimit order created successfully.${isAlertsNotEnabled ? '\n💥 Important: set up alerts for when the trade executes or expires!' : ''}`,
+        cta: isAlertsNotEnabled ? ["SETUP_ALERTS", "GO_TO_LIMIT_ORDERS"] : "GO_TO_LIMIT_ORDERS",
         content: {
             action: "LIMIT_ORDERS",
-            cta: isAlertsNotEnabled ? "SETUP_ALERTS" : null
+            orderId: orderId
         }
     }
 }
