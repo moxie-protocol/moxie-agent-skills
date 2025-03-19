@@ -32,10 +32,13 @@ export async function checkDegenFansCoins(wallets:string[]): Promise<number>{
           user_addresses: wallets,
         });
  
-       return portfolios.reduce(
+       const ret= portfolios.reduce(
             (acc, curr) => acc + Number(curr.balance) / 1e18,
             0
           );
+
+
+          return ret;
       } catch (e) {
         throw new Error(e);
       }

@@ -43,10 +43,10 @@ export const stakingConsultantAction: Action = {
                     }
 
                     const moxieUserInfo: MoxieUser = state.moxieUserInfo as MoxieUser;
-                    let wallets = moxieUserInfo.wallets.map((x) => x.walletAddress);
-                    
+                    let wallets = moxieUserInfo.wallets.map((x) => x.walletAddress.toLowerCase());
                     const minDegenFansCoins:number=5;
                     const degenFansCoins=await checkDegenFansCoins(wallets);
+                    elizaLogger.log("degenFansCoins: "+degenFansCoins);
                     if(degenFansCoins<minDegenFansCoins){
                         await callback?.({
                             text: "not enough DegenFans creator coins to get a AlfaFrens staking recommendation:\n"
