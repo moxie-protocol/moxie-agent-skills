@@ -110,19 +110,19 @@ export interface SignMessageResponse {
 }
 
 export type SignTransactionInput = {
-    from?: string
-    to?: string
-    nonce?: number
-    chainId?: number
-    data?: string
-    value?: string
-    type?: number
-    gasLimit?: string
-    gasPrice?: string
-    maxFeePerGas?: string
-    maxPriorityFeePerGas?: string
-    address?: string
-  }
+    from?: string;
+    to?: string;
+    nonce?: number;
+    chainId?: number;
+    data?: string;
+    value?: string;
+    type?: number;
+    gasLimit?: string;
+    gasPrice?: string;
+    maxFeePerGas?: string;
+    maxPriorityFeePerGas?: string;
+    address?: string;
+};
 
 export interface SignTransactionResponse {
     signature: string;
@@ -130,12 +130,12 @@ export interface SignTransactionResponse {
 }
 
 export type SignTypedDataInput = {
-    domain: Record<string, any>
-    types: Record<string, any>
-    message: Record<string, any>
-    primaryType: string
-    address: string
-  }
+    domain: Record<string, any>;
+    types: Record<string, any>;
+    message: Record<string, any>;
+    primaryType: string;
+    address: string;
+};
 
 export interface SignTypedDataResponse {
     signature: string;
@@ -270,13 +270,12 @@ export type GetUserInfoBatchOutput = {
     users: UserInfo[];
     freeTrialLimit: number;
     remainingFreeTrialCount: number;
-}
+};
 
 export type UserInfo = {
     user: MoxieUser | null;
     errorDetails: ErrorDetails | null;
-}
-
+};
 
 export type ErrorDetails = {
     errorMessage: string;
@@ -286,4 +285,91 @@ export type ErrorDetails = {
     requestedId: string;
     requestedUserName: string;
     requiredMoxieAmountInUSD: number;
+};
+export type EthereumSignMessageResponseType = {
+    signature: string;
+    encoding: string;
+};
+
+export type EthereumSignTypedDataResponseType = {
+    signature: string;
+    encoding: string;
+};
+
+export type EthereumSignTransactionResponseType = {
+    signedTransaction: string;
+    encoding: string;
+};
+
+export type EthereumSendTransactionResponseType = {
+    hash: string;
+    caip2: EvmCaip2ChainId;
+};
+
+export type EthereumSendTransactionInputType = EthereumRpcWrapper<
+    EthereumBaseTransactionInputType & {
+        /** CAIP-2 chain ID for the network to broadcast the transaction on. */
+        caip2: EvmCaip2ChainId;
+    }
+>;
+
+type EthereumRpcWrapper<T> = WithOptionalIdempotencyKey<
+    WithWalletIdOrAddressChainType<T, "ethereum">
+>;
+
+type Prettify<T> = {
+    [K in keyof T]: T[K];
+} & {};
+
+type WithOptionalIdempotencyKey<T> = Prettify<
+    T & {
+        idempotencyKey?: string;
+    }
+>;
+
+type WithWalletIdOrAddressChainType<T, U extends "solana" | "ethereum"> =
+    | Prettify<
+          T & {
+              /** Address of the wallet. */
+              address: string;
+              /** Chain type of the wallet. */
+              chainType: U;
+          }
+      >
+    | Prettify<
+          T & {
+              /** ID of the wallet. */
+              walletId: string;
+          }
+      >;
+
+type EthereumBaseTransactionInputType = {
+    transaction: {
+        from?: Hex;
+        to?: Hex;
+        nonce?: Quantity;
+        chainId?: Quantity;
+        data?: Hex;
+        value?: Quantity;
+        gasLimit?: Quantity;
+        gasPrice?: Quantity;
+        maxFeePerGas?: Quantity;
+        maxPriorityFeePerGas?: Quantity;
+    };
+};
+
+export type EvmCaip2ChainId = `eip155:${string}`;
+export type Quantity = Hex | number;
+export type Hex = `0x${string}`;
+
+export interface Wallet {
+    address: string;
+    chainType: "ethereum" | "solana";
+    chainId?: string;
+    walletType?: string;
+    walletClientType?: string;
+    connectorType?: string;
+    hdWalletIndex?: number;
+    imported?: boolean;
+    delegated?: boolean;
 }

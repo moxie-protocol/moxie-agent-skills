@@ -7,9 +7,10 @@
     "dependencies": {
         "@moxie-protocol/core": "workspace:*",
         "@codex-data/sdk": "^1.0.3",
-        "@elizaos/adapter-postgres": "workspace:*",
+        "@elizaos/adapter-postgres": "0.1.9",
+        "@privy-io/server-auth": "^1.16.6",
         "ioredis": "5.4.2",
-        "axios" :"^1.7.9",
+        "axios": "^1.7.9",
         "tsup": "^8.3.5"
     },
     "scripts": {

@@ -50,12 +50,31 @@ import {
     //VerifiableInferenceProvider,
     TelemetrySettings,
     TokenizerType,
+    ModelConfigOptions
 } from "./types.ts";
 import { fal } from "@fal-ai/client";
 import { tavily } from "@tavily/core";
 
 type Tool = CoreTool<any, any>;
 type StepResult = AIStepResult<any>;
+
+
+/**
+ * Computes the number of tokens used in a given input string before sending to the model.
+ * @param text - The input text.
+ * @param model - The model name (e.g., "gpt-4o", "gpt-3.5-turbo").
+ * @returns The number of tokens used.
+ */
+export function countTokens(text: string, model: string = "gpt-4o"): number {
+    try {
+        const encoder = encodingForModel(model as TiktokenModel);
+        const tokens = encoder.encode(text);
+        return tokens.length;
+    } catch (error) {
+        elizaLogger.error("Error in tokenization:", error);
+        return 0;
+    }
+}
 
 /**
  * Trims the provided text context to a specified token limit using a tokenizer model and type.
@@ -86,29 +105,35 @@ export async function trimTokens(
     if (!context) return "";
     if (maxTokens <= 0) throw new Error("maxTokens must be positive");
 
-    const tokenizerModel = runtime.getSetting("TOKENIZER_MODEL");
-    const tokenizerType = runtime.getSetting("TOKENIZER_TYPE");
+    try {
+        const tokenizerModel = runtime.getSetting("TOKENIZER_MODEL");
+        const tokenizerType = runtime.getSetting("TOKENIZER_TYPE");
 
-    if (!tokenizerModel || !tokenizerType) {
-        // Default to TikToken truncation using the "gpt-4o" model if tokenizer settings are not defined
+        if (!tokenizerModel || !tokenizerType) {
+            elizaLogger.info("Using default TikToken truncation with model 'gpt-4o'.");
+            return truncateTiktoken("gpt-4o", context, maxTokens);
+        }
+
+        // Choose the truncation method based on tokenizer type
+        if (tokenizerType === TokenizerType.Auto) {
+            return truncateAuto(tokenizerModel, context, maxTokens);
+        }
+
+        if (tokenizerType === TokenizerType.TikToken) {
+            elizaLogger.info("Using TikToken tokenizer for truncation.");
+            return truncateTiktoken(
+                tokenizerModel as TiktokenModel,
+                context,
+                maxTokens
+            );
+        }
+
+        elizaLogger.warn(`Unsupported tokenizer type: ${tokenizerType}`);
         return truncateTiktoken("gpt-4o", context, maxTokens);
+    } catch (error) {
+        elizaLogger.error("Error in trimTokens:", error instanceof Error ? error.stack : error);
+        throw error;
     }
-
-    // Choose the truncation method based on tokenizer type
-    if (tokenizerType === TokenizerType.Auto) {
-        return truncateAuto(tokenizerModel, context, maxTokens);
-    }
-
-    if (tokenizerType === TokenizerType.TikToken) {
-        return truncateTiktoken(
-            tokenizerModel as TiktokenModel,
-            context,
-            maxTokens
-        );
-    }
-
-    elizaLogger.warn(`Unsupported tokenizer type: ${tokenizerType}`);
-    return truncateTiktoken("gpt-4o", context, maxTokens);
 }
 
 async function truncateAuto(
@@ -241,6 +266,7 @@ export async function generateText({
     customSystemPrompt,
     verifiableInference = process.env.VERIFIABLE_INFERENCE_ENABLED === "true",
     verifiableInferenceOptions,
+    modelConfigOptions,
 }: {
     runtime: IAgentRuntime;
     context: string;
@@ -253,23 +279,25 @@ export async function generateText({
     verifiableInference?: boolean;
     verifiableInferenceAdapter?: IVerifiableInferenceAdapter;
     verifiableInferenceOptions?: VerifiableInferenceOptions;
+    modelConfigOptions?: ModelConfigOptions;
 }): Promise<string> {
     if (!context) {
         console.error("generateText context is empty");
         return "";
     }
-    console.log("--------context-------");
-    console.log(context);
+    elizaLogger.debug('--------context-------');
+    elizaLogger.debug(context);
 
     elizaLogger.log("Generating text...");
-    // console.log("[COntext]", context)
+    const modelProvider = modelConfigOptions?.modelProvider || runtime.modelProvider;
+    modelClass = modelConfigOptions?.modelClass || modelClass;
 
     elizaLogger.info("Generating text with options:", {
-        modelProvider: runtime.modelProvider,
-        model: modelClass,
+        modelProvider,
+        modelClass,
         verifiableInference,
     });
-    elizaLogger.log("Using provider:", runtime.modelProvider);
+    elizaLogger.log("Using provider:", modelProvider);
     // If verifiable inference is requested and adapter is provided, use it
     if (verifiableInference && runtime.verifiableInferenceAdapter) {
         elizaLogger.log(
@@ -297,10 +325,14 @@ export async function generateText({
             throw error;
         }
     }
-
-    const provider = runtime.modelProvider;
+    const provider = modelProvider
     elizaLogger.debug("Provider settings:", {
-        provider,
+        modelProvider,
+        modelClass,
+        modelConfigOptions: {
+            ...modelConfigOptions,
+            apiKey: modelConfigOptions?.apiKey ? '[REDACTED]' : undefined
+        },
         hasRuntime: !!runtime,
         runtimeSettings: {
             CLOUDFLARE_GW_ENABLED: runtime.getSetting("CLOUDFLARE_GW_ENABLED"),
@@ -313,10 +345,9 @@ export async function generateText({
         },
     });
 
-    const endpoint =
-        runtime.character.modelEndpointOverride || getEndpoint(provider);
-    const modelSettings = getModelSettings(runtime.modelProvider, modelClass);
-    let model = modelSettings.name;
+    const endpoint = modelConfigOptions?.modelEndpoint || runtime.character.modelEndpointOverride || getEndpoint(modelProvider);
+    const defaultModelSettings = getModelSettings(modelProvider, modelClass);
+    let model = modelConfigOptions?.name || defaultModelSettings.name;
 
     // allow character.json settings => secrets to override models
     // FIXME: add MODEL_MEDIUM support
@@ -386,40 +417,58 @@ export async function generateText({
 
     elizaLogger.info("Selected model:", model);
 
-    const modelConfiguration = runtime.character?.settings?.modelConfig;
+    const defaultModelConfigurationFromCharacterFile = runtime.character?.settings?.modelConfig;
     const temperature =
-        modelConfiguration?.temperature || modelSettings.temperature;
+        modelConfigOptions?.temperature ||
+        defaultModelConfigurationFromCharacterFile?.temperature ||
+        defaultModelSettings.temperature;
     const frequency_penalty =
-        modelConfiguration?.frequency_penalty ||
-        modelSettings.frequency_penalty;
+        modelConfigOptions?.frequency_penalty ||
+        defaultModelConfigurationFromCharacterFile?.frequency_penalty ||
+        defaultModelSettings.frequency_penalty;
     const presence_penalty =
-        modelConfiguration?.presence_penalty || modelSettings.presence_penalty;
+        modelConfigOptions?.presence_penalty ||
+        defaultModelConfigurationFromCharacterFile?.presence_penalty ||
+        defaultModelSettings.presence_penalty;
     const max_context_length =
-        modelConfiguration?.maxInputTokens || modelSettings.maxInputTokens;
+        modelConfigOptions?.maxInputTokens ||
+        defaultModelConfigurationFromCharacterFile?.maxInputTokens ||
+        defaultModelSettings.maxInputTokens;
     const max_response_length =
-        modelConfiguration?.max_response_length ||
-        modelSettings.maxOutputTokens;
+        modelConfigOptions?.maxOutputTokens ||
+        defaultModelConfigurationFromCharacterFile?.max_response_length ||
+        defaultModelSettings.maxOutputTokens;
     const experimental_telemetry =
-        modelConfiguration?.experimental_telemetry ||
-        modelSettings.experimental_telemetry;
+        modelConfigOptions?.experimental_telemetry ||
+        defaultModelConfigurationFromCharacterFile?.experimental_telemetry ||
+        defaultModelSettings.experimental_telemetry;
 
-    const apiKey = runtime.token;
+    let apiKey = runtime.token;
+    if (modelConfigOptions) {
+        if (modelConfigOptions.apiKey) {
+            apiKey = modelConfigOptions.apiKey;
+        } else {
+            throw new Error("API key must be provided when using model config options");
+        }
+    }
 
     try {
         elizaLogger.debug(
             `Trimming context to max length of ${max_context_length} tokens.`
         );
 
+        elizaLogger.success(`Original Token length: ${countTokens(context)} ....`);
         context = await trimTokens(context, max_context_length, runtime);
+        elizaLogger.success(`Trimmed Token length: ${countTokens(context)} ....`);
 
         let response: string;
 
-        const _stop = stop || modelSettings.stop;
+        const _stop = stop || modelConfigOptions?.stop || defaultModelSettings.stop;
         elizaLogger.debug(
-            `Using provider: ${provider}, model: ${model}, temperature: ${temperature}, max response length: ${max_response_length}`
+            `Using provider: ${modelProvider}, model: ${model}, temperature: ${temperature}, max response length: ${max_response_length}`
         );
 
-        switch (provider) {
+        switch (modelProvider) {
             // OPENAI & LLAMACLOUD shared same structure.
             case ModelProviderName.OPENAI:
             case ModelProviderName.ALI_BAILIAN:
@@ -461,7 +510,7 @@ export async function generateText({
                 });
 
                 response = openaiResponse;
-                console.log("Received response from OpenAI model.");
+                console.log("Received response from OpenAI model.", response);
                 break;
             }
 
@@ -572,12 +621,8 @@ export async function generateText({
             }
 
             case ModelProviderName.ANTHROPIC: {
-                elizaLogger.debug(
-                    "Initializing Anthropic model with Cloudflare check"
-                );
-                const baseURL =
-                    getCloudflareGatewayBaseURL(runtime, "anthropic") ||
-                    "https://api.anthropic.com/v1";
+                elizaLogger.debug("Initializing Anthropic model with Cloudflare check");
+                const baseURL = getCloudflareGatewayBaseURL(runtime, 'anthropic') || endpoint;
                 elizaLogger.debug("Anthropic baseURL result:", { baseURL });
 
                 const anthropic = createAnthropic({
@@ -603,9 +648,7 @@ export async function generateText({
                 });
 
                 response = anthropicResponse;
-                elizaLogger.debug("Received response from Anthropic model.", {
-                    response,
-                });
+                elizaLogger.debug("Received response from Anthropic model.", { response });
                 break;
             }
 
@@ -1043,9 +1086,12 @@ export async function generateText({
 
         return response;
     } catch (error) {
-        console.log("Error in generateText:", error);
-        elizaLogger.error("Error in generateText:", error);
-        throw error;
+        if (error instanceof Error) {
+            elizaLogger.error("Error in generateText:", error.stack);
+        } else {
+            elizaLogger.error("Error in generateText:", error);
+        }
+        return "An error occurred while generating text. Please try again.";
     }
 }
 
@@ -1062,6 +1108,7 @@ export async function* streamText({
     verifiableInference = process.env.VERIFIABLE_INFERENCE_ENABLED === "true",
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     verifiableInferenceOptions,
+    modelConfigOptions
 }: {
     runtime: IAgentRuntime;
     context: string;
@@ -1074,6 +1121,7 @@ export async function* streamText({
     verifiableInference?: boolean;
     verifiableInferenceAdapter?: IVerifiableInferenceAdapter;
     verifiableInferenceOptions?: VerifiableInferenceOptions;
+    modelConfigOptions?: ModelConfigOptions;
 }): AsyncGenerator<string> {
     if (!context) {
         console.error("streamText context is empty");
@@ -1083,17 +1131,23 @@ export async function* streamText({
     elizaLogger.debug(context);
 
     elizaLogger.log("Generating text...");
+    const modelProvider = modelConfigOptions?.modelProvider || runtime.modelProvider;
+    modelClass = modelConfigOptions?.modelClass || modelClass;
 
     elizaLogger.info("Generating text with options:", {
-        modelProvider: runtime.modelProvider,
-        model: modelClass,
+        modelProvider,
+        modelClass,
         verifiableInference,
     });
-    elizaLogger.log("Using provider:", runtime.modelProvider);
+    elizaLogger.log("Using provider:", modelProvider);
 
-    const provider = runtime.modelProvider;
     elizaLogger.debug("Provider settings:", {
-        provider,
+        modelProvider,
+        modelClass,
+        modelConfigOptions: {
+            ...modelConfigOptions,
+            apiKey: modelConfigOptions?.apiKey ? '[REDACTED]' : undefined
+        },
         hasRuntime: !!runtime,
         runtimeSettings: {
             CLOUDFLARE_GW_ENABLED: runtime.getSetting("CLOUDFLARE_GW_ENABLED"),
@@ -1106,12 +1160,11 @@ export async function* streamText({
         },
     });
 
-    const endpoint =
-        runtime.character.modelEndpointOverride || getEndpoint(provider);
-    const modelSettings = getModelSettings(runtime.modelProvider, modelClass);
-    let model = modelSettings.name;
+    const endpoint = modelConfigOptions?.modelEndpoint || runtime.character.modelEndpointOverride || getEndpoint(modelProvider);
+    const defaultModelSettings = getModelSettings(modelProvider, modelClass);
+    let model = modelConfigOptions?.name || defaultModelSettings.name;
 
-    switch (provider) {
+    switch (modelProvider) {
         // if runtime.getSetting("LLAMACLOUD_MODEL_LARGE") is true and modelProvider is LLAMACLOUD, then use the large model
         case ModelProviderName.LLAMACLOUD:
             {
@@ -1177,24 +1230,40 @@ export async function* streamText({
 
     elizaLogger.info("Selected model:", model);
 
-    const modelConfiguration = runtime.character?.settings?.modelConfig;
+    const defaultModelConfigurationFromCharacterFile = runtime.character?.settings?.modelConfig;
     const temperature =
-        modelConfiguration?.temperature || modelSettings.temperature;
+        modelConfigOptions?.temperature ||
+        defaultModelConfigurationFromCharacterFile?.temperature ||
+        defaultModelSettings.temperature;
     const frequency_penalty =
-        modelConfiguration?.frequency_penalty ||
-        modelSettings.frequency_penalty;
+        modelConfigOptions?.frequency_penalty ||
+        defaultModelConfigurationFromCharacterFile?.frequency_penalty ||
+        defaultModelSettings.frequency_penalty;
     const presence_penalty =
-        modelConfiguration?.presence_penalty || modelSettings.presence_penalty;
+        modelConfigOptions?.presence_penalty ||
+        defaultModelConfigurationFromCharacterFile?.presence_penalty ||
+        defaultModelSettings.presence_penalty;
     const max_context_length =
-        modelConfiguration?.maxInputTokens || modelSettings.maxInputTokens;
+        modelConfigOptions?.maxInputTokens ||
+        defaultModelConfigurationFromCharacterFile?.maxInputTokens ||
+        defaultModelSettings.maxInputTokens;
     const max_response_length =
-        modelConfiguration?.max_response_length ||
-        modelSettings.maxOutputTokens;
+        modelConfigOptions?.maxOutputTokens ||
+        defaultModelConfigurationFromCharacterFile?.max_response_length ||
+        defaultModelSettings.maxOutputTokens;
     const experimental_telemetry =
-        modelConfiguration?.experimental_telemetry ||
-        modelSettings.experimental_telemetry;
+        modelConfigOptions?.experimental_telemetry ||
+        defaultModelConfigurationFromCharacterFile?.experimental_telemetry ||
+        defaultModelSettings.experimental_telemetry;
 
-    const apiKey = runtime.token;
+        let apiKey = runtime.token;
+        if (modelConfigOptions) {
+            if (modelConfigOptions.apiKey) {
+                apiKey = modelConfigOptions.apiKey;
+            } else {
+                throw new Error("API key must be provided when using model config options");
+            }
+        }
 
     try {
         elizaLogger.debug(
@@ -1203,11 +1272,11 @@ export async function* streamText({
 
         context = await trimTokens(context, max_context_length, runtime);
 
-        const _stop = stop || modelSettings.stop;
+        const _stop = stop || modelConfigOptions?.stop || defaultModelSettings.stop;
         elizaLogger.debug(
-            `Using provider: ${provider}, model: ${model}, temperature: ${temperature}, max response length: ${max_response_length}`
+            `Using provider: ${modelProvider}, model: ${model}, temperature: ${temperature}, max response length: ${max_response_length}`
         );
-        switch (provider) {
+        switch (modelProvider) {
             // OPENAI & LLAMACLOUD shared same structure.
             case ModelProviderName.OPENAI:
             case ModelProviderName.ALI_BAILIAN:
@@ -1260,8 +1329,7 @@ export async function* streamText({
                     "Initializing Anthropic model with Cloudflare check"
                 );
                 const baseURL =
-                    getCloudflareGatewayBaseURL(runtime, "anthropic") ||
-                    "https://api.anthropic.com/v1";
+                    getCloudflareGatewayBaseURL(runtime, "anthropic") || endpoint;
                 elizaLogger.debug("Anthropic baseURL result:", { baseURL });
 
                 const anthropic = createAnthropic({
@@ -1331,10 +1399,11 @@ export async function* streamText({
             }
         }
     } catch (error) {
-        elizaLogger.error("Error in streamText:", error);
-        throw error;
+        elizaLogger.error("Error in streamText:", error instanceof Error ? error.stack : error);
+        yield "Sorry, I'm having trouble right now. Please try again later.";
     }
 }
+
 /**
  * Sends a message to the model to determine if it should respond to the given context.
  * @param opts - The options for the generateText request
@@ -1524,10 +1593,12 @@ export async function generateObjectDeprecated({
     runtime,
     context,
     modelClass,
+    modelConfigOptions,
 }: {
     runtime: IAgentRuntime;
     context: string;
     modelClass: ModelClass;
+    modelConfigOptions?: ModelConfigOptions;
 }): Promise<any> {
     if (!context) {
         elizaLogger.error("generateObjectDeprecated context is empty");
@@ -1542,7 +1613,9 @@ export async function generateObjectDeprecated({
                 runtime,
                 context,
                 modelClass,
+                modelConfigOptions,
             });
+            elizaLogger.debug("generateObjectDeprecated response:", response);
             const parsedResponse = parseJSONObjectFromText(response);
             if (parsedResponse) {
                 return parsedResponse;
@@ -2257,6 +2330,7 @@ export async function handleProvider(
         }
     }
 }
+
 /**
  * Handles object generation for OpenAI.
  *
