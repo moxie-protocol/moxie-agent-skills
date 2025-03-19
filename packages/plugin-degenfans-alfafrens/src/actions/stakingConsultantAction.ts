@@ -13,8 +13,9 @@ import {
 
 import { stakingConsultantTemplate } from "../templates";
 import { Staking, StakingSchema } from "../types";
-import { MoxieUser } from "@moxie-protocol/moxie-agent-lib";
+import { ftaService, MoxieUser } from "@moxie-protocol/moxie-agent-lib";
 import { getStakingOptions } from "../utils/degenfansApi";
+import { checkDegenFansCoins } from "../utils/moxieSubgraphApi";
 
 export const stakingConsultantAction: Action = {
     name: "GET_ALFAFRENS_STAKING_RECOMENDATION",
@@ -39,6 +40,20 @@ export const stakingConsultantAction: Action = {
                         state = (await runtime.composeState(message)) as State;
                     } else {
                         state = await runtime.updateRecentMessageState(state);
+                    }
+
+                    const moxieUserInfo: MoxieUser = state.moxieUserInfo as MoxieUser;
+                    let wallets = moxieUserInfo.wallets.map((x) => x.walletAddress);
+                    
+                    const minDegenFansCoins:number=5;
+                    const degenFansCoins=await checkDegenFansCoins(wallets);
+                    if(degenFansCoins<minDegenFansCoins){
+                        await callback?.({
+                            text: "not enough DegenFans creator coins to get a AlfaFrens staking recommendation:\n"
+                             	+ degenFansCoins + "/" + minDegenFansCoins+"\n\nsay to your Moxie AI Agent:\nbuy me " + minDegenFansCoins
+                             					+ " DegenFans creator coins"
+                        });
+                        return;
                     }
         
                     const context = composeContext({
@@ -65,12 +80,11 @@ export const stakingConsultantAction: Action = {
                             mystake: boolean;
                             minsubs: number;
                     };
-              const moxieUserInfo: MoxieUser = state.moxieUserInfo as MoxieUser;
-           
-              let wallets = moxieUserInfo.wallets.map((x) => x.walletAddress);
-
-              const stakingData:Staking={amount:amount,userAddress:userAddress,mysubs:mysubs,mystake:mystake,minsubs:minsubs};
-              const  resp =   await  getStakingOptions(wallets,stakingData);  
+        
+              const creatorCoin = await ftaService.getUserFtaData(moxieUserInfo.id);
+     
+              const stakingData:Staking = {amount:amount,userAddress:userAddress,mysubs:mysubs,mystake:mystake,minsubs:minsubs};
+              const resp =   await  getStakingOptions(creatorCoin?.subjectAddress, stakingData);  
               let tbl:string="\n";
               if(resp.status==200){
                 if(resp.data && resp.data.length > 0){
