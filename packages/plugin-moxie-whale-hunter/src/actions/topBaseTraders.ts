@@ -43,44 +43,44 @@ export const topTraders: Action = {
         await (
             runtime.databaseAdapter as MoxieAgentDBAdapter
         ).getFreeTrailBalance(moxieUserId, stringToUuid("WHALE_HUNTER"));
-        const {
-            total_free_queries,
-            remaining_free_queries: new_remaining_free_queries,
-        } = await (
-            runtime.databaseAdapter as MoxieAgentDBAdapter
-        ).deductFreeTrail(moxieUserId, stringToUuid("WHALE_HUNTER"));
+        // const {
+        //     total_free_queries,
+        //     remaining_free_queries: new_remaining_free_queries,
+        // } = await (
+        //     runtime.databaseAdapter as MoxieAgentDBAdapter
+        // ).deductFreeTrail(moxieUserId, stringToUuid("WHALE_HUNTER"));
 
-        if (new_remaining_free_queries > 0) {
-            elizaLogger.debug(
-                `[topBaseTradersAction] [${moxieUserId}] Remaining free queries: ${new_remaining_free_queries}`
-            );
-        } else {
-            // If no remaining free queries, check if user has base economy token > 1
-            try {
-                const hasSufficientBalance =
-                    await verifyUserBaseEconomyTokenOwnership(
-                        moxieUserId,
-                        runtime
-                    );
-                if (!hasSufficientBalance) {
-                    await callback({
-                        text: "You need to hold at least 1 base economy token to use this action.",
-                        action: "TOP_TOKEN_HOLDERS",
-                    });
-                    return false;
-                }
-            } catch (error) {
-                elizaLogger.error(
-                    "Error verifying user base economy token ownership:",
-                    error
-                );
-                await callback({
-                    text: "There was an error verifying your token ownership. Please try again.",
-                    action: "TOP_TOKEN_HOLDERS",
-                });
-                return false;
-            }
-        }
+        // if (new_remaining_free_queries > 0) {
+        //     elizaLogger.debug(
+        //         `[topBaseTradersAction] [${moxieUserId}] Remaining free queries: ${new_remaining_free_queries}`
+        //     );
+        // } else {
+        //     // If no remaining free queries, check if user has base economy token > 1
+        //     try {
+        //         const hasSufficientBalance =
+        //             await verifyUserBaseEconomyTokenOwnership(
+        //                 moxieUserId,
+        //                 runtime
+        //             );
+        //         if (!hasSufficientBalance) {
+        //             await callback({
+        //                 text: "You need to hold at least 1 base economy token to use this action.",
+        //                 action: "TOP_TOKEN_HOLDERS",
+        //             });
+        //             return false;
+        //         }
+        //     } catch (error) {
+        //         elizaLogger.error(
+        //             "Error verifying user base economy token ownership:",
+        //             error
+        //         );
+        //         await callback({
+        //             text: "There was an error verifying your token ownership. Please try again.",
+        //             action: "TOP_TOKEN_HOLDERS",
+        //         });
+        //         return false;
+        //     }
+        // }
 
         const topTraders = await getTopBaseTraders();
         elizaLogger.debug(`Top traders: ${JSON.stringify(topTraders)}`);
