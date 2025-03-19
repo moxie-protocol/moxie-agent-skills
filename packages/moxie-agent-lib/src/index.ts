@@ -42,13 +42,32 @@ export {
     LiquidityPool,
 } from "./services/types";
 
+export {
+    MoxieWalletSignMessageResponseType,
+    MoxieWalletSignTypedDataResponseType,
+    MoxieWalletSendTransactionResponseType,
+    MoxieWalletSendTransactionInputType,
+    MoxieHex,
+    MoxieClientWallet,
+    MoxieWalletClient,
+} from "./wallet";
 
-export { MoxieWalletSignMessageResponseType, MoxieWalletSignTypedDataResponseType, MoxieWalletSendTransactionResponseType, MoxieWalletSendTransactionInputType, MoxieHex, MoxieClientWallet, MoxieWalletClient } from "./wallet";
+export {
+    getMoxiePortfolioInfo,
+    MoxiePortfolioInfo,
+} from "./services/portfolioService";
 
-export { getMoxiePortfolioInfo, MoxiePortfolioInfo } from "./services/portfolioService";
+export {
+    Portfolio,
+    getPortfolioData,
+    getPortfolioV2Data,
+    PortfolioV2Data,
+} from "./services/zapperService";
 
-export { Portfolio, getPortfolioData, getPortfolioV2Data, PortfolioV2Data } from "./services/zapperService";
-
-export { validateMoxieUserTokens, PluginToken , fetchPluginTokenGate } from "./services/balanceValidator"
+export {
+    validateMoxieUserTokens,
+    PluginToken,
+    fetchPluginTokenGate,
+} from "./services/balanceValidator";
 
 export { deleteLimitOrders } from "./services/cowService";
