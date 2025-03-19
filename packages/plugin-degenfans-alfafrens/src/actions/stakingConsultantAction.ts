@@ -70,7 +70,7 @@ export const stakingConsultantAction: Action = {
               let wallets = moxieUserInfo.wallets.map((x) => x.walletAddress);
 
               const stakingData:Staking={amount:amount,userAddress:userAddress,mysubs:mysubs,mystake:mystake,minsubs:minsubs};
-              const  resp =   await  getStakingOptions(null,wallets,stakingData);  
+              const  resp =   await  getStakingOptions(wallets,stakingData);  
               let tbl:string="\n";
               if(resp.status==200){
                 if(resp.data && resp.data.length > 0){
