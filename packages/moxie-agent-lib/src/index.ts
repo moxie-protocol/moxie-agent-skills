@@ -49,6 +49,6 @@ export { getMoxiePortfolioInfo, MoxiePortfolioInfo } from "./services/portfolioS
 
 export { Portfolio, getPortfolioData, getPortfolioV2Data, PortfolioV2Data } from "./services/zapperService";
 
-export { validateMoxieUserTokens, PluginToken , fetchPluginTokenGate, getEligibleMoxieIds } from "./services/balanceValidator"
+export { validateMoxieUserTokens, PluginToken , fetchPluginTokenGate } from "./services/balanceValidator"
 
 export { deleteLimitOrders } from "./services/cowService";

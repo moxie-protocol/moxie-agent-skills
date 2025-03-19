@@ -87,6 +87,12 @@ export interface GetUserResponse {
     };
 }
 
+export interface GetUserInfoBatchResponse {
+    data: {
+        GetUserInfoBatch: GetUserInfoBatchOutput;
+    };
+}
+
 export type GetWalletDetailsOutput = {
     success: boolean;
     privyId: string;
@@ -258,4 +264,26 @@ export interface Skill {
 export interface StarterQuestion {
     label: string;
     value: string;
+}
+
+export type GetUserInfoBatchOutput = {
+    users: UserInfo[];
+    freeTrialLimit: number;
+    remainingFreeTrialCount: number;
+}
+
+export type UserInfo = {
+    user: MoxieUser | null;
+    errorDetails: ErrorDetails | null;
+}
+
+
+export type ErrorDetails = {
+    errorMessage: string;
+    expectedCreatorCoinBalance: number;
+    actualCreatorCoinBalance: number;
+    requesterId: string;
+    requestedId: string;
+    requestedUserName: string;
+    requiredMoxieAmountInUSD: number;
 }

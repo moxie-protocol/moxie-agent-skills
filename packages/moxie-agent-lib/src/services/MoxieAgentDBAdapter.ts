@@ -15,7 +15,9 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
 
     async getFreeTrailBalance(
         userId: string,
-        pluginId: string
+        pluginId: string,
+        totalFreeQueries: number = 10,
+        remainingFreeQueries: number = 10
     ): Promise<{ user_id: string; plugin_id: string; total_free_queries: number; remaining_free_queries: number }> {
         return this.pgAdapter
             .query(
@@ -31,8 +33,6 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
                         remaining_free_queries: result.rows[0].remaining_free_queries
                     };
                 } else {
-                    const totalFreeQueries = 10;
-                    const remainingFreeQueries = 10;
                     return this.pgAdapter
                         .query(
                             `INSERT INTO free_usage_details (id, user_id, plugin_id, total_free_queries, remaining_free_queries) VALUES ($1, $2, $3, $4, $5) RETURNING total_free_queries, remaining_free_queries`,
@@ -103,6 +103,43 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
                 throw error;
             });
     }
+
+    async getSkillById(skillId: string): Promise<Skill | null> {
+        const skillsTableName = process.env.SKILLS_TABLE_NAME || "skills";
+        const query = `SELECT * FROM ${skillsTableName} WHERE id = $1`;
+        return this.pgAdapter.query(query, [skillId]).then((result) => {
+            if (result.rows.length > 0) {
+                const row = result.rows[0];
+                let skill: Skill = {
+                    id: row.id,
+                    name: row.name,
+                    displayName: row.display_name,
+                    version: row.version,
+                    author: row.author,
+                    description: row.description,
+                    githubUrl: row.github_url,
+                    logoUrl: row.logo_url,
+                    status: row.status,
+                    isDefault: row.is_default,
+                    installedStatus: row.installed_status,
+                    settings: row.settings,
+                    capabilities: row.capabilities,
+                    starterQuestions: row.starter_questions,
+                    mediaUrls: row.media_urls,
+                    actions: row.actions,
+                    isPremium: row.is_premium,
+                    freeQueries: row.free_queries,
+                    skillCoinAddress: row.skill_coin_address,
+                    minimumSkillBalance: row.minimum_skill_balance,
+                    isFeatured: row.is_featured,
+                };
+                return skill;
+            } else {
+                return null;
+            }
+        });
+    }
+
     async getSkills(
         userId: string = "",
         installed_status: string = ""
@@ -132,18 +169,16 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
             "s.is_featured",
         ];
         if (userId !== "") {
-            selectFields.push(`'${installed_status}' AS installed_status`);
+            selectFields.push(
+                `CASE WHEN s.is_default = true THEN 'INSTALLED' ELSE COALESCE(us.status, 'UNINSTALLED') END AS installed_status`
+            );
         }
         let query = `SELECT ${selectFields.join(", ")} FROM ${skillsTableName} s `;
         if (userId !== "") {
             query += ` LEFT JOIN ${userSkillsTableName} us ON s.id = us.skill_id AND us.user_id = '${userId}'`;
         }
         if (installed_status !== "") {
-            query += ` WHERE COALESCE(us.status, 'UNINSTALLED') = '${installed_status}'`;
-            if (installed_status == "INSTALLED") {
-                // default skills should be shown as installed even if they are not installed by the user
-                query += ` OR s.is_default = true`;
-            }
+            query += ` WHERE COALESCE(us.status, 'UNINSTALLED') = '${installed_status}' ${installed_status == "INSTALLED" ? "OR s.is_default = true" : "AND s.is_default = false"}`;
         }
         return this.pgAdapter.query(query, []).then((result) => {
             return result.rows.map((row) => ({

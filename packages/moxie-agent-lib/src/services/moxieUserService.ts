@@ -13,6 +13,9 @@ import {
     SignTypedDataResponse,
     SendTransactionResponse,
     SendTransactionInput,
+    GetUserInfoBatchResponse,
+    ErrorDetails,
+    GetUserInfoBatchOutput,
 } from "./types";
 
 export async function getUserMoxieWalletAddress(
@@ -173,6 +176,82 @@ export async function getUserByMoxieIdMultiple(
     }
 }
 
+export async function getUserByMoxieIdMultipleTokenGate(
+    userIds: string[],
+    authorizationHeader: string,
+    pluginId: string
+): Promise<GetUserInfoBatchOutput> {
+    try {
+        const query = `
+            query GetUserInfoBatch($userIds: [String!]!, $pluginId: String!) {
+                GetUserInfoBatch(input: { userIds: $userIds, pluginDetails: { pluginId: $pluginId } }) {
+                remainingFreeTrialCount
+                freeTrialLimit
+                users {
+                    errorDetails {
+                        errorMessage
+                        expectedCreatorCoinBalance
+                        actualCreatorCoinBalance
+                        requestedUserName
+                        requestedId
+                        requesterId
+                        requiredMoxieAmountInUSD
+                    }
+                    user {
+                        id
+                        userName
+                        identities {
+                            id
+                            userId
+                            type
+                            dataSource
+                            connectedIdentitiesFetchStatus
+                            metadata
+                            profileId
+                            isActive
+                            createdAt
+                            updatedAt
+                        }
+                        wallets {
+                            id
+                            userId
+                            walletAddress
+                            walletType
+                            dataSource
+                            createdAt
+                            deletedAt
+                        }
+                        vestingContracts {
+                            beneficiaryAddress
+                            vestingContractAddress
+                        }
+                    }
+                }
+            }
+        } `
+
+        const response = await fetch(process.env.MOXIE_API_URL_INTERNAL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": authorizationHeader
+            },
+            body: JSON.stringify({
+                query,
+                variables: { userIds, pluginId }
+            })
+        })
+
+        let res = await response.json()
+        console.log("res", res)
+        const { data } = (res) as GetUserInfoBatchResponse;
+        return data.GetUserInfoBatch;
+    } catch (error) {
+        elizaLogger.error("Error in getUserByMoxieIdMultipleTokenGate:", error);
+        return { users: [], freeTrialLimit: 0, remainingFreeTrialCount: 0 };
+    }
+}
+
 export async function getUserByWalletAddressMultiple(
     walletAddresses: string[]
 ): Promise<Map<string, MoxieUser>> {
@@ -241,14 +320,20 @@ export interface SocialProfile {
     farcasterUserId?: string;
 }
 
-export async function getSocialProfilesByMoxieIdMultiple(userIds: string[]) {
+export async function getSocialProfilesByMoxieIdMultiple(userIds: string[], bearerToken: string, pluginId: string) {
     const userIdToSocialProfile = new Map<string, SocialProfile>();
+    const errorDetails = new Map<string, ErrorDetails>();
 
     try {
-        const results = await getUserByMoxieIdMultiple(userIds);
+        const results = await getUserByMoxieIdMultipleTokenGate(userIds, bearerToken, pluginId);
 
-        userIds.forEach((userId, _index) => {
-            const user = results.get(userId);
+        results.users.forEach((userInfo, _index) => {
+            const user = userInfo.user;
+            if (!user && userInfo.errorDetails) {
+                errorDetails.set(userInfo.errorDetails.requestedId, userInfo.errorDetails);
+                return;
+            }
+
             let twitterUsername = null;
             let farcasterUsername = null;
             let farcasterUserId = null;
@@ -286,10 +371,10 @@ export async function getSocialProfilesByMoxieIdMultiple(userIds: string[]) {
                 farcasterUserId,
             };
 
-            userIdToSocialProfile.set(userId, socialProfile);
+            userIdToSocialProfile.set(user.id, socialProfile);
         });
 
-        return userIdToSocialProfile;
+        return { userIdToSocialProfile, errorDetails, freeTrialLimit: results.freeTrialLimit, remainingFreeTrialCount: results.remainingFreeTrialCount };
     } catch (error) {
         elizaLogger.error(
             "Error in getTwitteruserNameByMoxieIdMultiple:",
@@ -297,6 +382,8 @@ export async function getSocialProfilesByMoxieIdMultiple(userIds: string[]) {
         );
     }
 }
+
+
 
 // getTwitteruserNameByMoxieIdMultiple(["M4"]).then(console.log)
 
