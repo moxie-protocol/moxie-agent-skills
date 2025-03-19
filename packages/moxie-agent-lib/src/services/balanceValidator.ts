@@ -97,39 +97,6 @@ export async function validateMoxieUserTokens(moxieUserInfo: MoxieUser, message:
     return textResponse;
 }
 
-export async function getEligibleMoxieIds(moxieUserInfo: MoxieUser, new_remaining_free_queries: number, moxieIds: string[]): Promise<{ eligibleMoxieIds: string[], ineligibleMoxieUsers: { requiredTokens: number, label: string }[] }> {
-    let eligibleMoxieIds = [];
-    let ineligibleMoxieUsers = [];
-
-    if (new_remaining_free_queries < 0) {
-        const pluginTokenGate = await fetchPluginTokenGate({
-            currentUserMoxieId: moxieUserInfo.id,
-            moxieIds: moxieIds,
-        });
-
-        pluginTokenGate.forEach((token) => {
-            if (token.requiredTokens > 0) {
-                ineligibleMoxieUsers.push({
-                    requiredMoxieAmountInUSD: roundToDecimalPlaces(token.requiredMoxieAmountInUSD, 4),
-                    requiredTokens: roundToDecimalPlaces(token.requiredTokens, 4),
-                    label: `@[${token.fanTokenName}|${token.creatorMoxieId}]`,
-                });
-            } else {
-                eligibleMoxieIds.push(token.creatorMoxieId);
-            }
-        });
-
-        eligibleMoxieIds = moxieIds.filter((id) => !ineligibleMoxieUsers.some(user => user.label.includes(id)));
-    } else {
-        eligibleMoxieIds = moxieIds;
-    }
-
-    return {
-        eligibleMoxieIds,
-        ineligibleMoxieUsers,
-    };
-}
-
 function roundToDecimalPlaces(num: number, decimalPlaces: number): number {
     // Convert to string to check decimal places
     const numStr = num.toString();

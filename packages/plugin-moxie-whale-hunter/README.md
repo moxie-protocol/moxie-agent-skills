@@ -1,0 +1,1 @@
+# Moxie Whale Hunter plugin
