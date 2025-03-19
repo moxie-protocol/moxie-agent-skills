@@ -28,7 +28,7 @@ const query = gql`
 
 export async function checkDegenFansCoins(wallets:string[]): Promise<number>{
     try {
-        const {portfolios} : GraphQLResponse= await graphQLClient.request(query, {
+        const {portfolios} = await graphQLClient.request<GraphQLResponse>(query, {
           user_addresses: wallets,
         });
  
