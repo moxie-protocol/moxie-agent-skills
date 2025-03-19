@@ -43,12 +43,12 @@
       "TOKEN_MARKET_PERFORMANCE",
       "TOKEN_MARKET_SENTIMENT"
     ],
-    "isPremium": true,
-    "freeQueries": 6,
-    "skillCoinAddress": "0xda7e153bbe75902bd23496284fe0c4b90c9ace7b",
-    "minimumSkillBalance": 1,
+    "isPremium": false,
+    "freeQueries": 0,
+    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
+    "minimumSkillBalance": 0,
     "status": "ACTIVE",
-    "isDefault": false,
+    "isDefault": true,
     "isFeatured": true
   },
   {
@@ -172,7 +172,7 @@
       "CREATOR_COIN_SWAP_SUMMARIES"
     ],
     "isPremium": false,
-    "freeQueries": 10,
+    "freeQueries": 0,
     "skillCoinAddress": "0x0000000000000000000000000000000000000000",
     "minimumSkillBalance": 0,
     "status": "ACTIVE",
@@ -329,9 +329,9 @@
     ],
     "isPremium": false,
     "freeQueries": 10,
-    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
-    "minimumSkillBalance": 0,
-    "status": "UPCOMING",
+    "skillCoinAddress": "0x125490489a27d541e39813c08d260debac071bb7",
+    "minimumSkillBalance": 1,
+    "status": "ACTIVE",
     "isDefault": true
   },
   {
