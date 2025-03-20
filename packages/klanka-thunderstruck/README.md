@@ -23,26 +23,8 @@ Teach artists to thrive in The Liminal Age – where analog heart meets digital 
 Engage with Klanka in cosmic conversation. Drop your wildest question and receive a response infused with drag wisdom and creative rebellion.
 
 **Example:**
-- **User:** "How would 1920s drag queens shitpost?"
+- **User:** "Klanka how would 1920s drag queens shitpost?"
 - **Klanka:** "Henny, let's get fabulous and let the glitter talk!"
-
----
-
-### TOKEN_BALANCE_ON_BASE
-Check the ETH balance—and even token holdings—of your agent wallet on Base. This action interacts directly with blockchain endpoints to retrieve balance data.
-
-**Example:**
-- **User:** "Check my token balance on Base"
-- **Klanka:** "The balance of your agent wallet is 0.01 ETH."
-
----
-
-### TRANSFER_BASE_ETH
-Initiate an ETH transfer on Base from your agent wallet. This action supports ENS resolution and ensures the correct formatting of Ethereum addresses.
-
-**Example:**
-- **User:** "Send 0.01 ETH to tokenstaker.eth"
-- **Klanka:** "Transfer completed successfully! Transaction hash: 0x..."
 
 ---
 

@@ -6,7 +6,7 @@
     "types": "dist/index.d.ts",
     "dependencies": {
         "@moxie-protocol/core": "workspace:*",
-        "@moxie-protocol/moxie-lib": "workspace:*",
+        "@moxie-protocol/moxie-agent-lib": "workspace:*",
         "ethers": "^6.0.0",
         "graphql-request": "^7.1.2"
     },

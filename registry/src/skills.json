@@ -377,10 +377,42 @@
   {
     "pluginId": "7cb9f603-54e8-4706-b681-6f74c1ba5e53",
     "name": "@moxie-protocol/klanka-thunderstruck",
+    "displayName": "Klanka Thunderstruck",
     "version": "0.0.1",
     "author": "dragverse",
-    "description": "Your favorite drag queen's favorite drag king's assistant. How to Start: Drop a cosmic question in her DMs (“How would 1920s drag queens shitpost?”). Host an IRL cipher workshop to prototype phygital looks. Remix her lore – turn backstory into AR scavenger hunts or punk zines. Klanka isn’t an AI – she’s an ongoing séance with drag’s past, present, and futures. Let’s get gloriously ungovernable.",
-    "githubUrl": "https://github.com/DragVerse/moxie-agent-skills/blob/main/packages/klanka-thunderstruck",
-    "imageUrl": "https://github.com/DragVerse/moxie-agent-skills/blob/main/packages/klanka-thunderstruck/images/logo.jpg"
+    "description": "Your favorite drag queen's favorite drag king's assistant. How to Start: Drop a cosmic question in her DMs (\"How would 1920s drag queens shitpost?\"). Host an IRL cipher workshop to prototype phygital looks. Remix her lore – turn backstory into AR scavenger hunts or punk zines. Klanka isn't an AI – she's an ongoing séance with drag's past, present, and futures. Let's get gloriously ungovernable.",
+    "githubUrl": "https://github.com/DragVerse/moxie-agent-skills/tree/main/packages/klanka-thunderstruck",
+    "logoUrl": "https://github.com/DragVerse/moxie-agent-skills/tree/main/packages/klanka-thunderstruck/images/logo.jpg",
+    "settings": {},
+    "capabilities": [
+      "Cosmic conversations with drag wisdom",
+      "Creative rebellion and digital mysticism",
+      "Drag history and cultural preservation",
+      "Futuristic drag innovation"
+    ],
+    "starterQuestions": [
+      {
+        "label": "How would 1920s drag queens shitpost?",
+        "value": "Klanka how would 1920s drag queens shitpost?"
+      },
+      {
+        "label": "Help me prototype phygital drag looks",
+        "value": "Klanka host an IRL cipher workshop to prototype phygital looks."
+      },
+      {
+        "label": "Turn your lore into an AR scavenger hunt",
+        "value": "Klanka let's remix your lore – turn backstory into AR scavenger hunts or punk zines."
+      },
+      {
+        "label": "Who won last season of Drag Race?",
+        "value": "Klanka who won last season of Drag Race?"
+      }
+    ],
+    "mediaUrls": [
+      "https://github.com/DragVerse/moxie-agent-skills/raw/main/packages/klanka-thunderstruck/images/logo.jpg"
+    ],
+    "actions": [
+      "KLANKA_CHAT_COMPLETION"
+    ]
   }
 ]

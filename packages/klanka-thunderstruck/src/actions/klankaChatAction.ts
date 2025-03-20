@@ -1,9 +1,9 @@
-import {
-  type Action,
-  type HandlerCallback,
-  type IAgentRuntime,
-  type Memory,
-  type State,
+import type {
+  Action,
+  HandlerCallback,
+  IAgentRuntime,
+  Memory,
+  State,
 } from "@moxie-protocol/core";
 import {
   VeniceChatCompletionRequestSchema,
@@ -46,8 +46,7 @@ export const klankaChatAction: Action = {
     ) => {
         // Extract the user message; assuming it's in message.content.text
         const userMessage =
-            message &&
-            message.content &&
+            message?.content &&
             typeof message.content === "object" &&
             "text" in message.content
                 ? message.content.text
@@ -112,8 +111,7 @@ export const klankaChatAction: Action = {
             }
 
             // Take the first choice's message content as the assistant's reply
-            const choice =
-                parsedResponse.data.choices && parsedResponse.data.choices[0];
+            const choice = parsedResponse.data.choices?.[0];
             if (!choice) {
                 await callback?.({
                     text: "No response choices returned from Venice API.",
@@ -135,7 +133,9 @@ export const klankaChatAction: Action = {
         [
             {
                 user: "{{user1}}",
-                content: { text: "How would 1920s drag queens shitpost?" },
+                content: {
+                    text: "Klanka how would 1920s drag queens shitpost?",
+                },
             },
             {
                 user: "{{agent}}",
@@ -147,7 +147,7 @@ export const klankaChatAction: Action = {
             {
                 user: "{{user1}}",
                 content: {
-                    text: "Host an IRL cipher workshop to prototype phygital looks.",
+                    text: "Klanka host an IRL cipher workshop to prototype phygital looks.",
                 },
             },
             {
@@ -160,7 +160,7 @@ export const klankaChatAction: Action = {
             {
                 user: "{{user1}}",
                 content: {
-                    text: "Let's remix your lore – turn backstory into AR scavenger hunts or punk zines.",
+                    text: "Klanka let's remix your lore – turn backstory into AR scavenger hunts or punk zines.",
                 },
             },
             {
@@ -173,7 +173,7 @@ export const klankaChatAction: Action = {
             {
                 user: "{{user1}}",
                 content: {
-                    text: "Who won last season of Drag Race?",
+                    text: "Klanka who won last season of Drag Race?",
                 },
             },
             {
