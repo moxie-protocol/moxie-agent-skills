@@ -4,7 +4,7 @@ import { Memory, State, HandlerCallback } from "@moxie-protocol/core";
 import { ethers } from "ethers";
 import { elizaLogger } from "@moxie-protocol/core";
 import * as callBackTemplate from "../templates/callBackTemplate";
-import { MoxieAgentDBAdapter, MoxieClientWallet, MoxieHex, MoxieUser, MoxieWalletClient, MoxieWalletSendTransactionResponseType, MoxieWalletSignTypedDataResponseType, Portfolio } from "@moxie-protocol/moxie-agent-lib";
+import * as agentLib from "@moxie-protocol/moxie-agent-lib";
 import { limitOrderPromptTemplate } from "../templates/limitOrderPrompt";
 import { Wallet } from "@privy-io/server-auth";
 import { decodeTokenTransfer, getERC20Balance, getERC20Decimals, getNativeTokenBalance } from "../service/erc20";
@@ -58,9 +58,9 @@ export const limitOrderAction = {
 
 
         // pick moxie user info from state
-        const moxieUserInfo = state.moxieUserInfo as MoxieUser;
+        const moxieUserInfo = state.moxieUserInfo as agentLib.MoxieUser;
         const moxieUserId = moxieUserInfo.id;
-        const agentWallet = state.agentWallet as MoxieClientWallet;
+        const agentWallet = state.agentWallet as agentLib.MoxieClientWallet;
 
         // add moxie user id to context
         context.moxieUserId = moxieUserId;
@@ -138,7 +138,7 @@ async function preValidateRequiredData(context: Context): Promise<boolean> {
         throw new Error("Agent wallet not found in state");
     }
 
-    if (!(state.agentWallet as MoxieClientWallet).delegated) {
+    if (!(state.agentWallet as agentLib.MoxieClientWallet).delegated) {
         throw new Error("Delegate access not found for agent wallet");
     }
 
@@ -447,7 +447,7 @@ async function processSingleLimitOrder(
 ): Promise<FunctionResponse<CallbackTemplate>> {
     elizaLogger.debug(context.traceId, `[limitOrder] [${context.moxieUserId}] [processSingleLimitOrder] limitOrder: ${JSON.stringify(limitOrder)}`);
     const { sellToken, buyToken, type, execution_type, limitPrice, buyQuantity, order_type, sellQuantity, value_type, balance } = limitOrder;
-    const agentWallet = context.state.agentWallet as MoxieClientWallet;
+    const agentWallet = context.state.agentWallet as agentLib.MoxieClientWallet;
     // extract the sell token address and symbol
     const sellTokenDetails = extractTokenDetails(sellToken);
     const buyTokenDetails = extractTokenDetails(buyToken);
@@ -612,7 +612,7 @@ async function processSingleLimitOrder(
         elizaLogger.debug(traceId,`[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [cowLimitOrder] cowLimitOrderId: ${cowLimitOrderId}`);
 
         // then insert into the database
-        await (context.runtime.databaseAdapter as  MoxieAgentDBAdapter).saveLimitOrder(cowLimitOrderId, agentWallet.address);
+        await (context.runtime.databaseAdapter as  agentLib.MoxieAgentDBAdapter).saveLimitOrder(cowLimitOrderId, agentWallet.address);
         elizaLogger.debug(traceId,`[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [saveLimitOrder]cowLimitOrderId: ${cowLimitOrderId}`);
 
         // check if the user has alerts enabled
@@ -748,7 +748,7 @@ async function swap(
     const traceId = context.traceId;
     const moxieUserId = context.moxieUserId;
     const provider = context.provider;
-    const walletClient = context.state.moxieWalletClient as MoxieWalletClient;
+    const walletClient = context.state.moxieWalletClient as agentLib.MoxieWalletClient;
 
     elizaLogger.debug(traceId,` [swap] called, buyTokenAddress: ${buyTokenAddress}, buyTokenSymbol: ${buyTokenSymbol}, sellTokenAddress: ${sellTokenAddress}, sellTokenSymbol: ${sellTokenSymbol}, agentWalletAddress: ${agentWalletAddress}, sellAmountInWEI: ${sellAmountInWEI}`);
     let buyAmountInWEI: bigint;
@@ -767,7 +767,7 @@ async function swap(
             elizaLogger.error(traceId,`[tokenSwap] [${moxieUserId}] [swap] Insufficient balance for ${sellTokenSymbol} to ${buyTokenSymbol} swap. Token balance: ${tokenBalance}, required: ${sellAmountInWEI}`);
             const callbackTemplate = await handleInsufficientBalance(
                 traceId,
-                context.state.agentWalletBalance as Portfolio,
+                context.state.agentWalletBalance as agentLib.Portfolio,
                 moxieUserId,
                 sellTokenAddress,
                 sellTokenSymbol,
@@ -840,7 +840,7 @@ async function swap(
 
     // if (sellTokenSymbol != "ETH") { // skip for ETH
     // signature related
-    let signResponse: MoxieWalletSignTypedDataResponseType | undefined;
+    let signResponse: agentLib.MoxieWalletSignTypedDataResponseType | undefined;
     try {
         elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [swap] quote.permit2.eip712: ${JSON.stringify(quote.permit2?.eip712)}`);
         if (quote.permit2?.eip712) {
@@ -854,7 +854,7 @@ async function swap(
         }
 
         if (signResponse && signResponse.signature && quote.transaction?.data) {
-            const signatureLengthInHex = numberToHex(size(signResponse.signature as MoxieHex), {
+            const signatureLengthInHex = numberToHex(size(signResponse.signature as agentLib.MoxieHex), {
                 signed: false,
                 size: 32,
             });
@@ -869,7 +869,7 @@ async function swap(
     // }
 
     // execute 0x swap
-    let tx: MoxieWalletSendTransactionResponseType | null = null;
+    let tx: agentLib.MoxieWalletSendTransactionResponseType | null = null;
     try {
         tx = await execute0xSwap({
             context: context,
@@ -940,7 +940,7 @@ async function swap(
  */
 async function handleInsufficientBalance(
     traceId: string,
-    currentWalletBalance: Portfolio,
+    currentWalletBalance: agentLib.Portfolio,
     moxieUserId: string,
     sellTokenAddress: string,
     sellTokenSymbol: string,

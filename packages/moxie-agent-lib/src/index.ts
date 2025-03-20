@@ -42,13 +42,13 @@ export type {
     LiquidityPool,
 } from "./services/types";
 
-export type {
-    MoxieWalletSignMessageResponseType,
-    MoxieWalletSignTypedDataResponseType,
-    MoxieWalletSendTransactionResponseType,
-    MoxieWalletSendTransactionInputType,
-    MoxieHex,
-    MoxieClientWallet,
+export {
+    type MoxieWalletSignMessageResponseType,
+    type MoxieWalletSignTypedDataResponseType,
+    type MoxieWalletSendTransactionResponseType,
+    type MoxieWalletSendTransactionInputType,
+    type MoxieHex,
+    type MoxieClientWallet,
     MoxieWalletClient,
 } from "./wallet";
 
