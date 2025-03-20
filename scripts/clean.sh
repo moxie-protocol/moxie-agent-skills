@@ -11,6 +11,9 @@ find . -type d -name "node_modules" -exec rm -rf {} + \
 # Remove core cache
 rm -rf ./packages/core/cache
 
+# Remove local sqlite db
+rm -rf ./agent/data
+
 # Remove pnpm lockfile
 rm ./pnpm-lock.yaml
 

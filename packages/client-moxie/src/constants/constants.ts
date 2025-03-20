@@ -1,11 +1,16 @@
-import type { walletService, MoxieUser } from "@moxie-protocol/moxie-lib";
+import type {
+    MoxieUser,
+    MoxieClientWallet,
+} from "@moxie-protocol/moxie-agent-lib";
 
 export const CREATOR_AGENT_TOKEN_ADDRESS: string =
-    process.env["CREATOR_AGENT_TOKEN_ADDRESS"] || "";
+    process.env["CREATOR_AGENT_TOKEN_ADDRESS"] ||
+    "0x838cc7f24a2696c796f90516c89369fbdcf7c575";
 export const MINIMUM_CREATOR_AGENT_COINS: number =
     Number(process.env["MINIMUM_CREATOR_AGENT_COINS"]) || 0;
 export const COMMON_AGENT_ID: string = process.env["COMMON_AGENT_ID"] || "";
-export const BASE_RPC_URL: string = process.env["BASE_RPC_URL"] || "";
+export const BASE_RPC_URL: string =
+    process.env["BASE_RPC_URL"] || "https://mainnet.base.org";
 /**
  * REUSABLE MOCK DATA STARTS BELOW
  */
@@ -24,26 +29,7 @@ export const mockMoxieUser: MoxieUser = {
     moxieScore: 1000,
     moxieRank: 0,
     createdAt: "2024-12-20T14:37:34.348Z",
-    moxieScoreResyncInfo: {
-        status: "COMPLETED",
-    },
     identities: [
-        {
-            id: "19b49f2a-8f57-4ebe-9897-a6dda30fb543",
-            userId: "M1",
-            type: "ENS",
-            connectedIdentitiesFetchStatus: "SUCCESS",
-            metadata: {
-                ens: "vitalik.eth",
-                expiryTimestamp: "2025-09-07T21:41:38.000Z",
-                resolvedAddress: "0xcbfbcbfca74955b8ab75dec41f7b9ef36f329879",
-            },
-            profileId: "vitalik.eth",
-            isActive: true,
-            createdAt: "2025-01-07T12:12:22.361Z",
-            updatedAt: "2025-01-07T12:12:22.361Z",
-            dataSource: "AIRSTACK",
-        },
         {
             id: "fd14e2a4-11a2-4115-81b4-4b1d266ade64",
             userId: "M8",
@@ -51,15 +37,9 @@ export const mockMoxieUser: MoxieUser = {
             connectedIdentitiesFetchStatus: "SUCCESS",
             metadata: {
                 bio: "hullo",
-                fid: 5650,
-                pfp: "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/341d47e1-f746-4f5c-8fbe-d9e56fa66100/original",
-                type: "farcaster",
+                profileTokenId: "5650",
                 username: "vitalik.eth",
-                verifiedAt: "2024-12-20T14:59:37.000Z",
                 displayName: "Vitalik Buterin",
-                ownerAddress: "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-                firstVerifiedAt: "2024-12-20T14:59:37.000Z",
-                latestVerifiedAt: "2024-12-20T14:59:37.000Z",
             },
             profileId: "5650",
             isActive: true,
@@ -110,10 +90,11 @@ export const mockMoxieUser: MoxieUser = {
             dataSource: "PRIVY",
         },
     ],
+    vestingContracts: [],
 };
 
 // Mock Moxie Wallet Data
-export const mockWallet: walletService.MoxieClientWallet = {
+export const mockWallet: MoxieClientWallet = {
     address: "0xa5cc845ef113c4c0908d4c1f4616a000b9a67b80",
     chainType: "ethereum",
     chainId: "8453",
@@ -123,3 +104,24 @@ export const mockWallet: walletService.MoxieClientWallet = {
     hdWalletIndex: 0,
     delegated: false,
 };
+
+export const MOXIE_USER_PORTFOLIOS_QUERY = (filterConditions: string[]) => `
+      query GetPortfolioInfo {
+        MoxieUserPortfolios(
+          input: {filter: {${filterConditions.join(", ")}}}
+        ) {
+          MoxieUserPortfolio {
+            fanTokenSymbol
+            fanTokenName
+            fanTokenAddress
+            totalLockedAmount
+            totalUnlockedAmount
+            totalTvl
+            walletAddresses
+            currentPrice
+            lockedTvl
+            unlockedTvl
+          }
+        }
+      }
+    `;

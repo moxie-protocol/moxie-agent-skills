@@ -10,7 +10,7 @@ import {
     generateObject,
     ModelClass,
 } from "@moxie-protocol/core";
-import { MoxieWalletClient } from "@moxie-protocol/moxie-lib/src/wallet";
+import { MoxieWalletClient } from "@moxie-protocol/moxie-agent-lib/src/wallet";
 import { transferEthTemplate } from "../templates";
 import { TransferEthSchema } from "../types";
 
@@ -107,7 +107,7 @@ export const transferAction: Action = {
                 `Transfering ${formattedValue} wei to address ${toAddress}...`
             );
             const wallet = state.agentWallet as MoxieWalletClient;
-            
+
             const { hash } = await wallet.sendTransaction("8543", {
                 toAddress,
                 value: formattedValue,

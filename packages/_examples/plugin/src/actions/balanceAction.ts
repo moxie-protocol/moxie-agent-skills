@@ -10,7 +10,7 @@ import {
     generateObject,
     ModelClass,
 } from "@moxie-protocol/core";
-import { MoxieWalletClient } from "@moxie-protocol/moxie-lib/src/wallet";
+import { MoxieWalletClient } from "@moxie-protocol/moxie-agent-lib/src/wallet";
 import { formatEther, http, createPublicClient } from "viem";
 import { base } from "viem/chains";
 import { getTokenBalance } from "../utils/balance";
