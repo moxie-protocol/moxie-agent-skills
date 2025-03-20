@@ -80,7 +80,7 @@ export async function getFarcasterCasts(query: string, runtime: IAgentRuntime) {
                 // prepare the query like blockchain after:2023-06-01
                 const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
                 const formattedDate = oneDayAgo.toISOString().split("T")[0];
-                query = `${query} after:${formattedDate} `;
+                query = `$${query} after:${formattedDate} `;
                 elizaLogger.log(`[Farcaster] query: ${query}`);
                 const response = await client.get(
                     `/v2/farcaster/cast/search?q=${query}&priority_mode=false&limit=100&sort_type=algorithmic`

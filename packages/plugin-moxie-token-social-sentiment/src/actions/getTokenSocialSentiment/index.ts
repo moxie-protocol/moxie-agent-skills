@@ -91,7 +91,7 @@ export default {
             elizaLogger.log(`[Farcaster] token ticker: ${tokenTicker}`);
             elizaLogger.log(`[Farcaster] token address: ${tokenAddress}`);
 
-            if ((!tokenSymbol || (Array.isArray(tokenSymbol) && tokenSymbol.length === 0)) && tokenTicker && tokenTicker.length > 0) {
+            if (tokenSymbol && (!tokenTicker || (Array.isArray(tokenTicker) && tokenTicker.length === 0))) {
                 tokenTicker = tokenSymbol;
             }
             if (!tokenTicker || (Array.isArray(tokenTicker) && tokenTicker.length === 0)) {

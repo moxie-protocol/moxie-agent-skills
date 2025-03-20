@@ -26,7 +26,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import yargs from "yargs";
 // import moxieBigFanPlugin from "@moxie-protocol/plugin-moxie-big-fan";
-// import moxieTokenDetailsPlugin from "@moxie-protocol/plugin-moxie-token-details";
+import moxieTokenDetailsPlugin from "@moxie-protocol/plugin-moxie-token-details";
 // import { moxieSwapPlugin } from "@moxie-protocol/plugin-moxie-swap";
 import moxieTokensSocialSentimentPlugin from "@moxie-protocol/plugin-token-social-sentiment"
 import samplePlugin from "@moxie-protocol/plugin-sample";
@@ -494,7 +494,7 @@ export async function createAgent(
         evaluators: [],
         character,
         // character.plugins are handled when clients are added
-        plugins: [samplePlugin, bootstrapPlugin, moxieTokensSocialSentimentPlugin].filter(Boolean),
+        plugins: [samplePlugin, bootstrapPlugin, moxieTokensSocialSentimentPlugin, moxieTokenDetailsPlugin].filter(Boolean),
         providers: [],
         actions: [],
         services: [],
