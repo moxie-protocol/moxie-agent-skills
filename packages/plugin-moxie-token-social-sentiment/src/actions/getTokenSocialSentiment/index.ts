@@ -20,14 +20,6 @@ import { formatMessages } from "../../util";
 import { twitterScraperService } from "../../services/twitterService";
 import { getFarcasterCasts } from "../../services/neynarService";
 import { socialPlatformDetectionTemplate, tokenSocialSentimentTemplateV2 } from "./template";
-export interface PortfolioSummary {
-    [userName: string]: {
-        tokenBalances: any[];
-        appBalances: any[];
-        totalTokenValue: number;
-        totalCreatorCoinValue: number;
-    };
-}
 
 // Export the action configuration
 export default {
@@ -167,13 +159,13 @@ export default {
 
             return true;
         } catch (error) {
-            elizaLogger.error("[Portfolio] Error fetching portfolio:", error, error?.stack);
+            elizaLogger.error("[TokenSocialSentiment] Error fetching token social sentiment:", error, error?.stack);
 
             if (callback) {
                 await callback({
-                    text: "There is some problem while fetching the portfolio. Please try again later.",
+                    text: "There is some problem while fetching the token social sentiment. Please try again later.",
                     content: { error: error.message },
-                    action: "PORTFOLIO_ERROR",
+                    action: "TOKEN_SOCIAL_SENTIMENT_ERROR",
                 });
             }
             return false;

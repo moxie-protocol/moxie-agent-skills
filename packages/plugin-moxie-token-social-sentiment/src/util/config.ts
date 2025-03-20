@@ -1,1 +1,0 @@
-export const FREEMIUM_TRENDING_CREATORS = process.env.FREEMIUM_TRENDING_CREATORS || '';

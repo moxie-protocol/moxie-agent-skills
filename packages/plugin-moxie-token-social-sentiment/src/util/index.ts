@@ -3,20 +3,12 @@ import {
     Memory,
     Actor,
     Content,
-    formatTimestamp,
-    elizaLogger
-} from "@moxie-protocol/core";
-import { MoxieUser } from "@moxie-protocol/moxie-agent-lib";
+    formatTimestamp} from "@moxie-protocol/core";
 
 const CACHE_EXPIRATION = 120000; // 2 minutes in milliseconds
 
-import { FREEMIUM_TRENDING_CREATORS } from "./config";
-import { fetchPluginTokenGate } from "@moxie-protocol/moxie-agent-lib";
 import { UUID } from "@moxie-protocol/core";
 
-const FREEMIUM_TRENDING_CREATORS_LIST = FREEMIUM_TRENDING_CREATORS
-    ? FREEMIUM_TRENDING_CREATORS.split(",")
-    : [];
 
 export async function setMoxieCache(
     data: string,
@@ -55,7 +47,6 @@ export const formatMessages = ({
                 actors.find((actor: Actor) => actor.id === message.userId)
                     ?.name || "Unknown User";
 
-            const attachments = (message.content as Content).attachments;
 
             const timestamp = formatTimestamp(message.createdAt);
 

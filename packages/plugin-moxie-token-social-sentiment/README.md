@@ -1,13 +1,11 @@
 # @elizaos/plugin-moxie-balance
 
-A plugin for Eliza that enables portfolio balance checking for Moxie users' connected wallets.
+A plugin for Eliza that enables analyse token sentiment of a erc20 token on base using twitter and farcaster data
 
 ## Features
 
-- Real-time portfolio balance checking
-- Support for multiple connected wallets
-- Detailed portfolio data including token holdings
-- Automatic wallet detection for Moxie users
-- Natural language processing for portfolio queries
+- analyse token sentiment on farcaster
+- vibe check of token on twitter
+- combined sentiment of a token usinf twitter and farcaster
 
 ## Installation
