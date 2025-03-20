@@ -45,7 +45,7 @@
     ],
     "isPremium": false,
     "freeQueries": 0,
-    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
+    "skillCoinAddress": "",
     "minimumSkillBalance": 0,
     "status": "ACTIVE",
     "isDefault": true,
@@ -96,7 +96,7 @@
     ],
     "isPremium": false,
     "freeQueries": 0,
-    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
+    "skillCoinAddress": "",
     "minimumSkillBalance": 0,
     "status": "ACTIVE",
     "isDefault": true
@@ -173,7 +173,7 @@
     ],
     "isPremium": false,
     "freeQueries": 0,
-    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
+    "skillCoinAddress": "",
     "minimumSkillBalance": 0,
     "status": "ACTIVE",
     "isDefault": true
@@ -224,7 +224,7 @@
     ],
     "isPremium": false,
     "freeQueries": 0,
-    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
+    "skillCoinAddress": "",
     "minimumSkillBalance": 0,
     "status": "ACTIVE",
     "isDefault": true
@@ -285,7 +285,7 @@
     ],
     "isPremium": false,
     "freeQueries": 10,
-    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
+    "skillCoinAddress": "",
     "minimumSkillBalance": 0,
     "status": "ACTIVE",
     "isDefault": true,
@@ -327,7 +327,7 @@
       "WHALE_HUNTER",
       "WHALE_TOKEN_HOLDERS"
     ],
-    "isPremium": false,
+    "isPremium": true,
     "freeQueries": 10,
     "skillCoinAddress": "0x125490489a27d541e39813c08d260debac071bb7",
     "minimumSkillBalance": 1,
@@ -369,7 +369,7 @@
     "actions": ["LIMIT_ORDERS"],
     "isPremium": false,
     "freeQueries": 0,
-    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
+    "skillCoinAddress": "",
     "minimumSkillBalance": 0,
     "status": "ACTIVE",
     "isDefault": true
