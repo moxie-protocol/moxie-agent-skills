@@ -13,14 +13,14 @@ export { portfolioService };
 
 export { RedisClient } from "./services/RedisClient";
 
-export { MoxiePortfolio } from "./services/portfolio";
+export type { MoxiePortfolio } from "./services/portfolio";
 export { getMoxiePortfolioInfoByCreatorTokenDetails } from "./services/portfolioService";
 
 export { MoxieAgentDBAdapter } from "./services/MoxieAgentDBAdapter";
 
 export { getTokenDetails } from "./services/tokenDetails";
 
-export {
+export type {
     TwitterMetadata,
     FarcasterMetadata,
     MoxieIdentity,
@@ -43,30 +43,30 @@ export {
 } from "./services/types";
 
 export {
-    MoxieWalletSignMessageResponseType,
-    MoxieWalletSignTypedDataResponseType,
-    MoxieWalletSendTransactionResponseType,
-    MoxieWalletSendTransactionInputType,
-    MoxieHex,
-    MoxieClientWallet,
+    type MoxieWalletSignMessageResponseType,
+    type MoxieWalletSignTypedDataResponseType,
+    type MoxieWalletSendTransactionResponseType,
+    type MoxieWalletSendTransactionInputType,
+    type MoxieHex,
+    type MoxieClientWallet,
     MoxieWalletClient,
 } from "./wallet";
 
 export {
     getMoxiePortfolioInfo,
-    MoxiePortfolioInfo,
+    type MoxiePortfolioInfo,
 } from "./services/portfolioService";
 
 export {
-    Portfolio,
+    type Portfolio,
     getPortfolioData,
     getPortfolioV2Data,
-    PortfolioV2Data,
+    type PortfolioV2Data,
 } from "./services/zapperService";
 
 export {
     validateMoxieUserTokens,
-    PluginToken,
+    type PluginToken,
     fetchPluginTokenGate,
 } from "./services/balanceValidator";
 
