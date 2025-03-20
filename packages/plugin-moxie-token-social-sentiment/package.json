@@ -1,5 +1,5 @@
 {
-    "name": "@moxie-protocol/plugin-moxie-token-social-sentiment",
+    "name": "@moxie-protocol/plugin-token-social-sentiment",
     "version": "0.1.8+build.1",
     "main": "dist/index.js",
     "type": "module",
