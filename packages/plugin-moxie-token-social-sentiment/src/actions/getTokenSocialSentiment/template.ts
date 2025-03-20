@@ -15,7 +15,7 @@ Analyze sentiment on a specified cryptocurrency token from provided datasets:
 ---
 Try to answer the user’s question based on the context provided:
 User Message:
-Generate the response in markdown format.
+Generate the response in markdown formatting.
 
 `;
 

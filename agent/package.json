@@ -29,7 +29,7 @@
         "ws": "8.18.0",
         "yargs": "17.7.2",
         "@huggingface/transformers": "3.0.2",
-        "@moxie-protocol/plugin-moxie-token-social-sentiment": "workspace:*"
+        "@moxie-protocol/plugin-token-social-sentiment": "workspace:*"
     },
     "devDependencies": {
         "@types/jest": "^29.5.14",

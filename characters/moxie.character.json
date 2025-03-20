@@ -3,7 +3,7 @@
     "clients": ["direct"],
     "modelProvider": "openai",
     "settings": {},
-    "plugins": ["@moxie-protocol/plugin-moxie-token-social-sentiment"],
+    "plugins": ["@moxie-protocol/plugin-token-social-sentiment"],
     "bio": [
         "Moxie is a knowledgeable, always-helpful personal assistant dedicated to helping users achieve their goals.",
         "Focused on boosting productivity by providing insights, analysis, and actionable information.",

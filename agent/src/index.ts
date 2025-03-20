@@ -28,6 +28,7 @@ import yargs from "yargs";
 // import moxieBigFanPlugin from "@moxie-protocol/plugin-moxie-big-fan";
 // import moxieTokenDetailsPlugin from "@moxie-protocol/plugin-moxie-token-details";
 // import { moxieSwapPlugin } from "@moxie-protocol/plugin-moxie-swap";
+import moxieTokensSocialSentimentPlugin from "@moxie-protocol/plugin-token-social-sentiment"
 import samplePlugin from "@moxie-protocol/plugin-sample";
 import bootstrapPlugin from "@elizaos/plugin-bootstrap";
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
@@ -493,7 +494,7 @@ export async function createAgent(
         evaluators: [],
         character,
         // character.plugins are handled when clients are added
-        plugins: [samplePlugin, bootstrapPlugin].filter(Boolean),
+        plugins: [samplePlugin, bootstrapPlugin, moxieTokensSocialSentimentPlugin].filter(Boolean),
         providers: [],
         actions: [],
         services: [],
