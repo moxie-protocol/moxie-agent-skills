@@ -327,12 +327,12 @@
       "WHALE_HUNTER",
       "WHALE_TOKEN_HOLDERS"
     ],
-    "isPremium": false,
+    "isPremium": true,
     "freeQueries": 10,
     "skillCoinAddress": "0x125490489a27d541e39813c08d260debac071bb7",
     "minimumSkillBalance": 1,
     "status": "ACTIVE",
-    "isDefault": true
+    "isDefault": false
   },
   {
     "pluginId": "36c9a919-5a55-4645-9008-cfd32ec4b5a2",
