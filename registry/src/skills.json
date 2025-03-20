@@ -373,5 +373,45 @@
     "minimumSkillBalance": 0,
     "status": "ACTIVE",
     "isDefault": true
+  },
+  {
+    "pluginId": "0ad0731e-698b-04bf-abeb-5d29cc36759d",
+    "name": "@moxie-protocol/plugin-token-social-sentiment",
+    "displayName": "Token Social Sentiment",
+    "version": "0.1.8+build.1",
+    "author": null,
+    "description": "Enables your agent to fetch token social sentiment for any ERC20 token on Base",
+    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-token-social-sentiment",
+    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-token-social-sentiment/images/logo.svg",
+    "settings": {},
+    "capabilities": ["Social sentiment for any ERC20 token on Base"],
+    "starterQuestions": [
+      {
+        "label": "What's the social sentiment for $moxie?",
+        "value": "What's the social sentiment for $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527]?"
+      },
+      {
+        "label": "Show me the social sentiment for $degen",
+        "value": "Show me the social sentiment for $[BNKR|0x22af33fe49fd1fa80c7149773dde5890d3c76f3b]"
+      },
+      {
+        "label": "Show me the farcaster sentiment for $VVV",
+        "value": "Show me the farcaster sentiment for $[VVV|0xacfe6019ed1a7dc6f7b508c02d1b04ec88cc21bf]"
+      },
+      {
+        "label": "Show me the twitter sentiment for $BNKR",
+        "value": "Show me the twitter sentiment for $[BNKR|0x22af33fe49fd1fa80c7149773dde5890d3c76f3b]"
+      }
+    ],
+    "mediaUrls": [
+      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-token-social-sentiment/images/logo.svg"
+    ],
+    "actions": ["TOKEN_SOCIAL_SENTIMENT"],
+    "isPremium": false,
+    "freeQueries": 0,
+    "skillCoinAddress": "",
+    "minimumSkillBalance": 0,
+    "status": "ACTIVE",
+    "isDefault": true
   }
 ]
