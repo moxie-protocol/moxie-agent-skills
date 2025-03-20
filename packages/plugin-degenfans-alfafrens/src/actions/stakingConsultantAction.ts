@@ -91,7 +91,7 @@ export const stakingConsultantAction: Action = {
                     tbl+="|rank|AlfaFrens Channel|ROI Spark/mo|current stake|\n";
                     tbl+="|------:|:--------|----:|------|\n";
                     resp.data.forEach(e=>{
-                        tbl+="#"+e.rank+"|["+e.name+"|https://alfafrens.com/channel/"+e.channelAddress+"]|"+e.roi+"|"+e.currentStake+"|\n";
+                        tbl+="|#"+e.rank+"|["+e.name+"|https://alfafrens.com/channel/"+e.channelAddress+"]|"+e.roi+"|"+e.currentStake+"|\n";
                     });
                 }else{
                     tbl+="no staking options found";
