@@ -8,32 +8,32 @@ import {
     type Client,
     Clients,
     DbCacheAdapter,
-    defaultCharacter,
-    elizaLogger,
     type IAgentRuntime,
     type ICacheManager,
     type IDatabaseAdapter,
     type IDatabaseCacheAdapter,
     ModelProviderName,
+    defaultCharacter,
+    elizaLogger,
     settings,
     stringToUuid,
     validateCharacterConfig,
 } from "@moxie-protocol/core";
-import Database from "better-sqlite3";
+import bootstrapPlugin from "@moxie-protocol/plugin-bootstrap";
 import fs from "node:fs";
 import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import yargs from "yargs";
 // import moxieBigFanPlugin from "@moxie-protocol/plugin-moxie-big-fan";
 // import moxieTokenDetailsPlugin from "@moxie-protocol/plugin-moxie-token-details";
 // import { moxieSwapPlugin } from "@moxie-protocol/plugin-moxie-swap";
-import klankaThunderstruckPlugin from "@moxie-protocol/klanka-thunderstruck";
-import bootstrapPlugin from "@moxie-protocol/plugin-bootstrap";
+import samplePlugin from "@moxie-protocol/plugin-sample";
+import Database from "better-sqlite3";
+import yargs from "yargs";
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
 
-export const wait = (minTime: number = 1000, maxTime: number = 3000) => {
+export const wait = (minTime = 1000, maxTime = 3000) => {
     const waitTime =
         Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
     return new Promise((resolve) => setTimeout(resolve, waitTime));
@@ -155,7 +155,7 @@ async function loadCharacter(filePath: string): Promise<Character> {
 export async function loadCharacters(
     charactersArg: string
 ): Promise<Character[]> {
-    let characterPaths = charactersArg
+    const characterPaths = charactersArg
         ?.split(",")
         .map((filePath) => filePath.trim());
     const loadedCharacters: Character[] = [];
@@ -493,7 +493,7 @@ export async function createAgent(
         evaluators: [],
         character,
         // character.plugins are handled when clients are added
-        plugins: [bootstrapPlugin, klankaThunderstruckPlugin].filter(Boolean),
+        plugins: [samplePlugin, bootstrapPlugin].filter(Boolean),
         providers: [],
         actions: [],
         services: [],
