@@ -6,6 +6,7 @@ interface CastResponse {
 
 interface Cast {
     text: string;
+    hash: string;
     username: string;
     fid: number;
     reactions: {
@@ -39,6 +40,7 @@ interface CastData {
     recasts_count: number;
     replies_count: number;
     timestamp: string;
+    cast_url: string;
     totalInteractions: number;
 }
 
@@ -88,6 +90,8 @@ export async function getFarcasterCasts(query: string, runtime: IAgentRuntime) {
                 const castResponse = response.data as CastResponse;
                 let castData: CastData[] = [];
                 castResponse.result.casts.forEach((cast) => {
+                    //choose first 10 chars of hash
+                    let castUrl = "https://warpcast.com/" + cast.author.username + "/" + cast.hash.substring(0, 10);
                     castData.push({
                         text: cast.text,
                         username: cast.author.username,
@@ -96,6 +100,7 @@ export async function getFarcasterCasts(query: string, runtime: IAgentRuntime) {
                         recasts_count: cast.reactions.recasts_count,
                         replies_count: cast.replies.count,
                         timestamp: cast.timestamp,
+                        cast_url: castUrl,
                         totalInteractions:
                             cast.reactions.likes_count +
                             cast.reactions.recasts_count +
