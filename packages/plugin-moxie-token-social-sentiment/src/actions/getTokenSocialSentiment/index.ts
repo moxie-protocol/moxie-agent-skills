@@ -49,7 +49,7 @@ export default {
         return true;
     },
     description:
-        "Analyzes ERC20 token on Base sentiment on Social Platforms (X and Farcaster). Use this when the user is asking about what people are talking about the token. Input can be token symbol (e.g.$[MOXIE|address]), contract address or token name. but only for X and Farcaster   ",
+        "Analyzes ERC20 token on Base sentiment on Social Platforms (X and Farcaster). Use this when the user is asking about what people are talking about the token. Input can be token symbol (e.g.$[MOXIE|address]), contract address or token name. but only for X and Farcaster",
     handler: async (
         runtime: IAgentRuntime,
         message: Memory,

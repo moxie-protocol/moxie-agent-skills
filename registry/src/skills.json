@@ -380,23 +380,23 @@
     "displayName": "Token Social Sentiment",
     "version": "0.1.8+build.1",
     "author": null,
-    "description": "Enables your agent to fetch token social sentiment for any ERC20 token on Base",
+    "description": "Analyzes ERC20 token on Base sentiment on Social Platforms (X and Farcaster). Use this when the user is asking about what people are talking about the token. Input can be token symbol (e.g.$[MOXIE|address]), contract address or token name. but only for X and Farcaster",
     "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-token-social-sentiment",
     "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-token-social-sentiment/images/logo.svg",
     "settings": {},
     "capabilities": ["Social sentiment for any ERC20 token on Base"],
     "starterQuestions": [
       {
-        "label": "What's the social sentiment for $moxie?",
-        "value": "What's the social sentiment for $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527]?"
+        "label": "What’s the vibe on $moxie?",
+        "value": "What’s the vibe on $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527]?"
       },
       {
-        "label": "Show me the social sentiment for $degen",
-        "value": "Show me the social sentiment for $[BNKR|0x22af33fe49fd1fa80c7149773dde5890d3c76f3b]"
+        "label": "What are people saying today about $KTA?",
+        "value": "What are people saying today about $[KTA|0xc0634090f2fe6c6d75e61be2b949464abb498973]"
       },
       {
-        "label": "Show me the farcaster sentiment for $VVV",
-        "value": "Show me the farcaster sentiment for $[VVV|0xacfe6019ed1a7dc6f7b508c02d1b04ec88cc21bf]"
+        "label": "What’s the sentiment on $DRB?",
+        "value": "What’s the sentiment on $[DRB|0x3ec2156d4c0a9cbdab4a016633b7bcf6a8d68ea2]"
       },
       {
         "label": "Show me the twitter sentiment for $BNKR",
