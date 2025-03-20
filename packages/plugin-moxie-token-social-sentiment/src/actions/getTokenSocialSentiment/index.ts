@@ -10,6 +10,7 @@ import {
     State,
     type Action,
     generateObjectDeprecated,
+    ModelProviderName,
 } from "@moxie-protocol/core";
 import { tokenSocialSentimentExamples } from "./examples";
 import {
@@ -151,6 +152,12 @@ export default {
                 runtime,
                 context: previousQuestionContext,
                 modelClass: ModelClass.MEDIUM,
+                modelConfigOptions: {
+                    modelProvider: ModelProviderName.OPENAI,
+                    temperature: 0.5,
+                    apiKey: process.env.OPENAI_API_KEY!,
+                    modelClass: ModelClass.MEDIUM
+                }
             });
 
             for await (const textPart of response) {
