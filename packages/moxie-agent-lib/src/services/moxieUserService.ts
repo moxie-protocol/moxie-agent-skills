@@ -93,7 +93,6 @@ export async function getUserByMoxieIdMultipleMinimal(
         });
 
         let res = await response.json();
-        console.log("res", res);
         const { data } = res as GetUserInfoMinimalResponse;
 
         const userIdToUser = new Map<string, MoxieUserMinimal>();
