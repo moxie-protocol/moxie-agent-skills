@@ -7,7 +7,7 @@
         "author": null,
         "description": "Enables your agent to fetch token details for any token on Base",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-token-details/images/logo.svg",
         "settings": {},
         "capabilities": ["Token prices", "Market caps", "Liquidity", "Holders"],
         "starterQuestions": [
@@ -21,7 +21,7 @@
             }
         ],
         "mediaUrls": [
-            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-token-details/images/logo.svg"
         ],
         "actions": [
             "TOKEN_DETAILS",
@@ -58,7 +58,7 @@
         "author": null,
         "description": "Enables your agent to send tokens from your agent wallet",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-transfer",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-transfer/images/logo.svg",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-token-transfer/images/logo.svg",
         "settings": {},
         "capabilities": [
             "Send tokens to yourself",
@@ -76,7 +76,7 @@
             }
         ],
         "mediaUrls": [
-            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-transfer/images/logo.svg"
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-token-transfer/images/logo.svg"
         ],
         "actions": [
             "TOKEN_TRANSFERS",
@@ -108,7 +108,7 @@
         "author": null,
         "description": "In-depth analysis on Base users, including trades, portfolios, and posts on Farcaster and X. Buy user’s coins to add them to your Social Alpha list.",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-social-alpha",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-social-alpha/images/logo.svg",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-social-alpha/images/logo.svg",
         "settings": {},
         "capabilities": [
             "AI Intelligence across onchain activity and social media",
@@ -140,7 +140,7 @@
             }
         ],
         "mediaUrls": [
-            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-social-alpha/images/logo.svg"
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-social-alpha/images/logo.svg"
         ],
         "actions": [
             "TWEET_SUMMARY",
@@ -185,7 +185,7 @@
         "author": null,
         "description": "Enables your agent to trade and swap for you onchain using your Agent Wallet",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-swap",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-swap/images/logo.svg",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-swap/images/logo.svg",
         "settings": {},
         "capabilities": [
             "Swap any token on Base. 💡Pro Tip: use “$” to auto-complete token names",
@@ -207,7 +207,7 @@
             }
         ],
         "mediaUrls": [
-            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-swap/images/logo.svg"
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-swap/images/logo.svg"
         ],
         "actions": [
             "SWAP_TOKENS",
@@ -236,11 +236,11 @@
         "author": null,
         "description": "Enables your agent to fetch portfolio details for thousands of wallets indexed by Moxie",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-balance",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-balance/images/logo.svg",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-balance/images/logo.svg",
         "settings": {},
         "capabilities": [
             "Analyze my portfolio",
-            "Analyze someone else’s portfolio (using Social Alpha skll)",
+            "Analyze someone else’s portfolio (using Social Alpha skill)",
             "Compare several portfolios"
         ],
         "starterQuestions": [
@@ -258,7 +258,7 @@
             }
         ],
         "mediaUrls": [
-            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-balance/images/logo.svg"
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-balance/images/logo.svg"
         ],
         "actions": [
             "PORTFOLIO",
@@ -297,7 +297,7 @@
         "author": null,
         "description": "Discover Base whales with Moxie AI! ",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-whale-hunter",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-whale-hunter/images/logo.svg",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-whale-hunter/images/logo.svg",
         "settings": {},
         "capabilities": [
             "Top traders across all of Base",
@@ -323,7 +323,7 @@
             }
         ],
         "mediaUrls": [
-            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-whale-hunter/images/logo.svg"
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-whale-hunter/images/logo.svg"
         ],
         "actions": [
             "TOP_TRADERS",
@@ -348,12 +348,11 @@
         "author": null,
         "description": "Enables your agent to buy or sell tokens for you based on limit conditions.",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-limit-order",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-limit-order/images/logo.svg",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-limit-order/images/logo.svg",
         "settings": {},
         "capabilities": [
             "Buy on dip — buy a token when the price drops",
             "Buy at target price — buy at target price",
-            "Sell on dip — sell when the price drops (all or some)",
             "Sell at target price — sell at target price (all or some)"
         ],
         "starterQuestions": [
@@ -371,7 +370,7 @@
             }
         ],
         "mediaUrls": [
-            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-limit-order/images/logo.svg"
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-limit-order/images/logo.svg"
         ],
         "actions": ["LIMIT_ORDERS"],
         "isPremium": false,
