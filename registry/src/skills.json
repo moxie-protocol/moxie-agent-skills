@@ -379,5 +379,41 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": true
+    },
+    {
+        "pluginId": "79449cd9-0590-4ccc-9d9f-12f99438c17b",
+        "name": "@moxie-protocol/plugin-degenfans-alfafrens",
+        "displayName": "DegenFans AlfaFrens",
+        "version": "0.0.1",
+        "author": "DegenFans",
+        "description": "Enables your agent to recommend staking options for AlfaFrens channels",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-degenfans-alfafrens",
+        "logoUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-degenfans-alfafrens/images/logo.png",
+        "settings": {},
+        "capabilities": [
+            "show the best staking options for a given staking amount"
+        ],
+        "starterQuestions": [
+            {
+                "label": "What are some staking recommendations you have for Alfafrens?",
+                "value": "What are some staking recommendations you have for Alfafrens?"
+            },
+            {
+                "label": "I have 9000 AF — how should I stake it?",
+                "value": "I have 9000 AF — how should I stake it?"
+            },
+            {
+                "label": "What are your top picks for staking on Alfafrens?",
+                "value": "What are your top picks for staking on Alfafrens?"
+            }
+        ],
+        "mediaUrls": [""],
+        "actions": ["GET_ALFAFRENS_STAKING_RECOMENDATION"],
+        "isPremium": false,
+        "freeQueries": 0,
+        "skillCoinAddress": "0x112cf1CC540eaDF234158c0e4044C3b5F2A33e5e",
+        "minimumSkillBalance": 5,
+        "status": "ACTIVE",
+        "isDefault": true
     }
 ]
