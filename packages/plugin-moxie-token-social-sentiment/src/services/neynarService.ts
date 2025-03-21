@@ -62,13 +62,15 @@ const client = axios.create({
     },
 });
 
-export async function getFarcasterCasts(query: string, runtime: IAgentRuntime) {
+export async function getFarcasterCasts(query: string, runtime: IAgentRuntime, traceId: string) {
     try {
         elizaLogger.log(
-            `[Farcaster] Getting Farcaster casts for query: ${query}`
+            traceId,
+            `[TokenSocialSentiment]Getting Farcaster casts for query: ${query}`
         );
         elizaLogger.log(
-            `[Farcaster] api key and url: ${API_KEY} and ${process.env.NEYNAR_API_URL}`
+            traceId,
+            `[TokenSocialSentiment]api key and url: ${API_KEY} and ${process.env.NEYNAR_API_URL}`
         );
 
         let attempts = 0;
@@ -81,11 +83,11 @@ export async function getFarcasterCasts(query: string, runtime: IAgentRuntime) {
                 const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
                 const formattedDate = oneDayAgo.toISOString().split("T")[0];
                 query = `$${query} after:${formattedDate} `;
-                elizaLogger.log(`[Farcaster] query: ${query}`);
+                elizaLogger.log(traceId, `[TokenSocialSentiment]query: ${query}`);
                 const response = await client.get(
                     `/v2/farcaster/cast/search?q=${query}&priority_mode=false&limit=100&sort_type=algorithmic`
                 );
-                elizaLogger.log("Farcaster casts response: ", response.data);
+                elizaLogger.log(traceId, "Farcaster casts response: ", response.data);
 
                 const castResponse = response.data as CastResponse;
                 let castData: CastData[] = [];
@@ -117,6 +119,7 @@ export async function getFarcasterCasts(query: string, runtime: IAgentRuntime) {
                     throw error;
                 }
                 elizaLogger.warn(
+                    traceId,
                     `Neynar API call failed, attempt ${attempts}/${maxAttempts}. Retrying...`
                 );
                 await new Promise((resolve) =>
@@ -126,6 +129,7 @@ export async function getFarcasterCasts(query: string, runtime: IAgentRuntime) {
         }
     } catch (error) {
         elizaLogger.error(
+            traceId,
             "Failed to fetch Farcaster casts after multiple attempts: ",
             error
         );

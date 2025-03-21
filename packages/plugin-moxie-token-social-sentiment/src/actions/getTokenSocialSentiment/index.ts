@@ -60,8 +60,9 @@ export default {
         elizaLogger.log("[TokenSocialSentiment] Starting SocialSentiment fetch");
 
         try {
+            const traceId = message.id;;
             await twitterScraperService.initialize();
-            elizaLogger.log(`[Farcaster] message context text: ${message.content.text}`);
+            elizaLogger.log(`[TokenSocialSentiment] message context text: ${message.content.text}`);
 
             // Initialize or update state
             state = (await runtime.composeState(message, {
@@ -80,31 +81,31 @@ export default {
             });
 
             const { socialPlatform, tokenSymbol } = socialPlatformDetectionResponse;
-            elizaLogger.log(`[SocialPlatform] social platform: ${socialPlatform} token symbol: ${tokenSymbol}`);
+            elizaLogger.log(traceId, `[SocialPlatform] social platform: ${socialPlatform} token symbol: ${tokenSymbol}`);
 
             const moxieUserId = (state.moxieUserInfo as MoxieUser)?.id;
             const tokenAddress = message.content.text.match(/0x[a-fA-F0-9]{40}/g) || [];
             let tokenTicker: string | RegExpMatchArray | [] = message.content.text.match(/(?<=\$\[)[^|]+(?=\|)/) || [];
 
             // $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] extract MOXIE and token address
-            elizaLogger.log(`[Farcaster] token symbol: ${tokenSymbol}`);
-            elizaLogger.log(`[Farcaster] token ticker: ${tokenTicker}`);
-            elizaLogger.log(`[Farcaster] token address: ${tokenAddress}`);
+            elizaLogger.log(`[TokenSocialSentiment]token symbol: ${tokenSymbol}`);
+            elizaLogger.log(`[TokenSocialSentiment]token ticker: ${tokenTicker}`);
+            elizaLogger.log(`[TokenSocialSentiment]token address: ${tokenAddress}`);
 
             if (tokenSymbol && (!tokenTicker || (Array.isArray(tokenTicker) && tokenTicker.length === 0))) {
                 tokenTicker = tokenSymbol;
             }
             if (!tokenTicker || (Array.isArray(tokenTicker) && tokenTicker.length === 0)) {
-                elizaLogger.log("[Farcaster] didn't find token symbol");
+                elizaLogger.log("[TokenSocialSentiment]didn't find token symbol");
                 if (tokenAddress.length > 0) {
                     // Get the token details
-                    elizaLogger.log("[Farcaster] Fetching token details");
+                    elizaLogger.log(traceId, "[TokenSocialSentiment]Fetching token details");
                     const tokenDetails = await getTokenDetails([tokenAddress[0]]);
 
                     if (!tokenDetails) {
                         callback({
                             text: "Please provide a valid token address or ticker symbol",
-                            action: "FARCASTER_ERROR",
+                            action: "TOKEN_SOCIAL_SENTIMENT",
                         });
                         return false;
                     }
@@ -118,12 +119,12 @@ export default {
             let tweets: any[] = [];
             // Get the farcaster casts and twitter posts
             if (socialPlatform.includes("farcaster")) {
-                farcasterCasts = await getFarcasterCasts(formattedSymbol, runtime);
-                elizaLogger.log(`[Farcaster] farcaster casts: ${JSON.stringify(farcasterCasts)}`);
+                farcasterCasts = await getFarcasterCasts(formattedSymbol, runtime, traceId);
+                elizaLogger.log(traceId, `[TokenSocialSentiment]farcaster casts: ${JSON.stringify(farcasterCasts)}`);
             }
             if (socialPlatform.includes("twitter")) {
-                tweets = await twitterScraperService.getTweetsBySearchQuery(formattedSymbol, 100);
-                elizaLogger.log(`[Twitter] tweets: ${JSON.stringify(tweets)}`);
+                tweets = await twitterScraperService.getTweetsBySearchQuery(formattedSymbol, 100, traceId);
+                elizaLogger.log(traceId, `[Twitter] tweets: ${JSON.stringify(tweets)}`);
             }
 
             // Generate stream text with the prompt
@@ -178,6 +179,6 @@ export default {
             return false;
         }
     },
-    examples: tokenSocialSentimentExamples,
+    examples: [],
     template: tokenSocialSentimentTemplateV2,
 } as Action;

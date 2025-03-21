@@ -55,7 +55,8 @@ class TwitterService {
 
     async getTweetsBySearchQuery(
         query: string,
-        maxTweets: number = 20
+        maxTweets: number = 20,
+        traceId: string
     ): Promise<Tweet[]> {
         const startTime = Date.now();
         const tweets = [];
@@ -64,13 +65,15 @@ class TwitterService {
             query = "$" + query;
             for await (const tweet of this.scraper.searchTweets(query, maxTweets)) {
                 tweet.html = "";
-                console.log(
+                elizaLogger.log(
+                    traceId,
                     `Timestamp ${tweet.id} ${tweet.timeParsed} ${tweet.text}`
                 );
                 tweets.push(tweet);
             }
         } catch (error) {
             elizaLogger.error(
+                traceId,
                 `Failed to get tweets for query ${query}: ${error.message}`
             );
             return [];
@@ -78,6 +81,7 @@ class TwitterService {
 
         const endTime = Date.now();
         elizaLogger.debug(
+            traceId,
             `Time taken to fetch ${tweets.length} tweets for ${query}: ${endTime - startTime}ms`
         );
 
