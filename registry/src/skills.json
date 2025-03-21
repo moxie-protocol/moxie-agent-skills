@@ -388,7 +388,7 @@
       "author": null,
       "description": "Analyze token sentiments on X and Farcaster!",
       "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-token-social-sentiment",
-      "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-token-social-sentiment/images/logo.svg",
+      "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/e9ac0912aba19398350aeaa63006211f0ccca403/packages/plugin-moxie-token-social-sentiment/images/logo.svg",
       "settings": {},
       "capabilities": ["Analyze token sentiments on X and Farcaster"],
       "starterQuestions": [
