@@ -40,6 +40,7 @@ export type {
     TransactionDetails,
     TokenDetails,
     LiquidityPool,
+    CampaignTokenDetails,
 } from "./services/types";
 
 export {
@@ -62,6 +63,8 @@ export {
     getPortfolioData,
     getPortfolioV2Data,
     type PortfolioV2Data,
+    getPortfolioV2DataByTokenAddress,
+    type TokenNode,
 } from "./services/zapperService";
 
 export {
