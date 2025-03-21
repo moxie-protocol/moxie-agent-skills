@@ -47,7 +47,7 @@ export default {
         return true;
     },
     description:
-        "Analyzes ERC20 token on Base sentiment on Social Platforms (X and Farcaster). Use this when the user is asking about what people are talking about the token. Input can be token symbol (e.g.$[MOXIE|address]), contract address or token name. but only for X and Farcaster",
+        "Analyzes ERC20 token on Base sentiment and news on Social Platforms (X and Farcaster). Use this when the user is asking about what people are talking about the token. Input can be token symbol (e.g.$[MOXIE|address]), contract address or token name.",
     handler: async (
         runtime: IAgentRuntime,
         message: Memory,
@@ -89,25 +89,20 @@ export default {
             elizaLogger.debug(traceId, `[TokenSocialSentiment]token ticker: ${tokenTicker}`);
             elizaLogger.debug(traceId, `[TokenSocialSentiment]token address: ${tokenAddress}`);
 
-            if (tokenSymbol && (!tokenTicker || (Array.isArray(tokenTicker) && tokenTicker.length === 0))) {
-                tokenTicker = tokenSymbol;
-            }
-            if (!tokenTicker || (Array.isArray(tokenTicker) && tokenTicker.length === 0)) {
-                elizaLogger.debug(traceId, "[TokenSocialSentiment]didn't find token symbol");
-                if (tokenAddress.length > 0) {
-                    // Get the token details
-                    elizaLogger.debug(traceId, "[TokenSocialSentiment]Fetching token details");
-                    const tokenDetails = await getTokenDetails([tokenAddress[0]]);
+            if (tokenAddress.length > 0 && (!tokenTicker || (Array.isArray(tokenTicker) && tokenTicker.length === 0))) {
+                elizaLogger.debug(traceId, "[TokenSocialSentiment]Found address but no ticker, fetching token details");
+                const tokenDetails = await getTokenDetails([tokenAddress[0]]);
 
-                    if (!tokenDetails) {
-                        callback({
-                            text: "Please provide a valid token address or ticker symbol",
-                            action: "TOKEN_SOCIAL_SENTIMENT",
-                        });
-                        return false;
-                    }
-                    tokenTicker = tokenDetails[0].tokenSymbol;
+                if (!tokenDetails) {
+                    callback({
+                        text: "Please provide a valid token address or ticker symbol",
+                        action: "TOKEN_SOCIAL_SENTIMENT",
+                    });
+                    return false;
                 }
+                tokenTicker = tokenDetails[0].tokenSymbol;
+            } else if (tokenSymbol && (!tokenTicker || (Array.isArray(tokenTicker) && tokenTicker.length === 0))) {
+                tokenTicker = tokenSymbol;
             }
 
             const formattedSymbol = (Array.isArray(tokenTicker) ? tokenTicker[0] : tokenTicker).toString().toLowerCase();
