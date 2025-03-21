@@ -1,6 +1,7 @@
 import { Fta } from "../services/fta";
 import { MoxieUser } from "../services/types";
 import { MoxieClientWallet } from "../wallet";
+import { Portfolio, PortfolioV2Data } from "./zapperService";
 
 /**
  * REUSABLE MOCK DATA STARTS BELOW
@@ -126,6 +127,52 @@ export const mockFta: Fta = {
     identityType: null,
     isFeatured: false,
     reserveRatio: 400000,
+};
+
+export const mockPortfolio: Portfolio = {
+    tokenBalances: [
+        {
+            address: "0x0000000000000000000000000000000000000000",
+            network: "BASE_MAINNET",
+            token: {
+                balance: 1000000000000000000,
+                balanceUSD: 1000000000000000000,
+                baseToken: {
+                    name: "ETH",
+                    address: "0x0000000000000000000000000000000000000000",
+                    symbol: "ETH",
+                },
+            },
+        },
+    ],
+};
+
+export const mockPortfolioV2: PortfolioV2Data = {
+    tokenBalances: {
+        totalBalanceUSD: 1000000000000000000,
+        byToken: {
+            edges: [
+                {
+                    cursor: "1",
+                    node: {
+                        id: "1",
+                        tokenAddress:
+                            "0x0000000000000000000000000000000000000000",
+                        name: "ETH",
+                        symbol: "ETH",
+                        price: 1000000000000000000,
+                        balance: 1000000000000000000,
+                        balanceUSD: 1000000000000000000,
+                        holdingPercentage: 100,
+                    },
+                },
+            ],
+        },
+    },
+    metadata: {
+        addresses: ["0x0000000000000000000000000000000000000000"],
+        networks: ["BASE_MAINNET"],
+    },
 };
 
 export const MOXIE_USER_PORTFOLIOS_QUERY = (filterConditions: string[]) => `

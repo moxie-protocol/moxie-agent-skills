@@ -1,6 +1,7 @@
 import type {
     MoxieUser,
     MoxieClientWallet,
+    Portfolio,
 } from "@moxie-protocol/moxie-agent-lib";
 
 export const CREATOR_AGENT_TOKEN_ADDRESS: string =
@@ -103,6 +104,24 @@ export const mockWallet: MoxieClientWallet = {
     connectorType: "embedded",
     hdWalletIndex: 0,
     delegated: false,
+};
+
+export const mockPortfolio: Portfolio = {
+    tokenBalances: [
+        {
+            address: "0x0000000000000000000000000000000000000000",
+            network: "BASE_MAINNET",
+            token: {
+                balance: 1000000000000000000,
+                balanceUSD: 1000000000000000000,
+                baseToken: {
+                    name: "ETH",
+                    address: "0x0000000000000000000000000000000000000000",
+                    symbol: "ETH",
+                },
+            },
+        },
+    ],
 };
 
 export const MOXIE_USER_PORTFOLIOS_QUERY = (filterConditions: string[]) => `
