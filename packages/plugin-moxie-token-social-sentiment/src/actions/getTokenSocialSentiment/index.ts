@@ -122,14 +122,14 @@ export default {
             const stateWithLatestMessage = tokenSocialSentimentTemplateV2.replace("{{tweets}}", JSON.stringify(tweets)).replace("{{farcasterCasts}}", JSON.stringify(farcasterCasts)).
             replace("{{currentDate}}", new Date().toISOString());
 
-            const previousQuestionContext = composeContext({
+            const currentContext = composeContext({
                 state,
                 template: stateWithLatestMessage,
             });
 
             const response = await streamText({
                 runtime,
-                context: previousQuestionContext,
+                context: currentContext,
                 modelClass: ModelClass.MEDIUM,
                 modelConfigOptions: {
                     modelProvider: ModelProviderName.OPENAI,
