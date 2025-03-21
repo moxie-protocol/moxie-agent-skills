@@ -29,7 +29,7 @@ import yargs from "yargs";
 // import moxieTokenDetailsPlugin from "@moxie-protocol/plugin-moxie-token-details";
 // import { moxieSwapPlugin } from "@moxie-protocol/plugin-moxie-swap";
 import samplePlugin from "@moxie-protocol/plugin-sample";
-import bootstrapPlugin from "@moxie-protocol/plugin-bootstrap";
+import bootstrapPlugin from "@elizaos/plugin-bootstrap";
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
 
