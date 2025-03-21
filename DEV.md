@@ -13,7 +13,7 @@
     git checkout -b <new-branch>
     ```
 7. `pnpm install --no-frozen-lockfile`
-8. `pnpm build`
+8. `cd moxie-agent-lib && pnpm build && cd .. && pnpm build`
 9. Setup .env file. By default, the Moxie Character uses OpenAI model thus need OpenAI API key
 10. Run agent `pnpm start`
 11. Run client `pnpm start:client`
