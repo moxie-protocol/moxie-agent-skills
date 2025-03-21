@@ -373,5 +373,37 @@
     "minimumSkillBalance": 0,
     "status": "ACTIVE",
     "isDefault": true
+  }, 
+  {
+    "pluginId": "79449cd9-0590-4ccc-9d9f-12f99438c17b",
+    "name": "@moxie-protocol/plugin-degenfans-alfafrens",
+    "displayName": "DegenFans AlfaFrens",
+    "version": "0.1.8+build.1",
+    "author": "DegenFans",
+    "description": "Enables your agent to recommend staking options for AlfaFrens channels",
+    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-degenfans-alfafrens",
+    "logoUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-degenfans-alfafrens/images/logo.png",
+    "settings": {},
+    "capabilities": ["show the best staking options for a given staking amount"],
+    "starterQuestions": [
+      {
+        "label": "I (degenfans) want to stake 42000 AF at my subscriptions",
+        "value": "I (degenfans) want to stake 42000 AF at my subscriptions"
+      },
+      {
+        "label": "I want to stake 9000 AF at my stakes and subscriptions",
+        "value": "I want to stake 9000 AF at my stakes and subscriptions"
+      }
+    ],
+    "mediaUrls": [
+      ""
+    ],
+    "actions": ["GET_ALFAFRENS_STAKING_RECOMENDATION"],
+    "isPremium": false,
+    "freeQueries": 0,
+    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
+    "minimumSkillBalance": 0,
+    "status": "ACTIVE",
+    "isDefault": true
   }
 ]
