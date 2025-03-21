@@ -408,12 +408,15 @@
             }
         ],
         "mediaUrls": [""],
-        "actions": ["GET_ALFAFRENS_STAKING_RECOMENDATION"],
+        "actions": [
+            "GET_ALFAFRENS_STAKING_RECOMENDATION",
+            "VIEW_ALFAFRENS_STAKING_RECOMENDATION"
+        ],
         "isPremium": false,
         "freeQueries": 0,
         "skillCoinAddress": "0x112cf1CC540eaDF234158c0e4044C3b5F2A33e5e",
         "minimumSkillBalance": 5,
         "status": "ACTIVE",
-        "isDefault": true
+        "isDefault": false
     }
 ]
