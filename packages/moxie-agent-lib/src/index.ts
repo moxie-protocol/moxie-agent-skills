@@ -40,6 +40,7 @@ export type {
     TransactionDetails,
     TokenDetails,
     LiquidityPool,
+    CampaignTokenDetails,
 } from "./services/types";
 
 export {
