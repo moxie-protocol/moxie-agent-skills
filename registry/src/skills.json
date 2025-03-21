@@ -408,6 +408,6 @@
     "skillCoinAddress": "0x0000000000000000000000000000000000000000",
     "minimumSkillBalance": 0,
     "status": "ACTIVE",
-    "isDefault": true
+    "isDefault": false
   }
 ]
