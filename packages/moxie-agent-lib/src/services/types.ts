@@ -373,3 +373,14 @@ export interface Wallet {
     imported?: boolean;
     delegated?: boolean;
 }
+
+export interface CampaignTokenDetails {
+    tokenAddress: string;
+    tokenSymbol: string;
+    type: string;
+    minimumBalance: number;
+    startDate: Date;
+    endDate: Date;
+    createdAt: Date;
+    updatedAt: Date;
+}
