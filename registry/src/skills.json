@@ -406,7 +406,7 @@
     "isPremium": false,
     "freeQueries": 0,
     "skillCoinAddress": "0x112cf1CC540eaDF234158c0e4044C3b5F2A33e5e",
-    "minimumSkillBalance": 500000000000000000,
+    "minimumSkillBalance": 5,
     "status": "ACTIVE",
     "isDefault": true
   }
