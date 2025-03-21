@@ -17,14 +17,23 @@ import type { Content } from "@moxie-protocol/core";
 import type { UserAgentInfo, UserAgentInteraction } from "./types/types.ts";
 import {
     COMMON_AGENT_ID,
+    MINIMUM_CREATOR_AGENT_COINS,
     mockMoxieUser,
     mockWallet,
+    mockPortfolio,
 } from "./constants/constants";
-import { validateInputAgentInteractions } from "./helpers";
+import {
+    validateInputAgentInteractions,
+    validateMoxieAIAgentBalance,
+} from "./helpers";
 import express from "express";
 import { ResponseHelper } from "./responseHelper.ts";
 import { traceIdMiddleware } from "./middleware/traceId.ts";
-import { ftaService } from "@moxie-protocol/moxie-agent-lib";
+import {
+    ftaService,
+    getPortfolioData,
+    Portfolio,
+} from "@moxie-protocol/moxie-agent-lib";
 import { walletService, MoxieUser } from "@moxie-protocol/moxie-agent-lib";
 import { MoxieWalletClient } from "@moxie-protocol/moxie-agent-lib/src/wallet";
 
@@ -111,6 +120,7 @@ export function createMoxieApiRouter(
         "/:agentId/message",
         upload.single("file"),
         async (req: express.Request, res: express.Response) => {
+            const traceId = req.traceId;
             try {
                 const startTime = new Date().getTime();
                 elizaLogger.debug("/v1 message api is started", {
@@ -176,9 +186,66 @@ export function createMoxieApiRouter(
                     return;
                 }
 
+                // Setting default mock values for states in local development
                 const moxieUserInfo: MoxieUser = mockMoxieUser;
                 const moxieUserId: string = moxieUserInfo.id;
                 const agentWallet: walletService.MoxieClientWallet = mockWallet;
+                let currentWalletBalance: Portfolio = mockPortfolio;
+
+                // If Zapper API key is set, fetch the current balance of the agent wallet
+                if (process.env.ZAPPER_API_KEY) {
+                    // fetch the current balance of the agent wallet
+                    currentWalletBalance = await getPortfolioData(
+                        [agentWallet.address],
+                        ["BASE_MAINNET"],
+                        moxieUserId,
+                        runtime
+                    );
+                    elizaLogger.info(traceId, `currentWalletBalance`, {
+                        currentWalletBalance,
+                    });
+
+                    // validate if user has min. creator agent coins
+                    let creatorAgentBalance, hasSufficientBalance;
+                    try {
+                        ({ creatorAgentBalance, hasSufficientBalance } =
+                            await validateMoxieAIAgentBalance({
+                                moxieUserId,
+                                runtime,
+                            }));
+                    } catch (error) {
+                        elizaLogger.error(
+                            "Error validating Moxie AI Agent balance:",
+                            error
+                        );
+                        res.status(500).json(
+                            ResponseHelper.error<null>(
+                                "VALIDATION_ERROR",
+                                "An error occurred while validating the Moxie AI Agent balance. Please try again later.",
+                                req.path,
+                                req.traceId
+                            )
+                        );
+                        return;
+                    }
+                    if (!hasSufficientBalance) {
+                        res.status(403).json(
+                            ResponseHelper.error<null>(
+                                "USER_NOT_ELIGIBILE",
+                                `user need to hold ${MINIMUM_CREATOR_AGENT_COINS} creator agent tokens to interact with agent. current balance is ${creatorAgentBalance}`,
+                                req.path,
+                                req.traceId,
+                                {
+                                    minimumCreatorAgentCoins:
+                                        MINIMUM_CREATOR_AGENT_COINS,
+                                    currentCreatorAgentCoinsBalance:
+                                        creatorAgentBalance,
+                                }
+                            )
+                        );
+                        return;
+                    }
+                }
 
                 const userId = stringToUuid(moxieUserId);
 
@@ -227,8 +294,10 @@ export function createMoxieApiRouter(
                 let state = await runtime.composeState(userMessage, {
                     agentName: runtime.character.name,
                     moxieUserInfo: moxieUserInfo,
-                    agentWallet: moxieWalletClient,
+                    agentWallet: agentWallet,
                     moxieWalletClient: moxieWalletClient,
+                    agentWalletBalance: currentWalletBalance,
+                    authorizationHeader: req.header("Authorization"),
                 });
 
                 const context = composeContext({
