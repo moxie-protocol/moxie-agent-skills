@@ -17,6 +17,8 @@ import {
     GetUserInfoBatchResponse,
     ErrorDetails,
     GetUserInfoBatchOutput,
+    GetUserInfoMinimalResponse,
+    MoxieUserMinimal,
 } from "./types";
 
 export async function getUserMoxieWalletAddress(
@@ -58,6 +60,51 @@ export async function getUserByMoxieIdMultiple(
         return userIdToTUser;
     } catch (error) {
         elizaLogger.error("Error in getUserByMoxieIdMultiple:", error);
+        return new Map();
+    }
+}
+
+export async function getUserByMoxieIdMultipleMinimal(
+    userIds: string[]
+): Promise<Map<string, MoxieUserMinimal>> {
+    try {
+        const query = `
+            query GetUserInfoMinimal($userIds:[String!]!) {
+                GetUserInfoMinimal(input: {userIds: $userIds}) {
+                    users {
+                    id
+                    userName
+                    name
+                    bio
+                    profileImageUrl
+                    }
+                }
+         }
+        `;
+        const response = await fetch(process.env.MOXIE_API_URL_INTERNAL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                query,
+                variables: { userIds },
+            }),
+        });
+
+        let res = await response.json();
+        console.log("res", res);
+        const { data } = res as GetUserInfoMinimalResponse;
+
+        const userIdToUser = new Map<string, MoxieUserMinimal>();
+        data.GetUserInfoMinimal.users.forEach((user) => {
+            userIdToUser.set(user.id, user);
+        });
+        
+        return userIdToUser;
+    
+    } catch (error) {
+        elizaLogger.error("Error in getUserByMoxieIdMultipleMinimal:", error);
         return new Map();
     }
 }

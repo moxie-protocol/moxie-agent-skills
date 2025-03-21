@@ -68,6 +68,14 @@ export interface MoxieUser {
     vestingContracts: VestingContracts[];
 }
 
+export interface MoxieUserMinimal {
+    id: string;
+    userName?: string;
+    name?: string;
+    bio?: string;
+    profileImageUrl?: string;
+}
+
 export interface MeQueryResponse {
     data: {
         Me: MoxieUser;
@@ -90,6 +98,16 @@ export interface GetUserResponse {
 export interface GetUserInfoBatchResponse {
     data: {
         GetUserInfoBatch: GetUserInfoBatchOutput;
+    };
+}
+
+export interface GetUserInfoMinimalOutput {
+    users: MoxieUserMinimal[];
+}
+
+export interface GetUserInfoMinimalResponse {
+    data: {
+        GetUserInfoMinimal: GetUserInfoMinimalOutput;
     };
 }
 
