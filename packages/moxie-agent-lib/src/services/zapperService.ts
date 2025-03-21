@@ -77,7 +77,7 @@ interface AppBalance {
     products: Product[];
 }
 
-interface TokenNode {
+export interface TokenNode {
     id: string;
     tokenAddress: string;
     name: string;
@@ -86,6 +86,7 @@ interface TokenNode {
     balance: number;
     balanceUSD: number;
     holdingPercentage: number;
+    imgUrl: string;
 }
 export interface PortfolioV2Data {
     tokenBalances: {
@@ -303,5 +304,72 @@ export async function getPortfolioV2Data(
             elizaLogger.error("Error fetching portfolioV2 data:", error);
             throw error;
         }
+    }
+}
+
+
+export async function getPortfolioV2DataByTokenAddress( traceId: string, addresses: string[], networks: string[], tokenAddress: string, moxieUserId: string): Promise<PortfolioV2Data> {
+    elizaLogger.info(`[getPortfolioV2DataByTokenAddress] [${traceId}] [${moxieUserId}] Getting portfolioV2 data by token address: ${tokenAddress}`);
+    try {
+        const query = `
+            query PortfolioV2 ($addresses: [Address!]!, $networks: [Network!]!, $tokenAddress: String!) {
+                portfolioV2 (addresses: $addresses, networks: $networks) {
+                    metadata {
+                        addresses
+                        networks
+                    }
+                    tokenBalances {
+                        byToken(filters: { tokenAddress: $tokenAddress }) {
+                            edges {
+                                cursor
+                                node {
+                                    tokenAddress
+                                    name
+                                    symbol
+                                    balance
+                                    balanceUSD
+                                    imgUrl
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        `;
+
+        let attempts = 0;
+        const maxAttempts = 3;
+        const backoffMs = 1000;
+
+        while (attempts < maxAttempts) {
+            try {
+                const response = await client.post('', {
+                    query: query,
+                    variables: {
+                        addresses,
+                        networks,
+                        tokenAddress
+                    }
+                });
+
+                if (response.status !== 200) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const portfolioData = response.data.data.portfolioV2;
+                return portfolioData;
+
+            } catch (error) {
+                attempts++;
+                if (attempts === maxAttempts) {
+                    throw error;
+                }
+                elizaLogger.warn(` [getPortfolioV2DataByTokenAddress] [${traceId}] [${moxieUserId}] Zapper getPortfolioV2DataByTokenAddress failed, attempt ${attempts}/${maxAttempts}. Retrying...`);
+                await new Promise(resolve => setTimeout(resolve, backoffMs * attempts));
+            }
+        }
+    } catch (error) {
+        elizaLogger.error(` [getPortfolioV2DataByTokenAddress] [${traceId}] [${moxieUserId}] Error fetching Zapper getPortfolioV2DataByTokenAddress data:`, error);
+        throw error;
     }
 }

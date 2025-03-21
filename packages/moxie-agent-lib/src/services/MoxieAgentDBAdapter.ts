@@ -4,7 +4,7 @@ import { IAgentRuntime } from "@moxie-protocol/core";
 import { v4 as uuidv4 } from "uuid";
 import { ethers } from "ethers";
 import { MOXIE_USER_PORTFOLIOS_QUERY } from "./constants";
-import { MoxiePortfolioInfo, MoxiePortfolioResponse, Skill } from "./types";
+import { CampaignTokenDetails, MoxiePortfolioInfo, MoxiePortfolioResponse, Skill } from "./types";
 
 export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
     private pgAdapter: PostgresDatabaseAdapter;
@@ -257,6 +257,29 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
                 return result.rowCount || 0 ;
             }).catch((error) => {
                 console.error("Error while updating limit order:", error);
+                throw error;
+            });
+    }
+
+    async getCampaignTokenDetails(): Promise<CampaignTokenDetails[]> {
+        return this.pgAdapter
+            .query(
+                `SELECT
+                    token_address as "tokenAddress",
+                    token_symbol as "tokenSymbol",
+                    type,
+                    minimum_balance as "minimumBalance",
+                    start_date as "startDate",
+                    end_date as "endDate",
+                    created_at as "createdAt",
+                    updated_at as "updatedAt"
+                FROM campaign_tokens
+                WHERE now() BETWEEN start_date AND end_date;`
+            )
+            .then((result) => {
+                return result.rows;
+            }).catch((error) => {
+                console.error("Error while getting campaign token details:", error);
                 throw error;
             });
     }

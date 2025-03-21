@@ -62,6 +62,8 @@ export {
     getPortfolioData,
     getPortfolioV2Data,
     type PortfolioV2Data,
+    getPortfolioV2DataByTokenAddress,
+    type TokenNode,
 } from "./services/zapperService";
 
 export {
