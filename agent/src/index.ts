@@ -25,9 +25,6 @@ import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import yargs from "yargs";
-// import moxieBigFanPlugin from "@moxie-protocol/plugin-moxie-big-fan";
-// import moxieTokenDetailsPlugin from "@moxie-protocol/plugin-moxie-token-details";
-// import { moxieSwapPlugin } from "@moxie-protocol/plugin-moxie-swap";
 import samplePlugin from "@moxie-protocol/plugin-sample";
 import bootstrapPlugin from "@elizaos/plugin-bootstrap";
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
