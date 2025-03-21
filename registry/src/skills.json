@@ -5,7 +5,7 @@
         "displayName": "Base Token Details",
         "version": "0.1.8+build.1",
         "author": null,
-        "description": "A Skills for Creator Agents that enables fetching of base token details.",
+        "description": "Enables your agent to fetch token details for any token on Base",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details",
         "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
         "settings": {},
