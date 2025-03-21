@@ -1,0 +1,19 @@
+import { z } from "zod";
+
+
+export interface Staking {
+    amount: number,
+    userAddress?: string,
+    mysubs: boolean,
+    mystake: boolean,
+    minsubs?:number,
+  }
+  
+
+export const StakingSchema = z.object({
+    amount: z.number().min(1),
+    userAddress: z.string().optional(),
+    mysubs: z.boolean(),
+    mystake: z.boolean(),
+    minsubs: z.number().optional(),
+});
