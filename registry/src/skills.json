@@ -387,12 +387,16 @@
     "capabilities": ["show the best staking options for a given staking amount"],
     "starterQuestions": [
       {
-        "label": "I (degenfans) want to stake 42000 AF at my subscriptions",
-        "value": "I (degenfans) want to stake 42000 AF at my subscriptions"
+        "label": "What are some staking recommendations you have for Alfafrens?",
+        "value": "What are some staking recommendations you have for Alfafrens?"
       },
       {
-        "label": "I want to stake 9000 AF at my stakes and subscriptions",
-        "value": "I want to stake 9000 AF at my stakes and subscriptions"
+        "label": "I have 9000 AF — how should I stake it?",
+        "value": "I have 9000 AF — how should I stake it?"
+      },
+      {
+        "label": "What are your top picks for staking on Alfafrens?"
+        "value": "What are your top picks for staking on Alfafrens?"
       }
     ],
     "mediaUrls": [
