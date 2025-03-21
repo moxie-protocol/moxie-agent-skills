@@ -64,11 +64,11 @@ const client = axios.create({
 
 export async function getFarcasterCasts(query: string, runtime: IAgentRuntime, traceId: string) {
     try {
-        elizaLogger.log(
+        elizaLogger.debug(
             traceId,
             `[TokenSocialSentiment]Getting Farcaster casts for query: ${query}`
         );
-        elizaLogger.log(
+        elizaLogger.debug(
             traceId,
             `[TokenSocialSentiment]api key and url: ${API_KEY} and ${process.env.NEYNAR_API_URL}`
         );
@@ -83,11 +83,11 @@ export async function getFarcasterCasts(query: string, runtime: IAgentRuntime, t
                 const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
                 const formattedDate = oneDayAgo.toISOString().split("T")[0];
                 query = `$${query} after:${formattedDate} `;
-                elizaLogger.log(traceId, `[TokenSocialSentiment]query: ${query}`);
+                elizaLogger.debug(traceId, `[TokenSocialSentiment]query: ${query}`);
                 const response = await client.get(
                     `/v2/farcaster/cast/search?q=${query}&priority_mode=false&limit=100&sort_type=algorithmic`
                 );
-                elizaLogger.log(traceId, "Farcaster casts response: ", response.data);
+                elizaLogger.debug(traceId, "Farcaster casts response: ", response.data);
 
                 const castResponse = response.data as CastResponse;
                 let castData: CastData[] = [];

@@ -12,12 +12,10 @@ import {
     generateObjectDeprecated,
     ModelProviderName,
 } from "@moxie-protocol/core";
-import { tokenSocialSentimentExamples } from "./examples";
 import {
     MoxieUser,
     getTokenDetails,
 } from "@moxie-protocol/moxie-agent-lib";
-import { formatMessages } from "../../util";
 import { twitterScraperService } from "../../services/twitterService";
 import { getFarcasterCasts } from "../../services/neynarService";
 import { socialPlatformDetectionTemplate, tokenSocialSentimentTemplateV2 } from "./template";
@@ -57,21 +55,21 @@ export default {
         _options: { [key: string]: unknown },
         callback?: HandlerCallback
     ): Promise<boolean> => {
-        elizaLogger.log("[TokenSocialSentiment] Starting SocialSentiment fetch");
+        const traceId = message.id;
+        elizaLogger.debug(traceId, "[TokenSocialSentiment] Starting SocialSentiment fetch");
 
         try {
-            const traceId = message.id;;
             await twitterScraperService.initialize();
-            elizaLogger.log(`[TokenSocialSentiment] message context text: ${message.content.text}`);
+            elizaLogger.debug(traceId, `[TokenSocialSentiment] message context text: ${message.content.text}`);
 
-            // Initialize or update state
-            state = (await runtime.composeState(message, {
-                latestMessage: message.content.text,
-            })) as State;
+            const latestMessage = message.content.text;
+
+            const socialPlatformDetectionTemplateWithLatestMessage = socialPlatformDetectionTemplate.replace("{{latestMessage}}", latestMessage);
+
 
             const socialPlatformDetectionContext = composeContext({
                 state,
-                template: socialPlatformDetectionTemplate,
+                template: socialPlatformDetectionTemplateWithLatestMessage,
             });
 
             const socialPlatformDetectionResponse = await generateObjectDeprecated({
@@ -81,25 +79,24 @@ export default {
             });
 
             const { socialPlatform, tokenSymbol } = socialPlatformDetectionResponse;
-            elizaLogger.log(traceId, `[SocialPlatform] social platform: ${socialPlatform} token symbol: ${tokenSymbol}`);
+            elizaLogger.debug(traceId, `[SocialPlatform] social platform: ${socialPlatform} token symbol: ${tokenSymbol}`);
 
             const moxieUserId = (state.moxieUserInfo as MoxieUser)?.id;
             const tokenAddress = message.content.text.match(/0x[a-fA-F0-9]{40}/g) || [];
             let tokenTicker: string | RegExpMatchArray | [] = message.content.text.match(/(?<=\$\[)[^|]+(?=\|)/) || [];
 
-            // $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] extract MOXIE and token address
-            elizaLogger.log(`[TokenSocialSentiment]token symbol: ${tokenSymbol}`);
-            elizaLogger.log(`[TokenSocialSentiment]token ticker: ${tokenTicker}`);
-            elizaLogger.log(`[TokenSocialSentiment]token address: ${tokenAddress}`);
+            elizaLogger.debug(traceId, `[TokenSocialSentiment]token symbol: ${tokenSymbol}`);
+            elizaLogger.debug(traceId, `[TokenSocialSentiment]token ticker: ${tokenTicker}`);
+            elizaLogger.debug(traceId, `[TokenSocialSentiment]token address: ${tokenAddress}`);
 
             if (tokenSymbol && (!tokenTicker || (Array.isArray(tokenTicker) && tokenTicker.length === 0))) {
                 tokenTicker = tokenSymbol;
             }
             if (!tokenTicker || (Array.isArray(tokenTicker) && tokenTicker.length === 0)) {
-                elizaLogger.log("[TokenSocialSentiment]didn't find token symbol");
+                elizaLogger.debug(traceId, "[TokenSocialSentiment]didn't find token symbol");
                 if (tokenAddress.length > 0) {
                     // Get the token details
-                    elizaLogger.log(traceId, "[TokenSocialSentiment]Fetching token details");
+                    elizaLogger.debug(traceId, "[TokenSocialSentiment]Fetching token details");
                     const tokenDetails = await getTokenDetails([tokenAddress[0]]);
 
                     if (!tokenDetails) {
@@ -120,33 +117,19 @@ export default {
             // Get the farcaster casts and twitter posts
             if (socialPlatform.includes("farcaster")) {
                 farcasterCasts = await getFarcasterCasts(formattedSymbol, runtime, traceId);
-                elizaLogger.log(traceId, `[TokenSocialSentiment]farcaster casts: ${JSON.stringify(farcasterCasts)}`);
+                elizaLogger.debug(traceId, `[TokenSocialSentiment]farcaster casts: ${JSON.stringify(farcasterCasts)}`);
             }
             if (socialPlatform.includes("twitter")) {
                 tweets = await twitterScraperService.getTweetsBySearchQuery(formattedSymbol, 100, traceId);
-                elizaLogger.log(traceId, `[Twitter] tweets: ${JSON.stringify(tweets)}`);
+                elizaLogger.debug(traceId, `[Twitter] tweets: ${JSON.stringify(tweets)}`);
             }
 
-            // Generate stream text with the prompt
-            const previousQuestion = formatMessages({
-                agentId: runtime.agentId,
-                actors: state.actorsData ?? [],
-                messages: state?.recentMessagesData,
-            });
-
-            // Initialize or update state
-            state = (await runtime.composeState(message, {
-                previousQuestion: previousQuestion,
-                latestMessage: message.content.text,
-                userMoxieId: moxieUserId,
-                farcasterCasts: JSON.stringify(farcasterCasts),
-                tweets: JSON.stringify(tweets),
-                currentDate: new Date().toISOString(),
-            })) as State;
+            const stateWithLatestMessage = tokenSocialSentimentTemplateV2.replace("{{tweets}}", JSON.stringify(tweets)).replace("{{farcasterCasts}}", JSON.stringify(farcasterCasts)).
+            replace("{{currentDate}}", new Date().toISOString());
 
             const previousQuestionContext = composeContext({
                 state,
-                template: tokenSocialSentimentTemplateV2,
+                template: stateWithLatestMessage,
             });
 
             const response = await streamText({
@@ -167,7 +150,7 @@ export default {
 
             return true;
         } catch (error) {
-            elizaLogger.error("[TokenSocialSentiment] Error fetching token social sentiment:", error, error?.stack);
+            elizaLogger.error(traceId, "[TokenSocialSentiment] Error fetching token social sentiment:", error, error?.stack);
 
             if (callback) {
                 await callback({

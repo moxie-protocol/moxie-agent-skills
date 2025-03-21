@@ -65,7 +65,7 @@ class TwitterService {
             query = "$" + query;
             for await (const tweet of this.scraper.searchTweets(query, maxTweets)) {
                 tweet.html = "";
-                elizaLogger.log(
+                elizaLogger.debug(
                     traceId,
                     `Timestamp ${tweet.id} ${tweet.timeParsed} ${tweet.text}`
                 );
