@@ -173,7 +173,7 @@ export default {
                 await callback({
                     text: "There is some problem while fetching the token social sentiment. Please try again later.",
                     content: { error: error.message },
-                    action: "TOKEN_SOCIAL_SENTIMENT_ERROR",
+                    action: "TOKEN_SOCIAL_SENTIMENT",
                 });
             }
             return false;
