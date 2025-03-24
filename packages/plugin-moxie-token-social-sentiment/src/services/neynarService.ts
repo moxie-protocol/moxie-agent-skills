@@ -62,15 +62,7 @@ const client = axios.create({
     },
 });
 
-<<<<<<< HEAD
-export async function getFarcasterCasts(
-    query: string,
-    runtime: IAgentRuntime,
-    traceId: string
-) {
-=======
 export async function getFarcasterCasts(query: string, runtime: IAgentRuntime, traceId: string) {
->>>>>>> 06d01ab221d01b5759d8390f19db9ce9da151a59
     try {
         elizaLogger.debug(
             traceId,
