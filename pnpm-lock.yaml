@@ -138,15 +138,9 @@ importers:
       '@moxie-protocol/core':
         specifier: workspace:*
         version: link:../packages/core
-      '@moxie-protocol/plugin-moxie-token-details':
-        specifier: workspace:*
-        version: link:../packages/plugin-moxie-token-details
       '@moxie-protocol/plugin-sample':
         specifier: workspace:*
         version: link:../packages/_examples/plugin
-      '@moxie-protocol/plugin-token-social-sentiment':
-        specifier: workspace:*
-        version: link:../packages/plugin-moxie-token-social-sentiment
       readline:
         specifier: 1.3.0
         version: 1.3.0
