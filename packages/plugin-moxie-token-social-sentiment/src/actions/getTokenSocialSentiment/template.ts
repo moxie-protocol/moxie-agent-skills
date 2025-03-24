@@ -11,7 +11,11 @@ Analyze sentiment on a specified cryptocurrency token from provided datasets:
 - Is there any notable news?
 - Focus more on specific details vs vague generalities.
 - Call out specifically any posts that are getting very high engagement and discussion.
+<<<<<<< HEAD
 - Provide links to the key posts in your summary and call out specific users who are leading the discourse about the token, linking to those users’ relevant posts.
+=======
+- Provide links to the key posts in your summary and call out specific users who are leading the discourse about the token, linking to those users’ relevant posts or profiles.
+>>>>>>> 06d01ab (feat: get social sentiment analysis for any erc 20 token on base (#20))
 ---
 Try to answer the user’s question based on the context provided:
 User Message:
