@@ -63,13 +63,12 @@ class TwitterService {
 
         try {
             query = "$" + query;
-            for await (const tweet of this.scraper.searchTweets(query, maxTweets)) {
+            for await (const tweet of this.scraper.searchTweets(
+                query,
+                maxTweets
+            )) {
                 tweet.html = "";
-<<<<<<< HEAD
-                elizaLogger.log(
-=======
                 elizaLogger.debug(
->>>>>>> 06d01ab (feat: get social sentiment analysis for any erc 20 token on base (#20))
                     traceId,
                     `Timestamp ${tweet.id} ${tweet.timeParsed} ${tweet.text}`
                 );
