@@ -62,11 +62,15 @@ const client = axios.create({
     },
 });
 
+<<<<<<< HEAD
 export async function getFarcasterCasts(
     query: string,
     runtime: IAgentRuntime,
     traceId: string
 ) {
+=======
+export async function getFarcasterCasts(query: string, runtime: IAgentRuntime, traceId: string) {
+>>>>>>> 06d01ab221d01b5759d8390f19db9ce9da151a59
     try {
         elizaLogger.debug(
             traceId,
@@ -87,28 +91,25 @@ export async function getFarcasterCasts(
                 const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
                 const formattedDate = oneDayAgo.toISOString().split("T")[0];
                 query = `$${query} after:${formattedDate} `;
-                elizaLogger.debug(
-                    traceId,
-                    `[TokenSocialSentiment]query: ${query}`
-                );
+                elizaLogger.debug(traceId, `[TokenSocialSentiment]query: ${query}`);
                 const response = await client.get(
                     `/v2/farcaster/cast/search?q=${query}&priority_mode=false&limit=100&sort_type=algorithmic`
                 );
-                elizaLogger.debug(
-                    traceId,
-                    "Farcaster casts response: ",
-                    response.data
-                );
+                elizaLogger.debug(traceId, "Farcaster casts response: ", response.data);
 
                 const castResponse = response.data as CastResponse;
                 let castData: CastData[] = [];
                 castResponse.result.casts.forEach((cast) => {
                     //choose first 10 chars of hash
+<<<<<<< HEAD
                     let castUrl =
                         "https://warpcast.com/" +
                         cast.author.username +
                         "/" +
                         cast.hash.substring(0, 10);
+=======
+                    let castUrl = "https://warpcast.com/" + cast.author.username + "/" + cast.hash.substring(0, 10);
+>>>>>>> 06d01ab221d01b5759d8390f19db9ce9da151a59
                     castData.push({
                         text: cast.text,
                         username: cast.author.username,
