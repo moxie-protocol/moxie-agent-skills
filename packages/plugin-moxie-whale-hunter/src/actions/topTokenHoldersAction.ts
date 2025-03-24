@@ -172,7 +172,7 @@ export const topTokenHoldersAction: Action = {
         elizaLogger.debug(`[topTokenHoldersAction] [${moxieUserId}] Price USD: ${priceUSD}`);
 
         const moxieUserIds = topTokenHolders.map(holder => holder.moxie_user_id);
-        const moxieUserProfiles = await moxieUserService.getUserByMoxieIdMultiple(moxieUserIds);
+        const moxieUserProfiles = await moxieUserService.getUserByMoxieIdMultipleMinimal(moxieUserIds);
 
         const enrichedTokenHolders = topTokenHolders.map(holder => {
             const userProfile = moxieUserProfiles.get(holder.moxie_user_id);
