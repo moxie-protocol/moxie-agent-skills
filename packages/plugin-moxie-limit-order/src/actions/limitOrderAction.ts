@@ -1082,7 +1082,8 @@ const calculateSellQuantityAmounts = async (
         try {
             // Calculate token amounts based on USD values
             const sellAmount = new Decimal(sellQuantity).div(sellTokenPriceInUSD).toFixed(sellTokenDecimals);
-            const buyAmount = new Decimal(sellAmount).mul(targetTokenPriceInUSD).div(buyTokenPriceInUSD).toFixed(buyTokenDecimals);
+            //const buyAmount = new Decimal(sellAmount).mul(targetTokenPriceInUSD).div(buyTokenPriceInUSD).toFixed(buyTokenDecimals);
+            const buyAmount = new Decimal(sellAmount).mul(sellTokenPriceInUSD).div(targetTokenPriceInUSD).toFixed(buyTokenDecimals);
 
             // Convert to WEI
             const buyTokenAmountInWEI = BigInt(ethers.utils.parseUnits(buyAmount, buyTokenDecimals).toString());
@@ -1101,7 +1102,9 @@ const calculateSellQuantityAmounts = async (
         // this is for direct case where user is selling in terms of sell quantity
         try {
             const sellAmount = new Decimal(sellQuantity)
-            const buyAmount = new Decimal(sellAmount).mul(targetTokenPriceInUSD).div(buyTokenPriceInUSD).toFixed(buyTokenDecimals);
+            // const buyAmount = new Decimal(sellAmount).mul(targetTokenPriceInUSD).div(buyTokenPriceInUSD).toFixed(buyTokenDecimals);
+            const buyAmount = new Decimal(sellAmount).mul(sellTokenPriceInUSD).div(targetTokenPriceInUSD).toFixed(buyTokenDecimals);
+
 
             // Convert to WEI
             const buyTokenAmountInWEI = BigInt(ethers.utils.parseUnits(buyAmount.toString(), buyTokenDecimals).toString());
