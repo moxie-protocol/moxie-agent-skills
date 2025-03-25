@@ -72,7 +72,7 @@ export const stakingConsultantAction: Action = {
               let fid:number=null;
               const fcId = moxieUserInfo.identities.find(o=>o.type==='FARCASTER');
               if(fcId){
-                fid=(fcId.metadata as FarcasterMetadata).fid;
+                fid=(fcId.metadata as FarcasterMetadata).profileTokenId;
               }
                     
               const stakingData:Staking = {amount:amount,userAddress:userAddress,mysubs:mysubs,mystake:mystake,minsubs:minsubs};
