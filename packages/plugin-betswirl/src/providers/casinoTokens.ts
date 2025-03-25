@@ -6,7 +6,6 @@ import {
     Memory,
     State,
 } from "@moxie-protocol/core";
-import { MoxieWalletClient } from "@moxie-protocol/moxie-agent-lib/src/wallet";
 import {
     CasinoChainId,
     type Token,
@@ -33,7 +32,7 @@ export const casinoTokensProvider: Provider = {
     get: async (
         runtime: IAgentRuntime,
         _message: Memory,
-        state?: State
+        _state?: State
     ): Promise<string> => {
         try {
             // Try to get from cache first
@@ -41,11 +40,7 @@ export const casinoTokensProvider: Provider = {
 
             // Fetch if no cache
             if (!tokens) {
-                const wallet = state.agentWallet as MoxieWalletClient;
-                const chainId = Number(
-                    (await wallet.wallet.provider.getNetwork()).chainId
-                ) as CasinoChainId;
-                tokens = await getCasinoTokens(chainId, wallet);
+                tokens = await getCasinoTokens();
 
                 // Cache the result
                 await runtime.cacheManager.set(CACHE_KEY, tokens, {
@@ -64,15 +59,14 @@ export const casinoTokensProvider: Provider = {
     },
 };
 
-export async function getCasinoTokens(
-    chainId: CasinoChainId,
-    walletClient: MoxieWalletClient
-): Promise<Token[]> {
+export async function getCasinoTokens(): Promise<Token[]> {
+    const chainId = 8453 as CasinoChainId;
     const casinoTokensFunctionData = getCasinoTokensFunctionData(chainId);
+    const provider = new ethers.JsonRpcProvider("https://mainnet.base.org");
     const casinoTokensContract = new ethers.Contract(
         casinoTokensFunctionData.data.to,
         casinoTokensFunctionData.data.abi,
-        walletClient.wallet.provider
+        provider
     );
     const rawCasinoTokens: RawCasinoToken[] =
         await casinoTokensContract[

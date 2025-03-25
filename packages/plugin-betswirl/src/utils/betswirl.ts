@@ -18,10 +18,8 @@ import {
 } from "@betswirl/sdk-core";
 import { getCasinoTokens } from "../providers/casinoTokens";
 
-export async function getChainIdFromWallet(wallet: MoxieWalletClient) {
-    const chainId = Number(
-        (await wallet.wallet.provider.getNetwork()).chainId
-    ) as CasinoChainId;
+export async function getChainIdFromWallet() {
+    const chainId = 8453 as CasinoChainId;
     if (!casinoChainIds.includes(chainId)) {
         throw new Error(
             `The chain id must be one of ${casinoChainIds.join(", ")}`
@@ -32,7 +30,6 @@ export async function getChainIdFromWallet(wallet: MoxieWalletClient) {
 
 export async function getBetToken(
     chainId: CasinoChainId,
-    wallet: MoxieWalletClient,
     tokenSymbolInput: string
 ) {
     const casinoChain = casinoChainById[chainId];
@@ -41,7 +38,7 @@ export async function getBetToken(
         tokenSymbolInput &&
         tokenSymbolInput !== casinoChain.viemChain.nativeCurrency.symbol
     ) {
-        const casinoTokens = await getCasinoTokens(chainId, wallet);
+        const casinoTokens = await getCasinoTokens();
         // Validate the token
         selectedToken = casinoTokens.find(
             (casinoToken) => casinoToken.symbol === tokenSymbolInput
@@ -69,7 +66,6 @@ export function getBetAmountInWei(betAmount: string, token: Token) {
 
 async function getBetRequirements(
     chainId: CasinoChainId,
-    walletClient: MoxieWalletClient,
     game: CASINO_GAME_TYPE,
     betToken: Token,
     multiplier: number
@@ -80,10 +76,11 @@ async function getBetRequirements(
             multiplier,
             chainId
         );
+        const provider = new ethers.JsonRpcProvider("https://mainnet.base.org");
         const betRequirementsContract = new ethers.Contract(
             betRequirementsFunctionData.data.to,
             betRequirementsFunctionData.data.abi,
-            walletClient.wallet.provider
+            provider
         );
         const rawBetRequirements: RawBetRequirements =
             await betRequirementsContract[
@@ -106,7 +103,6 @@ async function getBetRequirements(
 
 async function getChainlinkVrfCost(
     chainId: CasinoChainId,
-    walletClient: MoxieWalletClient,
     game: CASINO_GAME_TYPE,
     betToken: Hex,
     betCount: number,
@@ -119,10 +115,11 @@ async function getChainlinkVrfCost(
             betCount,
             chainId
         );
+        const provider = new ethers.JsonRpcProvider("https://mainnet.base.org");
         const chainlinkVRFCostContract = new ethers.Contract(
             chainlinkVRFCostFunctionData.data.to,
             chainlinkVRFCostFunctionData.data.abi,
-            walletClient.wallet.provider
+            provider
         );
         const chainlinkVRFCost: bigint = await chainlinkVRFCostContract[
             chainlinkVRFCostFunctionData.data.functionName
@@ -154,7 +151,6 @@ export async function placeBet(
 ) {
     const betRequirements = await getBetRequirements(
         chainId,
-        walletClient,
         game,
         casinoGameParams.betToken,
         gameMultiplier
@@ -190,15 +186,12 @@ export async function placeBet(
     );
 
     try {
-        const gasPrice =
-            ((await walletClient.wallet.provider.getFeeData()).gasPrice *
-                120n) /
-            100n;
+        const provider = new ethers.JsonRpcProvider("https://mainnet.base.org");
+        const gasPrice = ((await provider.getFeeData()).gasPrice * 120n) / 100n;
 
         const vrfCost =
             ((await getChainlinkVrfCost(
                 chainId,
-                walletClient,
                 game,
                 casinoGameParams.betToken.address,
                 casinoGameParams.betCount,

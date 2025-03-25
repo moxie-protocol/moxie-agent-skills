@@ -6,7 +6,6 @@ import {
     Memory,
     State,
 } from "@moxie-protocol/core";
-import { MoxieWalletClient } from "@moxie-protocol/moxie-agent-lib/src/wallet";
 import {
     type CasinoChainId,
     getGamePausedFunctionData,
@@ -30,7 +29,7 @@ export const casinoGamesProvider: Provider = {
     get: async (
         runtime: IAgentRuntime,
         _message: Memory,
-        state?: State
+        _state?: State
     ): Promise<string> => {
         try {
             // Try to get from cache first
@@ -38,11 +37,7 @@ export const casinoGamesProvider: Provider = {
 
             // Fetch if no cache
             if (!games) {
-                const wallet = state.agentWallet as MoxieWalletClient;
-                const chainId = Number(
-                    (await wallet.wallet.provider.getNetwork()).chainId
-                ) as CasinoChainId;
-                games = await getCasinoGames(chainId, wallet);
+                games = await getCasinoGames();
 
                 // Cache the result
                 await runtime.cacheManager.set(CACHE_KEY, games, {
@@ -61,10 +56,8 @@ export const casinoGamesProvider: Provider = {
     },
 };
 
-async function getCasinoGames(
-    chainId: CasinoChainId,
-    wallet: MoxieWalletClient
-) {
+async function getCasinoGames() {
+    const chainId = 8453 as CasinoChainId;
     const casinoChain = casinoChainById[chainId];
     const games = casinoChain.contracts.games;
     const gamesPausedStatus = await Promise.all(
@@ -73,10 +66,13 @@ async function getCasinoGames(
                 game,
                 chainId
             );
+            const provider = new ethers.JsonRpcProvider(
+                "https://mainnet.base.org"
+            );
             const gameContract = new ethers.Contract(
                 gamePausedFunctionData.data.to,
                 gamePausedFunctionData.data.abi,
-                wallet.wallet.provider
+                provider
             );
             return {
                 name: game,

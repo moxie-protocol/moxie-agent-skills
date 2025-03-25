@@ -106,7 +106,7 @@ export const getBetsAction: Action = {
 
             // Validate the chain
             const wallet = state.agentWallet as MoxieWalletClient;
-            const chainId = await getChainIdFromWallet(wallet);
+            const chainId = await getChainIdFromWallet();
 
             // Initialize or update state
             if (!state) {
@@ -129,9 +129,7 @@ export const getBetsAction: Action = {
             };
 
             // Send some text
-            const bettorAddress = (
-                wallet.address
-            ).toLowerCase() as Hex;
+            const bettorAddress = wallet.address.toLowerCase() as Hex;
             const moxieUserInfo = state.moxieUserInfo as MoxieUser;
             await callback({
                 text: `List of ${moxieUserInfo ? `@[${moxieUserInfo.userName}|${moxieUserInfo.id}]` : `[${truncate(bettorAddress, 10)}](${formatAccountUrl(bettorAddress, chainId)})`} bets:`,

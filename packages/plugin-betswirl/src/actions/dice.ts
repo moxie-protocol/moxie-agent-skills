@@ -117,7 +117,7 @@ export const diceAction: Action = {
 
             // Validate the chain
             const wallet = state.agentWallet as MoxieWalletClient;
-            const chainId = await getChainIdFromWallet(wallet);
+            const chainId = await getChainIdFromWallet();
 
             // Initialize or update state
             if (!state) {
@@ -150,7 +150,7 @@ export const diceAction: Action = {
             });
 
             // Get the bet token from the user input
-            const selectedToken = await getBetToken(chainId, wallet, token);
+            const selectedToken = await getBetToken(chainId, token);
 
             // Validate the bet amount
             const betAmountInWei = getBetAmountInWei(betAmount, selectedToken);

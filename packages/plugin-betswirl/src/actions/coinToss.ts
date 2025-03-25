@@ -92,7 +92,12 @@ Here are the recent user messages for context:
 `;
 export const coinTossAction: Action = {
     name: "COIN_TOSS",
-    similes: ["COIN_FLIP", "DOUBLE_OR_NOTHING", "TOSS_A_COIN", "BETSWIRL_COIN_TOSS"],
+    similes: [
+        "COIN_FLIP",
+        "DOUBLE_OR_NOTHING",
+        "TOSS_A_COIN",
+        "BETSWIRL_COIN_TOSS",
+    ],
     description:
         "Flip a coin on BetSwirl. The player is betting that the rolled face will be the one chosen.",
     suppressInitialMessage: true,
@@ -113,7 +118,7 @@ export const coinTossAction: Action = {
 
             // Validate the chain
             const wallet = state.agentWallet as MoxieWalletClient;
-            const chainId = await getChainIdFromWallet(wallet);
+            const chainId = await getChainIdFromWallet();
 
             // Initialize or update state
             if (!state) {
@@ -151,7 +156,7 @@ export const coinTossAction: Action = {
             });
 
             // Get the bet token from the user input
-            const selectedToken = await getBetToken(chainId, wallet, token);
+            const selectedToken = await getBetToken(chainId, token);
 
             // Validate the bet amount
             const betAmountInWei = getBetAmountInWei(betAmount, selectedToken);
