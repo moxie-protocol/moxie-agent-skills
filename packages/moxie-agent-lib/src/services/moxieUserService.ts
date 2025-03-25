@@ -1,5 +1,4 @@
 import { elizaLogger } from "@moxie-protocol/core";
-import { mockMoxieUser } from "./constants";
 import {
     MoxieUser,
     GetUserResponse,
@@ -24,17 +23,132 @@ import {
 export async function getUserMoxieWalletAddress(
     walletAddress: string
 ): Promise<MoxieUser | undefined> {
-    return (
-        mockMoxieUser.wallets.find(
-            (wallet) => wallet.walletAddress === walletAddress
-        ) && Promise.resolve(mockMoxieUser)
-    );
+    try {
+        const query = `
+            query GetUser($walletAddress: String!) {
+                GetUser(input: { walletAddress: $walletAddress }) {
+                    id
+                    userName
+                    identities {
+                        id
+                        userId
+                        type
+                        dataSource
+                        connectedIdentitiesFetchStatus
+                        metadata
+                        profileId
+                        isActive
+                        createdAt
+                        updatedAt
+                    }
+                    wallets {
+                        id
+                        userId
+                        walletAddress
+                        walletType
+                        dataSource
+                        createdAt
+                        deletedAt
+                    }
+                }
+            }
+        `;
+
+        const response = await fetch(process.env.MOXIE_API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                query,
+                variables: { walletAddress },
+            }),
+        });
+
+        if (!response.ok) {
+            elizaLogger.error(`HTTP error! status: ${response.status}`);
+            return undefined;
+        }
+
+        const result = await response.json();
+
+        if (!result.data) {
+            elizaLogger.error(
+                `No data in response for walletAddress ${walletAddress}:`,
+                result
+            );
+            return undefined;
+        }
+
+        if (!result.data.GetUser) {
+            elizaLogger.error(
+                `No user found for walletAddress ${walletAddress}`
+            );
+            return undefined;
+        }
+
+        return result.data.GetUser;
+    } catch (error) {
+        elizaLogger.error("Error in getUserMoxieWalletAddress:", error);
+        return undefined;
+    }
 }
 
 export async function getUserByMoxieId(
     userId: string
 ): Promise<MoxieUser | undefined> {
-    return userId === mockMoxieUser.id && Promise.resolve(mockMoxieUser);
+    try {
+        const query = `
+            query GetUser($userId: String!, $vestingContractRequired: Boolean!) {
+                GetUser(input: { userId: $userId, vestingContractRequired: $vestingContractRequired }) {
+                    id
+                    userName
+                    identities {
+                        id
+                        userId
+                        type
+                        dataSource
+                        connectedIdentitiesFetchStatus
+                        metadata
+                        profileId
+                        isActive
+                        createdAt
+                        updatedAt
+                    }
+                    wallets {
+                        id
+                        userId
+                        walletAddress
+                        walletType
+                        dataSource
+                        createdAt
+                        deletedAt
+                    }
+                    vestingContracts {
+                        beneficiaryAddress
+                        vestingContractAddress
+                    }
+                }
+            }
+        `;
+
+        const response = await fetch(process.env.MOXIE_API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                query,
+                variables: { userId, vestingContractRequired: true },
+            }),
+        });
+
+        const { data } = (await response.json()) as GetUserResponse;
+        return data.GetUser;
+    } catch (error) {
+        elizaLogger.error("Error in getUserByMoxieId:", error);
+        return undefined;
+    }
 }
 
 export async function getUserByMoxieIdMultiple(
@@ -60,50 +174,6 @@ export async function getUserByMoxieIdMultiple(
         return userIdToTUser;
     } catch (error) {
         elizaLogger.error("Error in getUserByMoxieIdMultiple:", error);
-        return new Map();
-    }
-}
-
-export async function getUserByMoxieIdMultipleMinimal(
-    userIds: string[]
-): Promise<Map<string, MoxieUserMinimal>> {
-    try {
-        const query = `
-            query GetUserInfoMinimal($userIds:[String!]!) {
-                GetUserInfoMinimal(input: {userIds: $userIds}) {
-                    users {
-                    id
-                    userName
-                    name
-                    bio
-                    profileImageUrl
-                    }
-                }
-         }
-        `;
-        const response = await fetch(process.env.MOXIE_API_URL_INTERNAL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                query,
-                variables: { userIds },
-            }),
-        });
-
-        let res = await response.json();
-        const { data } = res as GetUserInfoMinimalResponse;
-
-        const userIdToUser = new Map<string, MoxieUserMinimal>();
-        data.GetUserInfoMinimal.users.forEach((user) => {
-            userIdToUser.set(user.id, user);
-        });
-        
-        return userIdToUser;
-    
-    } catch (error) {
-        elizaLogger.error("Error in getUserByMoxieIdMultipleMinimal:", error);
         return new Map();
     }
 }
@@ -283,14 +353,33 @@ export async function getSocialProfilesByMoxieIdMultiple(
 
             const identities = user?.identities || [];
 
-            for (const identity of identities) {
-                if (identity.type === "TWITTER") {
-                    twitterUsername = identity?.metadata?.username;
-                } else if (identity.type === "FARCASTER") {
-                    console.log({ Metadata: JSON.stringify(identity) });
-                    farcasterUsername = identity?.metadata?.username;
-                    farcasterUserId = identity?.profileId;
-                }
+            console.log("identities", identities);
+
+            let twitterIdentity =
+                identities.find(
+                    (identity) =>
+                        identity.type === "TWITTER" &&
+                        identity.dataSource === "PRIVY"
+                ) || identities.find((identity) => identity.type === "TWITTER");
+
+            let farcasterIdentity =
+                identities.find(
+                    (identity) =>
+                        identity.type === "FARCASTER" &&
+                        identity.dataSource === "PRIVY"
+                ) ||
+                identities.find((identity) => identity.type === "FARCASTER");
+
+            console.log("twitterIdentity", twitterIdentity);
+            console.log("farcasterIdentity", farcasterIdentity);
+
+            if (twitterIdentity) {
+                twitterUsername = twitterIdentity.metadata?.username;
+            }
+
+            if (farcasterIdentity) {
+                farcasterUsername = farcasterIdentity.metadata?.username;
+                farcasterUserId = farcasterIdentity.profileId;
             }
             const socialProfile: SocialProfile = {
                 twitterUsername: twitterUsername,
@@ -851,4 +940,47 @@ export async function sendTransaction(
     }
 
     throw new Error("Failed to send transaction after maximum retries");
+}
+
+export async function getUserByMoxieIdMultipleMinimal(
+    userIds: string[]
+): Promise<Map<string, MoxieUserMinimal>> {
+    try {
+        const query = `
+            query GetUserInfoMinimal($userIds:[String!]!) {
+                GetUserInfoMinimal(input: {userIds: $userIds}) {
+                    users {
+                    id
+                    userName
+                    name
+                    bio
+                    profileImageUrl
+                    }
+                }
+         }
+        `;
+        const response = await fetch(process.env.MOXIE_API_URL_INTERNAL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                query,
+                variables: { userIds },
+            }),
+        });
+
+        let res = await response.json();
+        const { data } = res as GetUserInfoMinimalResponse;
+
+        const userIdToUser = new Map<string, MoxieUserMinimal>();
+        data.GetUserInfoMinimal.users.forEach((user) => {
+            userIdToUser.set(user.id, user);
+        });
+
+        return userIdToUser;
+    } catch (error) {
+        elizaLogger.error("Error in getUserByMoxieIdMultipleMinimal:", error);
+        return new Map();
+    }
 }
