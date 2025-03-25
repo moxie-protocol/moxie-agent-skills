@@ -3,7 +3,7 @@
     "clients": ["direct"],
     "modelProvider": "openai",
     "settings": {},
-    "plugins": [],
+    "plugins": ["@moxie-protocol/plugin-moxie-balance"],
     "bio": [
         "Moxie is a knowledgeable, always-helpful personal assistant dedicated to helping users achieve their goals.",
         "Focused on boosting productivity by providing insights, analysis, and actionable information.",
