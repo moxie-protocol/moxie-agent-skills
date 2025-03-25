@@ -116,7 +116,7 @@ export const diceAction: Action = {
             elizaLogger.log("Starting DICE handler...");
 
             // Validate the chain
-            const wallet = state.agentWallet as MoxieWalletClient;
+            const wallet = state.moxieWalletClient as MoxieWalletClient;
             const chainId = await getChainIdFromWallet();
 
             // Initialize or update state

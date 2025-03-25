@@ -105,7 +105,7 @@ export const getBetsAction: Action = {
             elizaLogger.log("Starting GET_BETS handler...");
 
             // Validate the chain
-            const wallet = state.agentWallet as MoxieWalletClient;
+            const wallet = state.moxieWalletClient as MoxieWalletClient;
             const chainId = await getChainIdFromWallet();
 
             // Initialize or update state

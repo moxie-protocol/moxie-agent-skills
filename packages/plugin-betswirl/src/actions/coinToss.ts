@@ -117,7 +117,7 @@ export const coinTossAction: Action = {
             elizaLogger.log("Starting COIN_TOSS handler...");
 
             // Validate the chain
-            const wallet = state.agentWallet as MoxieWalletClient;
+            const wallet = state.moxieWalletClient as MoxieWalletClient;
             const chainId = await getChainIdFromWallet();
 
             // Initialize or update state

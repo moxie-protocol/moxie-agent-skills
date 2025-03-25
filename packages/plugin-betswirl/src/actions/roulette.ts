@@ -119,7 +119,7 @@ export const rouletteAction: Action = {
             elizaLogger.log("Starting ROULETTE handler...");
 
             // Validate the chain
-            const wallet = state.agentWallet as MoxieWalletClient;
+            const wallet = state.moxieWalletClient as MoxieWalletClient;
             const chainId = await getChainIdFromWallet();
 
             // Initialize or update state
