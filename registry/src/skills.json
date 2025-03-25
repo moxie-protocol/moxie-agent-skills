@@ -14,9 +14,62 @@
         "name": "@moxie-protocol/plugin-betswirl",
         "version": "0.0.1",
         "author": "Romuald Hog <romuald@betswirl.com>",
-        "description": "The BetSwirl plugin offers a seamless way to interact with the BetSwirl betting platform. It includes actions for placing bets on games and retrieving bets information.",
+        "description": "Enabled your agent to place bets on BetSwirl's games of luck, and retrieving bets information.",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-betswirl",
-        "imageUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-betswirl/images/logo.png"
+        "logoUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-betswirl/images/logo.png",
+        "settings": {},
+        "capabilities": [
+            "Flip a Coin",
+            "Roll a Dice",
+            "Spin a Roulette",
+            "Get your bets"
+        ],
+        "starterQuestions": [
+            {
+                "label": "Bet 0.01 ETH on heads",
+                "value": "Bet 0.01 ETH on heads"
+            },
+            {
+                "label": "Bet 0.01 ETH above 44",
+                "value": "Bet 0.01 ETH above 44"
+            },
+            {
+                "label": "Bet 0.01 ETH on 3,6,8 and 10",
+                "value": "Bet 0.01 ETH on 3,6,8 and 10"
+            },
+            {
+                "label": "Show my bets",
+                "value": "Show my bets"
+            }
+        ],
+        "mediaUrls": [
+            "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-betswirl/images/logo.png"
+        ],
+        "actions": [
+            "COIN_TOSS",
+            "COIN_FLIP",
+            "DOUBLE_OR_NOTHING",
+            "TOSS_A_COIN",
+            "BETSWIRL_COIN_TOSS",
+            "DICE",
+            "ROLL_A_DICE",
+            "DICE_ROLL",
+            "BETSWIRL_DICE",
+            "ROULETTE",
+            "SPIN_A_ROULETTE",
+            "BETSWIRL_ROULETTE",
+            "GET_BETS",
+            "RETRIEVE_BETS",
+            "SHOW_BETS",
+            "LAST_BETS",
+            "GET_BETSWIRL_BETS"
+        ],
+        "isPremium": false,
+        "freeQueries": 0,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
+        "status": "ACTIVE",
+        "isDefault": true
     },
     {
         "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-token-details/images/logo.svg",
