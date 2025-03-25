@@ -1,3 +1,5 @@
+import { elizaLogger } from "@moxie-protocol/core";
+
 export interface Fta {
     id: string;
     entityId: string;

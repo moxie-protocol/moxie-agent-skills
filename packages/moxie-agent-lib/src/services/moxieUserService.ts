@@ -16,6 +16,8 @@ import {
     GetUserInfoBatchResponse,
     ErrorDetails,
     GetUserInfoBatchOutput,
+    GetUserInfoMinimalResponse,
+    MoxieUserMinimal,
 } from "./types";
 
 export async function getUserMoxieWalletAddress(
@@ -228,23 +230,23 @@ export async function getUserByMoxieIdMultipleTokenGate(
                     }
                 }
             }
-        } `
+        } `;
 
         const response = await fetch(process.env.MOXIE_API_URL_INTERNAL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": authorizationHeader
+                Authorization: authorizationHeader,
             },
             body: JSON.stringify({
                 query,
-                variables: { userIds, pluginId }
-            })
-        })
+                variables: { userIds, pluginId },
+            }),
+        });
 
-        let res = await response.json()
-        console.log("res", res)
-        const { data } = (res) as GetUserInfoBatchResponse;
+        let res = await response.json();
+        console.log("res", res);
+        const { data } = res as GetUserInfoBatchResponse;
         return data.GetUserInfoBatch;
     } catch (error) {
         elizaLogger.error("Error in getUserByMoxieIdMultipleTokenGate:", error);
@@ -320,17 +322,28 @@ export interface SocialProfile {
     farcasterUserId?: string;
 }
 
-export async function getSocialProfilesByMoxieIdMultiple(userIds: string[], bearerToken: string, pluginId: string) {
+export async function getSocialProfilesByMoxieIdMultiple(
+    userIds: string[],
+    bearerToken: string,
+    pluginId: string
+) {
     const userIdToSocialProfile = new Map<string, SocialProfile>();
     const errorDetails = new Map<string, ErrorDetails>();
 
     try {
-        const results = await getUserByMoxieIdMultipleTokenGate(userIds, bearerToken, pluginId);
+        const results = await getUserByMoxieIdMultipleTokenGate(
+            userIds,
+            bearerToken,
+            pluginId
+        );
 
         results.users.forEach((userInfo, _index) => {
             const user = userInfo.user;
             if (!user && userInfo.errorDetails) {
-                errorDetails.set(userInfo.errorDetails.requestedId, userInfo.errorDetails);
+                errorDetails.set(
+                    userInfo.errorDetails.requestedId,
+                    userInfo.errorDetails
+                );
                 return;
             }
 
@@ -342,17 +355,20 @@ export async function getSocialProfilesByMoxieIdMultiple(userIds: string[], bear
 
             console.log("identities", identities);
 
-            let twitterIdentity = identities.find(
-                (identity) => identity.type === "TWITTER" && identity.dataSource === "PRIVY"
-            ) || identities.find(
-                (identity) => identity.type === "TWITTER"
-            );
+            let twitterIdentity =
+                identities.find(
+                    (identity) =>
+                        identity.type === "TWITTER" &&
+                        identity.dataSource === "PRIVY"
+                ) || identities.find((identity) => identity.type === "TWITTER");
 
-            let farcasterIdentity = identities.find(
-                (identity) => identity.type === "FARCASTER" && identity.dataSource === "PRIVY"
-            ) || identities.find(
-                (identity) => identity.type === "FARCASTER"
-            );
+            let farcasterIdentity =
+                identities.find(
+                    (identity) =>
+                        identity.type === "FARCASTER" &&
+                        identity.dataSource === "PRIVY"
+                ) ||
+                identities.find((identity) => identity.type === "FARCASTER");
 
             console.log("twitterIdentity", twitterIdentity);
             console.log("farcasterIdentity", farcasterIdentity);
@@ -374,7 +390,12 @@ export async function getSocialProfilesByMoxieIdMultiple(userIds: string[], bear
             userIdToSocialProfile.set(user.id, socialProfile);
         });
 
-        return { userIdToSocialProfile, errorDetails, freeTrialLimit: results.freeTrialLimit, remainingFreeTrialCount: results.remainingFreeTrialCount };
+        return {
+            userIdToSocialProfile,
+            errorDetails,
+            freeTrialLimit: results.freeTrialLimit,
+            remainingFreeTrialCount: results.remainingFreeTrialCount,
+        };
     } catch (error) {
         elizaLogger.error(
             "Error in getTwitteruserNameByMoxieIdMultiple:",
@@ -382,8 +403,6 @@ export async function getSocialProfilesByMoxieIdMultiple(userIds: string[], bear
         );
     }
 }
-
-
 
 // getTwitteruserNameByMoxieIdMultiple(["M4"]).then(console.log)
 
@@ -459,9 +478,9 @@ export async function getUserByPrivyBearerToken(
         console.error("Error fetching user data:", error);
         throw error;
     }
-  }
+}
 
-  export async function GetWalletDetails(
+export async function GetWalletDetails(
     bearerToken: string
 ): Promise<GetWalletDetailsOutput> {
     const query = `
@@ -499,13 +518,18 @@ query GetWalletDetails {
             });
 
             // Retry on 429 (Too Many Requests) or 5xx server errors
-            if (response.status === 429 || (response.status >= 500 && response.status < 600)) {
+            if (
+                response.status === 429 ||
+                (response.status >= 500 && response.status < 600)
+            ) {
                 retryCount++;
                 if (retryCount === maxRetries) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 // Exponential backoff: 1s, 2s, 4s
-                await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000));
+                await new Promise((resolve) =>
+                    setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000)
+                );
                 continue;
             }
 
@@ -528,7 +552,9 @@ query GetWalletDetails {
                 const error = data.errors[0];
                 const errorMessage = error.message;
                 const errorPath = error.path?.join(".") || "unknown path";
-                throw new Error(`GraphQL error at ${errorPath}: ${errorMessage}`);
+                throw new Error(
+                    `GraphQL error at ${errorPath}: ${errorMessage}`
+                );
             }
 
             if (!data.data) {
@@ -536,18 +562,21 @@ query GetWalletDetails {
             }
 
             return data.data.GetWalletDetails;
-
         } catch (error) {
             if (retryCount === maxRetries - 1) {
                 if (error instanceof Error) {
-                    throw new Error(`Failed to get wallet details: ${error.message}`);
+                    throw new Error(
+                        `Failed to get wallet details: ${error.message}`
+                    );
                 }
                 throw new Error(
                     "Failed to get wallet details: An unknown error occurred"
                 );
             }
             retryCount++;
-            await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000));
+            await new Promise((resolve) =>
+                setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000)
+            );
         }
     }
 
@@ -585,13 +614,18 @@ export async function SignMessage(
             });
 
             // Retry on 429 (Too Many Requests) or 5xx server errors
-            if (response.status === 429 || (response.status >= 500 && response.status < 600)) {
+            if (
+                response.status === 429 ||
+                (response.status >= 500 && response.status < 600)
+            ) {
                 retryCount++;
                 if (retryCount === maxRetries) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 // Exponential backoff: 1s, 2s, 4s
-                await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000));
+                await new Promise((resolve) =>
+                    setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000)
+                );
                 continue;
             }
 
@@ -612,7 +646,9 @@ export async function SignMessage(
                 const error = data.errors[0];
                 const errorMessage = error.message;
                 const errorPath = error.path?.join(".") || "unknown path";
-                throw new Error(`GraphQL error at ${errorPath}: ${errorMessage}`);
+                throw new Error(
+                    `GraphQL error at ${errorPath}: ${errorMessage}`
+                );
             }
 
             if (!data.data) {
@@ -625,11 +661,15 @@ export async function SignMessage(
                 if (error instanceof Error) {
                     throw new Error(`Failed to sign message: ${error.message}`);
                 }
-                throw new Error("Failed to sign message: An unknown error occurred");
+                throw new Error(
+                    "Failed to sign message: An unknown error occurred"
+                );
             }
             retryCount++;
             // Exponential backoff for other errors too
-            await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000));
+            await new Promise((resolve) =>
+                setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000)
+            );
         }
     }
 
@@ -671,7 +711,9 @@ export async function SignTransaction(
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 // Exponential backoff: 1s, 2s, 4s
-                await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000));
+                await new Promise((resolve) =>
+                    setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000)
+                );
                 continue;
             }
 
@@ -690,7 +732,9 @@ export async function SignTransaction(
                 const error = data.errors[0];
                 const errorMessage = error.message;
                 const errorPath = error.path?.join(".") || "unknown path";
-                throw new Error(`GraphQL error at ${errorPath}: ${errorMessage}`);
+                throw new Error(
+                    `GraphQL error at ${errorPath}: ${errorMessage}`
+                );
             }
 
             if (!data.data) {
@@ -701,13 +745,19 @@ export async function SignTransaction(
         } catch (error) {
             if (retryCount === maxRetries - 1) {
                 if (error instanceof Error) {
-                    throw new Error(`Failed to sign transaction: ${error.message}`);
+                    throw new Error(
+                        `Failed to sign transaction: ${error.message}`
+                    );
                 }
-                throw new Error("Failed to sign transaction: An unknown error occurred");
+                throw new Error(
+                    "Failed to sign transaction: An unknown error occurred"
+                );
             }
             retryCount++;
             // Exponential backoff for other errors too
-            await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000));
+            await new Promise((resolve) =>
+                setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000)
+            );
         }
     }
 
@@ -749,7 +799,9 @@ export async function SignTypedData(
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 // Exponential backoff: 1s, 2s, 4s
-                await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000));
+                await new Promise((resolve) =>
+                    setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000)
+                );
                 continue;
             }
 
@@ -768,7 +820,9 @@ export async function SignTypedData(
                 const error = data.errors[0];
                 const errorMessage = error.message;
                 const errorPath = error.path?.join(".") || "unknown path";
-                throw new Error(`GraphQL error at ${errorPath}: ${errorMessage}`);
+                throw new Error(
+                    `GraphQL error at ${errorPath}: ${errorMessage}`
+                );
             }
 
             if (!data.data) {
@@ -779,13 +833,19 @@ export async function SignTypedData(
         } catch (error) {
             if (retryCount === maxRetries - 1) {
                 if (error instanceof Error) {
-                    throw new Error(`Failed to sign typed data: ${error.message}`);
+                    throw new Error(
+                        `Failed to sign typed data: ${error.message}`
+                    );
                 }
-                throw new Error("Failed to sign typed data: An unknown error occurred");
+                throw new Error(
+                    "Failed to sign typed data: An unknown error occurred"
+                );
             }
             retryCount++;
             // Exponential backoff for other errors too
-            await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000));
+            await new Promise((resolve) =>
+                setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000)
+            );
         }
     }
 
@@ -829,7 +889,9 @@ export async function sendTransaction(
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 // Exponential backoff: 1s, 2s, 4s
-                await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000));
+                await new Promise((resolve) =>
+                    setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000)
+                );
                 continue;
             }
 
@@ -848,7 +910,9 @@ export async function sendTransaction(
                 const error = data.errors[0];
                 const errorMessage = error.message;
                 const errorPath = error.path?.join(".") || "unknown path";
-                throw new Error(`GraphQL error at ${errorPath}: ${errorMessage}`);
+                throw new Error(
+                    `GraphQL error at ${errorPath}: ${errorMessage}`
+                );
             }
 
             if (!data.data) {
@@ -859,15 +923,64 @@ export async function sendTransaction(
         } catch (error) {
             if (retryCount === maxRetries - 1) {
                 if (error instanceof Error) {
-                    throw new Error(`Failed to send transaction: ${error.message}`);
+                    throw new Error(
+                        `Failed to send transaction: ${error.message}`
+                    );
                 }
-                throw new Error("Failed to send transaction: An unknown error occurred");
+                throw new Error(
+                    "Failed to send transaction: An unknown error occurred"
+                );
             }
             retryCount++;
             // Exponential backoff for other errors too
-            await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000));
+            await new Promise((resolve) =>
+                setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000)
+            );
         }
     }
 
     throw new Error("Failed to send transaction after maximum retries");
+}
+
+export async function getUserByMoxieIdMultipleMinimal(
+    userIds: string[]
+): Promise<Map<string, MoxieUserMinimal>> {
+    try {
+        const query = `
+            query GetUserInfoMinimal($userIds:[String!]!) {
+                GetUserInfoMinimal(input: {userIds: $userIds}) {
+                    users {
+                    id
+                    userName
+                    name
+                    bio
+                    profileImageUrl
+                    }
+                }
+         }
+        `;
+        const response = await fetch(process.env.MOXIE_API_URL_INTERNAL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                query,
+                variables: { userIds },
+            }),
+        });
+
+        let res = await response.json();
+        const { data } = res as GetUserInfoMinimalResponse;
+
+        const userIdToUser = new Map<string, MoxieUserMinimal>();
+        data.GetUserInfoMinimal.users.forEach((user) => {
+            userIdToUser.set(user.id, user);
+        });
+
+        return userIdToUser;
+    } catch (error) {
+        elizaLogger.error("Error in getUserByMoxieIdMultipleMinimal:", error);
+        return new Map();
+    }
 }
