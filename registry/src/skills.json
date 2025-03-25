@@ -49,7 +49,12 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": true,
-        "loaders": []
+        "loaders": [
+            "Searching onchain sources",
+            "Analyzing data",
+            "Synthesizing results",
+            "Preparing insights"
+        ]
     },
     {
         "pluginId": "927fb66c-2ebc-48e1-82a8-907c6e54e379",
@@ -100,7 +105,10 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": true,
-        "loaders": []
+        "loaders": [
+            "Initiating transaction",
+            "Writing to the Base blockchain"
+        ]
     },
     {
         "pluginId": "5d3b79e2-ac61-0bb6-a3ba-b0e00b943614",
@@ -178,7 +186,13 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": true,
-        "loaders": []
+        "loaders": [
+            "Searching Farcaster",
+            "Searching X",
+            "Analyzing data",
+            "Synthesizing results",
+            "Preparing insights"
+        ]
     },
     {
         "pluginId": "b5622f90-987e-51d1-bea9-5b1471bb9379",
@@ -230,7 +244,10 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": true,
-        "loaders": []
+        "loaders": [
+            "Initiating transaction",
+            "Writing to the Base blockchain"
+        ]
     },
     {
         "pluginId": "0ad0731e-698b-04bf-abeb-5d29cc36759f",
@@ -292,7 +309,12 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": true,
-        "loaders": []
+        "loaders": [
+            "Searching onchain sources",
+            "Analyzing data",
+            "Synthesizing results",
+            "Preparing insights"
+        ]
     },
     {
         "pluginId": "a8c0c53a-e4e5-0848-b69b-a17af97d64dd",
@@ -345,10 +367,11 @@
         "status": "ACTIVE",
         "isDefault": true,
         "loaders": [
-            "Searching onchain sources...",
-            "Analyzing 🐋 🐋 🐋...",
-            "Doing robot things...",
-            "Preparing insights..."
+            "Searching onchain sources",
+            "Analyzing 🐋 🐋 🐋",
+            "Doing robot things",
+            "Synthesizing results",
+            "Preparing insights"
         ]
     },
     {
@@ -392,7 +415,6 @@
         "isDefault": true,
         "loaders": [
             "Analyzing request",
-            "Doing robot things",
             "Setting limits",
             "Initiating transaction",
             "Writing to the Base blockchain"
@@ -433,6 +455,13 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": true,
-        "loaders": []
+        "loaders": [
+            "Searching X",
+            "Searching Farcaster",
+            "Analyzing sentiments",
+            "Feeling the vibes",
+            "Synthesizing results",
+            "Preparing insights"
+        ]
     }
 ]
