@@ -348,7 +348,7 @@ export async function getPortfolioV2DataByTokenAddress( traceId: string, address
                     variables: {
                         addresses,
                         networks,
-                        tokenAddress
+                        tokenAddress: tokenAddress ? tokenAddress.toLowerCase() : ""
                     }
                 });
 
