@@ -13,16 +13,18 @@ const client = new GraphQLClient(PROTOCOL_SUBGRAPH_URL);
 
 /**
  * Fetches the details of a subject token from the protocol subgraph
+ * @param traceId Trace ID for logging
  * @param subject The address of the subject token
  * @returns A promise that resolves to the subject token details or null if an error occurs
  */
 export async function getSubjectTokenDetailsBySubjectAddress(traceId: string, subject: string): Promise<SubjectToken | null> {
     if (!subject) {
+        elizaLogger.error(traceId, `[getSubjectTokenDetailsBySubjectAddress] Subject address is missing`);
         throw new Error('Subject address is required');
     }
 
     const query = `
-    query($subject: String) {
+    query($subject: String!) {
       subjectTokens(where: {subject: $subject}) {
         id
         name
@@ -38,13 +40,32 @@ export async function getSubjectTokenDetailsBySubjectAddress(traceId: string, su
     }
   `;
 
-    try {
-        const response = await client.request<SubjectTokenResponse>(query, { subject: subject.toLowerCase() });
-        return response.subjectTokens[0] || null;
-    } catch (error) {
-        elizaLogger.error(traceId,`[getSubjectTokenDetailsBySubjectAddress] [${subject}] Error fetching subject token details: ${JSON.stringify(error)}`);
-        return null;
+    const maxRetries = 3;
+    let retries = 0;
+
+    while (retries < maxRetries) {
+        try {
+            elizaLogger.debug(traceId, `[getSubjectTokenDetailsBySubjectAddress] Fetching details for subject: ${subject}`);
+            const response = await client.request<SubjectTokenResponse>(query, { subject: subject.toLowerCase() });
+
+            if (!response.subjectTokens || response.subjectTokens.length === 0) {
+                elizaLogger.warn(traceId, `[getSubjectTokenDetailsBySubjectAddress] No subject token found for subject: ${subject}`);
+                return null;
+            }
+
+            return response.subjectTokens[0];
+        } catch (error) {
+            retries++;
+            if (retries >= maxRetries) {
+                elizaLogger.error(traceId, `[getSubjectTokenDetailsBySubjectAddress] [${subject}] Error fetching subject token details after ${maxRetries} attempts: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
+                return null;
+            }
+            elizaLogger.warn(traceId, `[getSubjectTokenDetailsBySubjectAddress] [${subject}] Retry ${retries}/${maxRetries} after error: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
+            await new Promise(resolve => setTimeout(resolve, 1000 * retries)); // Exponential backoff
+        }
     }
+
+    return null; // Explicit return in case loop exits unexpectedly
 }
 
 export interface SubjectToken {
@@ -79,11 +100,13 @@ interface SubjectTokenResponse {
 
 /**
  * Fetches detailed subject token information for given subject token addresses from the protocol subgraph
+ * @param traceId Trace ID for logging
  * @param subjectTokenAddresses Array of subject token addresses to fetch details for
  * @returns A promise that resolves to a record of subject token details or null if an error occurs
  */
 export async function getSubjectTokenDetailsBySubjectTokenAddresses(traceId: string, subjectTokenAddresses: string[]): Promise<Record<string, SubjectToken> | null> {
     if (!subjectTokenAddresses || subjectTokenAddresses.length === 0) {
+        elizaLogger.error(traceId, `[getSubjectTokenDetailsBySubjectTokenAddresses] Subject token addresses are missing or empty`);
         throw new Error('Subject token addresses are required');
     }
 
@@ -117,18 +140,41 @@ export async function getSubjectTokenDetailsBySubjectTokenAddresses(traceId: str
         }
     `;
 
-    try {
-        const response = await client.request<SubjectTokenResponse>(
-            query,
-            { subjectTokenAddresses: subjectTokenAddresses.filter(addr => addr).map(addr => addr.toLowerCase()) }
-        );
-        if (!response.subjectTokens) return null;
-        return response.subjectTokens.reduce((acc, token) => {
-            acc[token.id] = token;
-            return acc;
-        }, {} as Record<string, SubjectToken>);
-    } catch (error) {
-        elizaLogger.error(traceId,`[getSubjectTokenDetailsBySubjectTokenAddresses] [${subjectTokenAddresses}] Error fetching detailed subject token information: ${JSON.stringify(error)}`);
-        return null;
+    const maxRetries = 3;
+    let retries = 0;
+
+    while (retries < maxRetries) {
+        try {
+            const normalizedAddresses = subjectTokenAddresses
+                .filter(addr => addr)
+                .map(addr => addr.toLowerCase());
+                
+            elizaLogger.debug(traceId, `[getSubjectTokenDetailsBySubjectTokenAddresses] Fetching details for subject tokens: ${normalizedAddresses.join(', ')}`);
+            
+            const response = await client.request<SubjectTokenResponse>(
+                query,
+                { subjectTokenAddresses: normalizedAddresses }
+            );
+            
+            if (!response.subjectTokens || response.subjectTokens.length === 0) {
+                elizaLogger.warn(traceId, `[getSubjectTokenDetailsBySubjectTokenAddresses] No subject tokens found for addresses: ${normalizedAddresses.join(', ')}`);
+                return null;
+            }
+            
+            return response.subjectTokens.reduce((acc, token) => {
+                acc[token.id] = token;
+                return acc;
+            }, {} as Record<string, SubjectToken>);
+        } catch (error) {
+            retries++;
+            if (retries >= maxRetries) {
+                elizaLogger.error(traceId, `[getSubjectTokenDetailsBySubjectTokenAddresses] Error fetching detailed subject token information after ${maxRetries} attempts: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
+                return null;
+            }
+            elizaLogger.warn(traceId, `[getSubjectTokenDetailsBySubjectTokenAddresses] Retry ${retries}/${maxRetries} after error: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
+            await new Promise(resolve => setTimeout(resolve, 1000 * retries)); // Exponential backoff
+        }
     }
+
+    return null; // Explicit return in case loop exits unexpectedly
 }
