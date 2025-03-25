@@ -1,3 +1,8 @@
+import { State } from "@moxie-protocol/core";
+import { IAgentRuntime } from "@moxie-protocol/core";
+import { Wallet as PrivyWallet } from "@privy-io/server-auth";
+import { ethers } from "ethers";
+import { MoxieClientWallet, MoxieWalletClient } from "../wallet";
 export interface TwitterMetadata {
     username: string;
     name?: string;
@@ -9,24 +14,11 @@ export interface TwitterMetadata {
     profilePictureUrl?: string;
 }
 
-export interface ENSMetadata {
-    username?: string;
-    ens: string;
-    expiryTimestamp: string;
-    resolvedAddress: string;
-}
-
 export interface FarcasterMetadata {
     bio: string;
-    fid: number;
-    pfp: string;
-    type: string;
     username: string;
-    verifiedAt: string;
     displayName: string;
-    ownerAddress: string;
-    firstVerifiedAt: string;
-    latestVerifiedAt: string;
+    profileTokenId: string;
 }
 
 export interface MoxieIdentity {
@@ -35,7 +27,7 @@ export interface MoxieIdentity {
     type: string;
     dataSource: string;
     connectedIdentitiesFetchStatus: string;
-    metadata: TwitterMetadata | FarcasterMetadata | ENSMetadata;
+    metadata: TwitterMetadata | FarcasterMetadata;
     profileId: string;
     isActive: boolean;
     createdAt: string;
@@ -76,6 +68,14 @@ export interface MoxieUser {
     vestingContracts: VestingContracts[];
 }
 
+export interface MoxieUserMinimal {
+    id: string;
+    userName?: string;
+    name?: string;
+    bio?: string;
+    profileImageUrl?: string;
+}
+
 export interface MeQueryResponse {
     data: {
         Me: MoxieUser;
@@ -95,10 +95,26 @@ export interface GetUserResponse {
     };
 }
 
+export interface GetUserInfoBatchResponse {
+    data: {
+        GetUserInfoBatch: GetUserInfoBatchOutput;
+    };
+}
+
+export interface GetUserInfoMinimalOutput {
+    users: MoxieUserMinimal[];
+}
+
+export interface GetUserInfoMinimalResponse {
+    data: {
+        GetUserInfoMinimal: GetUserInfoMinimalOutput;
+    };
+}
+
 export type GetWalletDetailsOutput = {
     success: boolean;
     privyId: string;
-    wallet: undefined | Wallet;
+    wallet: undefined | PrivyWallet;
 };
 
 export interface SignMessageInput {
@@ -166,6 +182,128 @@ export interface TransactionDetails {
     maxPriorityFeePerGas?: number;
 }
 
+export interface LiquidityPool {
+    poolName?: string;
+    poolAddress: string;
+    liquidityUSD: number;
+}
+
+export interface TokenDetails {
+    tokenName?: string;
+    tokenSymbol?: string;
+    tokenAddress?: string;
+    networkId?: number;
+    priceUSD?: string;
+    liquidityTop3PoolsUSD?: string;
+    fullyDilutedMarketCapUSD?: string;
+    uniqueHolders?: number;
+    uniqueBuysLast1Hour?: number;
+    uniqueBuysLast4Hours?: number;
+    uniqueBuysLast12Hours?: number;
+    uniqueBuysLast24Hours?: number;
+    uniqueSellsLast1Hour?: number;
+    uniqueSellsLast4Hours?: number;
+    uniqueSellsLast12Hours?: number;
+    uniqueSellsLast24Hours?: number;
+    changePercent1Hour?: string;
+    changePercent4Hours?: string;
+    changePercent12Hours?: string;
+    changePercent24Hours?: string;
+    high1Hour?: string;
+    high4Hours?: string;
+    high12Hours?: string;
+    high24Hours?: string;
+    low1Hour?: string;
+    low4Hours?: string;
+    low12Hours?: string;
+    low24Hours?: string;
+    volumeChange1Hour?: string;
+    volumeChange4Hours?: string;
+    volumeChange12Hours?: string;
+    volumeChange24Hours?: string;
+    liquidityPools?: LiquidityPool[];
+}
+
+export interface MoxiePortfolioInfo {
+    fanTokenSymbol: string;
+    fanTokenName: string;
+    fanTokenAddress: string;
+    totalLockedAmount: number;
+    totalUnlockedAmount: number;
+    totalAmount: number;
+    totalTvl: number;
+    walletAddresses: string[];
+    currentPrice: number;
+    lockedTvl: number;
+    unlockedTvl: number;
+    totalTvlInUSD: number;
+    lockedTvlInUSD: number;
+    unlockedTvlInUSD: number;
+    fanTokenMoxieUserId: string;
+    displayLabel: string;
+    holdingPercentage: number;
+}
+
+export interface MoxiePortfolioResponse {
+    errors?: Array<{
+        message: string;
+    }>;
+    data: {
+        MoxieUserPortfolios: {
+            MoxieUserPortfolio: MoxiePortfolioInfo[];
+        };
+    };
+}
+
+export interface Skill {
+    id: string;
+    name: string;
+    displayName: string;
+    version: string;
+    author: string;
+    description: string;
+    githubUrl: string;
+    logoUrl: string;
+    status: string;
+    settings: any;
+    capabilities: string[];
+    starterQuestions: StarterQuestion[];
+    mediaUrls: string[];
+    actions: string[];
+    isPremium: boolean;
+    freeQueries: number;
+    skillCoinAddress: string;
+    minimumSkillBalance: number;
+    installedStatus?: string;
+    isDefault: boolean;
+    isFeatured: boolean;
+}
+
+export interface StarterQuestion {
+    label: string;
+    value: string;
+}
+
+export type GetUserInfoBatchOutput = {
+    users: UserInfo[];
+    freeTrialLimit: number;
+    remainingFreeTrialCount: number;
+};
+
+export type UserInfo = {
+    user: MoxieUser | null;
+    errorDetails: ErrorDetails | null;
+};
+
+export type ErrorDetails = {
+    errorMessage: string;
+    expectedCreatorCoinBalance: number;
+    actualCreatorCoinBalance: number;
+    requesterId: string;
+    requestedId: string;
+    requestedUserName: string;
+    requiredMoxieAmountInUSD: number;
+};
 export type EthereumSignMessageResponseType = {
     signature: string;
     encoding: string;
@@ -254,44 +392,13 @@ export interface Wallet {
     delegated?: boolean;
 }
 
-export interface LiquidityPool {
-    poolName?: string;
-    poolAddress: string;
-    liquidityUSD: number;
-}
-
-export interface TokenDetails {
-    tokenName?: string;
-    tokenSymbol?: string;
-    tokenAddress?: string;
-    networkId?: number;
-    priceUSD?: string;
-    liquidityTop3PoolsUSD?: string;
-    fullyDilutedMarketCapUSD?: string;
-    uniqueHolders?: number;
-    uniqueBuysLast1Hour?: number;
-    uniqueBuysLast4Hours?: number;
-    uniqueBuysLast12Hours?: number;
-    uniqueBuysLast24Hours?: number;
-    uniqueSellsLast1Hour?: number;
-    uniqueSellsLast4Hours?: number;
-    uniqueSellsLast12Hours?: number;
-    uniqueSellsLast24Hours?: number;
-    changePercent1Hour?: string;
-    changePercent4Hours?: string;
-    changePercent12Hours?: string;
-    changePercent24Hours?: string;
-    high1Hour?: string;
-    high4Hours?: string;
-    high12Hours?: string;
-    high24Hours?: string;
-    low1Hour?: string;
-    low4Hours?: string;
-    low12Hours?: string;
-    low24Hours?: string;
-    volumeChange1Hour?: string;
-    volumeChange4Hours?: string;
-    volumeChange12Hours?: string;
-    volumeChange24Hours?: string;
-    liquidityPools?: LiquidityPool[];
+export interface CampaignTokenDetails {
+    tokenAddress: string;
+    tokenSymbol: string;
+    type: string;
+    minimumBalance: number;
+    startDate: Date;
+    endDate: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }

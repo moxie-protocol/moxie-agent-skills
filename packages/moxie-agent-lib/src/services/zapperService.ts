@@ -1,5 +1,6 @@
 import axios from "axios";
 import { elizaLogger, IAgentRuntime } from "@moxie-protocol/core";
+import { mockPortfolio, mockPortfolioV2 } from "./constants";
 const CACHE_EXPIRATION = 60000; // 1 minute in milliseconds
 
 interface PortfolioResponse {
@@ -76,7 +77,7 @@ interface AppBalance {
     products: Product[];
 }
 
-interface TokenNode {
+export interface TokenNode {
     id: string;
     tokenAddress: string;
     name: string;
@@ -85,6 +86,7 @@ interface TokenNode {
     balance: number;
     balanceUSD: number;
     holdingPercentage: number;
+    imgUrl: string;
 }
 export interface PortfolioV2Data {
     tokenBalances: {
@@ -106,7 +108,6 @@ export interface PortfolioV2Response {
 }
 
 const API_KEY = process.env.ZAPPER_API_KEY;
-
 const encodedKey = btoa(API_KEY);
 
 const client = axios.create({
@@ -123,22 +124,25 @@ export async function getPortfolioData(
     userId: string,
     runtime: IAgentRuntime
 ): Promise<Portfolio> {
-    try {
-        // Check cache first
-        elizaLogger.log(
-            "Getting portfolio data for user: ",
-            userId,
-            "with addresses: ",
-            addresses
-        );
-        const cacheKey = `PORTFOLIO-${userId}`;
-        const cachedPortfolio = await runtime.cacheManager.get(cacheKey);
+    if (!API_KEY) {
+        return mockPortfolio;
+    } else {
+        try {
+            // Check cache first
+            elizaLogger.log(
+                "Getting portfolio data for user: ",
+                userId,
+                "with addresses: ",
+                addresses
+            );
+            const cacheKey = `PORTFOLIO-${userId}`;
+            const cachedPortfolio = await runtime.cacheManager.get(cacheKey);
 
-        if (cachedPortfolio) {
-            return JSON.parse(cachedPortfolio as string);
-        }
+            if (cachedPortfolio) {
+                return JSON.parse(cachedPortfolio as string);
+            }
 
-        const PortfolioQuery = `
+            const PortfolioQuery = `
     query providerPorfolioQuery($addresses: [Address!]!, $networks: [Network!]!) {
         portfolio(addresses: $addresses, networks: $networks) {
         tokenBalances {
@@ -158,52 +162,56 @@ export async function getPortfolioData(
     }
     `;
 
-        // If not in cache, fetch from API
-        let attempts = 0;
-        const maxAttempts = 3;
-        const backoffMs = 1000;
+            // If not in cache, fetch from API
+            let attempts = 0;
+            const maxAttempts = 3;
+            const backoffMs = 1000;
 
-        while (attempts < maxAttempts) {
-            try {
-                const portfolioData: PortfolioResponse = await client.post("", {
-                    query: PortfolioQuery,
-                    variables: {
-                        addresses,
-                        networks,
-                    },
-                });
-                const portfolio = portfolioData.data.data.portfolio;
-                elizaLogger.log(
-                    "Portfolio data loaded successfully for wallets: ",
-                    addresses
-                );
+            while (attempts < maxAttempts) {
+                try {
+                    const portfolioData: PortfolioResponse = await client.post(
+                        "",
+                        {
+                            query: PortfolioQuery,
+                            variables: {
+                                addresses,
+                                networks,
+                            },
+                        }
+                    );
+                    const portfolio = portfolioData.data.data.portfolio;
+                    elizaLogger.log(
+                        "Portfolio data loaded successfully for wallets: ",
+                        addresses
+                    );
 
-                // Cache the result
-                await runtime.cacheManager.set(
-                    cacheKey,
-                    JSON.stringify(portfolio),
-                    {
-                        expires: Date.now() + CACHE_EXPIRATION,
+                    // Cache the result
+                    await runtime.cacheManager.set(
+                        cacheKey,
+                        JSON.stringify(portfolio),
+                        {
+                            expires: Date.now() + CACHE_EXPIRATION,
+                        }
+                    );
+
+                    return portfolio;
+                } catch (error) {
+                    attempts++;
+                    if (attempts === maxAttempts) {
+                        throw error;
                     }
-                );
-
-                return portfolio;
-            } catch (error) {
-                attempts++;
-                if (attempts === maxAttempts) {
-                    throw error;
+                    elizaLogger.warn(
+                        `Zapper API call failed, attempt ${attempts}/${maxAttempts}. Retrying...`
+                    );
+                    await new Promise((resolve) =>
+                        setTimeout(resolve, backoffMs * attempts)
+                    );
                 }
-                elizaLogger.warn(
-                    `Zapper API call failed, attempt ${attempts}/${maxAttempts}. Retrying...`
-                );
-                await new Promise((resolve) =>
-                    setTimeout(resolve, backoffMs * attempts)
-                );
             }
+        } catch (error) {
+            elizaLogger.error("Error fetching portfolio data:", error);
+            throw error;
         }
-    } catch (error) {
-        elizaLogger.error("Error fetching portfolio data:", error);
-        throw error;
     }
 }
 
@@ -213,15 +221,18 @@ export async function getPortfolioV2Data(
     userId: string,
     runtime: IAgentRuntime
 ): Promise<PortfolioV2Data> {
-    try {
-        const cacheKey = `PORTFOLIO-V2-${userId}`;
-        const cachedPortfolio = await runtime.cacheManager.get(cacheKey);
+    if (!API_KEY) {
+        return mockPortfolioV2;
+    } else {
+        try {
+            const cacheKey = `PORTFOLIO-V2-${userId}`;
+            const cachedPortfolio = await runtime.cacheManager.get(cacheKey);
 
-        if (cachedPortfolio) {
-            return JSON.parse(cachedPortfolio as string);
-        }
+            if (cachedPortfolio) {
+                return JSON.parse(cachedPortfolio as string);
+            }
 
-        const query = `
+            const query = `
             query PortfolioV2 ($addresses: [Address!]!, $networks: [Network!]!) {
                 portfolioV2 (addresses: $addresses, networks: $networks) {
                     tokenBalances {
@@ -246,18 +257,99 @@ export async function getPortfolioV2Data(
             }
         `;
 
+            let attempts = 0;
+            const maxAttempts = 3;
+            const backoffMs = 1000;
+
+            while (attempts < maxAttempts) {
+                try {
+                    const response = await client.post("", {
+                        query: query,
+                        variables: {
+                            addresses,
+                            networks,
+                        },
+                    });
+
+                    if (response.status !== 200) {
+                        throw new Error(
+                            `HTTP error! status: ${response.status}`
+                        );
+                    }
+
+                    const portfolioData = response.data.data.portfolioV2;
+                    await runtime.cacheManager.set(
+                        cacheKey,
+                        JSON.stringify(portfolioData),
+                        {
+                            expires: Date.now() + CACHE_EXPIRATION,
+                        }
+                    );
+
+                    return portfolioData;
+                } catch (error) {
+                    attempts++;
+                    if (attempts === maxAttempts) {
+                        throw error;
+                    }
+                    elizaLogger.warn(
+                        `Airstack API call failed, attempt ${attempts}/${maxAttempts}. Retrying...`
+                    );
+                    await new Promise((resolve) =>
+                        setTimeout(resolve, backoffMs * attempts)
+                    );
+                }
+            }
+        } catch (error) {
+            elizaLogger.error("Error fetching portfolioV2 data:", error);
+            throw error;
+        }
+    }
+}
+
+
+export async function getPortfolioV2DataByTokenAddress( traceId: string, addresses: string[], networks: string[], tokenAddress: string, moxieUserId: string): Promise<PortfolioV2Data> {
+    elizaLogger.info(`[getPortfolioV2DataByTokenAddress] [${traceId}] [${moxieUserId}] Getting portfolioV2 data by token address: ${tokenAddress}`);
+    try {
+        const query = `
+            query PortfolioV2 ($addresses: [Address!]!, $networks: [Network!]!, $tokenAddress: String!) {
+                portfolioV2 (addresses: $addresses, networks: $networks) {
+                    metadata {
+                        addresses
+                        networks
+                    }
+                    tokenBalances {
+                        byToken(filters: { tokenAddress: $tokenAddress }) {
+                            edges {
+                                cursor
+                                node {
+                                    tokenAddress
+                                    name
+                                    symbol
+                                    balance
+                                    balanceUSD
+                                    imgUrl
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        `;
+
         let attempts = 0;
         const maxAttempts = 3;
         const backoffMs = 1000;
 
         while (attempts < maxAttempts) {
             try {
-                const response = await client.post("", {
+                const response = await client.post('', {
                     query: query,
                     variables: {
                         addresses,
                         networks,
-                    },
+                        tokenAddress: tokenAddress ? tokenAddress.toLowerCase() : ""
+                    }
                 });
 
                 if (response.status !== 200) {
@@ -265,30 +357,19 @@ export async function getPortfolioV2Data(
                 }
 
                 const portfolioData = response.data.data.portfolioV2;
-                await runtime.cacheManager.set(
-                    cacheKey,
-                    JSON.stringify(portfolioData),
-                    {
-                        expires: Date.now() + CACHE_EXPIRATION,
-                    }
-                );
-
                 return portfolioData;
+
             } catch (error) {
                 attempts++;
                 if (attempts === maxAttempts) {
                     throw error;
                 }
-                elizaLogger.warn(
-                    `Airstack API call failed, attempt ${attempts}/${maxAttempts}. Retrying...`
-                );
-                await new Promise((resolve) =>
-                    setTimeout(resolve, backoffMs * attempts)
-                );
+                elizaLogger.warn(` [getPortfolioV2DataByTokenAddress] [${traceId}] [${moxieUserId}] Zapper getPortfolioV2DataByTokenAddress failed, attempt ${attempts}/${maxAttempts}. Retrying...`);
+                await new Promise(resolve => setTimeout(resolve, backoffMs * attempts));
             }
         }
     } catch (error) {
-        elizaLogger.error("Error fetching portfolioV2 data:", error);
+        elizaLogger.error(` [getPortfolioV2DataByTokenAddress] [${traceId}] [${moxieUserId}] Error fetching Zapper getPortfolioV2DataByTokenAddress data:`, error);
         throw error;
     }
 }

@@ -1,6 +1,7 @@
 import { Fta } from "../services/fta";
 import { MoxieUser } from "../services/types";
 import { MoxieClientWallet } from "../wallet";
+import { Portfolio, PortfolioV2Data } from "./zapperService";
 
 /**
  * REUSABLE MOCK DATA STARTS BELOW
@@ -22,37 +23,15 @@ export const mockMoxieUser: MoxieUser = {
     createdAt: "2024-12-20T14:37:34.348Z",
     identities: [
         {
-            id: "19b49f2a-8f57-4ebe-9897-a6dda30fb543",
-            userId: "M1",
-            type: "ENS",
-            connectedIdentitiesFetchStatus: "SUCCESS",
-            metadata: {
-                ens: "vitalik.eth",
-                expiryTimestamp: "2025-09-07T21:41:38.000Z",
-                resolvedAddress: "0xcbfbcbfca74955b8ab75dec41f7b9ef36f329879",
-            },
-            profileId: "vitalik.eth",
-            isActive: true,
-            createdAt: "2025-01-07T12:12:22.361Z",
-            updatedAt: "2025-01-07T12:12:22.361Z",
-            dataSource: "AIRSTACK",
-        },
-        {
             id: "fd14e2a4-11a2-4115-81b4-4b1d266ade64",
             userId: "M8",
             type: "FARCASTER",
             connectedIdentitiesFetchStatus: "SUCCESS",
             metadata: {
                 bio: "hullo",
-                fid: 5650,
-                pfp: "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/341d47e1-f746-4f5c-8fbe-d9e56fa66100/original",
-                type: "farcaster",
+                profileTokenId: "5650",
                 username: "vitalik.eth",
-                verifiedAt: "2024-12-20T14:59:37.000Z",
                 displayName: "Vitalik Buterin",
-                ownerAddress: "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-                firstVerifiedAt: "2024-12-20T14:59:37.000Z",
-                latestVerifiedAt: "2024-12-20T14:59:37.000Z",
             },
             profileId: "5650",
             isActive: true,
@@ -149,3 +128,70 @@ export const mockFta: Fta = {
     isFeatured: false,
     reserveRatio: 400000,
 };
+
+export const mockPortfolio: Portfolio = {
+    tokenBalances: [
+        {
+            address: "0x0000000000000000000000000000000000000000",
+            network: "BASE_MAINNET",
+            token: {
+                balance: 1000000000000000000,
+                balanceUSD: 1000000000000000000,
+                baseToken: {
+                    name: "ETH",
+                    address: "0x0000000000000000000000000000000000000000",
+                    symbol: "ETH",
+                },
+            },
+        },
+    ],
+};
+
+export const mockPortfolioV2: PortfolioV2Data = {
+    tokenBalances: {
+        totalBalanceUSD: 1000000000000000000,
+        byToken: {
+            edges: [
+                {
+                    cursor: "1",
+                    node: {
+                        id: "1",
+                        tokenAddress:
+                            "0x0000000000000000000000000000000000000000",
+                        name: "ETH",
+                        symbol: "ETH",
+                        price: 1000000000000000000,
+                        balance: 1000000000000000000,
+                        balanceUSD: 1000000000000000000,
+                        holdingPercentage: 100,
+                    },
+                },
+            ],
+        },
+    },
+    metadata: {
+        addresses: ["0x0000000000000000000000000000000000000000"],
+        networks: ["BASE_MAINNET"],
+    },
+};
+
+export const MOXIE_USER_PORTFOLIOS_QUERY = (filterConditions: string[]) => `
+      query GetPortfolioInfo {
+        MoxieUserPortfolios(
+          input: {filter: {${filterConditions.join(", ")}}}
+        ) {
+          MoxieUserPortfolio {
+            fanTokenSymbol
+            fanTokenName
+            fanTokenAddress
+            totalLockedAmount
+            totalUnlockedAmount
+            totalTvl
+            walletAddresses
+            currentPrice
+            lockedTvl
+            unlockedTvl
+          }
+        }
+      }
+    `;

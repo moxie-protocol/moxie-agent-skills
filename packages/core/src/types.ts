@@ -1556,3 +1556,32 @@ export enum ActionTimelineType {
     ForYou = "foryou",
     Following = "following",
 }
+
+export interface ModelConfigOptions {
+    // The name of the model to use. Optional. If not provided, the default name for the model provider and model class will be used.
+    name?: string;
+    // The maximum number of input tokens to use for the model. Optional. If not provided, the default maximum number of input tokens for the model provider will be used.
+    maxInputTokens?: number;
+    // The maximum number of output tokens to use for the model. Optional. If not provided, the default maximum number of output tokens for the model provider will be used.
+    maxOutputTokens?: number;
+    // The stop tokens to use for the model. Optional. If not provided, the default stop tokens for the model provider will be used.
+    stop?: string[];
+    // The temperature to use for the model. Optional. If not provided, the default temperature for the model provider will be used.
+    temperature?: number;
+    // The frequency penalty to use for the model. Optional. If not provided, the default frequency penalty for the model provider will be used.
+    frequency_penalty?: number;
+    // The presence penalty to use for the model. Optional. If not provided, the default presence penalty for the model provider will be used.
+    presence_penalty?: number;
+    // The repetition penalty to use for the model. Optional. If not provided, the default repetition penalty for the model provider will be used.
+    repetition_penalty?: number;
+    // The telemetry settings to use for the model. Optional. If not provided, the default telemetry settings for the model provider will be used.
+    experimental_telemetry?: TelemetrySettings;
+    // The provider of the model.
+    modelProvider: ModelProviderName;
+    // The class of the model to use.
+    modelClass: ModelClass;
+    // The endpoint to use for the model. if not provided, the default endpoint for the model provider will be used.
+    modelEndpoint?: string;
+    // The API key to use for the model.
+    apiKey: string;
+}
