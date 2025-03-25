@@ -204,15 +204,24 @@ export async function handleIneligibleMoxieUsers(ineligibleMoxieUsers, callback,
     if (ineligibleMoxieUsers.length == 1) {
         const userprofileLinkText = `[@${ineligibleMoxieUsers[0].requestedUserName}](https://moxie.xyz/profile/${ineligibleMoxieUsers[0].requestedId})`;
 
+        let remainingNoOfTokensToBuy = ineligibleMoxieUsers[0].expectedCreatorCoinBalance - ineligibleMoxieUsers[0].actualCreatorCoinBalance;
+        if (remainingNoOfTokensToBuy < 0) {
+            remainingNoOfTokensToBuy = 0;
+        }
+
         if (breakLine === true) {
-            messageParts.push(`I can also get you that social alpha on ${userprofileLinkText}, but you’ll need some ${userprofileLinkText} coins to unlock it.\n\n`);
+            if (ineligibleMoxieUsers[0].actualCreatorCoinBalance > 0) {
+                messageParts.push(`I can also get you that social alpha on ${userprofileLinkText}, but you’ll need some ${userprofileLinkText} coins to unlock it.\n\n`);
+            } else {
+                messageParts.push(`I can also get you that social alpha on ${userprofileLinkText}, but first you’ll need to buy ${remainingNoOfTokensToBuy} of their data coins to unlock it.\n\n`);
+            }
         } else {
-        messageParts.push(`I can get you that social alpha on ${userprofileLinkText}, but you’ll need some ${userprofileLinkText} coins to unlock it.\n\n`);
+            messageParts.push(`I can get you that social alpha on ${userprofileLinkText}, but first you’ll need to buy ${remainingNoOfTokensToBuy} of their data coins to unlock it.\n\n`);
         }
         if (ineligibleMoxieUsers[0].actualCreatorCoinBalance > 0) {
-            messageParts.push(`It costs ${ineligibleMoxieUsers[0].expectedCreatorCoinBalance}(~$${roundToDecimalPlaces(ineligibleMoxieUsers[0].requiredMoxieAmountInUSD, 2)}) ${userprofileLinkText} to access, and right now, you have only ${ineligibleMoxieUsers[0].actualCreatorCoinBalance} ${userprofileLinkText} in your wallet. Want me to grab them for you now? Just say the word, and I’ll handle it! 🚀`);
+            messageParts.push(`It costs ${remainingNoOfTokensToBuy} (~$${roundToDecimalPlaces(ineligibleMoxieUsers[0].requiredMoxieAmountInUSD, 2)}) ${userprofileLinkText} to access, and right now, you have only ${ineligibleMoxieUsers[0].actualCreatorCoinBalance} ${userprofileLinkText} in your wallet. Want me to grab them for you now? Just say the word, and I’ll handle it! 🚀`);
         } else {
-            messageParts.push(`It costs ${ineligibleMoxieUsers[0].expectedCreatorCoinBalance}(~$${roundToDecimalPlaces(ineligibleMoxieUsers[0].requiredMoxieAmountInUSD, 2)}) ${userprofileLinkText} to access, you don’t have any in your wallet. Want me to grab them for you now? Just say the word, and I’ll handle it! 🚀`);
+            messageParts.push(`It costs ~$${roundToDecimalPlaces(ineligibleMoxieUsers[0].requiredMoxieAmountInUSD, 2)} for lifetime access. Do you want me to buy it for you?`);
         }
 
         for (const part of messageParts) {
