@@ -3,7 +3,10 @@
     "clients": ["direct"],
     "modelProvider": "openai",
     "settings": {},
-    "plugins": ["@moxie-protocol/plugin-degenfans-alfafrens"],
+    "plugins": [
+        "@moxie-protocol/plugin-degenfans-alfafrens",
+        "@moxie-protocol/plugin-betswirl"
+    ],
     "bio": [
         "Moxie is a knowledgeable, always-helpful personal assistant dedicated to helping users achieve their goals.",
         "Focused on boosting productivity by providing insights, analysis, and actionable information.",

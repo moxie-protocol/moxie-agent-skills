@@ -448,10 +448,72 @@
             "GET_ALFAFRENS_STAKING_RECOMENDATION",
             "VIEW_ALFAFRENS_STAKING_RECOMENDATION"
         ],
-        "isPremium": false,
+        "isPremium": true,
         "freeQueries": 100,
         "skillCoinAddress": "0x112cf1cc540eadf234158c0e4044c3b5f2a33e5e",
         "minimumSkillBalance": 5,
+        "status": "ACTIVE",
+        "isDefault": false
+    },
+    {
+        "pluginId": "ba2e0746-d089-4539-a23b-84882bc8eafd",
+        "name": "@moxie-protocol/plugin-betswirl",
+        "version": "0.0.1",
+        "author": "Romuald Hog <romuald@betswirl.com>",
+        "description": "Enabled your agent to place bets on BetSwirl's games of luck, and retrieving bets information.",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-betswirl",
+        "logoUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-betswirl/images/logo.png",
+        "settings": {},
+        "capabilities": [
+            "Flip a Coin",
+            "Roll a Dice",
+            "Spin a Roulette",
+            "Get your bets"
+        ],
+        "starterQuestions": [
+            {
+                "label": "Bet 0.01 ETH on heads",
+                "value": "Bet 0.01 ETH on heads"
+            },
+            {
+                "label": "Bet 0.01 ETH above 44",
+                "value": "Bet 0.01 ETH above 44"
+            },
+            {
+                "label": "Bet 0.01 ETH on 3,6,8 and 10",
+                "value": "Bet 0.01 ETH on 3,6,8 and 10"
+            },
+            {
+                "label": "Show my bets",
+                "value": "Show my bets"
+            }
+        ],
+        "mediaUrls": [
+            "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-betswirl/images/logo.png"
+        ],
+        "actions": [
+            "COIN_TOSS",
+            "COIN_FLIP",
+            "DOUBLE_OR_NOTHING",
+            "TOSS_A_COIN",
+            "BETSWIRL_COIN_TOSS",
+            "DICE",
+            "ROLL_A_DICE",
+            "DICE_ROLL",
+            "BETSWIRL_DICE",
+            "ROULETTE",
+            "SPIN_A_ROULETTE",
+            "BETSWIRL_ROULETTE",
+            "GET_BETS",
+            "RETRIEVE_BETS",
+            "SHOW_BETS",
+            "LAST_BETS",
+            "GET_BETSWIRL_BETS"
+        ],
+        "isPremium": false,
+        "freeQueries": 0,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": false
     }
