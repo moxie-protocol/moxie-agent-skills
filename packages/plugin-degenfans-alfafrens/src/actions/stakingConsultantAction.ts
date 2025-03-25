@@ -13,7 +13,7 @@ import {
 
 import { stakingConsultantTemplate } from "../templates";
 import { Staking, StakingSchema } from "../types";
-import { FarcasterMetadata, ftaService, MoxieUser } from "@moxie-protocol/moxie-agent-lib";
+import { FarcasterMetadata, ftaService, MoxieUser, TwitterMetadata } from "@moxie-protocol/moxie-agent-lib";
 import { getStakingOptions } from "../utils/degenfansApi";
 import { checkDegenFansCoins } from "../utils/moxieSubgraphApi";
 
@@ -70,13 +70,19 @@ export const stakingConsultantAction: Action = {
                     };
         
               let fid:number=null;
+              let xhandle:string=null;
               const fcId = moxieUserInfo.identities.find(o=>o.type==='FARCASTER');
               if(fcId){
                 fid=(fcId.metadata as FarcasterMetadata).profileTokenId;
               }
+
+              const xId = moxieUserInfo.identities.find(o=>o.type==='TWITTER');
+              if(xId){
+                xhandle=(fcId.metadata as TwitterMetadata).username;
+              }
                     
               const stakingData:Staking = {amount:amount,userAddress:userAddress,mysubs:mysubs,mystake:mystake,minsubs:minsubs};
-              const resp =   await  getStakingOptions(fid, stakingData);  
+              const resp =   await  getStakingOptions(fid,xhandle, stakingData);  
               let tbl:string="\n";
               if(resp.status==200){
                 if(resp.data && resp.data.length > 0){
