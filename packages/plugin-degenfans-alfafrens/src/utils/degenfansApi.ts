@@ -19,7 +19,7 @@ export interface StakingOption{
 
 const degenfansApiBaseUrl="https://degenfans.xyz/servlet/rest-services/main/af/v1";
  
-  export function getStakingOptions(subjectAddress:string, data:Staking): Promise<DegenFansResponse<StakingOption[]>> {
+  export function getStakingOptions(fid:number, data:Staking): Promise<DegenFansResponse<StakingOption[]>> {
     // For now, consider the data is stored on a static `users.json` file
     return fetch(degenfansApiBaseUrl+'/alfafrens-staking-consultant/?token='+process.env.DEGENFANS_API, {
       method: 'POST',
@@ -27,7 +27,7 @@ const degenfansApiBaseUrl="https://degenfans.xyz/servlet/rest-services/main/af/v
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({subjectAddress, staking:data})
+      body: JSON.stringify({fid, staking:data})
     } )
       // the JSON body is taken from the response
       .then(res => res.json())
