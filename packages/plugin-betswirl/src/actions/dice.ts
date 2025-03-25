@@ -190,7 +190,7 @@ export const diceAction: Action = {
                 process.env.BETSWIRL_THEGRAPH_KEY
             );
             const resolutionMessage = `
-You **${bet.isWin ? "Won" : "Lost"} ${bet.isWin ? `💰 ${bet.payoutMultiplier.toFixed(2)}x` : "💥"}**,
+You **${bet.isWin ? "Won" : "Lost"} ${bet.isWin ? `💰 ${bet.formattedPayoutMultiplier}x` : "💥"}**,
 Rolled number: ${bet.decodedRolled}
 Payout: [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) ${tokenForMoxieTerminal}
 
