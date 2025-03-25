@@ -69,7 +69,7 @@ class TwitterService {
                 const now = Date.now();
                 const hoursDiff = (now - tweetTime) / (1000 * 60 * 60);
 
-                if (hoursDiff <= 48) {
+                if (hoursDiff <= Number(process.env.TWITTER_MAX_HOURS_AGE || '48')) {
                     tweet.html = "";
                     elizaLogger.debug(
                         traceId,
