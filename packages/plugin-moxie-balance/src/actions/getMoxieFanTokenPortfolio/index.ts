@@ -121,7 +121,7 @@ export default {
 
             let moxieUserInfo: MoxieUser =
                 await moxieUserService.getUserByPrivyBearerToken(state.authorizationHeader as string);
-            let moxieUserInfoMultiple: MoxieUser[];
+            let moxieUserInfoMultiple: MoxieUser[] = [];
             let isSelfPortolioRequested = false;
 
             let requestedMoxieUserIds = (message.content.text.match(/@\[[\w\.-]+\|M\d+\]/g) || [])
