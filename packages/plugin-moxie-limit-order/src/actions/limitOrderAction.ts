@@ -76,7 +76,7 @@ export const limitOrderAction = {
 
             // Validate limit order content
             const validationResult = isValidLimitOrderContent(context, limitOrderOptions.data);
-            if (validationResult.callBackTemplate) {
+            if (!validationResult) {
                 elizaLogger.debug(traceId, `[limitOrderAction] [${moxieUserId}] [isValidLimitOrderContent] validationResult: ${JSON.stringify(validationResult)}`);
                 await callback?.({content: validationResult.callBackTemplate.content, text: validationResult.callBackTemplate.text});
                 return true;
@@ -579,8 +579,7 @@ async function processSingleLimitOrder(
                     agentWallet.address,
                     sellTokenAmountInWEI,
                     sellTokenDecimals,
-                    sellTokenDecimals,
-                    buyTokenAddress
+                    sellTokenDecimals // here buyTokenDecimals is same as sellTokenDecimals
                 );
                 elizaLogger.debug(traceId,`[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [ETH_TO_WETH_SWAP] buyAmountInWEI: ${buyAmountInWEI.data}`);
                 sellTokenSymbol = WETH;
@@ -733,7 +732,6 @@ async function getTargetQuantityForBalanceBasedSwaps(
  * @param sellAmountInWEI The amount of the token to sell in WEI
  * @param sellTokenDecimals The number of decimals of the token to sell
  * @param buyTokenDecimals The number of decimals of the token to buy
- * @param rootBuyTokenAddress The address of the token to buy
  * @returns Promise that resolves to the amount of the token to buy in WEI
  */
 async function swap(
@@ -746,7 +744,6 @@ async function swap(
     sellAmountInWEI: bigint,
     sellTokenDecimals: number,
     buyTokenDecimals: number,
-    rootBuyTokenAddress: string
 ): Promise<FunctionResponse<bigint>> {
     const traceId = context.traceId;
     const moxieUserId = context.moxieUserId;
@@ -779,8 +776,7 @@ async function swap(
                 sellTokenDecimals,
                 agentWalletAddress,
                 context.callback,
-                buyTokenAddress,
-                rootBuyTokenAddress
+                buyTokenAddress
             );
             throw new Error(callbackTemplate.text);
         }
@@ -941,8 +937,6 @@ async function swap(
  * @param sellTokenDecimals - The decimals of the sell token
  * @param agentWalletAddress - The address of the agent wallet
  * @param callback - The callback function to receive status updates
- * @param buyTokenAddress - The address of the buy token
- * @param rootBuyTokenAddress - The address of the root buy token
  */
 async function handleInsufficientBalance(
     traceId: string,
@@ -956,7 +950,6 @@ async function handleInsufficientBalance(
     agentWalletAddress: string,
     callback: HandlerCallback,
     buyTokenAddress: string,
-    rootBuyTokenAddress: string
 ): Promise<CallbackTemplate> {
     elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [handleInsufficientBalance] [currentWalletBalance]: ${JSON.stringify(currentWalletBalance)}`);
     // Get indicative price of buy token in USD
@@ -980,7 +973,6 @@ async function handleInsufficientBalance(
     }
     const otherTokensWithSufficientBalance = currentWalletBalance.tokenBalances.filter((token) =>
         (!buyTokenAddress || token.token.baseToken.address.toLowerCase() !== buyTokenAddress.toLowerCase()) &&
-        (!rootBuyTokenAddress || token.token.baseToken.address.toLowerCase() !== rootBuyTokenAddress.toLowerCase()) &&
         Decimal(token.token.balanceUSD).gt(Decimal(indicativePriceOfBuyTokenInUSD.toString()))
     );
     elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [handleInsufficientBalance] [otherTokensWithSufficientBalance]: ${JSON.stringify(otherTokensWithSufficientBalance)}`);
