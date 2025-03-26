@@ -48,7 +48,7 @@ export const rouletteTemplate = `
 Extract the following details to play on Roulette:
 - **betAmount** (String): The amount to wager.
 - **numbers** (Array<number>): The numbers to bet on. Can be several unique numbers from ${MIN_SELECTABLE_ROULETTE_NUMBER} to ${MAX_SELECTABLE_ROULETTE_NUMBER}.
-- **token** (String): The optional token symbol.
+- **token** (String): The token symbol.
 
 Provide the values in the following JSON format:
 
@@ -90,7 +90,7 @@ Bet 0.01 ETH on 8 11 3 9
 {
     "betAmount": "0.5",
     "numbers": [8, 11, 3, 9],
-    "token": "",
+    "token": "ETH",
 }
 \`\`\`
 
