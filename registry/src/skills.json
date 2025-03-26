@@ -67,7 +67,7 @@
         ],
         "starterQuestions": [
             {
-                "label": "Send 50% of my $moxie to betashop.eth",
+                "label": "Send 50% of my $moxie to @betashop.eth",
                 "value": "Send 50% of my $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] to @[betashop.eth|M4]"
             },
             {
@@ -194,7 +194,7 @@
                 "value": "Buy me $25 worth of $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527]"
             },
             {
-                "label": "Swap 100 $degen for @moxie_ai",
+                "label": "Swap 100 $degen for $moxie_ai",
                 "value": "Swap 100 $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed] for $[MOXIE_AI|0xda7e153bbe75902bd23496284fe0c4b90c9ace7b]"
             },
             {
