@@ -955,7 +955,7 @@ async function getCreatorCoinDetails(
                 };
             }
             const tokenSubjectAddress = ftaResponses.data[tokenCreatorId]?.subjectAddress;
-            subjectTokenDetails = await getSubjectTokenDetailsBySubjectAddress(tokenSubjectAddress);
+            subjectTokenDetails = await getSubjectTokenDetailsBySubjectAddress(context.traceId, tokenSubjectAddress);
         } catch (error) {
             elizaLogger.error(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [getCreatorCoinDetails] Error getting FTA responses for creator ID ${tokenCreatorId}: ${error}`);
             return {
