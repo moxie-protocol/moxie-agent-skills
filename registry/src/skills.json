@@ -73,12 +73,12 @@
         ],
         "starterQuestions": [
             {
-                "label": "Send 50% of my $moxie to betashop.eth",
-                "value": "Send 50% of my $moxie to betashop.eth"
+                "label": "Send 50% of my $moxie to @betashop.eth",
+                "value": "Send 50% of my $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] to @[betashop.eth|M4]"
             },
             {
                 "label": "Send 25% of my $eth to @betashop.eth",
-                "value": "Send 25% of my $eth to @betashop.eth"
+                "value": "Send 25% of my $eth to @[betashop.eth|M4]"
             }
         ],
         "mediaUrls": [
@@ -129,24 +129,20 @@
         ],
         "starterQuestions": [
             {
-                "label": "What’s trending with my top creators?",
-                "value": "What’s trending with my top creators?"
-            },
-            {
                 "label": "Analyze portfolio and trades for @maretus and @betashop",
-                "value": "Analyze portfolio and trades for @maretus and @betashop"
+                "value": "Analyze portfolio and trades for @[maretus|M7164] and @[betashop.eth|M4]"
             },
             {
                 "label": "Show me recent trades for @maretus",
-                "value": "Show me recent trades for @maretus"
+                "value": "Show me recent trades for @[maretus|M7164]"
             },
             {
                 "label": "Show me social media sentiment from @betashop.eth and @jessepollak",
-                "value": "Show me social media sentiment from @betashop.eth and @jessepollak"
+                "value": "Show me social media sentiment from @[betashop.eth|M4] and @[jessepollak|M1245]"
             },
             {
-                "label": "What’s buzzing today on socials?",
-                "value": "What’s buzzing today on socials?"
+                "label": "What's buzzing today on socials?",
+                "value": "What's buzzing today on socials?"
             }
         ],
         "mediaUrls": [
@@ -212,15 +208,15 @@
         "starterQuestions": [
             {
                 "label": "Buy me $25 worth of $moxie",
-                "value": "Buy me $25 worth of $moxie"
+                "value": "Buy me $25 worth of $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527]"
             },
             {
-                "label": "Swap 100 $degen for @moxie_ai",
-                "value": "Swap 100 $degen for @moxie_ai"
+                "label": "Swap 100 $degen for $moxie_ai",
+                "value": "Swap 100 $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed] for $[MOXIE_AI|0xda7e153bbe75902bd23496284fe0c4b90c9ace7b]"
             },
             {
                 "label": "Use 40% of my $eth to buy $moxie and 20% to buy $degen",
-                "value": "Use 40% of my $eth to buy $moxie and 20% to buy $degen"
+                "value": "Use 40% of my $eth to buy $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] and 20% to buy $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed]"
             }
         ],
         "mediaUrls": [
@@ -271,11 +267,11 @@
             },
             {
                 "label": "Analyze @maretus portfolio",
-                "value": "Analyze @maretus portfolio"
+                "value": "Analyze @[maretus|M7164] portfolio"
             },
             {
                 "label": "Compare portfolios of @betashop.eth @macster @sgniwder",
-                "value": "Compare portfolios of @betashop.eth @macster @sgniwder"
+                "value": "Compare portfolios of @[betashop.eth|M4] @[maretus|M7164] @[sgniwder|M739]"
             }
         ],
         "mediaUrls": [
@@ -337,8 +333,8 @@
                 "value": "Who are the top traders today on Base?"
             },
             {
-                "label": "Show today’s trending tokens on Base along with the top traders",
-                "value": "Show today’s trending tokens on Base along with the top traders"
+                "label": "Show today's trending tokens on Base along with the top traders",
+                "value": "Show today's trending tokens on Base along with the top traders"
             },
             {
                 "label": "Who are the biggest $bnkr whales?",
@@ -437,12 +433,12 @@
                 "value": "What are people saying today about $[KTA|0xc0634090f2fe6c6d75e61be2b949464abb498973]"
             },
             {
-                "label": "What’s the sentiment on $DRB?",
-                "value": "What’s the sentiment on $[DRB|0x3ec2156d4c0a9cbdab4a016633b7bcf6a8d68ea2]"
+                "label": "What's the sentiment on $DRB?",
+                "value": "What's the sentiment on $[DRB|0x3ec2156d4c0a9cbdab4a016633b7bcf6a8d68ea2]"
             },
             {
-                "label": "What’s the vibe on $DEGEN?",
-                "value": "What’s the vibe on $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed]?"
+                "label": "What's the vibe on $DEGEN?",
+                "value": "What's the vibe on $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed]?"
             }
         ],
         "mediaUrls": [
