@@ -48,7 +48,13 @@
         "skillCoinAddress": "",
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
-        "isDefault": true
+        "isDefault": true,
+        "loaders": [
+            "Searching onchain sources",
+            "Analyzing data",
+            "Synthesizing results",
+            "Preparing insights"
+        ]
     },
     {
         "pluginId": "927fb66c-2ebc-48e1-82a8-907c6e54e379",
@@ -98,7 +104,11 @@
         "skillCoinAddress": "",
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
-        "isDefault": true
+        "isDefault": true,
+        "loaders": [
+            "Initiating transaction",
+            "Writing to the Base blockchain"
+        ]
     },
     {
         "pluginId": "5d3b79e2-ac61-0bb6-a3ba-b0e00b943614",
@@ -171,7 +181,14 @@
         "skillCoinAddress": "",
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
-        "isDefault": true
+        "isDefault": true,
+        "loaders": [
+            "Searching Farcaster",
+            "Searching X",
+            "Analyzing data",
+            "Synthesizing results",
+            "Preparing insights"
+        ]
     },
     {
         "pluginId": "b5622f90-987e-51d1-bea9-5b1471bb9379",
@@ -222,7 +239,11 @@
         "skillCoinAddress": "",
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
-        "isDefault": true
+        "isDefault": true,
+        "loaders": [
+            "Initiating transaction",
+            "Writing to the Base blockchain"
+        ]
     },
     {
         "pluginId": "0ad0731e-698b-04bf-abeb-5d29cc36759f",
@@ -283,7 +304,13 @@
         "skillCoinAddress": "",
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
-        "isDefault": true
+        "isDefault": true,
+        "loaders": [
+            "Searching onchain sources",
+            "Analyzing data",
+            "Synthesizing results",
+            "Preparing insights"
+        ]
     },
     {
         "pluginId": "a8c0c53a-e4e5-0848-b69b-a17af97d64dd",
@@ -334,7 +361,14 @@
         "skillCoinAddress": "0x125490489a27d541e39813c08d260debac071bb7",
         "minimumSkillBalance": 1,
         "status": "ACTIVE",
-        "isDefault": true
+        "isDefault": true,
+        "loaders": [
+            "Searching onchain sources",
+            "Analyzing 🐋 🐋 🐋",
+            "Doing robot things",
+            "Synthesizing results",
+            "Preparing insights"
+        ]
     },
     {
         "pluginId": "36c9a919-5a55-4645-9008-cfd32ec4b5a2",
@@ -374,42 +408,56 @@
         "skillCoinAddress": "",
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
-        "isDefault": true
+        "isDefault": true,
+        "loaders": [
+            "Analyzing request",
+            "Setting limits",
+            "Initiating transaction",
+            "Writing to the Base blockchain"
+        ]
     },
     {
-      "pluginId": "0ad0731e-698b-04bf-abeb-5d29cc36759d",
-      "name": "@moxie-protocol/plugin-token-social-sentiment",
-      "displayName": "Token Sentiment",
-      "version": "0.1.8+build.1",
-      "author": null,
-      "description": "Analyze token sentiments on X and Farcaster!",
-      "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-token-social-sentiment",
-      "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/e9ac0912aba19398350aeaa63006211f0ccca403/packages/plugin-moxie-token-social-sentiment/images/logo.svg",
-      "settings": {},
-      "capabilities": ["Analyze token sentiments on X and Farcaster"],
-      "starterQuestions": [
-        {
-          "label": "What are people saying today about $KTA?",
-          "value": "What are people saying today about $[KTA|0xc0634090f2fe6c6d75e61be2b949464abb498973]"
-        },
-        {
-          "label": "What's the sentiment on $DRB?",
-          "value": "What's the sentiment on $[DRB|0x3ec2156d4c0a9cbdab4a016633b7bcf6a8d68ea2]"
-        },
-        {
-          "label": "What's the vibe on $DEGEN?",
-          "value": "What's the vibe on $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed]?"
-        }
-      ],
-      "mediaUrls": [
-        "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-token-social-sentiment/images/logo.svg"
-      ],
-      "actions": ["TOKEN_SOCIAL_SENTIMENT"],
-      "isPremium": false,
-      "freeQueries": 0,
-      "skillCoinAddress": "",
-      "minimumSkillBalance": 0,
-      "status": "ACTIVE",
-      "isDefault": true
+        "pluginId": "0ad0731e-698b-04bf-abeb-5d29cc36759d",
+        "name": "@moxie-protocol/plugin-token-social-sentiment",
+        "displayName": "Token Sentiment",
+        "version": "0.1.8+build.1",
+        "author": null,
+        "description": "Analyze token sentiments on X and Farcaster!",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-token-social-sentiment",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/e9ac0912aba19398350aeaa63006211f0ccca403/packages/plugin-moxie-token-social-sentiment/images/logo.svg",
+        "settings": {},
+        "capabilities": ["Analyze token sentiments on X and Farcaster"],
+        "starterQuestions": [
+            {
+                "label": "What are people saying today about $KTA?",
+                "value": "What are people saying today about $[KTA|0xc0634090f2fe6c6d75e61be2b949464abb498973]"
+            },
+            {
+                "label": "What's the sentiment on $DRB?",
+                "value": "What's the sentiment on $[DRB|0x3ec2156d4c0a9cbdab4a016633b7bcf6a8d68ea2]"
+            },
+            {
+                "label": "What's the vibe on $DEGEN?",
+                "value": "What's the vibe on $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed]?"
+            }
+        ],
+        "mediaUrls": [
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-token-social-sentiment/images/logo.svg"
+        ],
+        "actions": ["TOKEN_SOCIAL_SENTIMENT"],
+        "isPremium": false,
+        "freeQueries": 0,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
+        "status": "ACTIVE",
+        "isDefault": true,
+        "loaders": [
+            "Searching X",
+            "Searching Farcaster",
+            "Analyzing sentiments",
+            "Feeling the vibes",
+            "Synthesizing results",
+            "Preparing insights"
+        ]
     }
 ]

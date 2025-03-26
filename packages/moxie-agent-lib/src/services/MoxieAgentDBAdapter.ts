@@ -132,6 +132,44 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
                     skillCoinAddress: row.skill_coin_address,
                     minimumSkillBalance: row.minimum_skill_balance,
                     isFeatured: row.is_featured,
+                    loaders: row.loaders,
+                };
+                return skill;
+            } else {
+                return null;
+            }
+        });
+    }
+
+    async getSkillByAction(action: string): Promise<Skill | null> {
+        const skillsTableName = process.env.SKILLS_TABLE_NAME || "skills";
+        const query = `SELECT * FROM ${skillsTableName} WHERE actions @> ARRAY[$1]`;
+        return this.pgAdapter.query(query, [action]).then((result) => {
+            if (result.rows.length > 0) {
+                const row = result.rows[0];
+                let skill: Skill = {
+                    id: row.id,
+                    name: row.name,
+                    displayName: row.display_name,
+                    version: row.version,
+                    author: row.author,
+                    description: row.description,
+                    githubUrl: row.github_url,
+                    logoUrl: row.logo_url,
+                    status: row.status,
+                    isDefault: row.is_default,
+                    installedStatus: row.installed_status,
+                    settings: row.settings,
+                    capabilities: row.capabilities,
+                    starterQuestions: row.starter_questions,
+                    mediaUrls: row.media_urls,
+                    actions: row.actions,
+                    isPremium: row.is_premium,
+                    freeQueries: row.free_queries,
+                    skillCoinAddress: row.skill_coin_address,
+                    minimumSkillBalance: row.minimum_skill_balance,
+                    isFeatured: row.is_featured,
+                    loaders: row.loaders,
                 };
                 return skill;
             } else {
@@ -167,6 +205,7 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
             "s.status",
             "s.is_default",
             "s.is_featured",
+            "s.loaders",
         ];
         if (userId !== "") {
             selectFields.push(
@@ -203,6 +242,7 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
                 skillCoinAddress: row.skill_coin_address,
                 minimumSkillBalance: row.minimum_skill_balance,
                 isFeatured: row.is_featured,
+                loaders: row.loaders,
             }));
         });
     }
