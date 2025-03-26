@@ -83,8 +83,9 @@ export const stakingConsultantAction: Action = {
                     
               const stakingData:Staking = {amount:amount,userAddress:userAddress,mysubs:mysubs,mystake:mystake,minsubs:minsubs};
               const resp =   await  getStakingOptions(fid,xhandle, stakingData);  
-              let tbl:string="\n";
+              let tbl:string="";
               if(resp.status==200){
+                tbl+="\n";
                 if(resp.data && resp.data.length > 0){
                     tbl+="|rank|AlfaFrens Channel|ROI Spark/mo|current stake|\n";
                     tbl+="|------:|:--------|----:|------|\n";

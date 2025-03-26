@@ -19,22 +19,37 @@ export interface StakingOption{
 
 const degenfansApiBaseUrl="https://degenfans.xyz/servlet/rest-services/main/af/v1";
  
-  export function getStakingOptions(fid:number, xhandle:string, data:Staking): Promise<DegenFansResponse<StakingOption[]>> {
-    // For now, consider the data is stored on a static `users.json` file
-    return fetch(degenfansApiBaseUrl+'/alfafrens-staking-consultant/?token='+process.env.DEGENFANS_API, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({fid, xhandle, staking:data})
-    } )
-      // the JSON body is taken from the response
-      .then(res => res.json())
-      .then(res => {
-        // The response has an `any` type, so we need to cast
-        // it to the `User` type, and return it from the promise
-        return res as DegenFansResponse<StakingOption[]>
-      })
+  export async function getStakingOptions(fid:number, xhandle:string, data:Staking): Promise<DegenFansResponse<StakingOption[] | null>> {
+ 
+      try {
+        // Make the HTTP request using fetch
+        const response = await fetch(degenfansApiBaseUrl+'/alfafrens-staking-consultant/?token='+process.env.DEGENFANS_API, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({fid, xhandle, staking:data})
+        } );
+    
+        // Check if the response status is OK (status code 200-299)
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+    
+        // Parse the JSON response
+        const apiData = await response.json() as DegenFansResponse<StakingOption[]>;
+        
+        return apiData;  // Return the parsed data
+      } catch (error) {
+   
+        if (error instanceof Error) {
+          return {message:error.message, status:500} as DegenFansResponse<null>;
+        } else {
+          return {message:'Unexpected error:', status:500} as DegenFansResponse<null>;
+        }
+        // You can also return null or a default value in case of an error
+    
+      }
   }
 
