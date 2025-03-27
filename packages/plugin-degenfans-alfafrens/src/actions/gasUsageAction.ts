@@ -107,7 +107,7 @@ export const gasUsageAction: Action = {
             {
                 user: "{{user2}}",
                 content: {
-                    text: "The balance of your agent wallet is 0.01 ETH",
+                    text: "Hi Degenfans,\n![gas usage image](imageUrl)",
                     action: "GET_ALFAFRENS_GAS_USAGE",
                 },
             },
