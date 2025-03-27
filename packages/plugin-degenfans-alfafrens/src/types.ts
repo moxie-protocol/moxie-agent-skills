@@ -11,7 +11,7 @@ export interface Staking {
   
 
 export const StakingSchema = z.object({
-    amount: z.number().min(1),
+    amount: z.number().optional(),
     userAddress: z.string().optional(),
     mysubs: z.boolean(),
     mystake: z.boolean(),
