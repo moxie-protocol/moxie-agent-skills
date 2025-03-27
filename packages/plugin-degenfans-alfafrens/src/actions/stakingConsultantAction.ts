@@ -97,7 +97,7 @@ export const stakingConsultantAction: Action = {
                 }
 
                 if(resp.data.amountRandom){
-                    tbl+="\n* you can also specify a staking amount to get a more precise result"
+                    tbl+="\n* you can also specify a staking amount to get a more precise result, e.g. 15000 AF"
                 }
 
                 if(resp.data.matchType){
