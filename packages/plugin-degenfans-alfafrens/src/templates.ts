@@ -114,3 +114,53 @@ I want to stake 4600 AF with minimum subscriptions 10
 Here are the recent user messages for context:
 {{recentMessages}}
 `;
+
+
+
+export const gasUsageTemplate = `
+Extract the following details to the users gas usage:
+- **userAddress** (String): The user address of the AlfaFrens account. Can be either:
+  - A valid Ethereum address following regex format: ^0x[a-fA-F0-9]{40}$
+  - A user name in format: degenfans
+
+Provide the values in the following JSON format:
+
+\`\`\`json
+{
+    "userAddress":string,
+}
+\`\`\`
+
+Here are example messages and their corresponding responses:
+
+**Message 1**
+
+\`\`\`
+give me gas usage informations for the user 0x114B242D931B47D5cDcEe7AF065856f70ee278C4
+\`\`\`
+
+**Response 1**
+
+\`\`\`json
+{
+    "userAddress": "0x114B242D931B47D5cDcEe7AF065856f70ee278C4",
+}
+\`\`\`
+
+**Message 2**
+
+\`\`\`
+show me gas usage for degenfans
+\`\`\`
+
+**Response 2**
+
+\`\`\`json
+{
+    "userAddress": "degenfans",
+}
+\`\`\`
+
+Here are the recent user messages for context:
+{{recentMessages}}
+`;
