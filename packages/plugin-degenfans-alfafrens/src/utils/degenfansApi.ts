@@ -82,7 +82,7 @@ function callGetDfApi<T>(url:string){
   return callDfApi<T>(url,Method.GET,null);
 }
  
-  export async function getStakingOptions(fid:number, xhandle:string, data:Staking): Promise<DegenFansResponse<StakingResult | null>> {
+  export async function getStakingOptions(fid:string, xhandle:string, data:Staking): Promise<DegenFansResponse<StakingResult | null>> {
       return callPostDfApi<StakingResult>('/alfafrens-staking-consultant/?token='+process.env.DEGENFANS_API,JSON.stringify({fid, xhandle, staking:data}));
   }
 
