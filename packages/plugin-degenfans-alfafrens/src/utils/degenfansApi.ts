@@ -16,6 +16,18 @@ export interface StakingOption{
   currentStake:number,
 }
 
+export interface StakingResult{
+  stakingOptions:StakingOption[],
+  userName?:string,
+  userAddress?:string,
+  matchType?:string,
+  amount:number,
+  amountRandom:boolean,
+}
+
+
+ 
+
 enum Method {
   GET = "GET",
   POST = "POST",
@@ -70,8 +82,8 @@ function callGetDfApi<T>(url:string){
   return callDfApi<T>(url,Method.GET,null);
 }
  
-  export async function getStakingOptions(fid:number, xhandle:string, data:Staking): Promise<DegenFansResponse<StakingOption[] | null>> {
-      return callPostDfApi<StakingOption[]>('/alfafrens-staking-consultant/?token='+process.env.DEGENFANS_API,JSON.stringify({fid, xhandle, staking:data}));
+  export async function getStakingOptions(fid:number, xhandle:string, data:Staking): Promise<DegenFansResponse<StakingResult | null>> {
+      return callPostDfApi<StakingResult>('/alfafrens-staking-consultant/?token='+process.env.DEGENFANS_API,JSON.stringify({fid, xhandle, staking:data}));
   }
 
 

@@ -32,7 +32,7 @@ export const stakingConsultantAction: Action = {
         _options: { [key: string]: unknown },
         callback: HandlerCallback
     ) => {
-        
+          try{
           elizaLogger.log("Starting GET_ALFAFRENS_STAKING_RECOMENDATION handler...");
         
                     // Initialize or update state
@@ -86,19 +86,52 @@ export const stakingConsultantAction: Action = {
               let tbl:string="";
               if(resp.status==200){
                 tbl+="\n";
-                if(resp.data && resp.data.length > 0){
+                if(resp.data && resp.data.stakingOptions && resp.data.stakingOptions.length > 0){
                     tbl+="|rank|AlfaFrens Channel|ROI Spark/mo|current stake|\n";
                     tbl+="|------:|:--------|----:|------|\n";
-                    resp.data.forEach(e=>{
+                    resp.data.stakingOptions.forEach(e=>{
                         tbl+="|#"+e.rank+"|["+e.name+"|https://alfafrens.com/channel/"+e.channelAddress+"]|"+e.roi+"|"+e.currentStake+"|\n";
                     });
                 }else{
                     tbl+="no staking options found";
                 }
+
+                if(resp.data.amountRandom){
+                    tbl+="\n* you can also specify a staking amount to get a more precise result"
+                }
+
+                if(resp.data.matchType){
+                    if(resp.data.matchType==="BY_CREATOR_COIN"){
+                      tbl+="\n* I matched your AlfaFrens user by your moxie creator coin FID";
+                    }else  if(resp.data.matchType==="BY_GIVEN_ADDRESS"){
+                        tbl+="\n* I matched your AlfaFrens user by your given AlfaFrens user address";
+                      }else  if(resp.data.matchType==="BY_GIVEN_NAME"){
+                        tbl+="\n* I matched your AlfaFrens user by your given AlfaFrens user name";
+                      }else  if(resp.data.matchType==="BY_FID"){
+                        tbl+="\n* I matched your AlfaFrens user by your moxie account FID";
+                      }else  if(resp.data.matchType==="BY_TWITTER"){
+                        tbl+="\n* I matched your AlfaFrens user by your moxie account X handle";
+                      }
+                }else{
+                     tbl+="\n* I was not able to match your AlfaFrens profile, following options you have:";
+                     tbl+="\n   * AlfaFrens profile address";
+                     tbl+="\n   * AlfaFrens profile name";
+                     tbl+="\n   * conected Farcaster Account from your Moxie profile";
+                     tbl+="\n   * conected X Account from your Moxie profile";
+                     tbl+="\n";
+                     tbl+="\nif you don´t have an account for AlfaFrens, you can create an account here:";
+                     tbl+="\nhttps://alfafrens.com";
+               
+                }
             }
         await callback?.({
             text: resp.message+tbl,
         });
+    }catch(err){
+        await callback?.({
+            text: "please make sure, that you have an AlfaFrens account:\nhttps://alfafrens.com",
+        });
+    }
     },
     examples: [
         [
