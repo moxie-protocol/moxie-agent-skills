@@ -1113,13 +1113,13 @@ const calculateSellQuantityAmounts = async (
             let sellAmount: string;
             if (type === "SELL") { // this is for usd based direct sell case where user is selling in terms of sell quantity
                 // example: sell $10 $KTA when price rises by 20% 
-                buyAmount = new Decimal(sellQuantity).div(limitPriceInUSD).toFixed(buyTokenDecimals);
+                buyAmount = new Decimal(sellQuantity).div(limitPriceInUSD).div(buyTokenPriceInUSD).toFixed(buyTokenDecimals);
                 sellAmount = new Decimal(sellQuantity).div(sellTokenPriceInUSD).toFixed(sellTokenDecimals);
                
             } else if (type === "BUY") { // this is for usd based direct buy case where user is buying in terms of sell quantity
                 // example: buy $KTA when price drops by 20% using 100$ $moxie
                 sellAmount = new Decimal(sellQuantity).div(sellTokenPriceInUSD).toFixed(sellTokenDecimals);
-                buyAmount = new Decimal(sellAmount).mul(limitPriceInUSD).toFixed(buyTokenDecimals);
+                buyAmount = new Decimal(sellAmount).mul(buyTokenPriceInUSD).div(limitPriceInUSD).toFixed(buyTokenDecimals);
             }
 
             // Convert to WEI
