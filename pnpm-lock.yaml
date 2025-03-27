@@ -138,6 +138,9 @@ importers:
       '@moxie-protocol/core':
         specifier: workspace:*
         version: link:../packages/core
+      '@moxie-protocol/plugin-moxie-autonomous-trading':
+        specifier: workspace:*
+        version: link:../packages/plugin-moxie-autonomous-trading
       '@moxie-protocol/plugin-sample':
         specifier: workspace:*
         version: link:../packages/_examples/plugin
