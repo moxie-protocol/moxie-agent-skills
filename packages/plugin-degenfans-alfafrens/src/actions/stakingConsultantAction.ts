@@ -118,9 +118,10 @@ export const stakingConsultantAction: Action = {
                      tbl+="\n   * conected Farcaster Account from your Moxie profile";
                      tbl+="\n   * conected X Account from your Moxie profile";
                      tbl+="\n";
-                     tbl+="\nif you don´t have an account for AlfaFrens, you can create an account here:";
+                     tbl+="\nif you don´t have any account on AlfaFrens, create one on:";
                      tbl+="\nhttps://alfafrens.com";
-               
+                     tbl+="\n\nElse, get in touch w/ @degenfans to resolve the issue";
+
                 }
             }
         await callback?.({
@@ -136,7 +137,7 @@ export const stakingConsultantAction: Action = {
             errorText+="\n\n";
           }
         await callback?.({
-            text: errorText+"also make sure, that you have an AlfaFrens account:\nhttps://alfafrens.com",
+            text: errorText+"also make sure, that you have an AlfaFrens account:\nhttps://alfafrens.com\n\nif you still face some issues, please contact @degenfans",
         });
     }
     },
