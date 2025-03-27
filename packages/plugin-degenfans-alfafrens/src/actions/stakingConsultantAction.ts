@@ -68,7 +68,7 @@ export const stakingConsultantAction: Action = {
                             minsubs: number;
                     };
         
-              let fid:number=null;
+              let fid:string=null;
               let xhandle:string=null;
               const fcId = moxieUserInfo.identities.find(o=>o.type==='FARCASTER');
               if(fcId){
@@ -123,9 +123,13 @@ export const stakingConsultantAction: Action = {
                      tbl+="\n\nElse, get in touch w/ @degenfans to resolve the issue";
 
                 }
+
+                tbl=  resp.message+tbl;
+            }else{
+                tbl="degenfans server is not reachable, try again later!";
             }
         await callback?.({
-            text: resp.message+tbl,
+            text: tbl,
         });
     }catch(err){
         let errorText="";
