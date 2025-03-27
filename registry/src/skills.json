@@ -485,7 +485,10 @@
         "mediaUrls": [""],
         "actions": [
             "GET_ALFAFRENS_STAKING_RECOMENDATION",
-            "VIEW_ALFAFRENS_STAKING_RECOMENDATION"
+            "VIEW_ALFAFRENS_STAKING_RECOMENDATION",
+            "GIVE_ALFAFRENS_STAKING_RECOMENDATION",
+            "GET_ALFAFRENS_STAKING_CONSULTANT",
+            "STAKING_RECOMMENDATION_ON_ALFAFRENS"
         ],
         "isPremium": true,
         "freeQueries": 100,

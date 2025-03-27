@@ -22,7 +22,12 @@ import { getStakingOptions } from "../utils/degenfansApi";
 import { z } from "zod";
 export const stakingConsultantAction: Action = {
     name: "GET_ALFAFRENS_STAKING_RECOMENDATION",
-    similes: ["VIEW_ALFAFRENS_STAKING_RECOMENDATION"],
+    similes: [
+        "VIEW_ALFAFRENS_STAKING_RECOMENDATION",
+        "GIVE_ALFAFRENS_STAKING_RECOMENDATION",
+        "GET_ALFAFRENS_STAKING_CONSULTANT",
+        "STAKING_RECOMMENDATION_ON_ALFAFRENS",
+    ],
     description: "get recomendation for AlfaFrens stakings",
     suppressInitialMessage: true,
     validate: async () => true,
@@ -46,8 +51,6 @@ export const stakingConsultantAction: Action = {
             }
 
             const moxieUserInfo: MoxieUser = state.moxieUserInfo as MoxieUser;
-
-            elizaLogger.log("moxieUserInfo", moxieUserInfo);
 
             const context = composeContext({
                 state,
@@ -85,6 +88,8 @@ export const stakingConsultantAction: Action = {
                 xhandle = (fcId.metadata as TwitterMetadata).username;
             }
 
+            console.log("userAddress", userAddress);
+
             const stakingData: Staking = {
                 amount: amount,
                 userAddress: userAddress,
@@ -94,18 +99,19 @@ export const stakingConsultantAction: Action = {
             };
             const resp = await getStakingOptions(fid, xhandle, stakingData);
             let tbl: string = "";
-            elizaLogger.log("resp", resp);
+            console.log(resp);
             if (resp.status == 200) {
                 tbl += "\n";
                 if (
-                    resp.data &&
-                    resp.data.stakingOptions &&
-                    resp.data.stakingOptions.length > 0
+                    resp?.data &&
+                    resp?.data?.result &&
+                    resp?.data?.result?.stakingOptions &&
+                    resp?.data?.result?.stakingOptions?.length > 0
                 ) {
                     tbl +=
                         "|rank|AlfaFrens Channel|ROI Spark/mo|current stake|\n";
                     tbl += "|------:|:--------|----:|------|\n";
-                    resp.data.stakingOptions.forEach((e) => {
+                    resp.data.result.stakingOptions.forEach((e) => {
                         tbl +=
                             "|#" +
                             e.rank +
@@ -123,25 +129,27 @@ export const stakingConsultantAction: Action = {
                     tbl += "no staking options found";
                 }
 
-                if (resp.data.amountRandom) {
+                if (resp.data.result.amountRandom) {
                     tbl +=
                         "\n* you can also specify a staking amount to get a more precise result, e.g. 15000 AF";
                 }
 
-                if (resp.data.matchType) {
-                    if (resp.data.matchType === "BY_CREATOR_COIN") {
+                if (resp.data.result.matchType) {
+                    if (resp.data.result.matchType === "BY_CREATOR_COIN") {
                         tbl +=
                             "\n* I matched your AlfaFrens user by your moxie creator coin FID";
-                    } else if (resp.data.matchType === "BY_GIVEN_ADDRESS") {
+                    } else if (
+                        resp.data.result.matchType === "BY_GIVEN_ADDRESS"
+                    ) {
                         tbl +=
                             "\n* I matched your AlfaFrens user by your given AlfaFrens user address";
-                    } else if (resp.data.matchType === "BY_GIVEN_NAME") {
+                    } else if (resp.data.result.matchType === "BY_GIVEN_NAME") {
                         tbl +=
                             "\n* I matched your AlfaFrens user by your given AlfaFrens user name";
-                    } else if (resp.data.matchType === "BY_FID") {
+                    } else if (resp.data.result.matchType === "BY_FID") {
                         tbl +=
                             "\n* I matched your AlfaFrens user by your moxie account FID";
-                    } else if (resp.data.matchType === "BY_TWITTER") {
+                    } else if (resp.data.result.matchType === "BY_TWITTER") {
                         tbl +=
                             "\n* I matched your AlfaFrens user by your moxie account X handle";
                     }
@@ -169,10 +177,6 @@ export const stakingConsultantAction: Action = {
                 text: tbl,
             });
         } catch (err) {
-            elizaLogger.error(
-                "Error in GET_ALFAFRENS_STAKING_RECOMENDATION",
-                err
-            );
             let errorText = "";
             if (err instanceof z.ZodError) {
                 errorText = "following error occured:";
