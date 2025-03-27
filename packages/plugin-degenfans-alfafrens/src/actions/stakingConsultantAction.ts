@@ -15,8 +15,7 @@ import { stakingConsultantTemplate } from "../templates";
 import { Staking, StakingSchema } from "../types";
 import { FarcasterMetadata, ftaService, MoxieUser, TwitterMetadata } from "@moxie-protocol/moxie-agent-lib";
 import { getStakingOptions } from "../utils/degenfansApi";
-import { checkDegenFansCoins } from "../utils/moxieSubgraphApi";
-
+import { z } from 'zod';
 export const stakingConsultantAction: Action = {
     name: "GET_ALFAFRENS_STAKING_RECOMENDATION",
     similes: [
@@ -128,8 +127,16 @@ export const stakingConsultantAction: Action = {
             text: resp.message+tbl,
         });
     }catch(err){
+        let errorText="";
+        if (err instanceof z.ZodError) {
+            errorText="following error occured:"
+            err.errors.forEach((err2) => {
+              errorText+="\n"+err2.message;
+            });
+            errorText+="\n\n";
+          }
         await callback?.({
-            text: "please make sure, that you have an AlfaFrens account:\nhttps://alfafrens.com",
+            text: errorText+"also make sure, that you have an AlfaFrens account:\nhttps://alfafrens.com",
         });
     }
     },
