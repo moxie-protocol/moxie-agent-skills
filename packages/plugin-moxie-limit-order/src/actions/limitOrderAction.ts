@@ -516,6 +516,7 @@ async function processSingleLimitOrder(
                     sellTokenDecimals,
                     traceId,
                     moxieUserId,
+                    buyTokenPriceInUSD,
                     type
                 );
                 buyTokenAmountInWEI = amounts.buyTokenAmountInWEI;
