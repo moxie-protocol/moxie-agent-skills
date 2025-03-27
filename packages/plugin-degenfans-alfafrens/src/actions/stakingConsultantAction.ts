@@ -14,7 +14,7 @@ import {
 import { stakingConsultantTemplate } from "../templates";
 import { Staking, StakingSchema } from "../types";
 import { FarcasterMetadata, ftaService, MoxieUser, TwitterMetadata } from "@moxie-protocol/moxie-agent-lib";
-import { getStakingOptions } from "../utils/degenfansApi";
+import { getHelpText, getStakingOptions, getUserData } from "../utils/degenfansApi";
 import { z } from 'zod';
 export const stakingConsultantAction: Action = {
     name: "GET_ALFAFRENS_STAKING_RECOMENDATION",
@@ -68,62 +68,29 @@ export const stakingConsultantAction: Action = {
                             minsubs: number;
                     };
         
-              let fid:string=null;
-              let xhandle:string=null;
-              const fcId = moxieUserInfo.identities.find(o=>o.type==='FARCASTER');
-              if(fcId){
-                fid=(fcId.metadata as FarcasterMetadata).profileTokenId;
-              }
-
-              const xId = moxieUserInfo.identities.find(o=>o.type==='TWITTER');
-              if(xId){
-                xhandle=(fcId.metadata as TwitterMetadata).username;
-              }
+              const userData=getUserData(moxieUserInfo);
                     
               const stakingData:Staking = {amount:amount,userAddress:userAddress,mysubs:mysubs,mystake:mystake,minsubs:minsubs};
-              const resp =   await  getStakingOptions(fid,xhandle, stakingData);  
+              const resp =   await  getStakingOptions(userData, stakingData);  
               let tbl:string="";
               console.log(resp);
               if(resp.status==200){
                 tbl+="\n";
-                if(resp.data && resp.data.stakingOptions && resp.data.stakingOptions.length > 0){
+                if(resp.data && resp.data.result && resp.data.result.stakingOptions && resp.data.result.stakingOptions.length > 0){
                     tbl+="|rank|AlfaFrens Channel|ROI Spark/mo|current stake|\n";
                     tbl+="|------:|:--------|----:|------|\n";
-                    resp.data.stakingOptions.forEach(e=>{
+                    resp.data.result.stakingOptions.forEach(e=>{
                         tbl+="|#"+e.rank+"|["+e.name+"|https://alfafrens.com/channel/"+e.channelAddress+"]|"+e.roi+"|"+e.currentStake+"|\n";
                     });
                 }else{
                     tbl+="no staking options found";
                 }
 
-                if(resp.data.amountRandom){
+                if(resp.data.result.amountRandom){
                     tbl+="\n* you can also specify a staking amount to get a more precise result, e.g. 15000 AF"
                 }
-
-                if(resp.data.matchType){
-                    if(resp.data.matchType==="BY_CREATOR_COIN"){
-                      tbl+="\n* I matched your AlfaFrens user by your moxie creator coin FID";
-                    }else  if(resp.data.matchType==="BY_GIVEN_ADDRESS"){
-                        tbl+="\n* I matched your AlfaFrens user by your given AlfaFrens user address";
-                      }else  if(resp.data.matchType==="BY_GIVEN_NAME"){
-                        tbl+="\n* I matched your AlfaFrens user by your given AlfaFrens user name";
-                      }else  if(resp.data.matchType==="BY_FID"){
-                        tbl+="\n* I matched your AlfaFrens user by your moxie account FID";
-                      }else  if(resp.data.matchType==="BY_TWITTER"){
-                        tbl+="\n* I matched your AlfaFrens user by your moxie account X handle";
-                      }
-                }else{
-                     tbl+="\n* I was not able to match your AlfaFrens profile, following options you have:";
-                     tbl+="\n   * AlfaFrens profile address";
-                     tbl+="\n   * AlfaFrens profile name";
-                     tbl+="\n   * conected Farcaster Account from your Moxie profile";
-                     tbl+="\n   * conected X Account from your Moxie profile";
-                     tbl+="\n";
-                     tbl+="\nif you don´t have any account on AlfaFrens, create one on:";
-                     tbl+="\nhttps://alfafrens.com";
-                     tbl+="\n\nElse, get in touch w/ @degenfans to resolve the issue";
-
-                }
+                tbl+=getHelpText(resp.data.user);
+                
 
                 tbl=  resp.message+tbl;
             }else{
