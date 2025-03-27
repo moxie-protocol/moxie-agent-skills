@@ -17,7 +17,7 @@ import { FarcasterMetadata, ftaService, MoxieUser, TwitterMetadata } from "@moxi
 import { getHelpText, getStakingOptions, getUserData, StakingRequest } from "../utils/degenfansApi";
 import { z } from 'zod';
 export const stakingConsultantAction: Action = {
-    name: "GET_ALFAFRENS_STAKING_RECOMENDATION",
+    name: "GET_ALFAFRENS_STAKING_RECOMMENDATION",
     similes: [
         "VIEW_ALFAFRENS_STAKING_RECOMMENDATION",
         "GIVE_ALFAFRENS_STAKING_RECOMMENDATION",
