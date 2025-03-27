@@ -8,6 +8,12 @@ export interface DegenFansResponse<T> {
   data?: T
 }
 
+export interface StakingRequest {
+  amount: number,
+  mysubs: boolean,
+  mystake: boolean,
+  minsubs?:number,
+}
 
 export interface StakingOption {
   rank: number,
@@ -135,8 +141,8 @@ export function getUserData(moxieUserInfo: MoxieUser): UserData {
   return { fid, xhandle };
 }
 
-export async function getStakingOptions(user: UserData, data: Staking): Promise<DegenFansResponse<AlfaFrensResult<StakingResult> | null>> {
-  return callPostDfApi<AlfaFrensResult<StakingResult>>('/alfafrens-staking-consultant/?token=' + process.env.DEGENFANS_API, JSON.stringify({ user, staking: data }));
+export async function getStakingOptions(user: UserData,userAddress:string, data: StakingRequest): Promise<DegenFansResponse<AlfaFrensResult<StakingResult> | null>> {
+  return callPostDfApi<AlfaFrensResult<StakingResult>>('/alfafrens-staking-consultant/?token=' + process.env.DEGENFANS_API, JSON.stringify({ user,userAddress, staking: data }));
 }
 
 

@@ -14,7 +14,7 @@ import {
 import { stakingConsultantTemplate } from "../templates";
 import { Staking, StakingSchema } from "../types";
 import { FarcasterMetadata, ftaService, MoxieUser, TwitterMetadata } from "@moxie-protocol/moxie-agent-lib";
-import { getHelpText, getStakingOptions, getUserData } from "../utils/degenfansApi";
+import { getHelpText, getStakingOptions, getUserData, StakingRequest } from "../utils/degenfansApi";
 import { z } from 'zod';
 export const stakingConsultantAction: Action = {
     name: "GET_ALFAFRENS_STAKING_RECOMENDATION",
@@ -70,8 +70,8 @@ export const stakingConsultantAction: Action = {
         
               const userData=getUserData(moxieUserInfo);
                     
-              const stakingData:Staking = {amount:amount,userAddress:userAddress,mysubs:mysubs,mystake:mystake,minsubs:minsubs};
-              const resp =   await  getStakingOptions(userData, stakingData);  
+              const stakingData:StakingRequest = {amount:amount,mysubs:mysubs,mystake:mystake,minsubs:minsubs};
+              const resp =   await  getStakingOptions(userData,userAddress, stakingData);  
               let tbl:string="";
               console.log(resp);
               if(resp.status==200){
