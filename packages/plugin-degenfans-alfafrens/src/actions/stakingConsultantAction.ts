@@ -19,7 +19,10 @@ import { z } from 'zod';
 export const stakingConsultantAction: Action = {
     name: "GET_ALFAFRENS_STAKING_RECOMENDATION",
     similes: [
-        "VIEW_ALFAFRENS_STAKING_RECOMENDATION"
+        "VIEW_ALFAFRENS_STAKING_RECOMMENDATION",
+        "GIVE_ALFAFRENS_STAKING_RECOMMENDATION",
+        "GET_ALFAFRENS_STAKING_CONSULTANT",
+        "STAKING_RECOMMENDATION_ON_ALFAFRENS",
     ],
     description: "get recomendation for AlfaFrens stakings",
     suppressInitialMessage: true,
