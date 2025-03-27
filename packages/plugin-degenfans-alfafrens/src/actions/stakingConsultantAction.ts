@@ -83,6 +83,7 @@ export const stakingConsultantAction: Action = {
               const stakingData:Staking = {amount:amount,userAddress:userAddress,mysubs:mysubs,mystake:mystake,minsubs:minsubs};
               const resp =   await  getStakingOptions(fid,xhandle, stakingData);  
               let tbl:string="";
+              console.log(resp);
               if(resp.status==200){
                 tbl+="\n";
                 if(resp.data && resp.data.stakingOptions && resp.data.stakingOptions.length > 0){
