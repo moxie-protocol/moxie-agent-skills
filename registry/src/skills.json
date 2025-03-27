@@ -411,6 +411,7 @@
         "isDefault": true,
         "loaders": [
             "Analyzing request",
+            "Doing robot things",
             "Setting limits",
             "Initiating transaction",
             "Writing to the Base blockchain"

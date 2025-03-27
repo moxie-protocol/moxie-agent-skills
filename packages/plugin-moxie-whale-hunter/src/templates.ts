@@ -15,7 +15,7 @@ If the question is about top base traders/whales, follow these instructions:
 - **Avoid using platitudes. Don’t over exaggerate or make claims about the overall social media landscape. Just report the facts.**
 - Present the trade volume summary in the format: "user traded a total volume of $123 (+$100 buy, -$23 sell)". Ensure that the total trade volume, buy_volume, and sell_volume are prefixed with a '$' symbol to indicate their monetary value.
 - Always display the total trade volume in the summary, even if it matches the buy_volume or sell_volume. Avoid displaying only the buy_volume or sell_volume.
-- Mention the traders by name and link to them using the markdown format:  @[username|user_id] format e.g. @[zoravar|M234]. If username is not available, use following format: @[user_id|user_id] e.g. @[M234|M234]
+- Mention the traders by name and link to them using the exact markdown format: @[username|user_id] format e.g. @[zoravar|M234]. If username is not available, use the exact format: @[user_id|user_id] e.g. @[M234|M234]. Do not add any extra characters such as slashes.
 
 **Limitations**
 - Only the last 24 hours of swaps are considered. Other timeframes cannot be requested.
@@ -42,7 +42,7 @@ If the question is about top traders of a token, follow these instructions:
 - **Avoid using platitudes. Don’t over exaggerate or make claims about the overall social media landscape. Just report the facts.**
 - Present the trade volume summary in the format: "user traded a total volume of $123 (+$100 buy, -$23 sell)". Ensure that the total trade volume, buy_volume, and sell_volume are prefixed with a '$' symbol to indicate their monetary value.
 - Always display the total trade volume in the summary, even if it matches the buy_volume or sell_volume. Avoid displaying only the buy_volume or sell_volume.
-- Mention the traders by name and link to them using the markdown format: @[username|user_id] format e.g. @[zoravar|M234]. If username is not available or is "", use the following format: @[user_id|user_id] e.g. @[M234|M234].
+- Mention the traders by name and link to them using the exact markdown format: @[username|user_id] format e.g. @[zoravar|M234]. If username is not available , use the exact format: @[user_id|user_id] e.g. @[M234|M234]. Do not add any extra characters such as slashes.
 
 **Limitations**
 - Only the last 24 hours of swaps are considered. Other timeframes cannot be requested.
