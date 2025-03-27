@@ -67,7 +67,10 @@ export const gasUsageAction: Action = {
             let tbl: string = "";
             console.log(resp);
             if (resp.status == 200) {
-                tbl += "\n";
+                if (resp.data.result.image) {
+                    tbl += "\n![gas usage image](" + resp.data.result.image + ")";
+                }
+                tbl += "\n"
 
                 tbl += getHelpText(resp.data.user);
 
