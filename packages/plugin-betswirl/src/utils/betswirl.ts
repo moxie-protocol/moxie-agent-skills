@@ -15,6 +15,8 @@ import {
     getPlaceBetFunctionData,
     parseRawBetRequirements,
     chainNativeCurrencyToToken,
+    getAllowanceFunctionData,
+    getApproveFunctionData,
 } from "@betswirl/sdk-core";
 import { getCasinoTokens } from "../providers/casinoTokens";
 
@@ -33,24 +35,26 @@ export async function getBetToken(
     tokenSymbolInput: string
 ) {
     const casinoChain = casinoChainById[chainId];
+    const casinoTokens = await getCasinoTokens();
     let selectedToken: Token;
-    if (
-        tokenSymbolInput &&
-        tokenSymbolInput !== casinoChain.viemChain.nativeCurrency.symbol
-    ) {
-        const casinoTokens = await getCasinoTokens();
-        // Validate the token
-        selectedToken = casinoTokens.find(
-            (casinoToken) => casinoToken.symbol === tokenSymbolInput
-        );
-        if (!selectedToken) {
-            throw new Error(
-                `The token must be one of ${casinoTokens.map((casinoToken) => casinoToken.symbol).join(", ")}`
+    if (tokenSymbolInput) {
+        if (
+            tokenSymbolInput.toUpperCase() ===
+            casinoChain.viemChain.nativeCurrency.symbol
+        ) {
+            selectedToken = chainNativeCurrencyToToken(
+                casinoChain.viemChain.nativeCurrency
+            );
+        } else {
+            selectedToken = casinoTokens.find(
+                (casinoToken) =>
+                    casinoToken.symbol === tokenSymbolInput.toUpperCase()
             );
         }
-    } else {
-        selectedToken = chainNativeCurrencyToToken(
-            casinoChain.viemChain.nativeCurrency
+    }
+    if (!selectedToken) {
+        throw new Error(
+            `The token must be one of ${casinoTokens.map((casinoToken) => casinoToken.symbol).join(", ")}`
         );
     }
     return selectedToken;
@@ -58,7 +62,7 @@ export async function getBetToken(
 
 export function getBetAmountInWei(betAmount: string, token: Token) {
     const betAmountInWei = ethers.parseUnits(betAmount, token.decimals);
-    if (betAmountInWei <= 0n) {
+    if (!betAmount || betAmountInWei <= 0n) {
         throw new Error("The bet amount must be greater than 0");
     }
     return betAmountInWei;
@@ -186,9 +190,16 @@ export async function placeBet(
     );
 
     try {
+        await approveIfERC20(
+            walletClient,
+            chainId,
+            game,
+            casinoGameParams.betToken,
+            casinoGameParams.betAmount
+        );
+
         const provider = new ethers.JsonRpcProvider("https://mainnet.base.org");
         const gasPrice = ((await provider.getFeeData()).gasPrice * 120n) / 100n;
-
         const vrfCost =
             ((await getChainlinkVrfCost(
                 chainId,
@@ -216,6 +227,46 @@ export async function placeBet(
         throw new Error(
             `An error occured while placing the bet: ${error.shortMessage || error.message}`
         );
+    }
+}
+
+export async function approveIfERC20(
+    walletClient: MoxieWalletClient,
+    chainId: number,
+    game: CASINO_GAME_TYPE,
+    token: Token,
+    amount: bigint
+) {
+    const casinoChain = casinoChainById[chainId as CasinoChainId];
+    if (token.symbol !== casinoChain.viemChain.nativeCurrency.symbol) {
+        const spender = walletClient.address as Hex;
+        const allowanceFunctionData = getAllowanceFunctionData(
+            token.address,
+            spender,
+            casinoChain.contracts.games[game]!.address
+        );
+        const provider = new ethers.JsonRpcProvider("https://mainnet.base.org");
+        const tokenContract = new ethers.Contract(
+            allowanceFunctionData.data.to,
+            allowanceFunctionData.data.abi,
+            provider
+        );
+        const rawAllowance: bigint = await tokenContract[
+            allowanceFunctionData.data.functionName
+        ](...allowanceFunctionData.data.args);
+
+        if (!rawAllowance || rawAllowance < amount) {
+            const amountToApprove = amount - (rawAllowance || 0n);
+            const functionData = getApproveFunctionData(
+                token.address,
+                spender,
+                amountToApprove
+            );
+            await walletClient.sendTransaction(chainId.toString(), {
+                toAddress: functionData.data.to,
+                data: functionData.encodedData,
+            });
+        }
     }
 }
 

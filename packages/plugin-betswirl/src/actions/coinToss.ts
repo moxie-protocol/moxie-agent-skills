@@ -41,7 +41,7 @@ Extract the following details to flip a coin:
 - **face** (String): The side of the coin to bet on. Can be either:
   - HEADS
   - TAILS
-- **token** (String): The optional token symbol.
+- **token** (String): The token symbol.
 
 Provide the values in the following JSON format:
 
@@ -74,7 +74,7 @@ Bet 0.01 ETH on heads
 **Message 2**
 
 \`\`\`
-Double or nothing 0.5 on heads
+Double or nothing 0.5 ETH on heads
 \`\`\`
 
 **Response 2**
@@ -83,7 +83,7 @@ Double or nothing 0.5 on heads
 {
     "betAmount": "0.5",
     "face": "HEADS",
-    "token": "",
+    "token": "ETH",
 }
 \`\`\`
 

@@ -277,6 +277,7 @@ export interface Skill {
     installedStatus?: string;
     isDefault: boolean;
     isFeatured: boolean;
+    loaders: string[];
 }
 
 export interface StarterQuestion {

@@ -45,7 +45,7 @@ export const diceTemplate = `
 Extract the following details to play on Dice:
 - **betAmount** (String): The amount to wager.
 - **number** (Number): The number to bet on. Can be from ${MIN_SELECTABLE_DICE_NUMBER} to ${MAX_SELECTABLE_DICE_NUMBER}.
-- **token** (String): The optional token symbol.
+- **token** (String): The token symbol.
 
 Provide the values in the following JSON format:
 
@@ -87,7 +87,7 @@ Roll the dice with 0.01 ETH on 23
 {
     "betAmount": "0.5",
     "number": 23,
-    "token": "",
+    "token": "ETH",
 }
 \`\`\`
 

@@ -9,8 +9,6 @@ export const casinoBetParams = {
     betAmount: z.string().describe("The bet amount"),
     token: z
         .string()
-        .describe("Token symbol")
-        .optional()
         .describe("The token to bet with"),
     stopGain: z
         .string()
