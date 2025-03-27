@@ -14,7 +14,7 @@ import {
 import { stakingConsultantTemplate } from "../templates";
 import { Staking, StakingSchema } from "../types";
 import { FarcasterMetadata, ftaService, MoxieUser, TwitterMetadata } from "@moxie-protocol/moxie-agent-lib";
-import { getHelpText, getStakingOptions, getUserData, StakingRequest } from "../utils/degenfansApi";
+import { getHelpText, getHelpTextUserNotFound, getStakingOptions, getUserData, StakingRequest } from "../utils/degenfansApi";
 import { z } from 'zod';
 export const stakingConsultantAction: Action = {
     name: "GET_ALFAFRENS_STAKING_RECOMMENDATION",
@@ -78,6 +78,10 @@ export const stakingConsultantAction: Action = {
             let tbl: string = "";
             console.log(resp);
             if (resp.status == 200) {
+
+                if(!resp.data.user){
+                    tbl += getHelpTextUserNotFound();
+                }
                 tbl += "\n";
                 if (resp.data && resp.data.result && resp.data.result.stakingOptions && resp.data.result.stakingOptions.length > 0) {
                     tbl += "|rank|AlfaFrens Channel|ROI Spark/mo|current stake|\n";

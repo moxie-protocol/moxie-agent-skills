@@ -110,19 +110,21 @@ export function getHelpText(user: AfUser): string {
     } else if (user.matchType === "BY_TWITTER") {
       tbl += "\n* I matched your AlfaFrens user by your moxie account X handle";
     }
-  } else {
-    tbl += "\n* I was not able to match your AlfaFrens profile, following options you have:";
-    tbl += "\n   * AlfaFrens profile address";
-    tbl += "\n   * AlfaFrens profile name";
-    tbl += "\n   * conected Farcaster Account from your Moxie profile";
-    tbl += "\n   * conected X Account from your Moxie profile";
-    tbl += "\n";
-    tbl += "\nif you don´t have any account on AlfaFrens, create one on:";
-    tbl += "\nhttps://alfafrens.com";
-    tbl += "\n\nElse, get in touch w/ @degenfans to resolve the issue";
-
-  }
+  } 
   return tbl
+}
+export function getHelpTextUserNotFound():string{
+  let tbl="";
+  tbl += "\n* I was not able to match your AlfaFrens profile, following options you have:";
+  tbl += "\n   * AlfaFrens profile address";
+  tbl += "\n   * AlfaFrens profile name";
+  tbl += "\n   * conected Farcaster Account from your Moxie profile";
+  tbl += "\n   * conected X Account from your Moxie profile";
+  tbl += "\n";
+  tbl += "\nif you don´t have any account on AlfaFrens, create one on:";
+  tbl += "\nhttps://alfafrens.com";
+  tbl += "\n\nElse, get in touch w/ @degenfans to resolve the issue";
+  return tbl;
 }
 
 export interface UserData {
