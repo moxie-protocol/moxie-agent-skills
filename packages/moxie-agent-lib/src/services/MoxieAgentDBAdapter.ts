@@ -4,7 +4,7 @@ import { IAgentRuntime } from "@moxie-protocol/core";
 import { v4 as uuidv4 } from "uuid";
 import { ethers } from "ethers";
 import { MOXIE_USER_PORTFOLIOS_QUERY } from "./constants";
-import { MoxiePortfolioInfo, MoxiePortfolioResponse, Skill } from "./types";
+import { CampaignTokenDetails, MoxiePortfolioInfo, MoxiePortfolioResponse, Skill } from "./types";
 
 export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
     private pgAdapter: PostgresDatabaseAdapter;
@@ -132,6 +132,44 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
                     skillCoinAddress: row.skill_coin_address,
                     minimumSkillBalance: row.minimum_skill_balance,
                     isFeatured: row.is_featured,
+                    loaders: row.loaders,
+                };
+                return skill;
+            } else {
+                return null;
+            }
+        });
+    }
+
+    async getSkillByAction(action: string): Promise<Skill | null> {
+        const skillsTableName = process.env.SKILLS_TABLE_NAME || "skills";
+        const query = `SELECT * FROM ${skillsTableName} WHERE actions @> ARRAY[$1]`;
+        return this.pgAdapter.query(query, [action]).then((result) => {
+            if (result.rows.length > 0) {
+                const row = result.rows[0];
+                let skill: Skill = {
+                    id: row.id,
+                    name: row.name,
+                    displayName: row.display_name,
+                    version: row.version,
+                    author: row.author,
+                    description: row.description,
+                    githubUrl: row.github_url,
+                    logoUrl: row.logo_url,
+                    status: row.status,
+                    isDefault: row.is_default,
+                    installedStatus: row.installed_status,
+                    settings: row.settings,
+                    capabilities: row.capabilities,
+                    starterQuestions: row.starter_questions,
+                    mediaUrls: row.media_urls,
+                    actions: row.actions,
+                    isPremium: row.is_premium,
+                    freeQueries: row.free_queries,
+                    skillCoinAddress: row.skill_coin_address,
+                    minimumSkillBalance: row.minimum_skill_balance,
+                    isFeatured: row.is_featured,
+                    loaders: row.loaders,
                 };
                 return skill;
             } else {
@@ -167,6 +205,7 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
             "s.status",
             "s.is_default",
             "s.is_featured",
+            "s.loaders",
         ];
         if (userId !== "") {
             selectFields.push(
@@ -203,6 +242,7 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
                 skillCoinAddress: row.skill_coin_address,
                 minimumSkillBalance: row.minimum_skill_balance,
                 isFeatured: row.is_featured,
+                loaders: row.loaders,
             }));
         });
     }
@@ -257,6 +297,29 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
                 return result.rowCount || 0 ;
             }).catch((error) => {
                 console.error("Error while updating limit order:", error);
+                throw error;
+            });
+    }
+
+    async getCampaignTokenDetails(): Promise<CampaignTokenDetails[]> {
+        return this.pgAdapter
+            .query(
+                `SELECT
+                    token_address as "tokenAddress",
+                    token_symbol as "tokenSymbol",
+                    type,
+                    minimum_balance as "minimumBalance",
+                    start_date as "startDate",
+                    end_date as "endDate",
+                    created_at as "createdAt",
+                    updated_at as "updatedAt"
+                FROM campaign_tokens
+                WHERE now() BETWEEN start_date AND end_date;`
+            )
+            .then((result) => {
+                return result.rows;
+            }).catch((error) => {
+                console.error("Error while getting campaign token details:", error);
                 throw error;
             });
     }

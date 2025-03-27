@@ -1,4 +1,4 @@
-# @moxie-protocol/plugin-bootstrap
+# @elizaos/plugin-bootstrap
 
 A plugin providing core functionality and basic actions for ElizaOS agents.
 
@@ -9,7 +9,7 @@ The Bootstrap plugin enables fundamental agent behaviors including conversation 
 ## Installation
 
 ```bash
-pnpm install @moxie-protocol/plugin-bootstrap
+pnpm install @elizaos/plugin-bootstrap
 ```
 
 ## Features

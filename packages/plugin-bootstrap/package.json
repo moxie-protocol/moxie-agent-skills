@@ -1,5 +1,5 @@
 {
-    "name": "@moxie-protocol/plugin-bootstrap",
+    "name": "@elizaos/plugin-bootstrap",
     "version": "0.1.8+build.1",
     "type": "module", 
     "main": "dist/index.js",
@@ -9,7 +9,7 @@
         "./package.json": "./package.json",
         ".": {
             "import": {
-                "@moxie-protocol/source": "./src/index.ts",
+                "@elizaos/source": "./src/index.ts",
                 "types": "./dist/index.d.ts",
                 "default": "./dist/index.js"    
             }

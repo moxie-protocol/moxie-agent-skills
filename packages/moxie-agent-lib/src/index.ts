@@ -40,15 +40,16 @@ export type {
     TransactionDetails,
     TokenDetails,
     LiquidityPool,
+    CampaignTokenDetails,
 } from "./services/types";
 
-export type {
-    MoxieWalletSignMessageResponseType,
-    MoxieWalletSignTypedDataResponseType,
-    MoxieWalletSendTransactionResponseType,
-    MoxieWalletSendTransactionInputType,
-    MoxieHex,
-    MoxieClientWallet,
+export {
+    type MoxieWalletSignMessageResponseType,
+    type MoxieWalletSignTypedDataResponseType,
+    type MoxieWalletSendTransactionResponseType,
+    type MoxieWalletSendTransactionInputType,
+    type MoxieHex,
+    type MoxieClientWallet,
     MoxieWalletClient,
 } from "./wallet";
 
@@ -62,6 +63,8 @@ export {
     getPortfolioData,
     getPortfolioV2Data,
     type PortfolioV2Data,
+    getPortfolioV2DataByTokenAddress,
+    type TokenNode,
 } from "./services/zapperService";
 
 export {

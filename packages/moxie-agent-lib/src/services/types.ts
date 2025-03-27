@@ -68,6 +68,14 @@ export interface MoxieUser {
     vestingContracts: VestingContracts[];
 }
 
+export interface MoxieUserMinimal {
+    id: string;
+    userName?: string;
+    name?: string;
+    bio?: string;
+    profileImageUrl?: string;
+}
+
 export interface MeQueryResponse {
     data: {
         Me: MoxieUser;
@@ -90,6 +98,16 @@ export interface GetUserResponse {
 export interface GetUserInfoBatchResponse {
     data: {
         GetUserInfoBatch: GetUserInfoBatchOutput;
+    };
+}
+
+export interface GetUserInfoMinimalOutput {
+    users: MoxieUserMinimal[];
+}
+
+export interface GetUserInfoMinimalResponse {
+    data: {
+        GetUserInfoMinimal: GetUserInfoMinimalOutput;
     };
 }
 
@@ -259,6 +277,7 @@ export interface Skill {
     installedStatus?: string;
     isDefault: boolean;
     isFeatured: boolean;
+    loaders: string[];
 }
 
 export interface StarterQuestion {
@@ -372,4 +391,15 @@ export interface Wallet {
     hdWalletIndex?: number;
     imported?: boolean;
     delegated?: boolean;
+}
+
+export interface CampaignTokenDetails {
+    tokenAddress: string;
+    tokenSymbol: string;
+    type: string;
+    minimumBalance: number;
+    startDate: Date;
+    endDate: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }

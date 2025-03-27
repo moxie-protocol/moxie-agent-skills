@@ -1,413 +1,500 @@
 [
-  {
-    "pluginId": "a1aa9887-fc11-5f54-aa62-235c7536ba67",
-    "name": "@moxie-protocol/plugin-moxie-token-details",
-    "displayName": "Moxie Token Details",
-    "version": "0.1.8+build.1",
-    "author": null,
-    "description": "A Skills for Creator Agents that enables fetching of base token details.",
-    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details",
-    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg",
-    "settings": {},
-    "capabilities": ["Token prices", "Market caps", "Liquidity", "Holders"],
-    "starterQuestions": [
-      {
-        "label": "Show token details for $moxie",
-        "value": "Show token details for $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527]"
-      },
-      {
-        "label": "Compare $moxie and $bnkr",
-        "value": "Compare $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] and $[BNKR|0x22af33fe49fd1fa80c7149773dde5890d3c76f3b]"
-      }
-    ],
-    "mediaUrls": [
-      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-details/images/logo.svg"
-    ],
-    "actions": [
-      "TOKEN_DETAILS",
-      "TOKEN_DETAILS_SUMMARY",
-      "BASE_TOKEN_DETAIL",
-      "BASE_TOKEN_DETAILS",
-      "BASE_TOKEN_DETAILS_SUMMARY",
-      "TOKEN_SUMMARY",
-      "ERC20_DETAILS",
-      "ERC20_DETAILS_SUMMARY",
-      "ERC20_TOKEN_DETAILS",
-      "ERC20_TOKEN_DETAILS_SUMMARY",
-      "TOKEN_INFO",
-      "TOKEN_PORTFOLIO",
-      "TOKEN_PRICE",
-      "TOKEN_MARKET_CAP",
-      "TOKEN_HOLDINGS",
-      "TOKEN_LIQUIDITY",
-      "TOKEN_MARKET_PERFORMANCE",
-      "TOKEN_MARKET_SENTIMENT"
-    ],
-    "isPremium": false,
-    "freeQueries": 0,
-    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
-    "minimumSkillBalance": 0,
-    "status": "ACTIVE",
-    "isDefault": true,
-    "isFeatured": true
-  },
-  {
-    "pluginId": "927fb66c-2ebc-48e1-82a8-907c6e54e379",
-    "name": "@moxie-protocol/plugin-moxie-token-transfer",
-    "displayName": "Moxie Token Transfer",
-    "version": "0.1.8+build.1",
-    "author": null,
-    "description": "A Skills for Creator Agents that enables token transfer.",
-    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-transfer",
-    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-transfer/images/logo.svg",
-    "settings": {},
-    "capabilities": [
-      "Send tokens to yourself",
-      "Send tokens to any ENS or Moxie user",
-      "Send tokens to any 0x address"
-    ],
-    "starterQuestions": [
-      {
-        "label": "Send 50% of my $moxie to betashop.eth",
-        "value": "Send 50% of my $moxie to betashop.eth"
-      },
-      {
-        "label": "Send 25% of my $eth to @betashop.eth",
-        "value": "Send 25% of my $eth to @betashop.eth"
-      }
-    ],
-    "mediaUrls": [
-      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-token-transfer/images/logo.svg"
-    ],
-    "actions": [
-      "TOKEN_TRANSFERS",
-      "SEND_TOKENS",
-      "SEND_COINS",
-      "SEND_CRYPTO",
-      "SEND_FUNDS",
-      "SEND_PAYMENT",
-      "SEND_CREATOR_COIN",
-      "SEND_ERC20",
-      "SEND_TOKEN",
-      "TRANSFER_PAYMENT",
-      "TRANSFER_CREATOR_COIN",
-      "TRANSFER_ERC20",
-      "TRANSFER_TOKENS"
-    ],
-    "isPremium": false,
-    "freeQueries": 0,
-    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
-    "minimumSkillBalance": 0,
-    "status": "ACTIVE",
-    "isDefault": true
-  },
-  {
-    "pluginId": "5d3b79e2-ac61-0bb6-a3ba-b0e00b943614",
-    "name": "@moxie-protocol/plugin-moxie-social-alpha",
-    "displayName": "Social Alpha",
-    "version": "0.1.8+build.1",
-    "author": null,
-    "description": "In-depth analysis on Base users, including trades, portfolios, and posts on Farcaster and X. Buy user’s coins to add them to your Social Alpha list.",
-    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-social-alpha",
-    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-social-alpha/images/logo.svg",
-    "settings": {},
-    "capabilities": [
-      "AI Intelligence across onchain activity and social media",
-      "Powerful insights into peoples’ trades and portfolios",
-      "Get Social Alpha insights on friends, influencers, whales",
-      "Aggregated trends",
-      "Alerts (coming soon)"
-    ],
-    "starterQuestions": [
-      {
-        "label": "What’s trending with my top creators?",
-        "value": "What’s trending with my top creators?"
-      },
-      {
-        "label": "Analyze portfolio and trades for @maretus and @betashop",
-        "value": "Analyze portfolio and trades for @maretus and @betashop"
-      },
-      {
-        "label": "Show me recent trades for @maretus",
-        "value": "Show me recent trades for @maretus"
-      },
-      {
-        "label": "Show me social media sentiment from @betashop.eth and @jessepollak",
-        "value": "Show me social media sentiment from @betashop.eth and @jessepollak"
-      },
-      {
-        "label": "What’s buzzing today on socials?",
-        "value": "What’s buzzing today on socials?"
-      }
-    ],
-    "mediaUrls": [
-      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-social-alpha/images/logo.svg"
-    ],
-    "actions": [
-      "TWEET_SUMMARY",
-      "TWEET_HISTORY",
-      "TWITTER_ACTIVITY",
-      "TWITTER_UPDATES",
-      "FARCASTER_SUMMARY",
-      "FARCASTER_HISTORY",
-      "FARCASTER_ACTIVITY",
-      "FARCASTER_UPDATES",
-      "FARCASTER_CASTS",
-      "TRENDING_TOKENS",
-      "TOKEN_PURCHASES",
-      "TOKEN_RECOMMENDATIONS",
-      "BUY_RECOMMENDATIONS",
-      "TRENDING_CRYPTOCURRENCIES",
-      "TOKEN_SWAP_SUMMARIES",
-      "SOCIAL_SUMMARY",
-      "FARCASTER_AND_TWITTER_SUMMARY",
-      "FARCASTER_AND_TWITTER_ACTIVITY",
-      "FARCASTER_AND_TWITTER_UPDATES",
-      "SOCIAL_POSTS",
-      "TRENDING_CREATOR_COINS",
-      "CREATOR_COIN_PURCHASES",
-      "CREATOR_COIN_RECOMMENDATIONS",
-      "CREATOR_COIN_BUY_RECOMMENDATIONS",
-      "CREATOR_COIN_TRENDING_CRYPTOCURRENCIES",
-      "CREATOR_COIN_SWAP_SUMMARIES"
-    ],
-    "isPremium": false,
-    "freeQueries": 0,
-    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
-    "minimumSkillBalance": 0,
-    "status": "ACTIVE",
-    "isDefault": true
-  },
-  {
-    "pluginId": "b5622f90-987e-51d1-bea9-5b1471bb9379",
-    "name": "@moxie-protocol/plugin-moxie-swap",
-    "displayName": "Trade",
-    "version": "0.1.8+build.1",
-    "author": null,
-    "description": "Enables your agent to trade and swap for you onchain using your Agent Wallet",
-    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-swap",
-    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-swap/images/logo.svg",
-    "settings": {},
-    "capabilities": [
-      "Swap any token on Base. 💡Pro Tip: use “$” to auto-complete token names",
-      "Swap any creator coin on Moxie. 💡Pro Tip: use “@” to auto-complete creator coin names",
-      "Spend a % of your wallet to buy coins"
-    ],
-    "starterQuestions": [
-      {
-        "label": "Buy me $25 worth of $moxie",
-        "value": "Buy me $25 worth of $moxie"
-      },
-      {
-        "label": "Swap 100 $degen for @moxie_ai",
-        "value": "Swap 100 $degen for @moxie_ai"
-      },
-      {
-        "label": "Use 40% of my $eth to buy $moxie and 20% to buy $degen",
-        "value": "Use 40% of my $eth to buy $moxie and 20% to buy $degen"
-      }
-    ],
-    "mediaUrls": [
-      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-swap/images/logo.svg"
-    ],
-    "actions": [
-      "SWAP_TOKENS",
-      "CREATOR_TOKEN_SWAP",
-      "CREATOR_COIN_SWAP",
-      "EXCHANGE_CREATOR_COINS",
-      "TRADE_CREATOR_TOKENS",
-      "BUY_CREATOR_TOKENS",
-      "BUY_CREATOR_COINS",
-      "PURCHASE_CREATOR_COINS",
-      "PURCHASE_ERC20_TOKENS",
-      "SWAP_ERC20_TOKENS"
-    ],
-    "isPremium": false,
-    "freeQueries": 0,
-    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
-    "minimumSkillBalance": 0,
-    "status": "ACTIVE",
-    "isDefault": true
-  },
-  {
-    "pluginId": "0ad0731e-698b-04bf-abeb-5d29cc36759f",
-    "name": "@moxie-protocol/plugin-moxie-balance",
-    "displayName": "Portfolios",
-    "version": "0.1.8+build.1",
-    "author": null,
-    "description": "Enables your agent to fetch portfolio details for thousands of wallets indexed by Moxie",
-    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-balance",
-    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-balance/images/logo.svg",
-    "settings": {},
-    "capabilities": [
-      "Analyze my portfolio",
-      "Analyze someone else’s portfolio (using Social Alpha skll)",
-      "Compare several portfolios"
-    ],
-    "starterQuestions": [
-      {
-        "label": "Analyze my portfolio",
-        "value": "Analyze my portfolio"
-      },
-      {
-        "label": "Analyze @maretus portfolio",
-        "value": "Analyze @maretus portfolio"
-      },
-      {
-        "label": "Compare portfolios of @betashop.eth @macster @sgniwder",
-        "value": "Compare portfolios of @betashop.eth @macster @sgniwder"
-      }
-    ],
-    "mediaUrls": [
-      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-balance/images/logo.svg"
-    ],
-    "actions": [
-      "PORTFOLIO",
-      "PORTFOLIO_SUMMARY",
-      "TOTAL_BALANCE",
-      "ALL_POSITIONS",
-      "ASSET_OVERVIEW",
-      "HOLDINGS_SUMMARY",
-      "WALLET_BALANCE",
-      "INVESTMENT_SUMMARY",
-      "ASSET_POSITIONS",
-      "PORTFOLIO_OVERVIEW",
-      "PORTFOLIO_STATUS",
-      "CREATOR_COIN_BALANCE",
-      "CREATOR_COIN",
-      "CREATOR_COIN_BALANCE",
-      "CREATOR_COIN_PRICE",
-      "CREATOR_COIN_POSITION",
-      "FAN_TOKEN",
-      "FAN_TOKEN_BALANCE",
-      "FAN_TOKEN_POSITION",
-      "FAN_TOKEN_PRICE"
-    ],
-    "isPremium": false,
-    "freeQueries": 10,
-    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
-    "minimumSkillBalance": 0,
-    "status": "ACTIVE",
-    "isDefault": true,
-    "isFeatured": true
-  },
-  {
-    "pluginId": "a8c0c53a-e4e5-0848-b69b-a17af97d64dd",
-    "name": "@moxie-protocol/plugin-moxie-whale-hunter",
-    "displayName": "Whale Hunter",
-    "version": "0.1.8+build.1",
-    "author": null,
-    "description": "Discover Base whales with Moxie AI! ",
-    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-whale-hunter",
-    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-whale-hunter/images/logo.svg",
-    "settings": {},
-    "capabilities": [],
-    "starterQuestions": [
-      {
-        "label": "Who are the top traders today on Base?",
-        "value": "Who are the top traders today on Base?"
-      },
-      {
-        "label": "Show today’s trending tokens on Base along with the top traders",
-        "value": "Show today’s trending tokens on Base along with the top traders"
-      },
-      {
-        "label": "Who are the biggest $bnkr whales?",
-        "value": "Who are the biggest $[BNKR|0x22af33fe49fd1fa80c7149773dde5890d3c76f3b] whales?"
-      }
-    ],
-    "mediaUrls": [
-      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-whale-hunter/images/logo.svg"
-    ],
-    "actions": [
-      "TOP_TRADERS",
-      "TOP_WHALES",
-      "TOP_TRADER_OF_A_TOKEN",
-      "TOP_TOKEN_HOLDERS",
-      "WHALE_HUNTER",
-      "WHALE_TOKEN_HOLDERS"
-    ],
-    "isPremium": false,
-    "freeQueries": 10,
-    "skillCoinAddress": "0x125490489a27d541e39813c08d260debac071bb7",
-    "minimumSkillBalance": 1,
-    "status": "ACTIVE",
-    "isDefault": true
-  },
-  {
-    "pluginId": "36c9a919-5a55-4645-9008-cfd32ec4b5a2",
-    "name": "@moxie-protocol/plugin-moxie-limit-order",
-    "displayName": "Limit Order",
-    "version": "0.1.8+build.1",
-    "author": null,
-    "description": "Enables your agent to setup limit orders",
-    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-limit-order",
-    "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-limit-order/images/logo.svg",
-    "settings": {},
-    "capabilities": ["Buy on dip — buy a token when the price drops"],
-    "starterQuestions": [
-      {
-        "label": "Buy me $25 worth of $moxie if the price dips by 5%",
-        "value": "Buy me $25 worth of $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] if the price dips by 5%"
-      },
-      {
-        "label": "Buy $25 worth of $moxie if the price increases by 10%",
-        "value": "Buy $25 worth of $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] if the price increases by 10%"
-      },
-      {
-        "label": "Sell 10% of my $bnkr if the price increases by 10%",
-        "value": "Sell 10% of my $[BNKR|0x22af33fe49fd1fa80c7149773dde5890d3c76f3b] if the price increases by 10%"
-      },
-      {
-        "label": "Sell 20% of my $vvv if the price dips by 10%",
-        "value": "Sell 20% of my $[VVV|0xacfe6019ed1a7dc6f7b508c02d1b04ec88cc21bf] if the price dips by 10%"
-      }
-    ],
-    "mediaUrls": [
-      "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-moxie-limit-order/images/logo.svg"
-    ],
-    "actions": ["LIMIT_ORDERS"],
-    "isPremium": false,
-    "freeQueries": 0,
-    "skillCoinAddress": "0x0000000000000000000000000000000000000000",
-    "minimumSkillBalance": 0,
-    "status": "ACTIVE",
-    "isDefault": true
-  }, 
-  {
-    "pluginId": "79449cd9-0590-4ccc-9d9f-12f99438c17b",
-    "name": "@moxie-protocol/plugin-degenfans-alfafrens",
-    "displayName": "DegenFans AlfaFrens",
-    "version": "0.0.1",
-    "author": "DegenFans",
-    "description": "Enables your agent to recommend staking options for AlfaFrens channels",
-    "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-degenfans-alfafrens",
-    "logoUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-degenfans-alfafrens/images/logo.png",
-    "settings": {},
-    "capabilities": ["show the best staking options for a given staking amount"],
-    "starterQuestions": [
-      {
-        "label": "What are some staking recommendations you have for Alfafrens?",
-        "value": "What are some staking recommendations you have for Alfafrens?"
-      },
-      {
-        "label": "I have 9000 AF — how should I stake it?",
-        "value": "I have 9000 AF — how should I stake it?"
-      },
-      {
-        "label": "What are your top picks for staking on Alfafrens?",
-        "value": "What are your top picks for staking on Alfafrens?"
-      }
-    ],
-    "mediaUrls": [
-      ""
-    ],
-    "actions": ["GET_ALFAFRENS_STAKING_RECOMENDATION"],
-    "isPremium": false,
-    "freeQueries": 0,
-    "skillCoinAddress": "0x112cf1CC540eaDF234158c0e4044C3b5F2A33e5e",
-    "minimumSkillBalance": 5,
-    "status": "ACTIVE",
-    "isDefault": false
-  }
+    {
+        "pluginId": "a1aa9887-fc11-5f54-aa62-235c7536ba67",
+        "name": "@moxie-protocol/plugin-moxie-token-details",
+        "displayName": "Base Token Details",
+        "version": "0.1.8+build.1",
+        "author": null,
+        "description": "Enables your agent to fetch token details for any token on Base",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-token-details/images/logo.svg",
+        "settings": {},
+        "capabilities": ["Token prices", "Market caps", "Liquidity", "Holders"],
+        "starterQuestions": [
+            {
+                "label": "Show token details for $moxie",
+                "value": "Show token details for $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527]"
+            },
+            {
+                "label": "Compare $moxie and $bnkr",
+                "value": "Compare $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] and $[BNKR|0x22af33fe49fd1fa80c7149773dde5890d3c76f3b]"
+            }
+        ],
+        "mediaUrls": [
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-token-details/images/logo.svg"
+        ],
+        "actions": [
+            "TOKEN_DETAILS",
+            "TOKEN_DETAILS_SUMMARY",
+            "BASE_TOKEN_DETAIL",
+            "BASE_TOKEN_DETAILS",
+            "BASE_TOKEN_DETAILS_SUMMARY",
+            "TOKEN_SUMMARY",
+            "ERC20_DETAILS",
+            "ERC20_DETAILS_SUMMARY",
+            "ERC20_TOKEN_DETAILS",
+            "ERC20_TOKEN_DETAILS_SUMMARY",
+            "TOKEN_INFO",
+            "TOKEN_PORTFOLIO",
+            "TOKEN_PRICE",
+            "TOKEN_MARKET_CAP",
+            "TOKEN_HOLDINGS",
+            "TOKEN_LIQUIDITY",
+            "TOKEN_MARKET_PERFORMANCE",
+            "TOKEN_MARKET_SENTIMENT"
+        ],
+        "isPremium": false,
+        "freeQueries": 0,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
+        "status": "ACTIVE",
+        "isDefault": true,
+        "loaders": [
+            "Searching onchain sources",
+            "Analyzing data",
+            "Synthesizing results",
+            "Preparing insights"
+        ]
+    },
+    {
+        "pluginId": "927fb66c-2ebc-48e1-82a8-907c6e54e379",
+        "name": "@moxie-protocol/plugin-moxie-token-transfer",
+        "displayName": "Send Tokens",
+        "version": "0.1.8+build.1",
+        "author": null,
+        "description": "Enables your agent to send tokens from your agent wallet",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-transfer",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-token-transfer/images/logo.svg",
+        "settings": {},
+        "capabilities": [
+            "Send tokens to yourself",
+            "Send tokens to any ENS or Moxie user",
+            "Send tokens to any 0x address"
+        ],
+        "starterQuestions": [
+            {
+                "label": "Send 50% of my $moxie to @betashop.eth",
+                "value": "Send 50% of my $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] to @[betashop.eth|M4]"
+            },
+            {
+                "label": "Send 25% of my $eth to @betashop.eth",
+                "value": "Send 25% of my $eth to @[betashop.eth|M4]"
+            }
+        ],
+        "mediaUrls": [
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-token-transfer/images/logo.svg"
+        ],
+        "actions": [
+            "TOKEN_TRANSFERS",
+            "SEND_TOKENS",
+            "SEND_COINS",
+            "SEND_CRYPTO",
+            "SEND_FUNDS",
+            "SEND_PAYMENT",
+            "SEND_CREATOR_COIN",
+            "SEND_ERC20",
+            "SEND_TOKEN",
+            "TRANSFER_PAYMENT",
+            "TRANSFER_CREATOR_COIN",
+            "TRANSFER_ERC20",
+            "TRANSFER_TOKENS"
+        ],
+        "isPremium": false,
+        "freeQueries": 0,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
+        "status": "ACTIVE",
+        "isDefault": true,
+        "loaders": [
+            "Initiating transaction",
+            "Writing to the Base blockchain"
+        ]
+    },
+    {
+        "pluginId": "5d3b79e2-ac61-0bb6-a3ba-b0e00b943614",
+        "name": "@moxie-protocol/plugin-moxie-social-alpha",
+        "displayName": "Social Alpha",
+        "version": "0.1.8+build.1",
+        "author": null,
+        "description": "In-depth analysis on Base users, including trades, portfolios, and posts on Farcaster and X. Buy user’s coins to add them to your Social Alpha list.",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-social-alpha",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-social-alpha/images/logo.svg",
+        "settings": {},
+        "capabilities": [
+            "AI Intelligence across onchain activity and social media",
+            "Powerful insights into peoples’ trades and portfolios",
+            "Get Social Alpha insights on friends, influencers, whales",
+            "Aggregated trends",
+            "Alerts (coming soon)"
+        ],
+        "starterQuestions": [
+            {
+                "label": "Analyze portfolio and trades for @maretus and @betashop",
+                "value": "Analyze portfolio and trades for @[maretus|M7164] and @[betashop.eth|M4]"
+            },
+            {
+                "label": "Show me recent trades for @maretus",
+                "value": "Show me recent trades for @[maretus|M7164]"
+            },
+            {
+                "label": "Show me social media sentiment from @betashop.eth and @jessepollak",
+                "value": "Show me social media sentiment from @[betashop.eth|M4] and @[jessepollak|M1245]"
+            },
+            {
+                "label": "What's buzzing today on socials?",
+                "value": "What's buzzing today on socials?"
+            }
+        ],
+        "mediaUrls": [
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-social-alpha/images/logo.svg"
+        ],
+        "actions": [
+            "TWEET_SUMMARY",
+            "TWEET_HISTORY",
+            "TWITTER_ACTIVITY",
+            "TWITTER_UPDATES",
+            "FARCASTER_SUMMARY",
+            "FARCASTER_HISTORY",
+            "FARCASTER_ACTIVITY",
+            "FARCASTER_UPDATES",
+            "FARCASTER_CASTS",
+            "TRENDING_TOKENS",
+            "TOKEN_PURCHASES",
+            "TOKEN_RECOMMENDATIONS",
+            "BUY_RECOMMENDATIONS",
+            "TRENDING_CRYPTOCURRENCIES",
+            "TOKEN_SWAP_SUMMARIES",
+            "SOCIAL_SUMMARY",
+            "FARCASTER_AND_TWITTER_SUMMARY",
+            "FARCASTER_AND_TWITTER_ACTIVITY",
+            "FARCASTER_AND_TWITTER_UPDATES",
+            "SOCIAL_POSTS",
+            "TRENDING_CREATOR_COINS",
+            "CREATOR_COIN_PURCHASES",
+            "CREATOR_COIN_RECOMMENDATIONS",
+            "CREATOR_COIN_BUY_RECOMMENDATIONS",
+            "CREATOR_COIN_TRENDING_CRYPTOCURRENCIES",
+            "CREATOR_COIN_SWAP_SUMMARIES"
+        ],
+        "isPremium": false,
+        "freeQueries": 0,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
+        "status": "ACTIVE",
+        "isDefault": true,
+        "loaders": [
+            "Searching Farcaster",
+            "Searching X",
+            "Analyzing data",
+            "Synthesizing results",
+            "Preparing insights"
+        ]
+    },
+    {
+        "pluginId": "b5622f90-987e-51d1-bea9-5b1471bb9379",
+        "name": "@moxie-protocol/plugin-moxie-swap",
+        "displayName": "Trade",
+        "version": "0.1.8+build.1",
+        "author": null,
+        "description": "Enables your agent to trade and swap for you onchain using your Agent Wallet",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-swap",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-swap/images/logo.svg",
+        "settings": {},
+        "capabilities": [
+            "Swap any token on Base. 💡Pro Tip: use “$” to auto-complete token names",
+            "Swap any creator coin on Moxie. 💡Pro Tip: use “@” to auto-complete creator coin names",
+            "Spend a % of your wallet to buy coins"
+        ],
+        "starterQuestions": [
+            {
+                "label": "Buy me $25 worth of $moxie",
+                "value": "Buy me $25 worth of $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527]"
+            },
+            {
+                "label": "Swap 100 $degen for $moxie_ai",
+                "value": "Swap 100 $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed] for $[MOXIE_AI|0xda7e153bbe75902bd23496284fe0c4b90c9ace7b]"
+            },
+            {
+                "label": "Use 40% of my $eth to buy $moxie and 20% to buy $degen",
+                "value": "Use 40% of my $eth to buy $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] and 20% to buy $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed]"
+            }
+        ],
+        "mediaUrls": [
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-swap/images/logo.svg"
+        ],
+        "actions": [
+            "SWAP_TOKENS",
+            "CREATOR_TOKEN_SWAP",
+            "CREATOR_COIN_SWAP",
+            "EXCHANGE_CREATOR_COINS",
+            "TRADE_CREATOR_TOKENS",
+            "BUY_CREATOR_TOKENS",
+            "BUY_CREATOR_COINS",
+            "PURCHASE_CREATOR_COINS",
+            "PURCHASE_ERC20_TOKENS",
+            "SWAP_ERC20_TOKENS"
+        ],
+        "isPremium": false,
+        "freeQueries": 0,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
+        "status": "ACTIVE",
+        "isDefault": true,
+        "loaders": [
+            "Initiating transaction",
+            "Writing to the Base blockchain"
+        ]
+    },
+    {
+        "pluginId": "0ad0731e-698b-04bf-abeb-5d29cc36759f",
+        "name": "@moxie-protocol/plugin-moxie-balance",
+        "displayName": "Portfolios",
+        "version": "0.1.8+build.1",
+        "author": null,
+        "description": "Enables your agent to fetch portfolio details for thousands of wallets indexed by Moxie",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-balance",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-balance/images/logo.svg",
+        "settings": {},
+        "capabilities": [
+            "Analyze my portfolio",
+            "Analyze someone else’s portfolio (using Social Alpha skill)",
+            "Compare several portfolios"
+        ],
+        "starterQuestions": [
+            {
+                "label": "Analyze my portfolio",
+                "value": "Analyze my portfolio"
+            },
+            {
+                "label": "Analyze @maretus portfolio",
+                "value": "Analyze @[maretus|M7164] portfolio"
+            },
+            {
+                "label": "Compare portfolios of @betashop.eth @macster @sgniwder",
+                "value": "Compare portfolios of @[betashop.eth|M4] @[maretus|M7164] @[sgniwder|M739]"
+            }
+        ],
+        "mediaUrls": [
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-balance/images/logo.svg"
+        ],
+        "actions": [
+            "PORTFOLIO",
+            "PORTFOLIO_SUMMARY",
+            "TOTAL_BALANCE",
+            "ALL_POSITIONS",
+            "ASSET_OVERVIEW",
+            "HOLDINGS_SUMMARY",
+            "WALLET_BALANCE",
+            "INVESTMENT_SUMMARY",
+            "ASSET_POSITIONS",
+            "PORTFOLIO_OVERVIEW",
+            "PORTFOLIO_STATUS",
+            "CREATOR_COIN_BALANCE",
+            "CREATOR_COIN",
+            "CREATOR_COIN_BALANCE",
+            "CREATOR_COIN_PRICE",
+            "CREATOR_COIN_POSITION",
+            "FAN_TOKEN",
+            "FAN_TOKEN_BALANCE",
+            "FAN_TOKEN_POSITION",
+            "FAN_TOKEN_PRICE"
+        ],
+        "isPremium": false,
+        "freeQueries": 10,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
+        "status": "ACTIVE",
+        "isDefault": true,
+        "loaders": [
+            "Searching onchain sources",
+            "Analyzing data",
+            "Synthesizing results",
+            "Preparing insights"
+        ]
+    },
+    {
+        "pluginId": "a8c0c53a-e4e5-0848-b69b-a17af97d64dd",
+        "name": "@moxie-protocol/plugin-moxie-whale-hunter",
+        "displayName": "Base Whale Hunter",
+        "version": "0.1.8+build.1",
+        "author": null,
+        "description": "Discover Base whales with Moxie AI! ",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-whale-hunter",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-whale-hunter/images/logo.svg",
+        "settings": {},
+        "capabilities": [
+            "Top traders across all of Base",
+            "Top traders of a specific token",
+            "Top holders of a specific token"
+        ],
+        "starterQuestions": [
+            {
+                "label": "Who are the top traders today on Base?",
+                "value": "Who are the top traders today on Base?"
+            },
+            {
+                "label": "Show today's trending tokens on Base along with the top traders",
+                "value": "Show today's trending tokens on Base along with the top traders"
+            },
+            {
+                "label": "Who are the biggest $bnkr whales?",
+                "value": "Who are the biggest $[BNKR|0x22af33fe49fd1fa80c7149773dde5890d3c76f3b] whales?"
+            },
+            {
+                "label": "Who are the top traders recently of $clanker?",
+                "value": "Who are the top traders recently of $[CLANKER|0x1bc0c42215582d5a085795f4badbac3ff36d1bcb]?"
+            }
+        ],
+        "mediaUrls": [
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-whale-hunter/images/logo.svg"
+        ],
+        "actions": [
+            "TOP_TRADERS",
+            "TOP_WHALES",
+            "TOP_TRADER_OF_A_TOKEN",
+            "TOP_TOKEN_HOLDERS",
+            "WHALE_HUNTER",
+            "WHALE_TOKEN_HOLDERS"
+        ],
+        "isPremium": true,
+        "freeQueries": 10,
+        "skillCoinAddress": "0x125490489a27d541e39813c08d260debac071bb7",
+        "minimumSkillBalance": 1,
+        "status": "ACTIVE",
+        "isDefault": true,
+        "loaders": [
+            "Searching onchain sources",
+            "Analyzing 🐋 🐋 🐋",
+            "Doing robot things",
+            "Synthesizing results",
+            "Preparing insights"
+        ]
+    },
+    {
+        "pluginId": "36c9a919-5a55-4645-9008-cfd32ec4b5a2",
+        "name": "@moxie-protocol/plugin-moxie-limit-order",
+        "displayName": "Limit Orders",
+        "version": "0.1.8+build.1",
+        "author": null,
+        "description": "Enables your agent to buy or sell tokens for you based on limit conditions.",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-limit-order",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-limit-order/images/logo.svg",
+        "settings": {},
+        "capabilities": [
+            "Buy on dip — buy a token when the price drops",
+            "Buy at target price — buy at target price",
+            "Sell at target price — sell at target price (all or some)"
+        ],
+        "starterQuestions": [
+            {
+                "label": "Buy me $25 worth of $moxie if the price dips by 5%",
+                "value": "Buy me $25 worth of $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] if the price dips by 5%"
+            },
+            {
+                "label": "Buy $25 worth of $moxie if the price increases by 10%",
+                "value": "Buy $25 worth of $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] if the price increases by 10%"
+            },
+            {
+                "label": "Sell 10% of my $bnkr if the price increases by 10%",
+                "value": "Sell 10% of my $[BNKR|0x22af33fe49fd1fa80c7149773dde5890d3c76f3b] if the price increases by 10%"
+            }
+        ],
+        "mediaUrls": [
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-limit-order/images/logo.svg"
+        ],
+        "actions": ["LIMIT_ORDERS"],
+        "isPremium": false,
+        "freeQueries": 0,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
+        "status": "ACTIVE",
+        "isDefault": true,
+        "loaders": [
+            "Analyzing request",
+            "Doing robot things",
+            "Setting limits",
+            "Initiating transaction",
+            "Writing to the Base blockchain"
+        ]
+    },
+    {
+        "pluginId": "0ad0731e-698b-04bf-abeb-5d29cc36759d",
+        "name": "@moxie-protocol/plugin-token-social-sentiment",
+        "displayName": "Token Sentiment",
+        "version": "0.1.8+build.1",
+        "author": null,
+        "description": "Analyze token sentiments on X and Farcaster!",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-token-social-sentiment",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/e9ac0912aba19398350aeaa63006211f0ccca403/packages/plugin-moxie-token-social-sentiment/images/logo.svg",
+        "settings": {},
+        "capabilities": ["Analyze token sentiments on X and Farcaster"],
+        "starterQuestions": [
+            {
+                "label": "What are people saying today about $KTA?",
+                "value": "What are people saying today about $[KTA|0xc0634090f2fe6c6d75e61be2b949464abb498973]"
+            },
+            {
+                "label": "What's the sentiment on $DRB?",
+                "value": "What's the sentiment on $[DRB|0x3ec2156d4c0a9cbdab4a016633b7bcf6a8d68ea2]"
+            },
+            {
+                "label": "What's the vibe on $DEGEN?",
+                "value": "What's the vibe on $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed]?"
+            }
+        ],
+        "mediaUrls": [
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-token-social-sentiment/images/logo.svg"
+        ],
+        "actions": ["TOKEN_SOCIAL_SENTIMENT"],
+        "isPremium": false,
+        "freeQueries": 0,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
+        "status": "ACTIVE",
+        "isDefault": true,
+        "loaders": [
+            "Searching X",
+            "Searching Farcaster",
+            "Analyzing sentiments",
+            "Feeling the vibes",
+            "Synthesizing results",
+            "Preparing insights"
+        ]
+    }, 
+    {
+      "pluginId": "79449cd9-0590-4ccc-9d9f-12f99438c17b",
+      "name": "@moxie-protocol/plugin-degenfans-alfafrens",
+      "displayName": "DegenFans AlfaFrens",
+      "version": "0.0.1",
+      "author": "DegenFans",
+      "description": "Enables your agent to recommend staking options for AlfaFrens channels",
+      "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-degenfans-alfafrens",
+      "logoUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-degenfans-alfafrens/images/logo.png",
+      "settings": {},
+      "capabilities": ["show the best staking options for a given staking amount"],
+      "starterQuestions": [
+        {
+          "label": "What are some staking recommendations you have for Alfafrens?",
+          "value": "What are some staking recommendations you have for Alfafrens?"
+        },
+        {
+          "label": "I have 9000 AF — how should I stake it?",
+          "value": "I have 9000 AF — how should I stake it?"
+        },
+        {
+          "label": "What are your top picks for staking on Alfafrens?",
+          "value": "What are your top picks for staking on Alfafrens?"
+        }
+      ],
+      "mediaUrls": [
+        ""
+      ],
+      "actions": ["GET_ALFAFRENS_STAKING_RECOMENDATION"],
+      "isPremium": false,
+      "freeQueries": 0,
+      "skillCoinAddress": "0x112cf1CC540eaDF234158c0e4044C3b5F2A33e5e",
+      "minimumSkillBalance": 5,
+      "status": "ACTIVE",
+      "isDefault": false
+    }
 ]

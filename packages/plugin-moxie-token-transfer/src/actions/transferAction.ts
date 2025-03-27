@@ -1,6 +1,6 @@
 import { composeContext, elizaLogger, generateObjectDeprecated, HandlerCallback, IAgentRuntime, Memory, ModelClass, ModelProviderName, State } from "@moxie-protocol/core";
 import { tokenTransferTemplate } from "../templates/template";
-import { ftaService, getTokenDetails, MoxieClientWallet, MoxieUser, moxieUserService, MoxieWalletClient, MoxieWalletSendTransactionResponseType, TransactionDetails } from "@moxie-protocol/moxie-agent-lib";
+import * as agentLib from "@moxie-protocol/moxie-agent-lib";
 import { CallbackTemplate, TransactionResponse, FunctionResponse, Balance, Context, TokenDetails, Transfer } from "../types/types";
 import * as callBackTemplate from "../templates/callBackTemplate";
 import { ethers } from "ethers";
@@ -44,9 +44,9 @@ export const tokenTransferAction = {
         }
 
         // pick moxie user info from state
-        const moxieUserInfo = state.moxieUserInfo as MoxieUser;
+        const moxieUserInfo = state.moxieUserInfo as agentLib.MoxieUser;
         const moxieUserId = moxieUserInfo.id;
-        const agentWallet = state.agentWallet as MoxieClientWallet;
+        const agentWallet = state.agentWallet as agentLib.MoxieClientWallet;
 
         // add moxie user id to context
         context.moxieUserId = moxieUserId;
@@ -211,7 +211,7 @@ async function processMessage(
 ): Promise<FunctionResponse<TransactionResponse>> {
     elizaLogger.debug(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [processMessage] message called: ${JSON.stringify(message)}`);
 
-    const agentWallet = state.agentWallet as MoxieClientWallet;
+    const agentWallet = state.agentWallet as agentLib.MoxieClientWallet;
 
     // Compose transfer context
     let transferContext = composeContext({
@@ -293,14 +293,14 @@ async function preValidateRequiredData(context: Context) {
     }
 
     // check moxie user info
-    const moxieUserInfo = state.moxieUserInfo as MoxieUser;
+    const moxieUserInfo = state.moxieUserInfo as agentLib.MoxieUser;
     if (!moxieUserInfo) {
         elizaLogger.error(context.traceId, `[tokenTransfer] [preValidateRequiredData] Moxie user info not found`);
         return callBackTemplate.APPLICATION_ERROR("Moxie user info not found in state");
     }
 
     // check agent wallet
-    const agentWallet = state.agentWallet as MoxieClientWallet;
+    const agentWallet = state.agentWallet as agentLib.MoxieClientWallet;
     if (!agentWallet) {
         elizaLogger.error(context.traceId, `[tokenTransfer] [preValidateRequiredData] Agent wallet not found`);
         return callBackTemplate.APPLICATION_ERROR("Agent wallet not found in state");
@@ -331,7 +331,7 @@ async function preValidateRequiredData(context: Context) {
 async function processTransfer(
     context: Context,
     transferOptions: TransactionResponse,
-    agentWallet: MoxieClientWallet,
+    agentWallet: agentLib.MoxieClientWallet,
     callback: HandlerCallback
 ): Promise<FunctionResponse<CallbackTemplate>> {
     elizaLogger.debug(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [processTransfer] started`);
@@ -397,7 +397,7 @@ async function processTransfer(
 async function processSingleTransfer(
     context: Context,
     transfer: Transfer,
-    agentWallet: MoxieClientWallet,
+    agentWallet: agentLib.MoxieClientWallet,
     currentWalletBalanceForBalanceBasedSwaps: Map<string, bigint | undefined>
 ): Promise<FunctionResponse<CallbackTemplate>> {
     elizaLogger.debug(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [processSingleTransfer] transfer: ${JSON.stringify(transfer)}`);
@@ -695,7 +695,7 @@ async function processCreatorCoin(context: Context, recipient: string): Promise<
             return null;
         }
         // fetch the creator agent wallet address
-        const moxieUserDetails = await moxieUserService.getUserByMoxieId(recipientTokenCreatorId);
+        const moxieUserDetails = await agentLib.moxieUserService.getUserByMoxieId(recipientTokenCreatorId);
         elizaLogger.debug(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [processCreatorCoin]  moxieUserDetails: ${JSON.stringify(moxieUserDetails)}`);
 
         if (!moxieUserDetails) {
@@ -830,7 +830,7 @@ async function getFtaResponses(
             }
 
             // Fetch fresh data if not in cache
-            const newResponse = await ftaService.getUserFtaData(creatorId);
+            const newResponse = await agentLib.ftaService.getUserFtaData(creatorId);
             if (!newResponse) {
                 elizaLogger.error(
                     context.traceId, `[tokenTransfer] [${context.moxieUserId}] [getFtaResponses] Creator ${creatorId} not found`
@@ -955,7 +955,7 @@ async function getCreatorCoinDetails(
                 };
             }
             const tokenSubjectAddress = ftaResponses.data[tokenCreatorId]?.subjectAddress;
-            subjectTokenDetails = await getSubjectTokenDetailsBySubjectAddress(tokenSubjectAddress);
+            subjectTokenDetails = await getSubjectTokenDetailsBySubjectAddress(context.traceId, tokenSubjectAddress);
         } catch (error) {
             elizaLogger.error(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [getCreatorCoinDetails] Error getting FTA responses for creator ID ${tokenCreatorId}: ${error}`);
             return {
@@ -1004,7 +1004,7 @@ async function executeTransfer(
 
     // Prepare transaction input for ERC20 token transfer
     const isEthTransfer = tokenAddress === ETH_ADDRESS;
-    const request: TransactionDetails = {
+    const request: agentLib.TransactionDetails = {
         fromAddress: agentWallet,
         toAddress: isEthTransfer ? recipientAddress : tokenAddress,
         value: isEthTransfer ? Number(amountInWEI) : 0,
@@ -1021,8 +1021,8 @@ async function executeTransfer(
     );
 
     // Send the transaction
-    const walletClient = context.state.moxieWalletClient as MoxieWalletClient;
-    let transactionResponse: MoxieWalletSendTransactionResponseType;
+    const walletClient = context.state.moxieWalletClient as agentLib.MoxieWalletClient;
+    let transactionResponse: agentLib.MoxieWalletSendTransactionResponseType;
     try {
         transactionResponse = await walletClient.sendTransaction(process.env.CHAIN_ID, request);
     } catch (error) {
@@ -1059,7 +1059,7 @@ async function getTargetQuantityForBalanceBasedTokenTransfer(
     currentWalletBalance: bigint | undefined,
     tokenAddress: string,
     tokenSymbol: string,
-    agentWallet: MoxieClientWallet,
+    agentWallet: agentLib.MoxieClientWallet,
     balance: Balance,
 ): Promise<FunctionResponse<bigint>> {
     // Input validation
@@ -1178,7 +1178,7 @@ async function convertUSDToTokenAmount(
         }
 
         const tokenWithNetworkId = `${tokenAddressForCodex}:${BASE_NETWORK_ID}`;
-        const tokenDetails = await getTokenDetails([tokenWithNetworkId]);
+        const tokenDetails = await agentLib.getTokenDetails([tokenWithNetworkId]);
         elizaLogger.debug(
             context.traceId,
             `[tokenTransfer] [${context.moxieUserId}] [convertUSDToTokenAmount] Token details Response: ${JSON.stringify(tokenDetails)}`
