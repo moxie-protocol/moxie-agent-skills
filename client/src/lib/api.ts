@@ -82,7 +82,7 @@ export const apiClient = {
                 if (contentType === "audio/mpeg") {
                     return await resp.blob();
                 }
-                if (contentType?.includes('text/event-stream')) {
+                if (contentType?.includes("text/event-stream")) {
                     const reader = resp.body?.getReader();
                     const decoder = new TextDecoder();
 
@@ -103,14 +103,20 @@ export const apiClient = {
                                             const data = JSON.parse(jsonStr);
                                             yield data;
                                         } catch (error) {
-                                            console.error('Failed to parse JSON:', jsonStr);
-                                            const errorMessage = error instanceof Error ? error.message : 'Failed to parse JSON';
+                                            console.error(
+                                                "Failed to parse JSON:",
+                                                jsonStr
+                                            );
+                                            const errorMessage =
+                                                error instanceof Error
+                                                    ? error.message
+                                                    : "Failed to parse JSON";
                                             throw new Error(errorMessage);
                                         }
                                     }
                                 }
                             }
-                        }
+                        },
                     };
                 }
                 return resp.json();
