@@ -12,6 +12,8 @@ import {
     CREATOR_AGENT_TOKEN_ADDRESS,
     MINIMUM_CREATOR_AGENT_COINS,
     BASE_RPC_URL,
+    MINIMUM_BASE_ECONOMY_COINS,
+    BASE_ECONOMY_TOKEN_ADDRESS,
 } from "./constants/constants";
 import { elizaLogger, validateUuid, IAgentRuntime } from "@moxie-protocol/core";
 import {
@@ -128,6 +130,94 @@ export async function validateMoxieAIAgentBalance({
     if (!response.hasSufficientBalance) {
         elizaLogger.error(
             `[validateMoxieAIAgentBalance] [${moxieUserId}] Total amount is less than minimum creator agent coins`
+        );
+    }
+
+    // Cache result if runtime provided
+    if (runtime) {
+        await runtime.cacheManager.set(cacheKey, JSON.stringify(response), {
+            expires: Date.now() + 60000, // 1 minute
+        });
+    }
+
+    return response;
+}
+
+/**
+ * Validates the balance of Base Economy tokens for a given wallet address
+ * @param moxieUserId - The Moxie user ID
+ * @returns Promise containing the base economy token balance and a boolean value indicating if the balance is sufficient
+ * @throws Error if the contract call fails or returns invalid response
+ */
+export async function validateBaseEconomyTokenBalance({
+    moxieUserId,
+    runtime,
+}: {
+    moxieUserId: string;
+    runtime?: IAgentRuntime;
+}): Promise<{
+    baseEconomyTokenBalance: number;
+    hasSufficientBalance: boolean;
+}> {
+    elizaLogger.debug(
+        `[validateBaseEconomyBalance] [${moxieUserId}] Validating base economy balance`
+    );
+
+    const response = {
+        baseEconomyTokenBalance: 0,
+        hasSufficientBalance: false,
+    };
+
+    // bypass this check for internal dev team
+    const devTeamMoxieUserIds =
+        process.env.DEV_TEAM_MOXIE_USER_IDS?.split(",") || [];
+    if (devTeamMoxieUserIds.includes(moxieUserId)) {
+        return {
+            baseEconomyTokenBalance: 0,
+            hasSufficientBalance: true,
+        };
+    }
+
+    const cacheKey = `moxie-base-economy-balance-${moxieUserId}`;
+
+    // Check cache first if runtime provided
+    if (runtime) {
+        const cachedData = await runtime.cacheManager.get(cacheKey);
+        if (cachedData) {
+            return JSON.parse(cachedData as string);
+        }
+    }
+
+    // Get portfolio info
+    const portfolioInfo = await getMoxiePortfolioInfoByCreatorTokenDetails(
+        moxieUserId,
+        {
+            address: BASE_ECONOMY_TOKEN_ADDRESS,
+        }
+    );
+
+    // Return early if no portfolio found
+    if (!portfolioInfo?.length) {
+        elizaLogger.error(
+            `No portfolio info found for moxie user ${moxieUserId}`
+        );
+        return response;
+    }
+
+    const totalLockedAmount = portfolioInfo[0].totalLockedAmount;
+    const totalUnlockedAmount = portfolioInfo[0].totalUnlockedAmount;
+    const totalAmount = totalLockedAmount + totalUnlockedAmount;
+
+    elizaLogger.debug(
+        `[validateBaseEconomyTokenBalance] [${moxieUserId}] Total amount: ${totalAmount}`
+    );
+
+    response.baseEconomyTokenBalance = totalAmount;
+    response.hasSufficientBalance = totalAmount >= MINIMUM_BASE_ECONOMY_COINS;
+
+    if (!response.hasSufficientBalance) {
+        elizaLogger.error(
+            `[validateBaseEconomyTokenBalance] [${moxieUserId}] Total amount is less than minimum base economy tokens`
         );
     }
 

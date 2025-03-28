@@ -7,6 +7,7 @@ import {
     messageCompletionFooter,
     type IDatabaseAdapter,
 } from "@moxie-protocol/core";
+import { validateBaseEconomyTokenBalance } from "./helpers";
 import { createMoxieApiRouter } from "./moxieApis.ts";
 
 export const messageHandlerTemplate =
@@ -132,3 +133,4 @@ export class MoxieClient {
 }
 
 export * from "./constants/constants";
+export { validateBaseEconomyTokenBalance };

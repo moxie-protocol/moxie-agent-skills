@@ -9,6 +9,10 @@ export const CREATOR_AGENT_TOKEN_ADDRESS: string =
     "0x838cc7f24a2696c796f90516c89369fbdcf7c575";
 export const MINIMUM_CREATOR_AGENT_COINS: number =
     Number(process.env["MINIMUM_CREATOR_AGENT_COINS"]) || 0;
+export const MINIMUM_BASE_ECONOMY_COINS: number =
+    Number(process.env["MINIMUM_BASE_ECONOMY_COINS"]) || 1;
+export const BASE_ECONOMY_TOKEN_ADDRESS: string =
+    process.env["BASE_ECONOMY_TOKEN_ADDRESS"] || "";
 export const COMMON_AGENT_ID: string = process.env["COMMON_AGENT_ID"] || "";
 export const BASE_RPC_URL: string =
     process.env["BASE_RPC_URL"] || "https://mainnet.base.org";
