@@ -111,6 +111,24 @@ I want to stake 4600 AF with minimum subscriptions 10
 }
 \`\`\`
 
+
+**Message 6**
+
+\`\`\`
+What are your top picks for staking on AlfaFrens?
+\`\`\`
+
+**Response 6**
+
+\`\`\`json
+{
+    "amount": 0,
+    "userAddress": "",
+    "mysubs": false,
+    "mytake": false
+}
+\`\`\`
+
 Here are the recent user messages for context:
 {{recentMessages}}
 `;
