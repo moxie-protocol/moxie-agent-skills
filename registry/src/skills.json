@@ -114,7 +114,13 @@
         "skillCoinAddress": "",
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
-        "isDefault": true
+        "isDefault": true,
+        "loaders": [
+            "Searching onchain sources",
+            "Analyzing data",
+            "Synthesizing results",
+            "Preparing insights"
+        ]
     },
     {
         "pluginId": "927fb66c-2ebc-48e1-82a8-907c6e54e379",
@@ -133,12 +139,12 @@
         ],
         "starterQuestions": [
             {
-                "label": "Send 50% of my $moxie to betashop.eth",
-                "value": "Send 50% of my $moxie to betashop.eth"
+                "label": "Send 50% of my $moxie to @betashop.eth",
+                "value": "Send 50% of my $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] to @[betashop.eth|M4]"
             },
             {
                 "label": "Send 25% of my $eth to @betashop.eth",
-                "value": "Send 25% of my $eth to @betashop.eth"
+                "value": "Send 25% of my $eth to @[betashop.eth|M4]"
             }
         ],
         "mediaUrls": [
@@ -164,7 +170,11 @@
         "skillCoinAddress": "",
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
-        "isDefault": true
+        "isDefault": true,
+        "loaders": [
+            "Initiating transaction",
+            "Writing to the Base blockchain"
+        ]
     },
     {
         "pluginId": "5d3b79e2-ac61-0bb6-a3ba-b0e00b943614",
@@ -185,24 +195,20 @@
         ],
         "starterQuestions": [
             {
-                "label": "What’s trending with my top creators?",
-                "value": "What’s trending with my top creators?"
-            },
-            {
                 "label": "Analyze portfolio and trades for @maretus and @betashop",
-                "value": "Analyze portfolio and trades for @maretus and @betashop"
+                "value": "Analyze portfolio and trades for @[maretus|M7164] and @[betashop.eth|M4]"
             },
             {
                 "label": "Show me recent trades for @maretus",
-                "value": "Show me recent trades for @maretus"
+                "value": "Show me recent trades for @[maretus|M7164]"
             },
             {
                 "label": "Show me social media sentiment from @betashop.eth and @jessepollak",
-                "value": "Show me social media sentiment from @betashop.eth and @jessepollak"
+                "value": "Show me social media sentiment from @[betashop.eth|M4] and @[jessepollak|M1245]"
             },
             {
-                "label": "What’s buzzing today on socials?",
-                "value": "What’s buzzing today on socials?"
+                "label": "What's buzzing today on socials?",
+                "value": "What's buzzing today on socials?"
             }
         ],
         "mediaUrls": [
@@ -241,7 +247,14 @@
         "skillCoinAddress": "",
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
-        "isDefault": true
+        "isDefault": true,
+        "loaders": [
+            "Searching Farcaster",
+            "Searching X",
+            "Analyzing data",
+            "Synthesizing results",
+            "Preparing insights"
+        ]
     },
     {
         "pluginId": "b5622f90-987e-51d1-bea9-5b1471bb9379",
@@ -261,15 +274,15 @@
         "starterQuestions": [
             {
                 "label": "Buy me $25 worth of $moxie",
-                "value": "Buy me $25 worth of $moxie"
+                "value": "Buy me $25 worth of $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527]"
             },
             {
-                "label": "Swap 100 $degen for @moxie_ai",
-                "value": "Swap 100 $degen for @moxie_ai"
+                "label": "Swap 100 $degen for $moxie_ai",
+                "value": "Swap 100 $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed] for $[MOXIE_AI|0xda7e153bbe75902bd23496284fe0c4b90c9ace7b]"
             },
             {
                 "label": "Use 40% of my $eth to buy $moxie and 20% to buy $degen",
-                "value": "Use 40% of my $eth to buy $moxie and 20% to buy $degen"
+                "value": "Use 40% of my $eth to buy $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] and 20% to buy $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed]"
             }
         ],
         "mediaUrls": [
@@ -292,7 +305,11 @@
         "skillCoinAddress": "",
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
-        "isDefault": true
+        "isDefault": true,
+        "loaders": [
+            "Initiating transaction",
+            "Writing to the Base blockchain"
+        ]
     },
     {
         "pluginId": "0ad0731e-698b-04bf-abeb-5d29cc36759f",
@@ -316,11 +333,11 @@
             },
             {
                 "label": "Analyze @maretus portfolio",
-                "value": "Analyze @maretus portfolio"
+                "value": "Analyze @[maretus|M7164] portfolio"
             },
             {
                 "label": "Compare portfolios of @betashop.eth @macster @sgniwder",
-                "value": "Compare portfolios of @betashop.eth @macster @sgniwder"
+                "value": "Compare portfolios of @[betashop.eth|M4] @[maretus|M7164] @[sgniwder|M739]"
             }
         ],
         "mediaUrls": [
@@ -353,7 +370,13 @@
         "skillCoinAddress": "",
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
-        "isDefault": true
+        "isDefault": true,
+        "loaders": [
+            "Searching onchain sources",
+            "Analyzing data",
+            "Synthesizing results",
+            "Preparing insights"
+        ]
     },
     {
         "pluginId": "a8c0c53a-e4e5-0848-b69b-a17af97d64dd",
@@ -376,8 +399,8 @@
                 "value": "Who are the top traders today on Base?"
             },
             {
-                "label": "Show today’s trending tokens on Base along with the top traders",
-                "value": "Show today’s trending tokens on Base along with the top traders"
+                "label": "Show today's trending tokens on Base along with the top traders",
+                "value": "Show today's trending tokens on Base along with the top traders"
             },
             {
                 "label": "Who are the biggest $bnkr whales?",
@@ -404,7 +427,14 @@
         "skillCoinAddress": "0x125490489a27d541e39813c08d260debac071bb7",
         "minimumSkillBalance": 1,
         "status": "ACTIVE",
-        "isDefault": true
+        "isDefault": true,
+        "loaders": [
+            "Searching onchain sources",
+            "Analyzing 🐋 🐋 🐋",
+            "Doing robot things",
+            "Synthesizing results",
+            "Preparing insights"
+        ]
     },
     {
         "pluginId": "36c9a919-5a55-4645-9008-cfd32ec4b5a2",
@@ -444,42 +474,57 @@
         "skillCoinAddress": "",
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
-        "isDefault": true
+        "isDefault": true,
+        "loaders": [
+            "Analyzing request",
+            "Doing robot things",
+            "Setting limits",
+            "Initiating transaction",
+            "Writing to the Base blockchain"
+        ]
     },
     {
-      "pluginId": "0ad0731e-698b-04bf-abeb-5d29cc36759d",
-      "name": "@moxie-protocol/plugin-token-social-sentiment",
-      "displayName": "Token Sentiment",
-      "version": "0.1.8+build.1",
-      "author": null,
-      "description": "Analyze token sentiments on X and Farcaster!",
-      "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-token-social-sentiment",
-      "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/e9ac0912aba19398350aeaa63006211f0ccca403/packages/plugin-moxie-token-social-sentiment/images/logo.svg",
-      "settings": {},
-      "capabilities": ["Analyze token sentiments on X and Farcaster"],
-      "starterQuestions": [
-        {
-          "label": "What are people saying today about $KTA?",
-          "value": "What are people saying today about $[KTA|0xc0634090f2fe6c6d75e61be2b949464abb498973]"
-        },
-        {
-          "label": "What’s the sentiment on $DRB?",
-          "value": "What’s the sentiment on $[DRB|0x3ec2156d4c0a9cbdab4a016633b7bcf6a8d68ea2]"
-        },
-        {
-          "label": "What’s the vibe on $DEGEN?",
-          "value": "What’s the vibe on $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed]?"
-        }
-      ],
-      "mediaUrls": [
-        "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-token-social-sentiment/images/logo.svg"
-      ],
-      "actions": ["TOKEN_SOCIAL_SENTIMENT"],
-      "isPremium": false,
-      "freeQueries": 0,
-      "skillCoinAddress": "",
-      "minimumSkillBalance": 0,
-      "status": "ACTIVE",
-      "isDefault": true
+        "pluginId": "0ad0731e-698b-04bf-abeb-5d29cc36759d",
+        "name": "@moxie-protocol/plugin-token-social-sentiment",
+        "displayName": "Token Sentiment",
+        "version": "0.1.8+build.1",
+        "author": null,
+        "description": "Analyze token sentiments on X and Farcaster!",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-token-social-sentiment",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/e9ac0912aba19398350aeaa63006211f0ccca403/packages/plugin-moxie-token-social-sentiment/images/logo.svg",
+        "settings": {},
+        "capabilities": ["Analyze token sentiments on X and Farcaster"],
+        "starterQuestions": [
+            {
+                "label": "What are people saying today about $KTA?",
+                "value": "What are people saying today about $[KTA|0xc0634090f2fe6c6d75e61be2b949464abb498973]"
+            },
+            {
+                "label": "What's the sentiment on $DRB?",
+                "value": "What's the sentiment on $[DRB|0x3ec2156d4c0a9cbdab4a016633b7bcf6a8d68ea2]"
+            },
+            {
+                "label": "What's the vibe on $DEGEN?",
+                "value": "What's the vibe on $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed]?"
+            }
+        ],
+        "mediaUrls": [
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-token-social-sentiment/images/logo.svg"
+        ],
+        "actions": ["TOKEN_SOCIAL_SENTIMENT"],
+        "isPremium": false,
+        "freeQueries": 0,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
+        "status": "ACTIVE",
+        "isDefault": true,
+        "loaders": [
+            "Searching X",
+            "Searching Farcaster",
+            "Analyzing sentiments",
+            "Feeling the vibes",
+            "Synthesizing results",
+            "Preparing insights"
+        ]
     }
 ]
