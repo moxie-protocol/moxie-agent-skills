@@ -79,6 +79,45 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
             });
     }
 
+    async upsertFreeTrialBalance(userId: string, pluginId: string, total_free_queries: number): Promise<{ user_id: string; plugin_id: string; total_free_queries: number; remaining_free_queries: number }> {
+        return this.pgAdapter
+            .query(
+                `
+                INSERT INTO free_usage_details (id, user_id, plugin_id, total_free_queries, remaining_free_queries)
+                VALUES ($1, $2, $3, $4, $5)
+                ON CONFLICT (user_id, plugin_id) DO UPDATE
+                SET remaining_free_queries = free_usage_details.remaining_free_queries - 1,
+                    updated_at = CURRENT_TIMESTAMP
+                RETURNING total_free_queries, remaining_free_queries;
+                `,
+                [
+                    uuidv4(),
+                    userId,
+                    pluginId,
+                    total_free_queries,
+                    total_free_queries - 1,
+                ]
+            )
+            .then((result) => {
+                if (result.rows.length > 0) {
+                    return {
+                        user_id: userId,
+                        plugin_id: pluginId,
+                        total_free_queries: result.rows[0].total_free_queries,
+                        remaining_free_queries:
+                            result.rows[0].remaining_free_queries,
+                    };
+                } else {
+                    return {
+                        user_id: userId,
+                        plugin_id: pluginId,
+                        total_free_queries: total_free_queries,
+                        remaining_free_queries: 0,
+                    };
+                }
+            });
+    }
+
     async createUserAgentFeedback(roomId: string, messageId: string, moxieUserId: string, agentId: string, feedback: string, rating: number, feedbackText: string, screenshotUrl: string): Promise<string> {
         return this.pgAdapter
             .query(
