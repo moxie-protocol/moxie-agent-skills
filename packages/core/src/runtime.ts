@@ -1394,12 +1394,13 @@ Text: ${attachment.text}
                 Promise.all(actionPromises),
                 getProviders(this, message, initialState),
             ]);
+        elizaLogger.info(`Resolved actions: ${resolvedActions}`);
 
         const evaluatorsData = resolvedEvaluators.filter(
             Boolean
         ) as Evaluator[];
         const actionsData = resolvedActions.filter(Boolean) as Action[];
-
+        elizaLogger.info(`Actions data: ${actionsData}`);
         const actionState = {
             actionNames:
                 "Possible response actions: " + formatActionNames(actionsData),
