@@ -115,15 +115,14 @@ export function getHelpText(user: AfUser): string {
 }
 export function getHelpTextUserNotFound():string{
   let tbl="";
-  tbl += "\n* I was not able to match your AlfaFrens profile, following options you have:";
-  tbl += "\n   * AlfaFrens profile address";
-  tbl += "\n   * AlfaFrens profile name";
-  tbl += "\n   * conected Farcaster Account from your Moxie profile";
-  tbl += "\n   * conected X Account from your Moxie profile";
+  tbl += "\nI was not able to find your AlfaFrens profile. To get a personalized staking recommendations, make sure that you have:";
+  tbl += "\n  * AlfaFrens profile connected to your Farcaster and X account";
+  tbl += "\n  * Conected Farcaster Account from your Moxie profile";
+  tbl += "\n  * Conected X Account from your Moxie profile";
   tbl += "\n";
-  tbl += "\nif you don´t have any account on AlfaFrens, create one on:";
-  tbl += "\nhttps://alfafrens.com";
-  tbl += "\n\nElse, get in touch w/ @degenfans to resolve the issue";
+  tbl += "\nIf you don't have an account on AlfaFrens, you can create one on:";
+  tbl += "\n[https://alfafrens.com](https://alfafrens.com)";
+  tbl += "\n\nElse, you can get in touch with @[degenfans|M155] to resolve the issue.";
   return tbl;
 }
 
