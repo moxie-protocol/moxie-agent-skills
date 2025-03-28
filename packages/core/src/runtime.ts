@@ -1369,6 +1369,7 @@ Text: ${attachment.text}
 
         const actionPromises = this.actions.map(async (action: Action) => {
             const result = await action.validate(this, message, initialState);
+            elizaLogger.info(`Action ${action.name} validated: ${result}`);
             if (result) {
                 return action;
             }
