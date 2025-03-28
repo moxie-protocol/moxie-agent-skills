@@ -267,7 +267,10 @@ export async function getUserByMoxieIdMultipleTokenGate(
                 await new Promise((resolve) => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
             }
         }
-
+        if (retryCount >= maxRetries) {
+            elizaLogger.error("Failed to get user info batch after maximum retries");
+            throw new Error("Failed to get user info batch after maximum retries");
+        }
         return { users: [], freeTrialLimit: 0, remainingFreeTrialCount: 0 };
     } catch (error) {
         elizaLogger.error("Error in getUserByMoxieIdMultipleTokenGate:", error);
