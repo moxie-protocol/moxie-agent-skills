@@ -76,12 +76,13 @@ export const stakingConsultantAction: Action = {
             const stakingData: StakingRequest = { amount: amount, mysubs: mysubs, mystake: mystake, minsubs: minsubs };
             const resp = await getStakingOptions(userData, userAddress, stakingData);
             let tbl: string = "";
-            console.log(resp);
+            
             if (resp.status == 200) {
 
                 if(!resp.data.user){
                     tbl += getHelpTextUserNotFound();
                 }
+                tbl + resp.message;
                 tbl += "\n";
                 if (resp.data && resp.data.result && resp.data.result.stakingOptions && resp.data.result.stakingOptions.length > 0) {
                     tbl += "|rank|AlfaFrens Channel|ROI Spark/mo|current stake|\n";
@@ -99,7 +100,7 @@ export const stakingConsultantAction: Action = {
                 tbl += getHelpText(resp.data.user);
 
 
-                tbl = resp.message + tbl;
+                tbl =  tbl;
             } else {
                 tbl = "degenfans server is not reachable, try again later!";
             }
