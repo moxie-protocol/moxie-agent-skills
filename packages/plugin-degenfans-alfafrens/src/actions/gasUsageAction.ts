@@ -11,20 +11,17 @@ import {
     ModelClass,
 } from "@moxie-protocol/core";
 
-import { stakingConsultantTemplate } from "../templates";
-import { Staking, StakingSchema } from "../types";
+import { gasUsageTemplate, stakingConsultantTemplate } from "../templates";
+import { GasUsageSchema, Staking, StakingSchema } from "../types";
 import { FarcasterMetadata, ftaService, MoxieUser, TwitterMetadata } from "@moxie-protocol/moxie-agent-lib";
-import { getHelpText, getHelpTextUserNotFound, getStakingOptions, getUserData, StakingRequest } from "../utils/degenfansApi";
+import { getGasUsgae, getHelpText, getStakingOptions, getUserData, StakingRequest } from "../utils/degenfansApi";
 import { z } from 'zod';
-export const stakingConsultantAction: Action = {
-    name: "GET_ALFAFRENS_STAKING_RECOMMENDATION",
+export const gasUsageAction: Action = {
+    name: "GET_ALFAFRENS_GAS_USAGE",
     similes: [
-        "VIEW_ALFAFRENS_STAKING_RECOMMENDATION",
-        "GIVE_ALFAFRENS_STAKING_RECOMMENDATION",
-        "GET_ALFAFRENS_STAKING_CONSULTANT",
-        "STAKING_RECOMMENDATION_ON_ALFAFRENS",
+        "VIEW_ALFAFRENS_GAS_USAGE"
     ],
-    description: "get recomendation for AlfaFrens stakings",
+    description: "get gas usage for an AlfaFrens profile",
     suppressInitialMessage: true,
     validate: async () => true,
     handler: async (
@@ -35,7 +32,7 @@ export const stakingConsultantAction: Action = {
         callback: HandlerCallback
     ) => {
         try {
-            elizaLogger.log("Starting GET_ALFAFRENS_STAKING_RECOMENDATION handler...");
+            elizaLogger.log("Starting GET_ALFAFRENS_GAS_USAGE handler...");
 
             // Initialize or update state
             if (!state) {
@@ -48,59 +45,37 @@ export const stakingConsultantAction: Action = {
 
             const context = composeContext({
                 state,
-                template: stakingConsultantTemplate,
+                template: gasUsageTemplate,
             });
 
             const transferDetails = await generateObject({
                 runtime,
                 context,
                 modelClass: ModelClass.SMALL,
-                schema: StakingSchema,
+                schema: GasUsageSchema,
             });
             let {
                 userAddress,
-                amount,
-                mysubs,
-                mystake,
-                minsubs,
             } = transferDetails.object as {
-                amount: number;
                 userAddress: string;
-                mysubs: boolean;
-                mystake: boolean;
-                minsubs: number;
             };
 
             const userData = getUserData(moxieUserInfo);
 
-            const stakingData: StakingRequest = { amount: amount, mysubs: mysubs, mystake: mystake, minsubs: minsubs };
-            const resp = await getStakingOptions(userData, userAddress, stakingData);
+
+            const resp = await getGasUsgae(userData, userAddress);
             let tbl: string = "";
-            
+            console.log(resp);
             if (resp.status == 200) {
+                if (resp.data.result.image) {
+                    tbl += "\n![gas usage image](" + resp.data.result.image + ")";
+                }
+                tbl += "\n"
 
-                if(!resp.data.user){
-                    tbl += getHelpTextUserNotFound();
-                }
-                tbl += resp.message;
-                tbl += "\n";
-                if (resp.data && resp.data.result && resp.data.result.stakingOptions && resp.data.result.stakingOptions.length > 0) {
-                    tbl += "|Rank|AlfaFrens Channel|ROI Spark/mo|Current Stake|\n";
-                    tbl += "|------:|:--------|----:|------|\n";
-                    resp.data.result.stakingOptions.forEach(e => {
-                        tbl += "|#" + e.rank + "|[" + e.name + "](https://alfafrens.com/channel/" + e.channelAddress + ")|" + e.roi + "|" + e.currentStake + "|\n";
-                    });
-                } else {
-                    tbl += "No staking options found";
-                }
-
-                if (resp.data.result.amountRandom) {
-                    tbl += "\n* You can also specify the staking amount to get a staking recommedation that suits your staking needs, e.g. 15000 AF"
-                }
                 tbl += getHelpText(resp.data.user);
 
 
-                tbl =  tbl;
+                tbl = resp.message + tbl;
             } else {
                 tbl = "degenfans server is not reachable, try again later!";
             }
@@ -126,14 +101,14 @@ export const stakingConsultantAction: Action = {
             {
                 user: "{{user1}}",
                 content: {
-                    text: "I (0x114B242D931B47D5cDcEe7AF065856f70ee278C4) want to stake 50000 AF",
+                    text: "give me gas usage informations for the user 0x114B242D931B47D5cDcEe7AF065856f70ee278C4",
                 },
             },
             {
                 user: "{{user2}}",
                 content: {
-                    text: "The balance of your agent wallet is 0.01 ETH",
-                    action: "GET_ALFAFRENS_STAKING_RECOMENDATION",
+                    text: "Hi Degenfans,\n![gas usage image](imageUrl)",
+                    action: "GET_ALFAFRENS_GAS_USAGE",
                 },
             },
         ],

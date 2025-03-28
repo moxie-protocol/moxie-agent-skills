@@ -17,3 +17,13 @@ export const StakingSchema = z.object({
     mystake: z.boolean(),
     minsubs: z.number().optional(),
 });
+
+
+export interface GasUsage {
+  userAddress?: string,
+}
+
+
+export const GasUsageSchema = z.object({
+  userAddress: z.string().optional(),
+});
