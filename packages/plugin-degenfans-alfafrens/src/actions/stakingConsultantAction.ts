@@ -85,17 +85,17 @@ export const stakingConsultantAction: Action = {
                 tbl + resp.message;
                 tbl += "\n";
                 if (resp.data && resp.data.result && resp.data.result.stakingOptions && resp.data.result.stakingOptions.length > 0) {
-                    tbl += "|rank|AlfaFrens Channel|ROI Spark/mo|current stake|\n";
+                    tbl += "|Rank|AlfaFrens Channel|ROI Spark/mo|Current Stake|\n";
                     tbl += "|------:|:--------|----:|------|\n";
                     resp.data.result.stakingOptions.forEach(e => {
                         tbl += "|#" + e.rank + "|[" + e.name + "](https://alfafrens.com/channel/" + e.channelAddress + ")|" + e.roi + "|" + e.currentStake + "|\n";
                     });
                 } else {
-                    tbl += "no staking options found";
+                    tbl += "No staking options found";
                 }
 
                 if (resp.data.result.amountRandom) {
-                    tbl += "\n* you can also specify a staking amount to get a more precise result, e.g. 15000 AF"
+                    tbl += "\n* You can also specify the staking amount to get a staking recommedation that suits your staking needs, e.g. 15000 AF"
                 }
                 tbl += getHelpText(resp.data.user);
 
