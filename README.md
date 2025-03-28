@@ -2,9 +2,9 @@
 <a align="center" href="https://moxie.xyz" target="_blank">
     <img src="./assets/logo.avif" alt="code snippets" height=50/>
   </a>
-  <h1 align="center">Moxie Skills Framework</h1>
+  <h1 align="center">Moxie Eliza AI Skills Framework</h1>
 
-📖 [Developer Docs](https://developer.moxie.xyz/) | 🎯 [Whitepaper](https://build.moxie.xyz/the-moxie-protocol)
+📖 [Developer Docs](https://developer.moxie.xyz/) | 
 
 </div>
 
