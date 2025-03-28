@@ -82,7 +82,7 @@ export const stakingConsultantAction: Action = {
                 if(!resp.data.user){
                     tbl += getHelpTextUserNotFound();
                 }
-                tbl + resp.message;
+                tbl += resp.message;
                 tbl += "\n";
                 if (resp.data && resp.data.result && resp.data.result.stakingOptions && resp.data.result.stakingOptions.length > 0) {
                     tbl += "|Rank|AlfaFrens Channel|ROI Spark/mo|Current Stake|\n";
