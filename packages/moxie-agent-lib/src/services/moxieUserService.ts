@@ -232,22 +232,46 @@ export async function getUserByMoxieIdMultipleTokenGate(
             }
         } `;
 
-        const response = await fetch(process.env.MOXIE_API_URL_INTERNAL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: authorizationHeader,
-            },
-            body: JSON.stringify({
-                query,
-                variables: { userIds, pluginId },
-            }),
-        });
+        const maxRetries = 3;
+        let retryCount = 0;
 
-        let res = await response.json();
-        console.log("res", res);
-        const { data } = res as GetUserInfoBatchResponse;
-        return data.GetUserInfoBatch;
+        while (retryCount < maxRetries) {
+            try {
+                const response = await fetch(process.env.MOXIE_API_URL_INTERNAL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: authorizationHeader,
+                    },
+                    body: JSON.stringify({
+                        query,
+                        variables: { userIds, pluginId },
+                    }),
+                });
+
+                let res = await response.json();
+                const { data } = res as GetUserInfoBatchResponse;
+                
+                if (!data?.GetUserInfoBatch?.users || data.GetUserInfoBatch.users.length === 0) {
+                    retryCount++;
+                    elizaLogger.warn(`Retry ${retryCount}: Empty users array received`);
+                    await new Promise((resolve) => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
+                    continue;
+                }
+
+                return data.GetUserInfoBatch;
+            } catch (error) {
+                retryCount++;
+                elizaLogger.error(`Retry ${retryCount}: Error in getUserByMoxieIdMultipleTokenGate:`, error);
+                if (retryCount === maxRetries) throw error;
+                await new Promise((resolve) => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
+            }
+        }
+        if (retryCount >= maxRetries) {
+            elizaLogger.error("Failed to get user info batch after maximum retries");
+            throw new Error("Failed to get user info batch after maximum retries");
+        }
+        return { users: [], freeTrialLimit: 0, remainingFreeTrialCount: 0 };
     } catch (error) {
         elizaLogger.error("Error in getUserByMoxieIdMultipleTokenGate:", error);
         return { users: [], freeTrialLimit: 0, remainingFreeTrialCount: 0 };
