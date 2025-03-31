@@ -40,36 +40,35 @@ export const RouletteBetParameters = z.object({
         .array()
         .min(1)
         .max(MAX_SELECTABLE_ROULETTE_NUMBER)
+        .nullable()
         .describe("The numbers to bet on"),
     ...casinoBetParams,
     ...getMaxBetCountParam(CASINO_GAME_TYPE.ROULETTE),
 });
 export const rouletteTemplate = `
 Extract the following details to play on Roulette:
-- **betAmount** (String): The amount to wager.
-- **numbers** (Array<number>): The numbers to bet on. Can be several unique numbers from ${MIN_SELECTABLE_ROULETTE_NUMBER} to ${MAX_SELECTABLE_ROULETTE_NUMBER}.
-- **token** (String): The token symbol.
+- **betAmount** (String?): The amount to wager.
+- **numbers** (Array<number>?): The numbers to bet on. Can be several unique numbers from ${MIN_SELECTABLE_ROULETTE_NUMBER} to ${MAX_SELECTABLE_ROULETTE_NUMBER}.
+- **token** (String?): The token symbol.
+Where "?" indicates that the value is optional.
 
 Provide the values in the following JSON format:
-
 \`\`\`json
 {
-    "betAmount": string,
-    "numbers": Array<number>,
-    "token": string
+    "betAmount": string?,
+    "numbers": Array<number>?,
+    "token": string?
 }
 \`\`\`
 
 Here are example messages and their corresponding responses:
 
 **Message 1**
-
 \`\`\`
 Bet 0.01 ETH on 3,6,8 and 10
 \`\`\`
 
 **Response 1**
-
 \`\`\`json
 {
     "betAmount": "0.01",
@@ -79,13 +78,11 @@ Bet 0.01 ETH on 3,6,8 and 10
 \`\`\`
 
 **Message 2**
-
 \`\`\`
 Bet 0.01 ETH on 8 11 3 9
 \`\`\`
 
 **Response 2**
-
 \`\`\`json
 {
     "betAmount": "0.5",
@@ -93,6 +90,62 @@ Bet 0.01 ETH on 8 11 3 9
     "token": "ETH",
 }
 \`\`\`
+
+** Message 3 **
+\`\`\`
+Spin a roulette for me
+\`\`\`
+
+** Response 3 **
+\`\`\`json
+{
+    "betAmount": null,
+    "numbers": null,
+    "token": null,
+}
+\`\`\`
+
+** Message 4 **
+\`\`\`
+I want to bet on the 8, 5, and 26
+\`\`\`
+
+** Response 4 **
+\`\`\`json
+{
+    "betAmount": null,
+    "numbers": [8, 5, 26],
+    "token": null,
+}
+\`\`\`
+
+** Message 5 **
+\`\`\`
+I want to bet 0.01 on 8, 5, and 26
+\`\`\`
+
+** Response 5 **
+\`\`\`json
+{
+    "betAmount": "0.01",
+    "numbers": [8, 5, 26],
+    "token": null,
+}
+\`\`\`
+
+** Message 6 **
+\`\`\`
+I want to bet my ETH on 8, 5, 26
+\`\`\`
+
+** Response 6 **
+\`\`\`json
+{
+    "betAmount": null,
+    "numbers": [8, 5, 26],
+    "token": "ETH",
+}
+\`\`\`json
 
 Here are the recent user messages for context:
 {{recentMessages}}

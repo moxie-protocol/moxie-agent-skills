@@ -31,38 +31,39 @@ import {
 import { formatTokenForMoxieTerminal } from "../utils/moxie";
 
 export const CoinTossBetParameters = z.object({
-    face: z.nativeEnum(COINTOSS_FACE).describe("The face of the coin"),
+    face: z
+        .nativeEnum(COINTOSS_FACE)
+        .nullable()
+        .describe("The face of the coin"),
     ...casinoBetParams,
     ...getMaxBetCountParam(CASINO_GAME_TYPE.COINTOSS),
 });
 export const coinTossTemplate = `
 Extract the following details to flip a coin:
-- **betAmount** (String): The amount to wager.
-- **face** (String): The side of the coin to bet on. Can be either:
+- **betAmount** (String?): The amount to wager.
+- **face** (String?): The side of the coin to bet on. Can be either:
   - HEADS
   - TAILS
-- **token** (String): The token symbol.
+- **token** (String?): The token symbol.
+Where "?" indicates that the value is optional.
 
 Provide the values in the following JSON format:
-
 \`\`\`json
 {
-    "betAmount": string,
-    "face": string,
-    "token": string
+    "betAmount": string?,
+    "face": string?,
+    "token": string?
 }
 \`\`\`
 
 Here are example messages and their corresponding responses:
 
 **Message 1**
-
 \`\`\`
 Bet 0.01 ETH on heads
 \`\`\`
 
 **Response 1**
-
 \`\`\`json
 {
     "betAmount": "0.01",
@@ -72,13 +73,11 @@ Bet 0.01 ETH on heads
 \`\`\`
 
 **Message 2**
-
 \`\`\`
 Double or nothing 0.5 ETH on heads
 \`\`\`
 
 **Response 2**
-
 \`\`\`json
 {
     "betAmount": "0.5",
@@ -86,6 +85,62 @@ Double or nothing 0.5 ETH on heads
     "token": "ETH",
 }
 \`\`\`
+
+** Message 3 **
+\`\`\`
+Flip a coin for me
+\`\`\`
+
+** Response 3 **
+\`\`\`json
+{
+    "betAmount": null,
+    "face": null,
+    "token": null,
+}
+\`\`\`
+
+** Message 4 **
+\`\`\`
+I want to bet on the tails side
+\`\`\`
+
+** Response 4 **
+\`\`\`json
+{
+    "betAmount": null,
+    "face": "TAILS",
+    "token": null,
+}
+\`\`\`
+
+** Message 5 **
+\`\`\`
+I want to bet 0.01 on heads
+\`\`\`
+
+** Response 5 **
+\`\`\`json
+{
+    "betAmount": "0.01",
+    "face": "HEADS",
+    "token": null,
+}
+\`\`\`
+
+** Message 6 **
+\`\`\`
+I want to bet my ETH on tails
+\`\`\`
+
+** Response 6 **
+\`\`\`json
+{
+    "betAmount": null,
+    "face": "TAILS",
+    "token": "ETH",
+}
+\`\`\`json
 
 Here are the recent user messages for context:
 {{recentMessages}}

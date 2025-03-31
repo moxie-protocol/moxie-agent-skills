@@ -43,30 +43,28 @@ export const DiceBetParameters = z.object({
 });
 export const diceTemplate = `
 Extract the following details to play on Dice:
-- **betAmount** (String): The amount to wager.
-- **number** (Number): The number to bet on. Can be from ${MIN_SELECTABLE_DICE_NUMBER} to ${MAX_SELECTABLE_DICE_NUMBER}.
-- **token** (String): The token symbol.
+- **betAmount** (String?): The amount to wager.
+- **number** (Number?): The number to bet on. Can be from ${MIN_SELECTABLE_DICE_NUMBER} to ${MAX_SELECTABLE_DICE_NUMBER}.
+- **token** (String?): The token symbol.
+Where "?" indicates that the value is optional.
 
 Provide the values in the following JSON format:
-
 \`\`\`json
 {
-    "betAmount": string,
-    "number": number,
-    "token": string
+    "betAmount": string?,
+    "number": number?,
+    "token": string?
 }
 \`\`\`
 
 Here are example messages and their corresponding responses:
 
 **Message 1**
-
 \`\`\`
 Bet 0.01 ETH above 44
 \`\`\`
 
 **Response 1**
-
 \`\`\`json
 {
     "betAmount": "0.01",
@@ -76,13 +74,11 @@ Bet 0.01 ETH above 44
 \`\`\`
 
 **Message 2**
-
 \`\`\`
 Roll the dice with 0.01 ETH on 23
 \`\`\`
 
 **Response 2**
-
 \`\`\`json
 {
     "betAmount": "0.5",
@@ -90,6 +86,62 @@ Roll the dice with 0.01 ETH on 23
     "token": "ETH",
 }
 \`\`\`
+
+** Message 3 **
+\`\`\`
+Roll a dice for me
+\`\`\`
+
+** Response 3 **
+\`\`\`json
+{
+    "betAmount": null,
+    "number": null,
+    "token": null,
+}
+\`\`\`
+
+** Message 4 **
+\`\`\`
+I want to bet on the 8
+\`\`\`
+
+** Response 4 **
+\`\`\`json
+{
+    "betAmount": null,
+    "number": 8,
+    "token": null,
+}
+\`\`\`
+
+** Message 5 **
+\`\`\`
+I want to bet 0.01 on 8
+\`\`\`
+
+** Response 5 **
+\`\`\`json
+{
+    "betAmount": "0.01",
+    "number": 8,
+    "token": null,
+}
+\`\`\`
+
+** Message 6 **
+\`\`\`
+I want to bet my ETH on 8
+\`\`\`
+
+** Response 6 **
+\`\`\`json
+{
+    "betAmount": null,
+    "number": 8,
+    "token": "ETH",
+}
+\`\`\`json
 
 Here are the recent user messages for context:
 {{recentMessages}}
