@@ -2,7 +2,7 @@ export const autonomousTradingTemplate = `
 Here's the conversation history you need to analyze:
 
 <conversation_history>
-{{conversation_history}}
+{{recentMessages}}
 </conversation_history>
 
 You are an AI assistant specialized in extracting parameters for cryptocurrency copy trading rules. Your task is to analyze user inputs and determine the rule type and relevant parameters.

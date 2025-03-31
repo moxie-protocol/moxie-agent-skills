@@ -41,7 +41,7 @@ export interface CreateRuleInput {
         groupTradeParams?: GroupTradeParams;
         userTradeParams?: UserTradeParams;
     };
-    ruleTriggers: 'GROUP' | 'USER';
+    ruleTrigger: 'GROUP' | 'USER';
 }
 
 const mutation = gql`
@@ -57,20 +57,21 @@ const mutation = gql`
 `;
 
 export async function createTradingRule(
+    authorizationHeader: string,
     requestId: string,
     ruleType: RuleType,
     baseParams: BaseParams,
-    ruleTriggers: 'GROUP' | 'USER',
+    ruleTrigger: 'GROUP' | 'USER',
     groupTradeParams?: GroupTradeParams,
     userTradeParams?: UserTradeParams,
     limitOrderParams?: LimitOrderParams
 ): Promise<{ ruleId: string; status: 'ACTIVE' | 'INACTIVE' | 'CANCELLED' | 'FAILED' }> {
     
     // Validate that at least one of groupTradeParams or userTradeParams exists
-    if (ruleTriggers === 'GROUP' && !groupTradeParams) {
+    if (ruleTrigger === 'GROUP' && !groupTradeParams) {
         throw new Error('groupTradeParams must be provided when ruleTriggers is GROUP');
     }
-    if (ruleTriggers === 'USER' && !userTradeParams) {
+    if (ruleTrigger === 'USER' && !userTradeParams) {
         throw new Error('userTradeParams must be provided when ruleTriggers is USER'); 
     }
 
@@ -80,7 +81,7 @@ export async function createTradingRule(
         ruleParameters: {
             baseParams
         },
-        ruleTriggers
+        ruleTrigger
     };
 
     if (limitOrderParams) {
@@ -100,6 +101,7 @@ export async function createTradingRule(
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': authorizationHeader
             },
             body: JSON.stringify({
                 query: mutation,

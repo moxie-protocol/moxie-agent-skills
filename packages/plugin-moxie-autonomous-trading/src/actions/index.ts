@@ -61,13 +61,14 @@ export const autonomousTradingAction: Action = {
         callback: HandlerCallback
     ) => {
 
+        
 
         const traceId = message.id;
         const moxieUserInfo = state.moxieUserInfo as MoxieUser;
         const moxieUserId = moxieUserInfo.id;
         
         try {
-            elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [tokenSwapAction] Starting creatorCoinSwap handler with user message: ${JSON.stringify(_message, (key, value) => key === 'embedding' ? undefined : value)}`);
+            elizaLogger.debug(traceId,`[AUTONOMOUS_TRADING] [${moxieUserId}] [AUTONOMOUS_TRADING] Starting AUTONOMOUS_TRADING handler with user message: ${JSON.stringify(message)}`);
 
             // Compose swap context
             const swapContext = composeContext({
@@ -91,11 +92,8 @@ export const autonomousTradingAction: Action = {
 
             if (!autonomousTradingResponse.success ) {
                 elizaLogger.warn(traceId,`[autonomous trading] [${moxieUserId}] [AUTONOMOUS_TRADING] [ADD_RULE] error occured while performing add rule operation: ${JSON.stringify(autonomousTradingResponse.error)}`);
-                await callback?.({
+                 callback?.({
                     text: autonomousTradingResponse.error.prompt_message,
-                    content: {
-                        action: "AUTONOMOUS_TRADING",
-                    }
                 });
                 return true;
             }
@@ -144,6 +142,7 @@ export const autonomousTradingAction: Action = {
 
             try {
                 const result = await createTradingRule(
+                    state.authorizationHeader as string,
                     traceId,
                     ruleType as RuleType,
                     baseParams,
@@ -154,28 +153,21 @@ export const autonomousTradingAction: Action = {
                 );
 
                 await callback?.({
-                    text: `Successfully created trading rule with ID: ${result.ruleId}`,
-                    content: {
-                        action: "AUTONOMOUS_TRADING",
-                        ruleId: result.ruleId,
-                        status: result.status
-                    }
+                    text: `Successfully created trading rule with ID: ${result.ruleId}`
                 });
 
             } catch (error) {
                 elizaLogger.error(traceId,`[autonomous trading] [${moxieUserId}] [AUTONOMOUS_TRADING] [ADD_RULE] error creating trading rule: ${error.message}`);
-                await callback?.({
-                    text: `Failed to create trading rule: ${error.message}`,
-                    content: {
-                        action: "AUTONOMOUS_TRADING",
-                        error: error.message
-                    }
+                 callback?.({
+                    text: `Something went wrong while creating autonomous trading rule. Please try again later.`,
                 });
             }
 
                 
         } catch(error) {
-
+            callback?.({
+                text: `Something went wrong while creating autonomous trading rule. Please try again later.`,
+            });
             elizaLogger.error(traceId,`[[autonomous trading]] [${moxieUserId}] [AUTONOMOUS_TRADING] [ADD_RULE] error occured while performing add rule operation: ${JSON.stringify(error)}`);
 
         }
