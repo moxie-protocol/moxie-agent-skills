@@ -182,3 +182,8 @@ show me gas usage for degenfans
 Here are the recent user messages for context:
 {{recentMessages}}
 `;
+
+export const infoTextTemplate = `Make the following text more indivual and use fancy markdown language:
+
+{{infoText}}
+`;

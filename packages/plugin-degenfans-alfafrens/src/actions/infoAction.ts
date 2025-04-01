@@ -1,3 +1,4 @@
+import { ModelClass } from "@moxie-protocol/core";
 import {
     type Action,
     type IAgentRuntime,
@@ -5,7 +6,10 @@ import {
     type HandlerCallback,
     type State,
     type ActionExample,
+    composeContext,
+    generateText,
 } from "@moxie-protocol/core";
+import { infoTextTemplate } from "../templates";
 
 export const infoAction: Action = {
     name: "DEGENFANS_ALFAFRENS_INFO",
@@ -69,13 +73,29 @@ export const infoAction: Action = {
               - I want to stake 4600 AF on channels with minimum 10 subscriptions
             `
         };
+
+        const mdResponse = pluginHelp.title + "\n"
+            + pluginHelp.description + "\n"
+            + pluginHelp.usage + "\n"
+            + pluginHelp.features + "\n"
+            + pluginHelp.tips + "\n"
+            + pluginHelp.exampleUsage;
+
+        const context = composeContext({
+            state: {
+                ...state,
+                infoText: mdResponse
+            },
+            template: infoTextTemplate,
+        });
+
+        const response = await generateText({
+            runtime,
+            context,
+            modelClass: ModelClass.MEDIUM,
+        });
         await callback({
-            text: pluginHelp.title + "\n"
-                + pluginHelp.description + "\n"
-                + pluginHelp.usage + "\n"
-                + pluginHelp.features + "\n"
-                + pluginHelp.tips + "\n"
-                + pluginHelp.exampleUsage,
+            text: response,
             action: "DEGENFANS_ALFAFRENS_INFO"
         });
         return true;
