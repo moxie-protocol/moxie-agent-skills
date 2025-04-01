@@ -148,7 +148,13 @@ Here are the recent user messages for context:
 `;
 export const diceAction: Action = {
     name: "DICE",
-    similes: ["ROLL_A_DICE", "DICE_ROLL", "BETSWIRL_DICE"],
+    similes: [
+        "ROLL_A_DICE",
+        "DICE_ROLL",
+        "BETSWIRL_DICE",
+        "BET_ON_DICE",
+        "BET_ON_DICE_BETSWIRL",
+    ],
     description:
         "Play the BetSwirl Dice. The player is betting that the rolled number will be above this chosen number.",
     suppressInitialMessage: true,

@@ -152,7 +152,12 @@ Here are the recent user messages for context:
 `;
 export const rouletteAction: Action = {
     name: "ROULETTE",
-    similes: ["SPIN_A_ROULETTE", "BETSWIRL_ROULETTE"],
+    similes: [
+        "SPIN_A_ROULETTE",
+        "BETSWIRL_ROULETTE",
+        "BET_ON_ROULETTE",
+        "BET_ON_ROULETTE_BETSWIRL",
+    ],
     description:
         "Play the BetSwirl Roulette. The player is betting that the rolled number will be one of the chosen numbers.",
     suppressInitialMessage: true,
