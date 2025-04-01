@@ -204,7 +204,9 @@ export const rouletteAction: Action = {
 
             // Validate face is heads or tails
             if (!numbers || !numbers.length) {
-                throw new Error(`No provided numbers`);
+                throw new Error(
+                    `You must provide from 1 to ${MAX_SELECTABLE_ROULETTE_NUMBER} numbers between ${MIN_SELECTABLE_ROULETTE_NUMBER} and ${MAX_SELECTABLE_ROULETTE_NUMBER}. i.e. "Bet 0.07 ETH on 3, 18, 26, and 31"`
+                );
             }
             const formattedNumbers = numbers.join(", ");
             await callback({

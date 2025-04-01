@@ -212,7 +212,9 @@ export const coinTossAction: Action = {
                     face as COINTOSS_FACE
                 )
             ) {
-                throw new Error("Face must be heads or tails");
+                throw new Error(
+                    `You must specify the face heads or tails. i.e. "Bet 0.07 ETH on heads"`
+                );
             }
             await callback({
                 text: "Betting on " + face,
