@@ -122,7 +122,7 @@ export function getHelpTextUserNotFound():string{
   tbl += "\n";
   tbl += "\nIf you don't have an account on AlfaFrens, you can create one on:";
   tbl += "\n[https://alfafrens.com](https://alfafrens.com)";
-  tbl += "\n\nElse, you can get in touch with @[degenfans|M155] to resolve the issue.\n";
+  tbl += "\n\nElse, you can get in touch with @[degenfans|M155] or [AlfaFrens - DegenFans](https://www.alfafrens.com/channel/0x997a65d6e7beafd3ea548b499fd2ea7a7875721f) to resolve the issue.\n";
   return tbl;
 }
 
