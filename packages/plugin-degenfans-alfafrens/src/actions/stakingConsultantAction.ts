@@ -117,7 +117,7 @@ export const stakingConsultantAction: Action = {
                 errorText += "\n\n";
             }
             await callback?.({
-                text: errorText + "also make sure, that you have an AlfaFrens account:\nhttps://alfafrens.com\n\nif you still face some issues, please contact @degenfans",
+                text: errorText + "also make sure, that you have an AlfaFrens account:\nhttps://alfafrens.com\n\nif you still face some issues, please contact @[degenfans|M155]",
             });
         }
     },
