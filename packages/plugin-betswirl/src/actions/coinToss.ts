@@ -284,5 +284,61 @@ Payout: [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) ${to
                 },
             },
         ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "Flip a coin for me",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "Face must be heads or tails, bet amount and token symbol",
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "I want to bet on the tails side",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "You must specify the bet amount and token symbol",
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "I want to bet 0.01 on heads",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "You must specify the token symbol",
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "I want to bet my ETH on tails",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "You must specify the bet amount",
+                },
+            },
+        ],
     ] as ActionExample[][],
 };

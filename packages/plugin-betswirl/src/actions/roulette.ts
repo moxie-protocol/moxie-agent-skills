@@ -280,5 +280,61 @@ Payout: [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) ${to
                 },
             },
         ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "Spin a roulette for me",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "You must specify on which number(s), bet amount and token symbol",
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "I want to bet on the 8, 5, and 26",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "You must specify the bet amount and token symbol",
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "I want to bet 0.01 on 8, 5, and 26",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "You must specify the token symbol",
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "I want to bet my ETH on 8, 5, and 26",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "You must specify the bet amount",
+                },
+            },
+        ],
     ] as ActionExample[][],
 };
