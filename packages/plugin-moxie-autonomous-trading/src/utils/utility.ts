@@ -19,7 +19,7 @@ export interface LimitOrderParams {
         sellPercentage: number;
         priceChangePercentage: number;
     };
-    limitOrderValidity: number;
+    limitOrderValidityInSeconds: number;
 }
 
 export interface GroupTradeParams {
@@ -73,6 +73,10 @@ export async function createTradingRule(
     }
     if (ruleTrigger === 'USER' && !userTradeParams) {
         throw new Error('userTradeParams must be provided when ruleTriggers is USER'); 
+    }
+
+    if(groupTradeParams && userTradeParams) {
+        throw new Error('Only one of groupTradeParams or userTradeParams can be provided');
     }
 
     const createRuleInput: CreateRuleInput = {

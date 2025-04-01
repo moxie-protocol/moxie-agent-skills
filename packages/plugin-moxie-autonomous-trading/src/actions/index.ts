@@ -94,6 +94,7 @@ export const autonomousTradingAction: Action = {
                 elizaLogger.warn(traceId,`[autonomous trading] [${moxieUserId}] [AUTONOMOUS_TRADING] [ADD_RULE] error occured while performing add rule operation: ${JSON.stringify(autonomousTradingResponse.error)}`);
                  callback?.({
                     text: autonomousTradingResponse.error.prompt_message,
+                    action: "AUTONOMOUS_TRADING",
                 });
                 return true;
             }
@@ -116,11 +117,11 @@ export const autonomousTradingAction: Action = {
             let limitOrderParams: LimitOrderParams;
             let ruleTriggers: 'GROUP' | 'USER';
 
-            if (ruleType.startsWith('GROUP_')) {
+            if (ruleType === 'GROUP_COPY_TRADE' || ruleType === 'GROUP_COPY_TRADE_AND_PROFIT') {
                 ruleTriggers = 'GROUP';
                 groupTradeParams = {
                     groupId: params.groupId,
-                    condition: 'ANY',
+                    condition: params.condition,
                     conditionValue: params.conditionValue
                 };
             } else {
@@ -130,13 +131,13 @@ export const autonomousTradingAction: Action = {
                 };
             }
 
-            if (ruleType.includes('_AND_PROFIT')) {
+            if (ruleType === 'GROUP_COPY_TRADE_AND_PROFIT' || ruleType === 'COPY_TRADE_AND_PROFIT') {
                 limitOrderParams = {
                     sellConditions: {
                         sellPercentage: 100,
                         priceChangePercentage: params.profitPercentage
                     },
-                    limitOrderValidity: params.timeDurationInSec
+                    limitOrderValidityInSeconds: params.timeDurationInSec
                 };
             }
 
@@ -160,6 +161,7 @@ export const autonomousTradingAction: Action = {
                 elizaLogger.error(traceId,`[autonomous trading] [${moxieUserId}] [AUTONOMOUS_TRADING] [ADD_RULE] error creating trading rule: ${error.message}`);
                  callback?.({
                     text: `Something went wrong while creating autonomous trading rule. Please try again later.`,
+                    action: "AUTONOMOUS_TRADING",
                 });
             }
 
@@ -167,6 +169,7 @@ export const autonomousTradingAction: Action = {
         } catch(error) {
             callback?.({
                 text: `Something went wrong while creating autonomous trading rule. Please try again later.`,
+                action: "AUTONOMOUS_TRADING",
             });
             elizaLogger.error(traceId,`[[autonomous trading]] [${moxieUserId}] [AUTONOMOUS_TRADING] [ADD_RULE] error occured while performing add rule operation: ${JSON.stringify(error)}`);
 
@@ -187,7 +190,7 @@ export const autonomousTradingAction: Action = {
                 user: "{{user2}}",
                 content: {
                     text: "buy 10$ worth tokens whenever @betashop and @jessepollak buy any token in 6 hours and sell it off when it makes a profit of 40%",
-                    action: "COPY_TRADE_AND_PROFIT",
+                    action: "AUTONOMOUS_TRADING",
                 },
             },
         ],
@@ -212,7 +215,9 @@ export const getAutonomousTradingRuleDetailAction: Action = {
 
         const response = getAutonomousTradingRuleDetails(formatUserMention(user.id, user.userName));
         callback({
-            text: response,
+            text: response, 
+            action: "COPY_TRADE_RULE_DETAILS",
+            cta: ["COPY_TRADE", "GROUP_COPY_TRADE"]
         });
     },
     examples: [
