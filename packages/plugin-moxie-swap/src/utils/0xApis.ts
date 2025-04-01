@@ -8,7 +8,8 @@ import { mockGetQuoteResponse } from "../constants/constants";
 
 const initializeClients = () => {
     if (!process.env.ZERO_EX_API_KEY) {
-        throw new Error('ZERO_EX_API_KEY environment variable is required');
+        elizaLogger.error('ZERO_EX_API_KEY environment variable is not given, will use mock data');
+        return { zxClient: null };
     }
 
     try {

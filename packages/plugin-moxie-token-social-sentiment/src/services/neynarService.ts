@@ -50,7 +50,7 @@ import { mockFarcasterCasts } from "../constants/constants";
 
 const API_KEY = process.env.NEYNAR_API_KEY;
 if (!API_KEY) {
-    throw new Error("NEYNAR_API_KEY environment variable is required");
+    elizaLogger.error("NEYNAR_API_KEY environment variable is not given, will use mock data");
 }
 
 const client = axios.create({

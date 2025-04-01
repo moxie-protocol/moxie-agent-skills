@@ -6,7 +6,7 @@ const PROTOCOL_SUBGRAPH_URL = process.env.PROTOCOL_SUBGRAPH_URL;
 
 
 if (!PROTOCOL_SUBGRAPH_URL) {
-    throw new Error('PROTOCOL_SUBGRAPH_URL environment variable is not defined');
+    elizaLogger.error('PROTOCOL_SUBGRAPH_URL environment variable is not defined, will use mock data');
 }
 
 // Add singleton client
@@ -23,7 +23,9 @@ export async function getSubjectTokenDetailsBySubjectAddress(traceId: string, su
         elizaLogger.error(traceId, `[getSubjectTokenDetailsBySubjectAddress] Subject address is missing`);
         throw new Error('Subject address is required');
     }
-
+    if (!PROTOCOL_SUBGRAPH_URL) {
+        return mockSubjectTokenDetail;
+    }
     const query = `
     query($subject: String!) {
       subjectTokens(where: {subject: $subject}) {
@@ -46,9 +48,6 @@ export async function getSubjectTokenDetailsBySubjectAddress(traceId: string, su
 
     while (retries < maxRetries) {
         try {
-            if (!PROTOCOL_SUBGRAPH_URL) {
-                return mockSubjectTokenDetail;
-            }
             elizaLogger.debug(traceId, `[getSubjectTokenDetailsBySubjectAddress] Fetching details for subject: ${subject}`);
             const response = await client.request<SubjectTokenResponse>(query, { subject: subject.toLowerCase() });
 
@@ -113,7 +112,9 @@ export async function getSubjectTokenDetailsBySubjectTokenAddresses(traceId: str
         elizaLogger.error(traceId, `[getSubjectTokenDetailsBySubjectTokenAddresses] Subject token addresses are missing or empty`);
         throw new Error('Subject token addresses are required');
     }
-
+    if (!PROTOCOL_SUBGRAPH_URL) {
+        return mockSubjectTokenDetails;
+    }
     const query = `
         query($subjectTokenAddresses: [String!]!) {
             subjectTokens(where: { id_in: $subjectTokenAddresses }) {
@@ -149,9 +150,6 @@ export async function getSubjectTokenDetailsBySubjectTokenAddresses(traceId: str
 
     while (retries < maxRetries) {
         try {
-            if (!PROTOCOL_SUBGRAPH_URL) {
-                return mockSubjectTokenDetails;
-            }
             const normalizedAddresses = subjectTokenAddresses
                 .filter(addr => addr)
                 .map(addr => addr.toLowerCase());
