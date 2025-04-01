@@ -254,14 +254,17 @@ export default {
                 // Fetch user info for all requested IDs
                 const ineligibleMoxieUsers = [];
                 const eligibleMoxieIds = [];
-                const userInfoBatchOutput = await moxieUserService.getUserByMoxieIdMultipleTokenGate(requestedMoxieUserIds, state.authorizationHeader as string, stringToUuid("PORTFOLIOS"));
-                for (const userInfo of userInfoBatchOutput.users) {
-                    if (userInfo.errorDetails) {
-                        ineligibleMoxieUsers.push(userInfo.errorDetails);
-                    } else {
-                        eligibleMoxieIds.push(userInfo.user.id);
-                        moxieUserInfoMultiple.push(userInfo.user);
-                    }
+
+                let userInfoBatchOutput;
+                try {
+                    userInfoBatchOutput = await moxieUserService.getUserByMoxieIdMultipleTokenGate(requestedMoxieUserIds, state.authorizationHeader as string, stringToUuid("PORTFOLIOS"));
+                } catch (error) {
+                    elizaLogger.error("Error fetching user info batch:", error instanceof Error ? error.stack : error);
+                    await callback({
+                        text: "There was an error processing your request. Please try again later.",
+                        action: "CREATOR_COIN_BALANCE_ERROR",
+                    });
+                    return false;
                 }
 
                 if (ineligibleMoxieUsers.length > 0) {
@@ -304,7 +307,18 @@ export default {
             if (!isSelfPortolioRequested && requestedMoxieUserIds?.length === 1) {
                 const ineligibleMoxieUsers = [];
                 const eligibleMoxieIds = [];
-                const userInfoBatchOutput = await moxieUserService.getUserByMoxieIdMultipleTokenGate(requestedMoxieUserIds, state.authorizationHeader as string, stringToUuid("PORTFOLIOS"));
+                let userInfoBatchOutput;
+                try {
+                    userInfoBatchOutput = await moxieUserService.getUserByMoxieIdMultipleTokenGate(requestedMoxieUserIds, state.authorizationHeader as string, stringToUuid("PORTFOLIOS"));
+                } catch (error) {
+                    elizaLogger.error("Error fetching user info batch:", error instanceof Error ? error.stack : error);
+                    await callback({
+                        text: "There was an error processing your request. Please try again later.",
+                        action: "CREATOR_COIN_BALANCE_ERROR",
+                    });
+                    return false;
+                }
+
                 for (const userInfo of userInfoBatchOutput.users) {
                     if (userInfo.errorDetails) {
                         ineligibleMoxieUsers.push(userInfo.errorDetails);
