@@ -6,7 +6,7 @@ const PROTOCOL_SUBGRAPH_URL = process.env.PROTOCOL_SUBGRAPH_URL;
 
 
 if (!PROTOCOL_SUBGRAPH_URL) {
-    throw new Error('PROTOCOL_SUBGRAPH_URL environment variable is not defined');
+    elizaLogger.error('PROTOCOL_SUBGRAPH_URL environment variable is not defined, will use mock data');
 }
 
 // Add singleton client
