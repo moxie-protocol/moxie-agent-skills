@@ -474,6 +474,10 @@
         "capabilities": ["Copy trades", "Copy group trades", "Copy trades with profit", "Copy group trades with profit"],
         "starterQuestions": [
             {
+                "label": "What automations are possible?",
+                "value": "What automations are possible?"
+            },
+            {
                 "label": "Buy 10$ worth tokens whenever @betashop and @jessepollak buy any token in 6 hours",
                 "value": "Buy 10$ worth tokens whenever @[betashop|M4] and @[jessepollak|M739] buy any token in 6 hours"
             },
@@ -494,10 +498,8 @@
             "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-autonomous-trading/images/logo.svg"
         ],
         "actions": [
-            "COPY_TRADES",
-            "COPY_GROUP_TRADES",
-            "COPY_TRADES_WITH_PROFIT",
-            "COPY_GROUP_TRADES_WITH_PROFIT"
+            "AUTONOMOUS_TRADING",
+            "COPY_TRADE_RULE_DETAILS"
         ],
         "isPremium": false,
         "freeQueries": 0,
