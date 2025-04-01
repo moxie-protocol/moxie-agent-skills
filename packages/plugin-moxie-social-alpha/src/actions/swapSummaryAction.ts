@@ -323,8 +323,17 @@ async function swapSummaryHandler(
     let eligibleMoxieIds: string[] = [], ineligibleMoxieUsers = []
 
     if (!isGeneralQuery) {
-
-        let userInfoBatchOutput = await moxieUserService.getUserByMoxieIdMultipleTokenGate(moxieIds, state.authorizationHeader as string, stringToUuid("SOCIAL_ALPHA"));
+        let userInfoBatchOutput;
+        try {
+            userInfoBatchOutput = await moxieUserService.getUserByMoxieIdMultipleTokenGate(moxieIds, state.authorizationHeader as string, stringToUuid("SOCIAL_ALPHA"));
+        } catch (error) {
+            elizaLogger.error("Error fetching user info batch:", error instanceof Error ? error.stack : error);
+            await callback({
+                text: "There was an error processing your request. Please try again later.",
+                action: "SWAP_SUMMARY_ERROR",
+            });
+            return false;
+        }
         totalFreeQueries = userInfoBatchOutput.freeTrialLimit;
         usedFreeQueries = userInfoBatchOutput.freeTrialLimit - userInfoBatchOutput.remainingFreeTrialCount;
         for (const userInfo of userInfoBatchOutput.users) {
@@ -355,7 +364,17 @@ async function swapSummaryHandler(
     if (allSwaps.length === 0) {
         if (eligibleMoxieIds.length <= 3) {
             const userProfiles = []
-            let userProfilesOutput = await moxieUserService.getUserByMoxieIdMultipleTokenGate(eligibleMoxieIds, state.authorizationHeader as string, stringToUuid("SOCIAL_ALPHA"));
+            let userProfilesOutput;
+            try {
+                userProfilesOutput = await moxieUserService.getUserByMoxieIdMultipleTokenGate(eligibleMoxieIds, state.authorizationHeader as string, stringToUuid("SOCIAL_ALPHA"));
+            } catch (error) {
+                elizaLogger.error("Error fetching user info batch:", error instanceof Error ? error.stack : error);
+                await callback({
+                    text: "There was an error processing your request. Please try again later.",
+                    action: "SWAP_SUMMARY_ERROR",
+                });
+                return false;
+            }
             for (const userInfo of userProfilesOutput.users) {
                 if (userInfo.user) {
                     userProfiles.push(userInfo.user);
