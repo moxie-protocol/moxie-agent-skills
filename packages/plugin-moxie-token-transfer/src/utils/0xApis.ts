@@ -26,7 +26,8 @@ const initializeClients = () => {
 const { zxClient } = initializeClients();
 
 if (!process.env.CHAIN_ID || isNaN(Number(process.env.CHAIN_ID))) {
-    throw new Error('Valid CHAIN_ID environment variable is required');
+    process.env.CHAIN_ID = '8453';
+    elizaLogger.error('CHAIN_ID environment variable is not set, using default value 8453');
 }
 
 
@@ -61,7 +62,7 @@ export const get0xPrice = async ({
             sellAmount: sellAmountBaseUnits,
             sellToken: sellTokenAddress,
             buyToken: buyTokenAddress,
-            chainId: Number(process.env.CHAIN_ID),
+            chainId: Number(process.env.CHAIN_ID || '8453'),
         })) as GetIndicativePriceResponse;
         elizaLogger.debug(context.traceId,`[get0xPrice] [${context.moxieUserId}] price: ${JSON.stringify(price)}`)
         return price;

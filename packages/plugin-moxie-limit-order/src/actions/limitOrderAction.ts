@@ -126,7 +126,8 @@ async function preValidateRequiredData(context: Context): Promise<boolean> {
 
     const chainId = Number(process.env.CHAIN_ID);
     if (!chainId) {
-        throw new Error('CHAIN_ID environment variable is not set');
+        process.env.CHAIN_ID = '8453';
+        elizaLogger.error('CHAIN_ID environment variable is not set, using default value 8453');
     }
 
     // Validate required state objects

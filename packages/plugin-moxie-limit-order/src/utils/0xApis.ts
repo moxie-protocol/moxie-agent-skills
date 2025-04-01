@@ -26,7 +26,8 @@ const initializeClients = () => {
 const { zxClient } = initializeClients();
 
 if (!process.env.CHAIN_ID || isNaN(Number(process.env.CHAIN_ID))) {
-    throw new Error('Valid CHAIN_ID environment variable is required');
+    process.env.CHAIN_ID = '8453';
+    elizaLogger.error('CHAIN_ID environment variable is not set, using default value 8453');
 }
 
 /**
@@ -62,7 +63,7 @@ export const get0xSwapQuote = async ({
             sellAmount: sellAmountBaseUnits,
             sellToken: sellTokenAddress,
             buyToken: buyTokenAddress,
-            chainId: Number(process.env.CHAIN_ID),
+            chainId: Number(process.env.CHAIN_ID || '8453'),
             taker: walletAddress,
             slippageBps: ERC20_TXN_SLIPPAGE_BPS
         })) as GetQuoteResponse;
@@ -110,7 +111,7 @@ export const execute0xSwap = async ({
             maxPriorityFeePerGas: Number(maxPriorityFeePerGas)
         }
         elizaLogger.debug(traceId,`[execute0xSwap] [${moxieUserId}] transactionDetails: ${JSON.stringify(transactionDetails)}`)
-        const tx = await walletClient.sendTransaction(process.env.CHAIN_ID, transactionDetails);
+        const tx = await walletClient.sendTransaction(process.env.CHAIN_ID || '8453', transactionDetails);
         elizaLogger.debug(traceId,`[execute0xSwap] [${moxieUserId}] tx hash: ${tx.hash}`)
         return tx;
     } catch (error) {
