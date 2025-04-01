@@ -30,7 +30,7 @@ export const infoAction: Action = {
         callback: HandlerCallback
     ) => {
         const pluginHelp = {
-            title: "DegenFans AlfaFrens Staking Helper Plugin",
+            title: "DegenFans AlfaFrens Plugin",
             description: `
               This plugin helps you discover the best staking options on **AlfaFrens**.  
               AlfaFrens is a **SocialFi** platform where you can subscribe to channels, 
