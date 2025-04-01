@@ -4,6 +4,7 @@ import { createClientV2 } from "@0x/swap-ts-sdk";
 import { elizaLogger } from "@moxie-protocol/core";
 import { ethers } from "ethers";
 import { ERC20_TXN_SLIPPAGE_BPS } from "../constants";
+import { mockGetQuoteResponse } from "../constants/constants";
 
 const initializeClients = () => {
     if (!process.env.ZERO_EX_API_KEY) {
@@ -53,6 +54,9 @@ export const get0xSwapQuote = async ({
 }) => {
     try {
         elizaLogger.debug(traceId,`[get0xSwapQuote] [${moxieUserId}] input details: [${walletAddress}] [${sellTokenAddress}] [${buyTokenAddress}] [${sellAmountBaseUnits}]`)
+        if(!process.env.ZERO_EX_API_KEY) {
+            return mockGetQuoteResponse;
+        }
         const quote = (await zxClient.swap.permit2.getQuote.query({
             sellAmount: sellAmountBaseUnits,
             sellToken: sellTokenAddress,

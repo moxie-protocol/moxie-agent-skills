@@ -1,6 +1,7 @@
 import { elizaLogger } from "@moxie-protocol/core";
 import { createClientV2 } from "@0x/swap-ts-sdk";
 import { Context, GetIndicativePriceResponse } from "../types/types";
+import { mockGetIndicativePriceResponse } from "../constants/constants";
 
 
 
@@ -51,6 +52,9 @@ export const get0xPrice = async ({
     sellTokenAddress: string;
 }) => {
     try {
+        if(!process.env.ZERO_EX_API_KEY) {
+            return mockGetIndicativePriceResponse;
+        }
         elizaLogger.debug(context.traceId,`[get0xPrice] [${context.moxieUserId}] input details: [${walletAddress}] [${sellTokenAddress}] [${buyTokenAddress}] [${sellAmountBaseUnits}]`)
         const price = (await zxClient.gasless.getPrice.query({
             sellAmount: sellAmountBaseUnits,
