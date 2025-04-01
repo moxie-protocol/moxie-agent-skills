@@ -72,7 +72,7 @@ To process the transfer intent, follow these steps:
 
 3. Validate required fields:
    - sender: Always set to the value in <agent_wallet_address> tags
-   - recipient: Must be an ENS address, wallet address, creator coin (@[username|userId]), or ERC20 token ($[symbol|address])
+   - recipient: Must be an ENS address, wallet address, creator coin (@[username|userId])should be indicated by 'to')
    - transferAmount: Must specify either a numeric value or a balance-based transfer (FULL/PERCENTAGE)
    - token: Must be in $[symbol|address] format and match exactly what was validated from user intent, preserving this format in all response fields (transfer object, balance, source_token)
    - value_type: Required ONLY for USD-based transfers

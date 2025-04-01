@@ -171,10 +171,10 @@ export async function handleIneligibleMoxieUsers(ineligibleMoxieUsers: ErrorDeta
             if (ineligibleMoxieUsers[0].actualCreatorCoinBalance > 0) {
                 messageParts.push(`I can also get you that portfolio on ${userprofileLinkText}, but you’ll need some ${userprofileLinkText} coins to unlock it.\n\n`);
             } else {
-                messageParts.push(`I can also get you that portfolio analysis on ${userprofileLinkText}, but first you’ll need to buy ${remainingNoOfTokensToBuy} of their data coins to unlock it.\n\n`);
+                messageParts.push(`I can also get you that portfolio analysis on ${userprofileLinkText}, but first you’ll need to buy ${remainingNoOfTokensToBuy} of their coins to unlock it.\n\n`);
             }
         } else {
-            messageParts.push(`I can get you that portfolio analysis on ${userprofileLinkText}, but first you’ll need to buy ${remainingNoOfTokensToBuy} of their data coins to unlock it.\n\n`);
+            messageParts.push(`I can get you that portfolio analysis on ${userprofileLinkText}, but first you’ll need to buy ${remainingNoOfTokensToBuy} of their coins to unlock it.\n\n`);
         }
         if (ineligibleMoxieUsers[0].actualCreatorCoinBalance > 0) {
             messageParts.push(`It costs ${remainingNoOfTokensToBuy} (~$${roundToDecimalPlaces(ineligibleMoxieUsers[0].requiredMoxieAmountInUSD, 2)}) ${userprofileLinkText} to access, and right now, you have only ${ineligibleMoxieUsers[0].actualCreatorCoinBalance} ${userprofileLinkText} in your wallet. Want me to grab them for you now? Just say the word, and I’ll handle it! 🚀`);
