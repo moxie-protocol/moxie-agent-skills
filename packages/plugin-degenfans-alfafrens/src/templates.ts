@@ -42,7 +42,7 @@ I (0x114B242D931B47D5cDcEe7AF065856f70ee278C4) want to stake 50000 AF
 **Message 2**
 
 \`\`\`
-I (degenfans) want to stake 42000 AF at my subscriptions
+I (degenfans) want to stake 42000 AF at my active subscriptions
 \`\`\`
 
 **Response 2**
@@ -60,7 +60,7 @@ I (degenfans) want to stake 42000 AF at my subscriptions
 **Message 3**
 
 \`\`\`
-I want to stake 7000 AF at my stakes
+I want to stake 7000 AF at my existing stakes
 \`\`\`
 
 **Response 3**
@@ -79,7 +79,7 @@ I want to stake 7000 AF at my stakes
 **Message 4**
 
 \`\`\`
-I want to stake 9000 AF at my stakes and subscriptions
+I want to stake 9000 AF at my existing stakes and subscriptions
 \`\`\`
 
 **Response 4**
@@ -96,7 +96,7 @@ I want to stake 9000 AF at my stakes and subscriptions
 **Message 5**
 
 \`\`\`
-I want to stake 4600 AF with minimum subscriptions 10
+I want to stake 4600 AF on channels with minimum 10 subscriptions
 \`\`\`
 
 **Response 5**
