@@ -157,7 +157,7 @@ export const diceAction: Action = {
         "BET_ON_DICE_BETSWIRL",
     ],
     description:
-        "Play the BetSwirl Dice. The player is betting that the rolled number will be above this chosen number.",
+        "Play the BetSwirl Dice. The Dice has 100 sides. The player is betting that the rolled number will be above this chosen number.",
     suppressInitialMessage: true,
     validate: async (
         _runtime: IAgentRuntime,
