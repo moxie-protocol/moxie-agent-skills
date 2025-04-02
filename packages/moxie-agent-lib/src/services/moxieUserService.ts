@@ -273,8 +273,8 @@ export async function getUserByMoxieIdMultipleTokenGate(
         }
         return { users: [], freeTrialLimit: 0, remainingFreeTrialCount: 0 };
     } catch (error) {
-        elizaLogger.error("Error in getUserByMoxieIdMultipleTokenGate:", error);
-        return { users: [], freeTrialLimit: 0, remainingFreeTrialCount: 0 };
+        elizaLogger.error("Error in getUserByMoxieIdMultipleTokenGate:", error instanceof Error ? error.stack : error)
+        throw error;
     }
 }
 
