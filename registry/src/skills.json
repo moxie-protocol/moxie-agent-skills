@@ -500,7 +500,7 @@
     {
         "pluginId": "ba2e0746-d089-4539-a23b-84882bc8eafd",
         "name": "@moxie-protocol/plugin-betswirl",
-        "displayName": "BetSwirl",
+        "displayName": "Play Games of Luck",
         "version": "0.0.1",
         "author": "Romuald Hog <romuald@betswirl.com>",
         "description": "Enabled your agent to place bets on BetSwirl's games of luck, and retrieving bets information.",
@@ -514,6 +514,10 @@
             "Get your bets"
         ],
         "starterQuestions": [
+            {
+                "label": "What is the BetSwirl skills?",
+                "value": "Flip a coin"
+            },
             {
                 "label": "Bet 0.01 ETH on heads",
                 "value": "Bet 0.01 ETH on heads"
@@ -540,14 +544,25 @@
             "DOUBLE_OR_NOTHING",
             "TOSS_A_COIN",
             "BETSWIRL_COIN_TOSS",
+            "BET_ON_HEADS",
+            "BET_ON_TAILS",
+            "BET_ON_COIN_FLIP",
+            "BET_ON_COIN_TOSS",
+            "BET_ON_HEADS_BETSWIRL",
+            "BET_ON_TAILS_BETSWIRL",
+            "BET_ON_CON_FLIP_BETSWIRL",
+            "BET_ON_COIN_TOSS_BETSWIRL",
             "DICE",
             "ROLL_A_DICE",
             "DICE_ROLL",
             "BETSWIRL_DICE",
+            "BET_ON_DICE",
+            "BET_ON_DICE_BETSWIRL",
             "ROULETTE",
             "SPIN_A_ROULETTE",
             "BETSWIRL_ROULETTE",
-            "GET_BETS",
+            "BET_ON_ROULETTE",
+            "BET_ON_ROULETTE_BETSWIRL",
             "RETRIEVE_BETS",
             "SHOW_BETS",
             "LAST_BETS",
