@@ -61,11 +61,15 @@ export async function getBetToken(
 }
 
 export function getBetAmountInWei(betAmount: string, token: Token) {
-    const betAmountInWei = ethers.parseUnits(betAmount, token.decimals);
-    if (!betAmount || betAmountInWei <= 0n) {
-        throw new Error("The bet amount must be greater than 0");
+    if (betAmount) {
+        const betAmountInWei = ethers.parseUnits(betAmount, token.decimals);
+        if (betAmountInWei <= 0n) {
+            throw new Error("The bet amount must be greater than 0");
+        }
+        return betAmountInWei;
+    } else {
+        throw new Error("You must specify the bet amount.");
     }
-    return betAmountInWei;
 }
 
 async function getBetRequirements(
