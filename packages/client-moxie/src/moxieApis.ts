@@ -131,8 +131,9 @@ export function createMoxieApiRouter(
                 });
                 const agentId = req.params.agentId;
                 let runtime = agents.get(agentId);
-
-                elizaLogger.info(req.body, { traceId: req.traceId });
+                elizaLogger.info(JSON.stringify(req.body), {
+                    traceId: req.traceId,
+                });
 
                 // validations
                 const { roomId, text } = req.body;
