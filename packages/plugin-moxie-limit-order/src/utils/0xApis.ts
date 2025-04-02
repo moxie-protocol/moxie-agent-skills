@@ -4,10 +4,12 @@ import { createClientV2 } from "@0x/swap-ts-sdk";
 import { elizaLogger } from "@moxie-protocol/core";
 import { ethers } from "ethers";
 import { ERC20_TXN_SLIPPAGE_BPS } from "../constants";
+import { mockGetQuoteResponse } from "../constants/constants";
 
 const initializeClients = () => {
     if (!process.env.ZERO_EX_API_KEY) {
-        throw new Error('ZERO_EX_API_KEY environment variable is required');
+        elizaLogger.error('ZERO_EX_API_KEY environment variable is not given, will use mock data');
+        return { zxClient: null };
     }
 
     try {
@@ -24,7 +26,8 @@ const initializeClients = () => {
 const { zxClient } = initializeClients();
 
 if (!process.env.CHAIN_ID || isNaN(Number(process.env.CHAIN_ID))) {
-    throw new Error('Valid CHAIN_ID environment variable is required');
+    process.env.CHAIN_ID = '8453';
+    elizaLogger.error('CHAIN_ID environment variable is not set, using default value 8453');
 }
 
 /**
@@ -53,11 +56,14 @@ export const get0xSwapQuote = async ({
 }) => {
     try {
         elizaLogger.debug(traceId,`[get0xSwapQuote] [${moxieUserId}] input details: [${walletAddress}] [${sellTokenAddress}] [${buyTokenAddress}] [${sellAmountBaseUnits}]`)
+        if(!process.env.ZERO_EX_API_KEY) {
+            return mockGetQuoteResponse;
+        }
         const quote = (await zxClient.swap.permit2.getQuote.query({
             sellAmount: sellAmountBaseUnits,
             sellToken: sellTokenAddress,
             buyToken: buyTokenAddress,
-            chainId: Number(process.env.CHAIN_ID),
+            chainId: Number(process.env.CHAIN_ID || '8453'),
             taker: walletAddress,
             slippageBps: ERC20_TXN_SLIPPAGE_BPS
         })) as GetQuoteResponse;
@@ -105,7 +111,7 @@ export const execute0xSwap = async ({
             maxPriorityFeePerGas: Number(maxPriorityFeePerGas)
         }
         elizaLogger.debug(traceId,`[execute0xSwap] [${moxieUserId}] transactionDetails: ${JSON.stringify(transactionDetails)}`)
-        const tx = await walletClient.sendTransaction(process.env.CHAIN_ID, transactionDetails);
+        const tx = await walletClient.sendTransaction(process.env.CHAIN_ID || '8453', transactionDetails);
         elizaLogger.debug(traceId,`[execute0xSwap] [${moxieUserId}] tx hash: ${tx.hash}`)
         return tx;
     } catch (error) {

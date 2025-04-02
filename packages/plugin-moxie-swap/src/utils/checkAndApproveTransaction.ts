@@ -134,21 +134,21 @@ export async function checkAllowanceAndApproveSpendRequest(
         const approveRequestInput: MoxieWalletSendTransactionInputType = {
             address: walletAddress,
             chainType: "ethereum",
-            caip2: "eip155:" + process.env.CHAIN_ID,
+            caip2: "eip155:" + (process.env.CHAIN_ID || '8453'),
             transaction: {
                 from: walletAddress,
                 to: tokenAddress,
                 data: approveData,
                 maxFeePerGas: Number(maxFeePerGas),
                 maxPriorityFeePerGas: Number(maxPriorityFeePerGas),
-                chainId: Number(process.env.CHAIN_ID),
+                chainId: Number(process.env.CHAIN_ID || '8453'),
             }
         };
 
         elizaLogger.debug(traceId,`[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] approve request: ${JSON.stringify(approveRequestInput, (key, value) =>
             typeof value === 'bigint' ? value.toString() : value
         )}`)
-        const approveResponse = await walletClient.sendTransaction(process.env.CHAIN_ID, {
+        const approveResponse = await walletClient.sendTransaction(process.env.CHAIN_ID || '8453', {
             fromAddress: walletAddress,
             toAddress: tokenAddress,
             data: approveData,
