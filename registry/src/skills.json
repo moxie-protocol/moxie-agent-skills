@@ -27,6 +27,10 @@
         ],
         "starterQuestions": [
             {
+                "label": "What is the BetSwirl skills?",
+                "value": "What is the BetSwirl skills?"
+            },
+            {
                 "label": "Bet 0.01 ETH on heads",
                 "value": "Bet 0.01 ETH on heads"
             },
