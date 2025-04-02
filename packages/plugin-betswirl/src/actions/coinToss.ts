@@ -213,7 +213,7 @@ export const coinTossAction: Action = {
                 )
             ) {
                 throw new Error(
-                    `You must specify the face heads or tails. i.e. "Bet 0.07 ETH on heads"`
+                    `You must specify the face heads or tails. i.e. "Bet 0.07 ETH on heads". You'll be betting that the rolled face will be the one chosen.`
                 );
             }
             await callback({

@@ -203,7 +203,7 @@ export const diceAction: Action = {
             // Validate face is heads or tails
             if (!number) {
                 throw new Error(
-                    `You must provide a number between ${MIN_SELECTABLE_DICE_NUMBER} and ${MAX_SELECTABLE_DICE_NUMBER}. i.e. "Bet 0.07 ETH on 77"`
+                    `You must provide a number between ${MIN_SELECTABLE_DICE_NUMBER} and ${MAX_SELECTABLE_DICE_NUMBER}. i.e. "Bet 0.07 ETH on 77". You'll be betting that the rolled number will be above this chosen number.`
                 );
             }
             await callback({
