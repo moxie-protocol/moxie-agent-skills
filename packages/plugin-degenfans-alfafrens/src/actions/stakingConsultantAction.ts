@@ -13,20 +13,9 @@ import {
 
 import { stakingConsultantTemplate } from "../templates";
 import { Staking, StakingSchema } from "../types";
-import {
-    FarcasterMetadata,
-    ftaService,
-    MoxieUser,
-    TwitterMetadata,
-} from "@moxie-protocol/moxie-agent-lib";
-import {
-    getHelpText,
-    getHelpTextUserNotFound,
-    getStakingOptions,
-    getUserData,
-    StakingRequest,
-} from "../utils/degenfansApi";
-import { z } from "zod";
+import { FarcasterMetadata, ftaService, MoxieUser, TwitterMetadata } from "@moxie-protocol/moxie-agent-lib";
+import { getHelpText, getHelpTextUserNotFound, getStakingOptions, getUserData, StakingRequest } from "../utils/degenfansApi";
+import { z } from 'zod';
 export const stakingConsultantAction: Action = {
     name: "GET_ALFAFRENS_STAKING_RECOMMENDATION",
     similes: [
@@ -37,9 +26,7 @@ export const stakingConsultantAction: Action = {
     ],
     description: "get recomendation for AlfaFrens stakings",
     suppressInitialMessage: true,
-    validate: async (runtime: IAgentRuntime, message: Memory) => {
-        return true;
-    },
+    validate: async () => true,
     handler: async (
         runtime: IAgentRuntime,
         message: Memory,
@@ -48,9 +35,7 @@ export const stakingConsultantAction: Action = {
         callback: HandlerCallback
     ) => {
         try {
-            elizaLogger.log(
-                "Starting GET_ALFAFRENS_STAKING_RECOMENDATION handler..."
-            );
+            elizaLogger.log("Starting GET_ALFAFRENS_STAKING_RECOMENDATION handler...");
 
             // Initialize or update state
             if (!state) {
@@ -72,70 +57,50 @@ export const stakingConsultantAction: Action = {
                 modelClass: ModelClass.SMALL,
                 schema: StakingSchema,
             });
-            const { userAddress, amount, mysubs, mystake, minsubs } =
-                transferDetails.object as {
-                    amount: number;
-                    userAddress: string;
-                    mysubs: boolean;
-                    mystake: boolean;
-                    minsubs: number;
-                };
+            let {
+                userAddress,
+                amount,
+                mysubs,
+                mystake,
+                minsubs,
+            } = transferDetails.object as {
+                amount: number;
+                userAddress: string;
+                mysubs: boolean;
+                mystake: boolean;
+                minsubs: number;
+            };
 
             const userData = getUserData(moxieUserInfo);
 
-            const stakingData: StakingRequest = {
-                amount: amount,
-                mysubs: mysubs,
-                mystake: mystake,
-                minsubs: minsubs,
-            };
-            const resp = await getStakingOptions(
-                userData,
-                userAddress,
-                stakingData
-            );
+            const stakingData: StakingRequest = { amount: amount, mysubs: mysubs, mystake: mystake, minsubs: minsubs };
+            const resp = await getStakingOptions(userData, userAddress, stakingData);
             let tbl: string = "";
-
+            
             if (resp.status == 200) {
-                if (!resp.data.user) {
+
+                if(!resp.data.user){
                     tbl += getHelpTextUserNotFound();
                 }
                 tbl += resp.message;
                 tbl += "\n";
-                if (
-                    resp.data &&
-                    resp.data.result &&
-                    resp.data.result.stakingOptions &&
-                    resp.data.result.stakingOptions.length > 0
-                ) {
-                    tbl +=
-                        "|Rank|AlfaFrens Channel|ROI Spark/mo|Current Stake|\n";
+                if (resp.data && resp.data.result && resp.data.result.stakingOptions && resp.data.result.stakingOptions.length > 0) {
+                    tbl += "|Rank|AlfaFrens Channel|ROI Spark/mo|Current Stake|\n";
                     tbl += "|------:|:--------|----:|------|\n";
-                    resp.data.result.stakingOptions.forEach((e) => {
-                        tbl +=
-                            "|#" +
-                            e.rank +
-                            "|[" +
-                            e.name +
-                            "](https://alfafrens.com/channel/" +
-                            e.channelAddress +
-                            ")|" +
-                            e.roi +
-                            "|" +
-                            e.currentStake +
-                            "|\n";
+                    resp.data.result.stakingOptions.forEach(e => {
+                        tbl += "|#" + e.rank + "|[" + e.name + "](https://alfafrens.com/channel/" + e.channelAddress + ")|" + e.roi + "|" + e.currentStake + "|\n";
                     });
                 } else {
                     tbl += "No staking options found";
                 }
 
                 if (resp.data.result.amountRandom) {
-                    tbl +=
-                        "\n* You can also specify the staking amount to get a staking recommedation that suits your staking needs, e.g. 15000 AF";
+                    tbl += "\n* You can also specify the staking amount to get a staking recommedation that suits your staking needs, e.g. 15000 AF"
                 }
                 tbl += getHelpText(resp.data.user);
 
-                tbl = tbl;
+
+                tbl =  tbl;
             } else {
                 tbl = "degenfans server is not reachable, try again later!";
             }
@@ -145,16 +110,14 @@ export const stakingConsultantAction: Action = {
         } catch (err) {
             let errorText = "";
             if (err instanceof z.ZodError) {
-                errorText = "following error occured:";
+                errorText = "following error occured:"
                 err.errors.forEach((err2) => {
                     errorText += "\n" + err2.message;
                 });
                 errorText += "\n\n";
             }
             await callback?.({
-                text:
-                    errorText +
-                    "also make sure, that you have an AlfaFrens account:\nhttps://alfafrens.com\n\nif you still face some issues, please contact @degenfans",
+                text: errorText + "also make sure, that you have an AlfaFrens account:\nhttps://alfafrens.com\n\nif you still face some issues, please contact @[degenfans|M155]",
             });
         }
     },

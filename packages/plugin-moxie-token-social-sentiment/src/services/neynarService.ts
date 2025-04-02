@@ -32,7 +32,7 @@ interface Cast {
     };
 }
 
-interface CastData {
+export interface CastData {
     text: string;
     username: string;
     fid: number;
@@ -46,14 +46,17 @@ interface CastData {
 
 import { elizaLogger, IAgentRuntime } from "@moxie-protocol/core";
 import axios from "axios";
+import { mockFarcasterCasts } from "../constants/constants";
 
 const API_KEY = process.env.NEYNAR_API_KEY;
 if (!API_KEY) {
-    throw new Error("NEYNAR_API_KEY environment variable is required");
+    elizaLogger.error(
+        "NEYNAR_API_KEY environment variable is not given, will use mock data"
+    );
 }
 
 const client = axios.create({
-    baseURL: process.env.NEYNAR_API_URL,
+    baseURL: process.env.NEYNAR_API_URL || "",
     headers: {
         "x-api-key": `${API_KEY}`,
         "content-type": "application/json",
@@ -91,6 +94,9 @@ export async function getFarcasterCasts(
                     traceId,
                     `[TokenSocialSentiment]query: ${query}`
                 );
+                if (!API_KEY) {
+                    return mockFarcasterCasts;
+                }
                 const response = await client.get(
                     `/v2/farcaster/cast/search?q=${query}&priority_mode=false&limit=100&sort_type=algorithmic`
                 );

@@ -40,36 +40,35 @@ export const RouletteBetParameters = z.object({
         .array()
         .min(1)
         .max(MAX_SELECTABLE_ROULETTE_NUMBER)
+        .nullable()
         .describe("The numbers to bet on"),
     ...casinoBetParams,
     ...getMaxBetCountParam(CASINO_GAME_TYPE.ROULETTE),
 });
 export const rouletteTemplate = `
 Extract the following details to play on Roulette:
-- **betAmount** (String): The amount to wager.
-- **numbers** (Array<number>): The numbers to bet on. Can be several unique numbers from ${MIN_SELECTABLE_ROULETTE_NUMBER} to ${MAX_SELECTABLE_ROULETTE_NUMBER}.
-- **token** (String): The token symbol.
+- **betAmount** (String?): The amount to wager.
+- **numbers** (Array<number>?): The numbers to bet on. Can be several unique numbers from ${MIN_SELECTABLE_ROULETTE_NUMBER} to ${MAX_SELECTABLE_ROULETTE_NUMBER}.
+- **token** (String?): The token symbol.
+Where "?" indicates that the value is optional.
 
 Provide the values in the following JSON format:
-
 \`\`\`json
 {
-    "betAmount": string,
-    "numbers": Array<number>,
-    "token": string
+    "betAmount": string?,
+    "numbers": Array<number>?,
+    "token": string?
 }
 \`\`\`
 
 Here are example messages and their corresponding responses:
 
 **Message 1**
-
 \`\`\`
 Bet 0.01 ETH on 3,6,8 and 10
 \`\`\`
 
 **Response 1**
-
 \`\`\`json
 {
     "betAmount": "0.01",
@@ -79,13 +78,11 @@ Bet 0.01 ETH on 3,6,8 and 10
 \`\`\`
 
 **Message 2**
-
 \`\`\`
 Bet 0.01 ETH on 8 11 3 9
 \`\`\`
 
 **Response 2**
-
 \`\`\`json
 {
     "betAmount": "0.5",
@@ -94,12 +91,73 @@ Bet 0.01 ETH on 8 11 3 9
 }
 \`\`\`
 
+** Message 3 **
+\`\`\`
+Spin a roulette for me
+\`\`\`
+
+** Response 3 **
+\`\`\`json
+{
+    "betAmount": null,
+    "numbers": null,
+    "token": null,
+}
+\`\`\`
+
+** Message 4 **
+\`\`\`
+I want to bet on the 8, 5, and 26
+\`\`\`
+
+** Response 4 **
+\`\`\`json
+{
+    "betAmount": null,
+    "numbers": [8, 5, 26],
+    "token": null,
+}
+\`\`\`
+
+** Message 5 **
+\`\`\`
+I want to bet 0.01 on 8, 5, and 26
+\`\`\`
+
+** Response 5 **
+\`\`\`json
+{
+    "betAmount": "0.01",
+    "numbers": [8, 5, 26],
+    "token": null,
+}
+\`\`\`
+
+** Message 6 **
+\`\`\`
+I want to bet my ETH on 8, 5, 26
+\`\`\`
+
+** Response 6 **
+\`\`\`json
+{
+    "betAmount": null,
+    "numbers": [8, 5, 26],
+    "token": "ETH",
+}
+\`\`\`json
+
 Here are the recent user messages for context:
 {{recentMessages}}
 `;
 export const rouletteAction: Action = {
     name: "ROULETTE",
-    similes: ["SPIN_A_ROULETTE", "BETSWIRL_ROULETTE"],
+    similes: [
+        "SPIN_A_ROULETTE",
+        "BETSWIRL_ROULETTE",
+        "BET_ON_ROULETTE",
+        "BET_ON_ROULETTE_BETSWIRL",
+    ],
     description:
         "Play the BetSwirl Roulette. The player is betting that the rolled number will be one of the chosen numbers.",
     suppressInitialMessage: true,
@@ -146,7 +204,9 @@ export const rouletteAction: Action = {
 
             // Validate face is heads or tails
             if (!numbers || !numbers.length) {
-                throw new Error(`No provided numbers`);
+                throw new Error(
+                    `You must provide from 1 to ${MAX_SELECTABLE_ROULETTE_NUMBER} numbers between ${MIN_SELECTABLE_ROULETTE_NUMBER} and ${MAX_SELECTABLE_ROULETTE_NUMBER}. i.e. "Bet 0.07 ETH on 3, 18, 26, and 31". You'll be betting that the rolled number will be one of the chosen numbers.`
+                );
             }
             const formattedNumbers = numbers.join(", ");
             await callback({
@@ -224,6 +284,62 @@ Payout: [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) ${to
                 content: {
                     text: "You Won, your Payout is 0.00003 ETH, Bet tx: 0x6ba8a0c3e861b036f052709f56412084806376fbaf24b15bce4920a8a53095af, Resolution tx hash: 0x8ed5541c45b6c7083b3e5795f52f92827748e93e6562ec126f4a1cf22b433f77",
                     action: "ROULETTE",
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "Spin a roulette for me",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "You must specify on which number(s), bet amount and token symbol",
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "I want to bet on the 8, 5, and 26",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "You must specify the bet amount and token symbol",
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "I want to bet 0.01 on 8, 5, and 26",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "You must specify the token symbol",
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "I want to bet my ETH on 8, 5, and 26",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "You must specify the bet amount",
                 },
             },
         ],

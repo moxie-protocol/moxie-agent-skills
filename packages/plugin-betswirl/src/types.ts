@@ -6,10 +6,8 @@ export const hexAddress = z
     .regex(/^0x[a-fA-F0-9]{40}$/, "The address must be a valid EVM address");
 
 export const casinoBetParams = {
-    betAmount: z.string().describe("The bet amount"),
-    token: z
-        .string()
-        .describe("The token to bet with"),
+    betAmount: z.string().nullable().describe("The bet amount"),
+    token: z.string().nullable().describe("The token to bet with"),
     stopGain: z
         .string()
         .optional()

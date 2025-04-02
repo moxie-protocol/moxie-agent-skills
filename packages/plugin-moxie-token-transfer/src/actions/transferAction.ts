@@ -1024,7 +1024,7 @@ async function executeTransfer(
     const walletClient = context.state.moxieWalletClient as agentLib.MoxieWalletClient;
     let transactionResponse: agentLib.MoxieWalletSendTransactionResponseType;
     try {
-        transactionResponse = await walletClient.sendTransaction(process.env.CHAIN_ID, request);
+        transactionResponse = await walletClient.sendTransaction(process.env.CHAIN_ID || '8453', request);
     } catch (error) {
         elizaLogger.error(
             context.traceId,
