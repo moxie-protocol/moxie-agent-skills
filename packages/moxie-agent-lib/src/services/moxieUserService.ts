@@ -132,7 +132,7 @@ export async function getUserByMoxieId(
             }
         `;
 
-        const response = await fetch(process.env.MOXIE_API_URL, {
+        const response = await fetch(process.env.MOXIE_BACKEND_INTERNAL_URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -251,7 +251,7 @@ export async function getUserByMoxieIdMultipleTokenGate(
 
                 let res = await response.json();
                 const { data } = res as GetUserInfoBatchResponse;
-                
+
                 if (!data?.GetUserInfoBatch?.users || data.GetUserInfoBatch.users.length === 0) {
                     retryCount++;
                     elizaLogger.warn(`Retry ${retryCount}: Empty users array received`);
