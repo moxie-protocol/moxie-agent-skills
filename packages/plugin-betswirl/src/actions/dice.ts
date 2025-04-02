@@ -37,6 +37,7 @@ export const DiceBetParameters = z.object({
         .number()
         .gte(MIN_SELECTABLE_DICE_NUMBER)
         .lte(MAX_SELECTABLE_DICE_NUMBER)
+        .nullable()
         .describe("The number to bet on"),
     ...casinoBetParams,
     ...getMaxBetCountParam(CASINO_GAME_TYPE.DICE),
