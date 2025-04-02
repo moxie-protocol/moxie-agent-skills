@@ -516,7 +516,7 @@
         "starterQuestions": [
             {
                 "label": "What is the BetSwirl skills?",
-                "value": "Flip a coin"
+                "value": "What is the BetSwirl skills?"
             },
             {
                 "label": "Bet 0.01 ETH on heads",
