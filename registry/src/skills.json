@@ -563,10 +563,15 @@
             "BETSWIRL_ROULETTE",
             "BET_ON_ROULETTE",
             "BET_ON_ROULETTE_BETSWIRL",
+            "GET_BETS",
             "RETRIEVE_BETS",
             "SHOW_BETS",
             "LAST_BETS",
-            "GET_BETSWIRL_BETS"
+            "GET_BETSWIRL_BETS",
+            "BETSWIRL_INFO",
+            "WHAT_IS_BETSWIRL",
+            "HOW_DOES_BETSWIRL_WORK",
+            "HOW_TO_PLAY_BETSWIRL"
         ],
         "isPremium": false,
         "freeQueries": 0,
