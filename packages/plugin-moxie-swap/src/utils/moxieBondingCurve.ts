@@ -52,7 +52,7 @@ export async function buyShares(traceId: string, moxieUserId: string, embeddedWa
         const swapRequestInput: MoxieWalletSendTransactionInputType = {
             address: embeddedWallet,
             chainType: "ethereum",
-            caip2: "eip155:" + process.env.CHAIN_ID,
+            caip2: "eip155:" + (process.env.CHAIN_ID || '8453'),
             transaction: {
                 from: embeddedWallet,
                 to: process.env.BONDING_CURVE_ADDRESS,
@@ -66,7 +66,7 @@ export async function buyShares(traceId: string, moxieUserId: string, embeddedWa
                     ],
                     functionName: "buySharesV2",
                 }),
-                chainId: Number(process.env.CHAIN_ID),
+                chainId: Number(process.env.CHAIN_ID || '8453'),
                 maxFeePerGas: Number(maxFeePerGas),
                 maxPriorityFeePerGas: Number(maxPriorityFeePerGas),
             }
@@ -115,7 +115,7 @@ export function createBuyRequestInput(embeddedWallet: string, creatorSubjectAddr
     return {
         address: embeddedWallet,
         chainType: "ethereum",
-        caip2: "eip155:" + process.env.CHAIN_ID,
+        caip2: "eip155:" + (process.env.CHAIN_ID || '8453'),
         transaction: {
             from: embeddedWallet,
             to: process.env.BONDING_CURVE_ADDRESS,
@@ -343,7 +343,7 @@ export async function sellShares(traceId: string, moxieUserId: string, embeddedW
         const swapRequestInput: MoxieWalletSendTransactionInputType = {
             address: embeddedWallet,
             chainType: "ethereum",
-            caip2: "eip155:" + process.env.CHAIN_ID,
+            caip2: "eip155:" + (process.env.CHAIN_ID || '8453'),
             transaction: {
                 from: embeddedWallet,
                 to: process.env.BONDING_CURVE_ADDRESS,
@@ -357,7 +357,7 @@ export async function sellShares(traceId: string, moxieUserId: string, embeddedW
                     ],
                     functionName: "sellSharesV2",
                 }),
-                chainId: Number(process.env.CHAIN_ID),
+                chainId: Number(process.env.CHAIN_ID || '8453'),
                 maxPriorityFeePerGas: Number(maxPriorityFeePerGas),
                 maxFeePerGas: Number(maxFeePerGas),
             }
@@ -365,7 +365,7 @@ export async function sellShares(traceId: string, moxieUserId: string, embeddedW
         elizaLogger.debug(traceId,`[creatorCoinSwap] [sellShares] [${moxieUserId}] swap request: ${JSON.stringify(swapRequestInput, (key, value) =>
             typeof value === 'bigint' ? value.toString() : value
         )}`)
-        const swapResponse = await walletClient.sendTransaction(process.env.CHAIN_ID, {
+        const swapResponse = await walletClient.sendTransaction(process.env.CHAIN_ID || '8453', {
             fromAddress: embeddedWallet,
             toAddress: process.env.BONDING_CURVE_ADDRESS,
             data: swapRequestInput.transaction.data,

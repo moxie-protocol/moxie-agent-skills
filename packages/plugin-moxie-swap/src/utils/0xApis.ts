@@ -4,10 +4,12 @@ import { createClientV2 } from "@0x/swap-ts-sdk";
 import { elizaLogger } from "@moxie-protocol/core";
 import { ethers } from "ethers";
 import { ERC20_TXN_SLIPPAGE_BPS } from "./constants";
+import { mockGetQuoteResponse } from "../constants/constants";
 
 const initializeClients = () => {
     if (!process.env.ZERO_EX_API_KEY) {
-        throw new Error('ZERO_EX_API_KEY environment variable is required');
+        elizaLogger.error('ZERO_EX_API_KEY environment variable is not given, will use mock data');
+        return { zxClient: null };
     }
 
     try {
@@ -24,7 +26,8 @@ const initializeClients = () => {
 const { zxClient } = initializeClients();
 
 if (!process.env.CHAIN_ID || isNaN(Number(process.env.CHAIN_ID))) {
-    throw new Error('Valid CHAIN_ID environment variable is required');
+    process.env.CHAIN_ID = '8453';
+    elizaLogger.error('CHAIN_ID environment variable is not set, using default value 8453');
 }
 
 /**
@@ -52,12 +55,15 @@ export const get0xSwapQuote = async ({
     sellTokenAddress: string;
 }) => {
     try {
+        if(!process.env.ZERO_EX_API_KEY) {
+            return mockGetQuoteResponse;
+        }
         elizaLogger.debug(traceId,`[get0xSwapQuote] [${moxieUserId}] input details: [${walletAddress}] [${sellTokenAddress}] [${buyTokenAddress}] [${sellAmountBaseUnits}]`)
         const quote = (await zxClient.swap.permit2.getQuote.query({
             sellAmount: sellAmountBaseUnits,
             sellToken: sellTokenAddress,
             buyToken: buyTokenAddress,
-            chainId: Number(process.env.CHAIN_ID),
+            chainId: Number(process.env.CHAIN_ID || '8453'),
             taker: walletAddress,
             slippageBps: ERC20_TXN_SLIPPAGE_BPS
         })) as GetQuoteResponse;
@@ -101,18 +107,18 @@ export const execute0xSwap = async ({
         const transactionInput: MoxieWalletSendTransactionInputType = {
             address: walletAddress,
             chainType: "ethereum",
-            caip2: `eip155:${process.env.CHAIN_ID}`,
+            caip2: `eip155:${process.env.CHAIN_ID || '8453'}`,
             transaction: {
                 to: quote.transaction.to,
                 value: Number(quote.transaction.value),
                 data: quote.transaction.data,
                 gasLimit: Math.ceil(Number(quote.transaction.gas) * 1.2),  // added 20% buffer
                 gasPrice: Number(quote.transaction.gasPrice),
-                chainId: Number(process.env.CHAIN_ID),
+                chainId: Number(process.env.CHAIN_ID || '8453'),
             },
         };
         elizaLogger.debug(traceId,`[execute0xSwap] [${moxieUserId}] transactionInput: ${JSON.stringify(transactionInput)}`)
-        const tx = await walletClient.sendTransaction(process.env.CHAIN_ID,
+        const tx = await walletClient.sendTransaction(process.env.CHAIN_ID || '8453',
             {
                 fromAddress: walletAddress,
                 toAddress: quote.transaction.to,

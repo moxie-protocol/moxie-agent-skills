@@ -1,13 +1,15 @@
 import { elizaLogger } from "@moxie-protocol/core";
 import { createClientV2 } from "@0x/swap-ts-sdk";
 import { Context, GetIndicativePriceResponse } from "../types/types";
+import { mockGetIndicativePriceResponse } from "../constants/constants";
 
 
 
 const initializeClients = () => {
 
     if (!process.env.ZERO_EX_API_KEY) {
-        throw new Error('ZERO_EX_API_KEY environment variable is required');
+        elizaLogger.error('ZERO_EX_API_KEY environment variable is not given, will use mock data');
+        return { zxClient: null };
     }
 
     try {
@@ -24,7 +26,8 @@ const initializeClients = () => {
 const { zxClient } = initializeClients();
 
 if (!process.env.CHAIN_ID || isNaN(Number(process.env.CHAIN_ID))) {
-    throw new Error('Valid CHAIN_ID environment variable is required');
+    process.env.CHAIN_ID = '8453';
+    elizaLogger.error('CHAIN_ID environment variable is not set, using default value 8453');
 }
 
 
@@ -51,12 +54,15 @@ export const get0xPrice = async ({
     sellTokenAddress: string;
 }) => {
     try {
+        if(!process.env.ZERO_EX_API_KEY) {
+            return mockGetIndicativePriceResponse;
+        }
         elizaLogger.debug(context.traceId,`[get0xPrice] [${context.moxieUserId}] input details: [${walletAddress}] [${sellTokenAddress}] [${buyTokenAddress}] [${sellAmountBaseUnits}]`)
         const price = (await zxClient.gasless.getPrice.query({
             sellAmount: sellAmountBaseUnits,
             sellToken: sellTokenAddress,
             buyToken: buyTokenAddress,
-            chainId: Number(process.env.CHAIN_ID),
+            chainId: Number(process.env.CHAIN_ID || '8453'),
         })) as GetIndicativePriceResponse;
         elizaLogger.debug(context.traceId,`[get0xPrice] [${context.moxieUserId}] price: ${JSON.stringify(price)}`)
         return price;

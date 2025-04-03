@@ -49,13 +49,13 @@ const orderTypes = {
 const domain = {
     name: "Gnosis Protocol",
     version: "v2",
-    chainId: process.env.CHAIN_ID,
+    chainId: process.env.CHAIN_ID || '8453',
     verifyingContract: cowProtocolVerifierContractAddress
 };
 
 const orderBookApi = new OrderBookApi({
     env: process.env.COW_ENV as CowEnv,
-    chainId: Number(process.env.CHAIN_ID) as SupportedChainId
+    chainId: Number(process.env.CHAIN_ID || '8453') as SupportedChainId
 });
 
 /**
@@ -209,7 +209,7 @@ async function sendApprovalTransactionFromEmbeddedWallet(
     elizaLogger.debug(traceId, '[sendApprovalTransactionFromEmbeddedWallet] started');
 
     const agentWallet = (context.state.agentWallet as MoxieClientWallet).address;
-    const chainId = process.env.CHAIN_ID;
+    const chainId = process.env.CHAIN_ID || '8453';
     const moxieWalletClient = context.state.moxieWalletClient as MoxieWalletClient;
 
     try {

@@ -126,7 +126,8 @@ async function preValidateRequiredData(context: Context): Promise<boolean> {
 
     const chainId = Number(process.env.CHAIN_ID);
     if (!chainId) {
-        throw new Error('CHAIN_ID environment variable is not set');
+        process.env.CHAIN_ID = '8453';
+        elizaLogger.error('CHAIN_ID environment variable is not set, using default value 8453');
     }
 
     // Validate required state objects
@@ -515,7 +516,9 @@ async function processSingleLimitOrder(
                     buyTokenDecimals,
                     sellTokenDecimals,
                     traceId,
-                    moxieUserId
+                    moxieUserId,
+                    buyTokenPriceInUSD,
+                    type
                 );
                 buyTokenAmountInWEI = amounts.buyTokenAmountInWEI;
                 sellTokenAmountInWEI = amounts.sellTokenAmountInWEI;
@@ -535,7 +538,8 @@ async function processSingleLimitOrder(
                     buyTokenDecimals,
                     sellTokenDecimals,
                     traceId,
-                    moxieUserId
+                    moxieUserId,
+                    type
                 );
                 buyTokenAmountInWEI = amounts.buyTokenAmountInWEI;
                 sellTokenAmountInWEI = amounts.sellTokenAmountInWEI;
@@ -557,7 +561,9 @@ async function processSingleLimitOrder(
                     agentWallet,
                     balance,
                     targetTokenPriceInUSD,
-                    buyTokenPriceInUSD
+                    buyTokenPriceInUSD,
+                    sellTokenPriceInUSD,
+                    type
                 );
                 buyTokenAmountInWEI = amounts.buyTokenAmountInWEI;
                 sellTokenAmountInWEI = amounts.sellTokenAmountInWEI;
@@ -1017,19 +1023,30 @@ async function handleInsufficientBalance(
 const calculateBuyQuantityAmounts = async (
     value_type: string,
     buyQuantity: number,
-    targetTokenPriceInUSD: number,
+    limitPriceInUSD: number,
     sellTokenPriceInUSD: number,
     buyTokenDecimals: number,
     sellTokenDecimals: number,
     traceId: string,
-    moxieUserId: string
+    moxieUserId: string,
+    buyTokenPriceInUSD: number,
+    type: string
 ): Promise<{buyTokenAmountInWEI: bigint, sellTokenAmountInWEI: bigint}> => {
+    elizaLogger.debug(traceId,`[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [type]: ${type}`);
     if (value_type && value_type == "USD") {
         elizaLogger.debug(traceId,`[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [VALUE_TYPE]: ${value_type}`);
         try {
-            // Calculate token amounts based on USD values
-            const buyAmount = new Decimal(buyQuantity).div(targetTokenPriceInUSD).toFixed(buyTokenDecimals);
-            const sellAmount = new Decimal(buyQuantity).div(sellTokenPriceInUSD).toFixed(sellTokenDecimals);
+            let buyAmount: string;
+            let sellAmount: string;
+            if (type === "SELL") { // this is for usd based direct sell case where user is selling in terms of buy quantity
+                // sell $KTA when price increase by 10% and get me $10 worth of moxie
+                buyAmount = new Decimal(buyQuantity).div(buyTokenPriceInUSD).toFixed(buyTokenDecimals);
+                sellAmount = new Decimal(buyQuantity).div(limitPriceInUSD).toFixed(sellTokenDecimals);
+            } else if (type === "BUY") { // this is for usd based direct buy case where user is buying in terms of buy quantity
+                // buy $10 worth of $KTA when price drops by 10% 
+                buyAmount = new Decimal(buyQuantity).div(limitPriceInUSD).toFixed(buyTokenDecimals);
+                sellAmount = new Decimal(buyQuantity).div(sellTokenPriceInUSD).toFixed(sellTokenDecimals);
+            }
 
             // Convert to WEI
             const buyTokenAmountInWEI = BigInt(ethers.utils.parseUnits(buyAmount, buyTokenDecimals).toString());
@@ -1047,8 +1064,18 @@ const calculateBuyQuantityAmounts = async (
     } else {
         // this is for direct case where user is buying in terms of buy quantity
         try {
-            const buyAmount = new Decimal(buyQuantity)
-            const sellAmount = new Decimal(buyAmount).mul(targetTokenPriceInUSD).div(sellTokenPriceInUSD).toFixed(sellTokenDecimals);
+
+            let buyAmount: string;
+            let sellAmount: string;
+            if (type === "SELL") {
+                // sell $[KTA|0x12323423] when price increase by 10% and get me 1000 moxie
+                buyAmount = new Decimal(buyQuantity).toFixed(buyTokenDecimals);
+                sellAmount = new Decimal(buyQuantity).mul(buyTokenPriceInUSD).div(limitPriceInUSD).toFixed(sellTokenDecimals);
+            } else if (type === "BUY") {
+                // buy 1000 $[KTA|0x12323423] when price drops by 10% 
+                buyAmount = new Decimal(buyQuantity).toFixed(buyTokenDecimals);
+                sellAmount = new Decimal(buyAmount).mul(limitPriceInUSD).div(sellTokenPriceInUSD).toFixed(sellTokenDecimals);
+            }
 
             // Convert to WEI
             const buyTokenAmountInWEI = BigInt(ethers.utils.parseUnits(buyAmount.toString(), buyTokenDecimals).toString());
@@ -1069,21 +1096,32 @@ const calculateBuyQuantityAmounts = async (
 const calculateSellQuantityAmounts = async (
     value_type: string,
     sellQuantity: number,
-    targetTokenPriceInUSD: number,
+    limitPriceInUSD: number,
     buyTokenPriceInUSD: number,
     sellTokenPriceInUSD: number,
     buyTokenDecimals: number,
     sellTokenDecimals: number,
     traceId: string,
-    moxieUserId: string
+    moxieUserId: string,
+    type: string
 ): Promise<{buyTokenAmountInWEI: bigint, sellTokenAmountInWEI: bigint}> => {
+    elizaLogger.debug(traceId,`[limitOrder] [${moxieUserId}] [processSingleLimitOrder] started with type: ${type}`);
     if (value_type && value_type == "USD") {
         elizaLogger.debug(traceId,`[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [SELL_QUANTITY] [VALUE_TYPE]: ${value_type}`);
         try {
             // Calculate token amounts based on USD values
-            const sellAmount = new Decimal(sellQuantity).div(sellTokenPriceInUSD).toFixed(sellTokenDecimals);
-            //const buyAmount = new Decimal(sellAmount).mul(targetTokenPriceInUSD).div(buyTokenPriceInUSD).toFixed(buyTokenDecimals);
-            const buyAmount = new Decimal(sellAmount).mul(sellTokenPriceInUSD).div(targetTokenPriceInUSD).toFixed(buyTokenDecimals);
+            let buyAmount: string;
+            let sellAmount: string;
+            if (type === "SELL") { // this is for usd based direct sell case where user is selling in terms of sell quantity
+                // example: sell $10 $KTA when price rises by 20% 
+                buyAmount = new Decimal(sellQuantity).div(buyTokenPriceInUSD).toFixed(buyTokenDecimals);
+                sellAmount = new Decimal(sellQuantity).div(limitPriceInUSD).toFixed(sellTokenDecimals);
+               
+            } else if (type === "BUY") { // this is for usd based direct buy case where user is buying in terms of sell quantity
+                // example: buy $KTA when price drops by 20% using 100$ $moxie
+                sellAmount = new Decimal(sellQuantity).div(sellTokenPriceInUSD).toFixed(sellTokenDecimals);
+                buyAmount = new Decimal(sellAmount).mul(sellTokenPriceInUSD).div(limitPriceInUSD).toFixed(buyTokenDecimals);
+            }
 
             // Convert to WEI
             const buyTokenAmountInWEI = BigInt(ethers.utils.parseUnits(buyAmount, buyTokenDecimals).toString());
@@ -1101,10 +1139,17 @@ const calculateSellQuantityAmounts = async (
     } else {
         // this is for direct case where user is selling in terms of sell quantity
         try {
-            const sellAmount = new Decimal(sellQuantity)
-            // const buyAmount = new Decimal(sellAmount).mul(targetTokenPriceInUSD).div(buyTokenPriceInUSD).toFixed(buyTokenDecimals);
-            const buyAmount = new Decimal(sellAmount).mul(sellTokenPriceInUSD).div(targetTokenPriceInUSD).toFixed(buyTokenDecimals);
-
+            let buyAmount: string;
+            let sellAmount: string;
+            if (type === "SELL") { // this is for direct sell case where user is selling in terms of sell quantity
+                // example: sell 10 $KTA when price rises by 20% 
+                sellAmount = new Decimal(sellQuantity).toFixed(sellTokenDecimals);
+                buyAmount = new Decimal(sellQuantity).mul(limitPriceInUSD).div(buyTokenPriceInUSD).toFixed(buyTokenDecimals);
+            } else if (type === "BUY") { // this is for direct buy case where user is buying in terms of sell quantity  
+                // example: buy $KTA when price drops by 20% using 100 $moxie
+                sellAmount = new Decimal(sellQuantity).toFixed(sellTokenDecimals);
+                buyAmount = new Decimal(sellQuantity).mul(sellTokenPriceInUSD).div(limitPriceInUSD).toFixed(buyTokenDecimals);
+            }   
 
             // Convert to WEI
             const buyTokenAmountInWEI = BigInt(ethers.utils.parseUnits(buyAmount.toString(), buyTokenDecimals).toString());
@@ -1132,9 +1177,12 @@ const calculateBalanceBasedAmounts = async (
     buyTokenDecimals: number,
     agentWallet: any,
     balance: any,
-    targetTokenPriceInUSD: number,
-    buyTokenPriceInUSD: number
+    limitPriceInUSD: number,
+    buyTokenPriceInUSD: number,
+    sellTokenPriceInUSD: number,
+    type: string
 ): Promise<{buyTokenAmountInWEI: bigint, sellTokenAmountInWEI: bigint, currentWalletBalance: bigint}> => {
+    elizaLogger.debug(traceId,`[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BALANCE_BASED] [type]: ${type}`);
     const result = await getTargetQuantityForBalanceBasedSwaps(
         traceId,
         currentBalance,
@@ -1148,8 +1196,17 @@ const calculateBalanceBasedAmounts = async (
     const sellQuantity = ethers.utils.formatUnits(result.quantityInWEI, sellTokenDecimals);
     elizaLogger.debug(traceId,`[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BALANCE_BASED] sellQuantity: ${sellQuantity}`);
 
-    const sellAmount = new Decimal(sellQuantity)
-    const buyAmount = new Decimal(sellAmount).mul(targetTokenPriceInUSD).div(buyTokenPriceInUSD).toFixed(buyTokenDecimals);
+    let sellAmount: string;
+    let buyAmount: string;
+    if (type === "SELL") {
+        // sell all of my $KTA when the price rises by 20%
+        sellAmount = new Decimal(sellQuantity).toFixed(sellTokenDecimals);
+        buyAmount = new Decimal(sellQuantity).mul(limitPriceInUSD).div(buyTokenPriceInUSD).toFixed(buyTokenDecimals);
+    } else if (type === "BUY") {
+        // buy $KTA when price drops by 20% using 10% of my $usdc balance
+        sellAmount = new Decimal(sellQuantity).toFixed(sellTokenDecimals);
+        buyAmount = new Decimal(sellQuantity).mul(sellTokenPriceInUSD).div(limitPriceInUSD).toFixed(buyTokenDecimals);
+    }
 
     // Convert to WEI
     const buyTokenAmountInWEI = BigInt(ethers.utils.parseUnits(buyAmount.toString(), buyTokenDecimals).toString());

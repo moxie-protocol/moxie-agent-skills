@@ -1,6 +1,7 @@
 import { elizaLogger } from "@moxie-protocol/core";
 import { CastAddMessage, fromFarcasterTime } from "@farcaster/hub-nodejs";
 import axios from "axios";
+import { mockCastsByFid } from "../constants/constants";
 
 export interface Cast {
     hash: string;
@@ -124,6 +125,11 @@ export const fetchCastByFid = async (
     maxCasts: number = 20,
     includeReplies: boolean = false
 ): Promise<Cast[]> => {
+    const API_KEY = process.env.NEYNAR_API_KEY;
+    if (!API_KEY) {
+        // mock response
+        return mockCastsByFid;
+    }
     const startTime = Date.now();
     try {
         const response = await axios.get<NeynarCastResponse>(
@@ -131,7 +137,7 @@ export const fetchCastByFid = async (
             {
                 headers: {
                     accept: "application/json",
-                    "x-api-key": process.env.NEYNAR_API_KEY || "",
+                    "x-api-key": API_KEY,
                 },
             }
         );

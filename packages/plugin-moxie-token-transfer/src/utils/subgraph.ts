@@ -1,11 +1,12 @@
 import { elizaLogger } from '@moxie-protocol/core';
 import { GraphQLClient } from 'graphql-request';
+import { mockSubjectTokenDetail, mockSubjectTokenDetails } from '../constants/constants';
 
 const PROTOCOL_SUBGRAPH_URL = process.env.PROTOCOL_SUBGRAPH_URL;
 
 
 if (!PROTOCOL_SUBGRAPH_URL) {
-    throw new Error('PROTOCOL_SUBGRAPH_URL environment variable is not defined');
+    elizaLogger.error('PROTOCOL_SUBGRAPH_URL environment variable is not defined, will use mock data');
 }
 
 // Add singleton client
@@ -21,6 +22,9 @@ export async function getSubjectTokenDetailsBySubjectAddress(traceId: string, su
     if (!subject) {
         elizaLogger.error(traceId, `[getSubjectTokenDetailsBySubjectAddress] Subject address is missing`);
         throw new Error('Subject address is required');
+    }
+    if (!PROTOCOL_SUBGRAPH_URL) {
+        return mockSubjectTokenDetail;
     }
 
     const query = `
@@ -107,7 +111,9 @@ export async function getSubjectTokenDetailsBySubjectTokenAddresses(traceId: str
         elizaLogger.error(traceId, `[getSubjectTokenDetailsBySubjectTokenAddresses] Subject token addresses are missing or empty`);
         throw new Error('Subject token addresses are required');
     }
-
+    if (!PROTOCOL_SUBGRAPH_URL) {
+        return mockSubjectTokenDetails;
+    }
     const query = `
         query($subjectTokenAddresses: [String!]!) {
             subjectTokens(where: { id_in: $subjectTokenAddresses }) {
@@ -145,19 +151,19 @@ export async function getSubjectTokenDetailsBySubjectTokenAddresses(traceId: str
             const normalizedAddresses = subjectTokenAddresses
                 .filter(addr => addr)
                 .map(addr => addr.toLowerCase());
-                
+
             elizaLogger.debug(traceId, `[getSubjectTokenDetailsBySubjectTokenAddresses] Fetching details for subject tokens: ${normalizedAddresses.join(', ')}`);
-            
+
             const response = await client.request<SubjectTokenResponse>(
                 query,
                 { subjectTokenAddresses: normalizedAddresses }
             );
-            
+
             if (!response.subjectTokens || response.subjectTokens.length === 0) {
                 elizaLogger.warn(traceId, `[getSubjectTokenDetailsBySubjectTokenAddresses] No subject tokens found for addresses: ${normalizedAddresses.join(', ')}`);
                 return null;
             }
-            
+
             return response.subjectTokens.reduce((acc, token) => {
                 acc[token.id] = token;
                 return acc;
