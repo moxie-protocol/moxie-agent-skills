@@ -18,7 +18,13 @@ export interface FarcasterMetadata {
     bio: string;
     username: string;
     displayName: string;
-    profileTokenId: string;
+    fid: number;
+    pfp: string;
+    type: string;
+    verifiedAt: string;
+    ownerAddress: string;
+    firstVerifiedAt: string;
+    latestVerifiedAt: string;
 }
 
 export interface MoxieIdentity {
