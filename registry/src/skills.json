@@ -511,9 +511,9 @@
       "status": "ACTIVE",
       "isDefault": false,
       "loaders": [
-            "querying AlfaFrens",
-            "waiting for response",
-            "doing some DegenFans magic"
+            "Querying AlfaFrens",
+            "Waiting for response",
+            "Doing some DegenFans magic"
         ]
     }
 ]
