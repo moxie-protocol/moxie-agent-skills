@@ -267,6 +267,15 @@ export default {
                     return false;
                 }
 
+                for (const userInfo of userInfoBatchOutput.users) {
+                    if (userInfo.errorDetails) {
+                        ineligibleMoxieUsers.push(userInfo.errorDetails);
+                    } else {
+                        eligibleMoxieIds.push(userInfo.user.id);
+                        moxieUserInfoMultiple.push(userInfo.user);
+                    }
+                }
+
                 if (ineligibleMoxieUsers.length > 0) {
                     await handleIneligibleMoxieUsers(ineligibleMoxieUsers, callback);
                     return false;
