@@ -4,7 +4,7 @@
   </a>
   <h1 align="center">Moxie Eliza AI Skills Framework</h1>
 
-📖 [Developer Docs](https://developer.moxie.xyz/) | 
+📖 [Developer Docs](https://developer.moxie.xyz/) |
 
 </div>
 
@@ -12,11 +12,11 @@
 
 - [Table of Contents](#table-of-contents)
 - [🚀 Quick Start](#-quick-start)
-  - [Prerequisites](#prerequisites)
-  - [Get Started](#get-started)
-  - [Create Your First Skills](#create-your-first-skills)
-  - [General Guidelines For Skills Development](#general-guidelines-for-skills-development)
-  - [Register Your Skills to Moxie](#register-your-skills-to-moxie)
+    - [Prerequisites](#prerequisites)
+    - [Get Started](#get-started)
+    - [Create Your First Skills](#create-your-first-skills)
+    - [General Guidelines For Skills Development](#general-guidelines-for-skills-development)
+    - [Register Your Skills to Moxie](#register-your-skills-to-moxie)
 - [📋 General Guidelines For Skills Registration](#-general-guidelines-for-skills-registration)
 - [💬 Community \& Contact](#-community--contact)
 - [👥 Contributors](#-contributors)
@@ -91,11 +91,27 @@ Once you completed development on your skills, you can register your skills to t
 interface Skills {
     pluginId: string; // Any UUID, must be unique, to generate one use this https://www.uuidgenerator.net/
     name: string; // Creator Agent Skills name (based on package.json)
+    displayName: string; // Display name shown in marketplace
     version: string; // Creator Agent Skills Version (based on package.json)
+    author: string | null; // Author/Creator of the Skills
     description: string; // Description of what the Skills can do
-    author?: string | null; // Author/Creator of the Skills
     githubUrl: string; // GitHub URL to your Skills folder under `/packages`
-    imageUrl?: string | null; // Image URL to logo.png (400x400 px) of your Skills, which should be located under the `/packages/<skills-folder>/images` folder
+    logoUrl: string; // Logo URL for the skill (400x400 px PNG)
+    settings: Record<string, any>; // Skill settings configuration
+    capabilities: string[]; // List of skill capabilities
+    starterQuestions: Array<{
+        label: string;
+        value: string;
+    }>; // Example questions to get started
+    mediaUrls: string[]; // Additional media URLs
+    actions: string[]; // Supported actions
+    isPremium: boolean; // Whether skill is premium
+    freeQueries: number; // Number of free queries
+    skillCoinAddress: string; // Token address for skill
+    minimumSkillBalance: number; // Minimum token balance required
+    status: string; // Skill status
+    isDefault: boolean; // Whether skill is default
+    loaders: string[]; // Loading messages
 }
 ```
 
