@@ -135,7 +135,7 @@ export function getUserData(moxieUserInfo: MoxieUser): UserData {
   let xhandle: string = null;
   const fcId = moxieUserInfo.identities.find(o => o.type === 'FARCASTER');
   if (fcId) {
-    fid = (fcId.metadata as FarcasterMetadata).profileTokenId;
+    fid = (fcId.metadata as FarcasterMetadata)?.fid?.toString();
   }
 
   const xId = moxieUserInfo.identities.find(o => o.type === 'TWITTER');
