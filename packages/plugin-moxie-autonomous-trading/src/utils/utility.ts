@@ -7,6 +7,12 @@ export interface SellToken {
     address: string;
 }
 
+
+export interface Amount {
+    valueType: 'USD';
+    amount: number;
+}
+
 export interface BaseParams {
     buyAmount: number;
     duration: number;
@@ -26,10 +32,12 @@ export interface GroupTradeParams {
     groupId: string;
     condition: 'ANY' | 'ALL';
     conditionValue: number;
+    minPurchaseAmount: Amount
 }
 
 export interface UserTradeParams {
     moxieUsers: string[];
+    minPurchaseAmount: Amount;
 }
 
 export interface CreateRuleInput {
@@ -44,6 +52,14 @@ export interface CreateRuleInput {
     ruleTrigger: 'GROUP' | 'USER';
 }
 
+export interface CreateRuleResponse {
+    id: string;
+    requestId: string;
+    ruleType: string;
+    status: string;
+    instructions: string;
+}
+
 const mutation = gql`
     mutation CreateRule($createRuleInput: CreateRuleInput!) {
         CreateRule(input: $createRuleInput) {
@@ -51,7 +67,7 @@ const mutation = gql`
             requestId
             ruleType
             status
-            reason
+            instructions
         }
     }
 `;
@@ -65,7 +81,7 @@ export async function createTradingRule(
     groupTradeParams?: GroupTradeParams,
     userTradeParams?: UserTradeParams,
     limitOrderParams?: LimitOrderParams
-): Promise<{ ruleId: string; status: 'ACTIVE' | 'INACTIVE' | 'CANCELLED' | 'FAILED' }> {
+): Promise<CreateRuleResponse> {
     
     // Validate that at least one of groupTradeParams or userTradeParams exists
     if (ruleTrigger === 'GROUP' && !groupTradeParams) {
@@ -119,7 +135,7 @@ export async function createTradingRule(
             throw new Error(`Failed to create rule: ${result.errors[0].message}`);
         }
 
-        return result.data.CreateRule;
+        return result.data.CreateRule as CreateRuleResponse;
 
     } catch (error) {
         throw new Error(`Error creating trading rule: ${error.message}`);

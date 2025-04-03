@@ -24,6 +24,7 @@ export interface AutonomousTradingRuleParams {
     profitPercentage?: number;
     condition?: 'ANY' | 'ALL';
     conditionValue?: number;
+    minPurchaseAmount?: number;
 }
 
 export interface AutonomousTradingError {
@@ -122,12 +123,20 @@ export const autonomousTradingAction: Action = {
                 groupTradeParams = {
                     groupId: params.groupId,
                     condition: params.condition,
-                    conditionValue: params.conditionValue
+                    conditionValue: params.conditionValue,
+                    minPurchaseAmount: {
+                        valueType: 'USD',
+                        amount: params.minPurchaseAmount
+                    }
                 };
             } else {
                 ruleTriggers = 'USER';
                 userTradeParams = {
-                    moxieUsers: params.moxieIds
+                    moxieUsers: params.moxieIds,
+                    minPurchaseAmount: {
+                        valueType: 'USD',
+                        amount: params.minPurchaseAmount
+                    }
                 };
             }
 
@@ -142,7 +151,7 @@ export const autonomousTradingAction: Action = {
             }
 
             try {
-                const result = await createTradingRule(
+                const response = await createTradingRule(
                     state.authorizationHeader as string,
                     traceId,
                     ruleType as RuleType,
@@ -154,7 +163,8 @@ export const autonomousTradingAction: Action = {
                 );
 
                 await callback?.({
-                    text: `Successfully created trading rule with ID: ${result.ruleId}`
+                    text: `✅ Automation Rule Created Successfully!\n\n📌 Instruction: ${response.instructions}`,
+                     action: "AUTONOMOUS_TRADING",
                 });
 
             } catch (error) {
