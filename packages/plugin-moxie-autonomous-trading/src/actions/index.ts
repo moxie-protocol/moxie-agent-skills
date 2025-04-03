@@ -51,7 +51,7 @@ export const autonomousTradingAction: Action = {
         "GROUP_COPY_TRADES",
         "GROUP_COPY_TRADE_WITH_PROFIT",
     ],
-    description: "Select this action when the request is seeking information about possible automation types, available parameters, or general questions about what copy trading functionality exists. Example: 'What automations are possible?' or 'What kinds of trading rules can I create?",
+    description: "Select this action when a specific trading rule is being set up, including details like specific wallets to follow, token amounts, time conditions, or other specific parameters for automated trades. Example: 'Buy 10$ worth tokens whenever @[betashop|M4] and @[jessepollak|M739] buy minimum of $50 of any token in 6 hours.",
     suppressInitialMessage: true,
     validate: async () => true,
     handler: async (
@@ -210,7 +210,7 @@ export const autonomousTradingAction: Action = {
 export const getAutonomousTradingRuleDetailAction: Action = {
     name: "COPY_TRADE_RULE_DETAILS",
     similes: ["AUTONOMOUS_TRADING_RULE_DETAILS"],
-    description: "should be selected when the user wants to know what kind of rules are possible.",
+    description: "Select this action when the request is seeking information about possible automation types, available parameters, or general questions about what copy trading functionality exists. Example: 'What automations are possible?' or 'What kinds of trading rules can I create?",
     suppressInitialMessage: true,
     validate: async () => true,
     handler: async (
