@@ -116,7 +116,7 @@
         "displayName": "Social Alpha",
         "version": "0.1.8+build.1",
         "author": null,
-        "description": "In-depth analysis on Base users, including trades, portfolios, and posts on Farcaster and X. Buy user’s coins to add them to your Social Alpha list.",
+        "description": "In-depth analysis on Base users, including trades, portfolios, and posts on Farcaster and X.",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-social-alpha",
         "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-social-alpha/images/logo.svg",
         "settings": {},
