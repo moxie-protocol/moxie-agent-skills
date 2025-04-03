@@ -37,7 +37,7 @@ Once you cloned the repository, you can setup your environment with the followin
 ```bash
 cd moxie-agent-skills
 cp .env.example .env
-pnpm i && cd ./packages/moxie-agent-lib && pnpm run build && cd ../../ && pnpm build && pnpm start
+pnpm i --no-frozen-lockfile && cd ./packages/moxie-agent-lib && pnpm run build && cd ../../ && pnpm build && pnpm start
 ```
 
 Once the agent is running, you should see the message to run "pnpm start:client" at the end.

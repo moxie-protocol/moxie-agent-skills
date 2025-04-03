@@ -25,7 +25,7 @@ import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import yargs from "yargs";
-import samplePlugin from "@moxie-protocol/plugin-sample";
+// import samplePlugin from "@moxie-protocol/plugin-sample";
 import bootstrapPlugin from "@elizaos/plugin-bootstrap";
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -490,7 +490,7 @@ export async function createAgent(
         evaluators: [],
         character,
         // character.plugins are handled when clients are added
-        plugins: [samplePlugin, bootstrapPlugin].filter(Boolean),
+        plugins: [bootstrapPlugin].filter(Boolean),
         providers: [],
         actions: [],
         services: [],

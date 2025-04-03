@@ -105,10 +105,7 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": true,
-        "loaders": [
-            "Initiating transaction",
-            "Writing to the Base blockchain"
-        ]
+        "loaders": ["Initiating transaction", "Writing to the Base blockchain"]
     },
     {
         "pluginId": "5d3b79e2-ac61-0bb6-a3ba-b0e00b943614",
@@ -240,10 +237,7 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": true,
-        "loaders": [
-            "Initiating transaction",
-            "Writing to the Base blockchain"
-        ]
+        "loaders": ["Initiating transaction", "Writing to the Base blockchain"]
     },
     {
         "pluginId": "0ad0731e-698b-04bf-abeb-5d29cc36759f",
@@ -459,6 +453,46 @@
             "Feeling the vibes",
             "Synthesizing results",
             "Preparing insights"
+        ]
+    },
+    {
+        "pluginId": "0ad0731e-698b-04bf-abeb-5d29cc36759f",
+        "name": "@moxie-protocol/plugin-new-skill",
+        "displayName": "New Skill",
+        "version": "0.0.1",
+        "author": null,
+        "description": "This is a new skill!",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-new-skill",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/e9ac0912aba19398350aeaa63006211f0ccca403/packages/plugin-moxie-token-social-sentiment/images/logo.svg",
+        "settings": {},
+        "capabilities": [
+            "Read ETH Balance on Base",
+            "Transfer ETH to any address on Base"
+        ],
+        "starterQuestions": [
+            {
+                "label": "What is my ETH balance on Base?",
+                "value": "What is my ETH balance on Base?"
+            },
+            {
+                "label": "Transfer 0.01 ETH to 0x1234567890123456789012345678901234567890",
+                "value": "Transfer 0.01 ETH to 0x1234567890123456789012345678901234567890"
+            }
+        ],
+        "mediaUrls": [
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-token-social-sentiment/images/logo.svg"
+        ],
+        "actions": ["TOKEN_BALANCE_ON_BASE", "TRANSFER_BASE_ETH"],
+        "isPremium": false,
+        "freeQueries": 0,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
+        "status": "ACTIVE",
+        "isDefault": false,
+        "loaders": [
+            "Reading balance",
+            "Transferring ETH",
+            "Writing to the Base blockchain"
         ]
     }
 ]
