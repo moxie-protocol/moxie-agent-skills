@@ -499,7 +499,14 @@
         ],
         "actions": [
             "AUTONOMOUS_TRADING",
-            "COPY_TRADE_RULE_DETAILS"
+            "COPY_TRADE_RULE_DETAILS",
+            "COPY_TRADE",
+            "COPY_TRADES",
+            "COPY_TRADE_WITH_PROFIT",
+            "GROUP_COPY_TRADE",
+            "GROUP_COPY_TRADES",
+            "GROUP_COPY_TRADE_WITH_PROFIT",
+            "AUTONOMOUS_TRADING_RULE_DETAILS"
         ],
         "isPremium": false,
         "freeQueries": 0,
