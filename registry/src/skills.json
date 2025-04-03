@@ -494,7 +494,7 @@
         ""
       ],
       "actions":  [
-         "GET_ALFAFRENS_STAKING_RECOMENDATION",
+          "GET_ALFAFRENS_STAKING_RECOMENDATION",
           "VIEW_ALFAFRENS_STAKING_RECOMENDATION",
           "GIVE_ALFAFRENS_STAKING_RECOMENDATION",
           "GET_ALFAFRENS_STAKING_CONSULTANT",
@@ -511,9 +511,9 @@
       "status": "ACTIVE",
       "isDefault": false,
       "loaders": [
-            "Text 1",
-            "Text 2"
+            "querying AlfaFrens",
+            "waiting for response",
+            "doing some DegenFans magic"
         ]
-    },
     }
 ]
