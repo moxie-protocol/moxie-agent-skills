@@ -465,7 +465,7 @@
       "pluginId": "79449cd9-0590-4ccc-9d9f-12f99438c17b",
       "name": "@moxie-protocol/plugin-degenfans-alfafrens",
       "displayName": "DegenFans AlfaFrens",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "author": "DegenFans",
       "description": "Enables your agent to recommend staking options for AlfaFrens channels",
       "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-degenfans-alfafrens",
