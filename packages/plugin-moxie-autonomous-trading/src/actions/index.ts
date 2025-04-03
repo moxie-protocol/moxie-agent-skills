@@ -51,7 +51,7 @@ export const autonomousTradingAction: Action = {
         "GROUP_COPY_TRADES",
         "GROUP_COPY_TRADE_WITH_PROFIT",
     ],
-    description: "Helps you set up copy trade rules to automatically follow other traders and groups.",
+    description: "Select this action when the request is seeking information about possible automation types, available parameters, or general questions about what copy trading functionality exists. Example: 'What automations are possible?' or 'What kinds of trading rules can I create?",
     suppressInitialMessage: true,
     validate: async () => true,
     handler: async (
@@ -210,7 +210,7 @@ export const autonomousTradingAction: Action = {
 export const getAutonomousTradingRuleDetailAction: Action = {
     name: "COPY_TRADE_RULE_DETAILS",
     similes: ["AUTONOMOUS_TRADING_RULE_DETAILS"],
-    description: "Provides details about available copy trading rules and automation options. Use this action to explain trading automation capabilities, rule configurations, and how users can set up copy trading with specific triggers and conditions.",
+    description: "should be selected when the user wants to know what kind of rules are possible.",
     suppressInitialMessage: true,
     validate: async () => true,
     handler: async (
