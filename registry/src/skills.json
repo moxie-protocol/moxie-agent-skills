@@ -470,6 +470,10 @@
         ],
         "starterQuestions": [
             {
+                "label": "What is the Degenfans Alfafrens Skills?",
+                "value": "What is the Degenfans Alfafrens Skills?"
+            },
+            {
                 "label": "What are some staking recommendations you have for Alfafrens?",
                 "value": "What are some staking recommendations you have for Alfafrens?"
             },
