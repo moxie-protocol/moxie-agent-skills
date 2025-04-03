@@ -499,7 +499,12 @@
         "skillCoinAddress": "0x112cf1cc540eadf234158c0e4044c3b5f2a33e5e",
         "minimumSkillBalance": 5,
         "status": "ACTIVE",
-        "isDefault": false
+        "isDefault": false,
+        "loaders": [
+            "Querying AlfaFrens",
+            "Waiting for response",
+            "Doing some DegenFans magic"
+        ]
     },
     {
         "pluginId": "ba2e0746-d089-4539-a23b-84882bc8eafd",
