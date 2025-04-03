@@ -465,11 +465,11 @@
       "pluginId": "79449cd9-0590-4ccc-9d9f-12f99438c17b",
       "name": "@moxie-protocol/plugin-degenfans-alfafrens",
       "displayName": "DegenFans AlfaFrens",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "author": "DegenFans",
       "description": "Enables your agent to recommend staking options for AlfaFrens channels",
       "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-degenfans-alfafrens",
-      "logoUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-degenfans-alfafrens/images/logo.png",
+      "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-degenfans-alfafrens/images/logo.png",
       "settings": {},
       "capabilities": ["show the best staking options for a given staking amount"],
       "starterQuestions": [
@@ -505,7 +505,7 @@
           "HOW_TO_USE_DEGENFANS_ALFAFRENS"
       ],
       "isPremium": true,
-      "freeQueries": 0,
+      "freeQueries": 3,
       "skillCoinAddress": "0x112cf1cc540eadf234158c0e4044c3b5f2a33e5e",
       "minimumSkillBalance": 5,
       "status": "ACTIVE",
