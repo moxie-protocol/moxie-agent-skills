@@ -104,14 +104,14 @@ interface Skills {
         value: string;
     }>; // Example questions to get started
     mediaUrls: string[]; // Additional media URLs
-    actions: string[]; // Supported actions
-    isPremium: boolean; // Whether skill is premium
-    freeQueries: number; // Number of free queries
-    skillCoinAddress: string; // Token address for skill
+    actions: string[]; // Supported actions & similes on the Skill
+    isPremium: boolean; // Whether skill is premium or not, if yes, it will check `freeQueries` and `skillCoinAddress`
+    freeQueries: number; // Number of free queries available for users in the case of premium skills
+    skillCoinAddress: string; // Coin address to token gate the Skill
     minimumSkillBalance: number; // Minimum token balance required
-    status: string; // Skill status
-    isDefault: boolean; // Whether skill is default
-    loaders: string[]; // Loading messages
+    status: string; // Skill status, "ACTIVE" or "INACTIVE"
+    isDefault: boolean; // 3rd party Skill should be `false`
+    loaders: string[]; // Messages when loading AI agent responses
 }
 ```
 
