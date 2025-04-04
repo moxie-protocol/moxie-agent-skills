@@ -21,6 +21,9 @@ import { getMoxieIdsFromMessage, streamTextByLines, handleIneligibleMoxieUsers }
 import { FIVE_MINS, getTweetsCacheKey, ONE_HOUR } from "../cache";
 import { Tweet } from "agent-twitter-client";
 import { TOP_CREATORS_COUNT } from "../config";
+import { DATA_FILTER_DURATION_IN_HOURS } from "../constants/constants";
+
+
 function formatTweets(tweets: Tweet[]) {
     return tweets.map((tweet) => ({
         text: tweet.text,
@@ -44,7 +47,8 @@ function formatTweets(tweets: Tweet[]) {
 export async function fetchTweetsByMoxieUserIds(
     userIdToTwitterUsernames: Map<string, string>,
     runtime: IAgentRuntime,
-    maxTweetsPerUser: number = 20
+    maxTweetsPerUser: number = 20,
+    durationInHours: number = DATA_FILTER_DURATION_IN_HOURS
 ) {
     await twitterService.initialize();
 
@@ -79,10 +83,20 @@ export async function fetchTweetsByMoxieUserIds(
                     }
                 );
                 elizaLogger.debug(`cached tweets for ${moxieId}`);
+
+                elizaLogger.debug(`unfiltered tweets |${tweets.length}|\n: ${JSON.stringify(tweets)}`);
+
+                const cutoffTimestamp = Date.now() - durationInHours * 60 * 60 * 1000;
+                const filteredTweets = tweets.filter((tweet) => {
+                    return tweet.timestamp >= cutoffTimestamp;
+                });
+
+                elizaLogger.debug(`filtered tweets ${cutoffTimestamp}| ${filteredTweets.length}|\n: ${JSON.stringify(filteredTweets)}`);
+
                 return {
                     moxieId,
                     twitterHandle,
-                    tweets: formatTweets(tweets),
+                    tweets: formatTweets(filteredTweets),
                 };
             } catch (error) {
                 elizaLogger.error(
@@ -131,7 +145,13 @@ async function fetchAndValidateTweets(
     const {
         isTopTokenOwnersQuery,
         selfQuery,
+        durationInHours,
     } = responseJson;
+
+    let durationInHoursToUse = durationInHours;
+    if (durationInHours === null) {
+        durationInHoursToUse = DATA_FILTER_DURATION_IN_HOURS;
+    }
 
     let moxieIds: string[] = [];
     if (selfQuery === true) {

@@ -11,6 +11,7 @@ export interface Cast {
         displayName: string;
     };
     text: string;
+    timestamp: number;
     timeParsed: Date;
     replyCount: number;
     likesCount: number;
@@ -153,6 +154,7 @@ export const fetchCastByFid = async (
             },
             text: cast.text,
             timeParsed: new Date(cast.timestamp),
+            timestamp: Number(cast.timestamp),
             replyCount: cast.replies.count,
             likesCount: cast.reactions.likes_count,
             recastsCount: cast.reactions.recasts_count,

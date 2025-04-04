@@ -19,6 +19,8 @@ import { fetchTweetsByMoxieUserIds } from "./twitterSummaryAction";
 import * as templates from "../templates";
 import { TOP_CREATORS_COUNT } from "../config";
 import { getMoxieIdsFromMessage, streamTextByLines, handleIneligibleMoxieUsers } from "./utils";
+import { DATA_FILTER_DURATION_IN_HOURS } from "../constants/constants";
+
 export const creatorSocialSummary: Action = {
     name: "SOCIAL_SUMMARY",
     suppressInitialMessage: true,
@@ -71,7 +73,13 @@ export const creatorSocialSummary: Action = {
         const {
             isTopTokenOwnersQuery,
             selfQuery,
+            durationInHours,
         } = responseJson;
+
+        let durationInHoursToUse = durationInHours;
+        if (durationInHours === null) {
+            durationInHoursToUse = DATA_FILTER_DURATION_IN_HOURS;
+        }
 
         let moxieIds: string[] = [];
         if (selfQuery === true) {

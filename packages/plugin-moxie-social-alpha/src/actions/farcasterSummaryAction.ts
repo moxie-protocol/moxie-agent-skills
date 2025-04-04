@@ -20,6 +20,7 @@ import { Cast, fetchCastByFid } from "../services/farcasterService";
 import { getMoxieIdsFromMessage, streamTextByLines, handleIneligibleMoxieUsers } from "./utils";
 import { FIVE_MINS, getFarcasterCastsCacheKey, ONE_HOUR } from "../cache";
 import { TOP_CREATORS_COUNT } from "../config";
+import { DATA_FILTER_DURATION_IN_HOURS } from "../constants/constants";
 
 const SOCIAL_ALPHA = "SOCIAL_ALPHA";
 
@@ -30,6 +31,7 @@ export async function fetchFarcasterCastsByMoxieUserIds(
     >,
     runtime: IAgentRuntime,
     maxCastsPerUser: number = 20,
+    durationInHours: number = DATA_FILTER_DURATION_IN_HOURS
 ) {
     const castPromises = Array.from(userIdToFarcasterUsernames.entries()).map(
         async ([moxieId, farcasterDetails]) => {
@@ -69,7 +71,7 @@ export async function fetchFarcasterCastsByMoxieUserIds(
                     };
                 }
 
-                const filteredCasts = casts.map((cast: Cast) => ({
+                let filteredCasts = casts.map((cast: Cast) => ({
                     ...cast,
                     url: `https://warpcast.com/${farcasterDetails.userName}/${cast.hash.toString().substring(0, 10)}`,
                 }));
@@ -84,9 +86,18 @@ export async function fetchFarcasterCastsByMoxieUserIds(
                     );
                 }
 
-                elizaLogger.debug(
-                    `Fetched ${casts.length} casts for ${farcasterDetails.userName}`
-                );
+                elizaLogger.debug(`unfiltered casts |${casts.length}|\n: ${JSON.stringify(casts)}`);
+
+                const cutoffTimestamp = Date.now() - durationInHours * 60 * 60 * 1000;
+                filteredCasts = filteredCasts.filter((cast: Cast) => {
+                    return cast.timestamp >= cutoffTimestamp;
+                });
+
+                // elizaLogger.debug(
+                //     `Fetched ${casts.length} casts for ${farcasterDetails.userName}`
+                // );
+
+                elizaLogger.debug(`filtered casts ${cutoffTimestamp}| ${filteredCasts.length}|\n: ${JSON.stringify(filteredCasts)}`);
 
                 return {
                     moxieId,
@@ -163,7 +174,13 @@ export const creatorFarcasterSummary: Action = {
         const {
             isTopTokenOwnersQuery,
             selfQuery,
+            durationInHours,
         } = responseJson;
+
+        let durationInHoursToUse = durationInHours;
+        if (durationInHours === null) {
+            durationInHoursToUse = DATA_FILTER_DURATION_IN_HOURS;
+        }
 
         let moxieIds: string[] = [];
         if (selfQuery === true) {

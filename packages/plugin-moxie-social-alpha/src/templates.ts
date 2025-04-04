@@ -547,25 +547,28 @@ export const socialSummaryInputContextExtraction = `Please analyze the message b
     {
     "isTopTokenOwnersQuery": true/false,
     "selfQuery": true/false,
+    "durationInHours": 1/2/4/8/12/24/48/72/null
     }
     \`\`\`
 
     If the user is asking for a specific user, then isTopTokenOwnersQuery should be false.
 
     Consider these examples for guidance:
-    - "What's the news today?" should result in: isTopTokenOwnersQuery: true, selfQuery: false
-    - "What is the social activity of my creators?" should result in: isTopTokenOwnersQuery: true, selfQuery: false
-    - "What is the hot on social media?" should result in: isTopTokenOwnersQuery: true, selfQuery: false
-    - "What are my friends upto?" should result in: isTopTokenOwnersQuery: true, selfQuery: false
-    - "What's new on social media?" should result in: isTopTokenOwnersQuery: true, selfQuery: false
-    - "What is @[betashop.eth|M4], @[jessepollak|M1245] doing on farcaster?" should result in: isTopTokenOwnersQuery: false, selfQuery: false
-    - "What is @[betashop.eth|M4], @[jessepollak|M1245] doing on twitter?" should result in: isTopTokenOwnersQuery: false, selfQuery: false
-    - "What is @[betashop.eth|M4], @[jessepollak|M1245] doing?" should result in: isTopTokenOwnersQuery: false, selfQuery: false
-    - "What is betashop.eth is doing on social media?" should result in: isTopTokenOwnersQuery: false, selfQuery: false
-    - "What is betashop.eth doing on farcaster?" should result in: isTopTokenOwnersQuery: false, selfQuery: false
-    - "What is betashop.eth doing on twitter?" should result in: isTopTokenOwnersQuery: false, selfQuery: false
-    - "Show my social summary?" should result in: isTopTokenOwnersQuery: false, selfQuery: true
-    - "What is my social media activity?" should result in: isTopTokenOwnersQuery: false, selfQuery: true
+    - "What's the news today?" should result in: isTopTokenOwnersQuery: true, selfQuery: false, durationInHours: 24
+    - "What is the social activity of my creators?" should result in: isTopTokenOwnersQuery: true, selfQuery: false, durationInHours: null
+    - "What is the hot on social media?" should result in: isTopTokenOwnersQuery: true, selfQuery: false, durationInHours: 24
+    - "What are my friends upto?" should result in: isTopTokenOwnersQuery: true, selfQuery: false, durationInHours: null
+    - "What's new on social media?" should result in: isTopTokenOwnersQuery: true, selfQuery: false, durationInHours: 24
+    - "What is @[betashop.eth|M4], @[jessepollak|M1245] doing on farcaster?" should result in: isTopTokenOwnersQuery: false, selfQuery: false, durationInHours: null
+    - "What is @[betashop.eth|M4], @[jessepollak|M1245] doing on twitter?" should result in: isTopTokenOwnersQuery: false, selfQuery: false, durationInHours: null
+    - "What is @[betashop.eth|M4], @[jessepollak|M1245] doing?" should result in: isTopTokenOwnersQuery: false, selfQuery: false, durationInHours: null
+    - "What is betashop.eth is doing on social media?" should result in: isTopTokenOwnersQuery: false, selfQuery: false, durationInHours: null
+    - "What is betashop.eth doing on farcaster?" should result in: isTopTokenOwnersQuery: false, selfQuery: false, durationInHours: null
+    - "What is betashop.eth doing on twitter?" should result in: isTopTokenOwnersQuery: false, selfQuery: false, durationInHours: null
+    - "Show my social summary?" should result in: isTopTokenOwnersQuery: false, selfQuery: true, durationInHours: null
+    - "What is my social media activity?" should result in: isTopTokenOwnersQuery: false, selfQuery: true, durationInHours: null
+    - "What is @[betashop.eth|M4] doing on social media in last 2 hours?" should result in: isTopTokenOwnersQuery: false, selfQuery: false, durationInHours: 2
+    - "What is @[betashop.eth|M4] doing on social media in last 4 hours?" should result in: isTopTokenOwnersQuery: false, selfQuery: false, durationInHours: 4
 `;
 
 export const swapSummaryInputContextExtraction = `Please analyze the message below to extract essential details about the swap request: {{message}}
