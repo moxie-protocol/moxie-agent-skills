@@ -126,7 +126,7 @@ export const autonomousTradingAction: Action = {
                     conditionValue: params.conditionValue,
                     minPurchaseAmount: {
                         valueType: 'USD',
-                        amount: params.minPurchaseAmount
+                        amount: params.minPurchaseAmount || 0
                     }
                 };
             } else {
@@ -135,7 +135,7 @@ export const autonomousTradingAction: Action = {
                     moxieUsers: params.moxieIds,
                     minPurchaseAmount: {
                         valueType: 'USD',
-                        amount: params.minPurchaseAmount
+                        amount: params.minPurchaseAmount || 0
                     }
                 };
             }
