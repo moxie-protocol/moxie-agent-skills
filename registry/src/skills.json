@@ -657,5 +657,44 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": false
+    },
+    {
+        "pluginId": "5f823f62-19f7-460f-a05b-94351a07e00d",
+        "name": "@moxie-protocol/plugin-ai-duster",
+        "displayName": "AI Duster",
+        "version": "0.0.1",
+        "author": "Alex and Yoseph",
+        "description": "A Moxie AI Skill that swaps low-value ERC-20 tokens (dust) into ETH using your agent wallet.",
+        "githubUrl": "https://github.com/<your-repo-url>/tree/main/packages/plugin-ai-duster",
+        "logoUrl": "https://github.com/<your-repo-url>/tree/main/packages/plugin-ai-duster/images/logo.png",
+        "settings": {},
+        "capabilities": ["dusting", "preview", "swap"],
+        "starterQuestions": [
+            {
+                "label": "How does dusting work?",
+                "value": "How does AI Dusting work?"
+            },
+            {
+                "label": "Dust tokens under $10",
+                "value": "Can you dust my wallet under $10?"
+            },
+            {
+                "label": "Preview dust swap",
+                "value": "Show me what tokens would be dusted"
+            },
+            {
+                "label": "Convert small tokens",
+                "value": "Swap anything worth less than $2"
+            }
+        ],
+        "mediaUrls": [],
+        "actions": ["DUST_WALLET_TO_ETH", "EXPLAIN_AI_DUSTING"],
+        "isPremium": true,
+        "freeQueries": 10,
+        "skillCoinAddress": "0xff5a326b85335a8ec1f89b2f7ea0d7d00722aaf7",
+        "minimumSkillBalance": 1,
+        "status": "ACTIVE",
+        "isDefault": false,
+        "loaders": ["Dusting your wallet..."]
     }
 ]
