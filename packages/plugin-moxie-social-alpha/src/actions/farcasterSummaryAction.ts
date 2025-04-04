@@ -88,9 +88,14 @@ export async function fetchFarcasterCastsByMoxieUserIds(
 
                 elizaLogger.debug(`unfiltered casts |${casts.length}|\n: ${JSON.stringify(casts)}`);
 
-                const cutoffTimestamp = Date.now() - durationInHours * 60 * 60 * 1000;
+                const cutoffTimestamp = Math.floor(Date.now() / 1000) - durationInHours * 60 * 60;
+
                 filteredCasts = filteredCasts.filter((cast: Cast) => {
-                    return cast.timestamp >= cutoffTimestamp;
+                    const castTimestampSec = cast.timestamp > 1e12
+                        ? Math.floor(cast.timestamp / 1000)  // Convert from ms to s
+                        : cast.timestamp;                    // Already in seconds
+
+                    return castTimestampSec >= cutoffTimestamp;
                 });
 
                 // elizaLogger.debug(

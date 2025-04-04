@@ -86,9 +86,14 @@ export async function fetchTweetsByMoxieUserIds(
 
                 elizaLogger.debug(`unfiltered tweets |${tweets.length}|\n: ${JSON.stringify(tweets)}`);
 
-                const cutoffTimestamp = Date.now() - durationInHours * 60 * 60 * 1000;
+                const cutoffTimestamp = Math.floor(Date.now() / 1000) - durationInHours * 60 * 60;
+
                 const filteredTweets = tweets.filter((tweet) => {
-                    return tweet.timestamp >= cutoffTimestamp;
+                    const tweetTimestampSec = tweet.timestamp > 1e12
+                        ? Math.floor(tweet.timestamp / 1000) // Convert ms to sec
+                        : tweet.timestamp;
+
+                    return tweetTimestampSec >= cutoffTimestamp;
                 });
 
                 elizaLogger.debug(`filtered tweets ${cutoffTimestamp}| ${filteredTweets.length}|\n: ${JSON.stringify(filteredTweets)}`);
