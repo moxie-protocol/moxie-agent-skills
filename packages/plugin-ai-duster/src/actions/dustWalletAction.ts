@@ -5,8 +5,8 @@ import {
     Memory,
     State,
 } from "@moxie-protocol/core";
-import { MoxieWalletClient } from "@moxie-protocol/moxie-agent-lib";
-import { swapTokenToETH, TokenBalance } from "../utils/token";
+import { MoxieWalletClient, Portfolio } from "@moxie-protocol/moxie-agent-lib";
+import { swapTokenToETH } from "../utils/token";
 
 export const dustWalletAction: Action = {
     name: "DUST_WALLET_TO_ETH",
@@ -98,10 +98,17 @@ export const dustWalletAction: Action = {
 
             const wallet = state?.agentWallet as MoxieWalletClient;
 
-            const tokenBalances = state?.agentWalletBalance ?? [];
+            const { tokenBalances }: Portfolio =
+                (state?.agentWalletBalance as Portfolio) ?? {
+                    tokenBalances: [],
+                };
             console.log(tokenBalances);
-            const dustTokens = (tokenBalances as TokenBalance[])?.filter(
-                (t: TokenBalance) => t.usdValue < threshold
+            const dustTokens = tokenBalances.filter(
+                (t) =>
+                    t.token.balanceUSD < threshold &&
+                    t.token.balance > 0 &&
+                    // ignore ETH
+                    t.address !== "0x0000000000000000000000000000000000000000"
             );
 
             if (!dustTokens.length) {
@@ -111,14 +118,14 @@ export const dustWalletAction: Action = {
             }
 
             const totalUsdValue = dustTokens
-                .reduce((sum, token) => sum + token.usdValue, 0)
+                .reduce((sum, token) => sum + token.token.balanceUSD, 0)
                 .toFixed(2);
 
             for (const token of dustTokens) {
                 const txHash = await swapTokenToETH(
                     wallet,
                     token.address,
-                    token.amount
+                    token.token.balance.toString()
                 );
                 if (!txHash) {
                     console.warn(`Swap failed for token ${token.address}`);
