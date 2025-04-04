@@ -148,7 +148,7 @@ export const getAutonomousTradingRuleDetails = (currentUser: string) =>
 I can help you easily set up copy trade automations — so you never miss that alpha. Here are some examples of automations I can currently do:
  
 ### **1) Buy when someone else buys**
-- If **@[betashop.eth|M4]** or **@[jessepollak|M1245]** buys a token, then buy me **$100** of it.
+- If **@[betashop.eth|M4]** and **@[jessepollak|M1245]** buys a token, then buy me **$100** of it.
 - If **@[betashop.eth|M4]**, **@[jessepollak|M1245]**, and **@[maretus|M7164]** all buy the same token within an hour of each other, then buy me **$100** of it.  
 
   *(Use @name for anyone whose coins you own on Moxie.)*
