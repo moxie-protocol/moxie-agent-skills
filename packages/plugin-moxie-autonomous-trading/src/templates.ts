@@ -21,6 +21,7 @@ Please follow these steps to process the user input and generate the appropriate
    - If the input mentions a group (contains "#["), it's a GROUP rule.
    - If it mentions selling based on profit, it's a PROFIT rule.
    - Combine these factors to determine the exact rule type.
+   - Important: The presence of multiple individual users (e.g., "@[user1|id1] and @[user2|id2]") does NOT indicate a GROUP rule. Only use GROUP rules when "#[" is present.
 
 3. Extract the required parameters based on the rule type:
 
