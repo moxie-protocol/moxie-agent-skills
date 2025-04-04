@@ -456,6 +456,71 @@
         ]
     },
     {
+        "pluginId": "f65a02f3-4bf2-436d-be50-34e7d33fd293",
+        "name": "@moxie-protocol/plugin-moxie-autonomous-trading",
+        "displayName": "Autonomous Trading",
+        "version": "0.1.8+build.1",
+        "author": null,
+        "description": "Enables your agent to do autonomous trading by fetching copy trades from top traders or group of traders. You can also set limit orders on Base",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-autonomous-trading",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-autonomous-trading/images/logo.svg",
+        "settings": {},
+        "capabilities": [
+            "Copy trades",
+            "Copy group trades",
+            "Copy trades with profit",
+            "Copy group trades with profit"
+        ],
+        "starterQuestions": [
+            {
+                "label": "What automations are possible?",
+                "value": "What automations are possible?"
+            },
+            {
+                "label": "Buy 10$ worth tokens whenever @betashop and @jessepollak buy minimum of $50 of any token in 6 hours",
+                "value": "Buy 10$ worth tokens whenever @[betashop|M4] and @[jessepollak|M1245] buy minimum of $50 of any token in 6 hours"
+            },
+            {
+                "label": "buy 10$ worth tokens whenever @betashop and @jessepollak buy minimum of $50 of any token in 6 hours and sell it off when it makes a profit of 40%.",
+                "value": "buy 10$ worth tokens whenever @[betashop|M4] and @[jessepollak|M1245] buy minimum of $50 of any token in 6 hours and sell it off when it makes a profit of 40%."
+            },
+            {
+                "label": "Buy 10$ worth tokens whenever any 3 members of #copytrade buys minimum of $50 of any token in 6 hours",
+                "value": "Buy 10$ worth tokens whenever any 3 members of #copytrade buys minimum of $50 of any token in 6 hours"
+            },
+            {
+                "label": "Buy 10$ worth tokens whenever any 3 members of #copytrade buys minimum of $50 of any token in 6 hours and sell it off when it makes a profit of 40%.",
+                "value": "Buy 10$ worth tokens whenever any 3 members of #copytrade buys minimum of $50 of any token in 6 hours and sell it off when it makes a profit of 40%."
+            }
+        ],
+        "mediaUrls": [
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-autonomous-trading/images/logo.svg"
+        ],
+        "actions": [
+            "AUTONOMOUS_TRADING",
+            "COPY_TRADE_RULE_DETAILS",
+            "COPY_TRADE",
+            "COPY_TRADES",
+            "COPY_TRADE_WITH_PROFIT",
+            "GROUP_COPY_TRADE",
+            "GROUP_COPY_TRADES",
+            "GROUP_COPY_TRADE_WITH_PROFIT",
+            "AUTONOMOUS_TRADING_RULE_DETAILS"
+        ],
+        "isPremium": false,
+        "freeQueries": 0,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
+        "status": "ACTIVE",
+        "isDefault": true,
+        "loaders": [
+            "Analyzing request",
+            "Setting trade parameters",
+            "Creating trading triggers",
+            "Creating trading rules"
+        ]
+    },
+    {
         "pluginId": "79449cd9-0590-4ccc-9d9f-12f99438c17b",
         "name": "@moxie-protocol/plugin-degenfans-alfafrens",
         "displayName": "DegenFans AlfaFrens",

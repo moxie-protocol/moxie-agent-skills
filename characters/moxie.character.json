@@ -6,6 +6,7 @@
     "plugins": [
         "@moxie-protocol/plugin-degenfans-alfafrens",
         "@moxie-protocol/plugin-betswirl",
+        "@moxie-protocol/plugin-moxie-autonomous-trading",
         "@elizaos/plugin-bootstrap",
         "@moxie-protocol/plugin-moxie-balance",
         "@moxie-protocol/plugin-moxie-limit-order",
