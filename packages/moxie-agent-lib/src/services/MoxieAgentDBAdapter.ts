@@ -525,7 +525,7 @@ export async function getMoxiePortfolioInfoByCreatorTokenDetails(
         const filterConditions = [
             `moxieUserId: {_eq: "${moxieUserId}"}`,
             ...(creatorToken.address
-                ? [`fanTokenAddress: {_eq: "${creatorToken.address}"}`]
+                ? [`fanTokenAddress: {_eq: "${creatorToken.address.toLowerCase()}"}`]
                 : []),
             ...(creatorToken.name
                 ? [`fanTokenName: {_eq: "${creatorToken.name}"}`]
