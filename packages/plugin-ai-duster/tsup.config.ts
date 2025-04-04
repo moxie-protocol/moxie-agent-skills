@@ -16,6 +16,9 @@ export default defineConfig({
         "http",
         "agentkeepalive",
         "safe-buffer",
+        "object-inspect",
+        "side-channel",
+        "qs",
         // Add other modules you want to externalize
     ],
 });

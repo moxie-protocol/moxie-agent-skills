@@ -1,15 +1,16 @@
 import type { Plugin } from "@moxie-protocol/core";
-import { transferAction } from "./actions/transferAction";
-import { balanceAction } from "./actions/balanceAction";
+import { dustWalletAction } from "./actions/dustWalletAction";
+import { explainAiDustingAction } from "./actions/explainAiDustingAction";
 
-const samplePlugin: Plugin = {
-    name: "sample",
-    description: "Execute sample onchain actions",
-    actions: [balanceAction, transferAction],
+const aiDusterPlugin: Plugin = {
+    name: "AI Duster",
+    description:
+        "Dust low-value tokens into ETH using your Moxie agent wallet.",
+    actions: [dustWalletAction, explainAiDustingAction],
     providers: [],
     evaluators: [],
     services: [],
     clients: [],
 };
 
-export default samplePlugin;
+export default aiDusterPlugin;

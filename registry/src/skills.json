@@ -105,10 +105,7 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": true,
-        "loaders": [
-            "Initiating transaction",
-            "Writing to the Base blockchain"
-        ]
+        "loaders": ["Initiating transaction", "Writing to the Base blockchain"]
     },
     {
         "pluginId": "5d3b79e2-ac61-0bb6-a3ba-b0e00b943614",
@@ -240,10 +237,7 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": true,
-        "loaders": [
-            "Initiating transaction",
-            "Writing to the Base blockchain"
-        ]
+        "loaders": ["Initiating transaction", "Writing to the Base blockchain"]
     },
     {
         "pluginId": "0ad0731e-698b-04bf-abeb-5d29cc36759f",
@@ -460,60 +454,99 @@
             "Synthesizing results",
             "Preparing insights"
         ]
-    }, 
+    },
     {
-      "pluginId": "79449cd9-0590-4ccc-9d9f-12f99438c17b",
-      "name": "@moxie-protocol/plugin-degenfans-alfafrens",
-      "displayName": "DegenFans AlfaFrens",
-      "version": "0.0.2",
-      "author": "DegenFans",
-      "description": "Enables your agent to recommend staking options for AlfaFrens channels",
-      "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-degenfans-alfafrens",
-      "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-degenfans-alfafrens/images/logo.png",
-      "settings": {},
-      "capabilities": ["show the best staking options for a given staking amount"],
-      "starterQuestions": [
-        {
-          "label": "What is the Degenfans Alfafrens Skills?",
-          "value": "What is the Degenfans Alfafrens Skills?"
-        },
-        {
-          "label": "What are some staking recommendations you have for Alfafrens?",
-          "value": "What are some staking recommendations you have for Alfafrens?"
-        },
-        {
-          "label": "I have 9000 AF — how should I stake it?",
-          "value": "I have 9000 AF — how should I stake it?"
-        },
-        {
-          "label": "What are your top picks for staking on Alfafrens?",
-          "value": "What are your top picks for staking on Alfafrens?"
-        }
-      ],
-      "mediaUrls": [
-        ""
-      ],
-      "actions":  [
-          "GET_ALFAFRENS_STAKING_RECOMMENDATION",
-          "VIEW_ALFAFRENS_STAKING_RECOMMENDATION",
-          "GIVE_ALFAFRENS_STAKING_RECOMMENDATION",
-          "GET_ALFAFRENS_STAKING_CONSULTANT",
-          "STAKING_RECOMMENDATION_ON_ALFAFRENS",
-          "DEGENFANS_ALFAFRENS_INFO",
-          "WHAT_IS_DEGENFANS_ALFAFRENS",
-          "HOW_DOES_DEGENFANS_ALFAFRENS_WORK",
-          "HOW_TO_USE_DEGENFANS_ALFAFRENS"
-      ],
-      "isPremium": true,
-      "freeQueries": 3,
-      "skillCoinAddress": "0x112cf1cc540eadf234158c0e4044c3b5f2a33e5e",
-      "minimumSkillBalance": 5,
-      "status": "ACTIVE",
-      "isDefault": false,
-      "loaders": [
+        "pluginId": "79449cd9-0590-4ccc-9d9f-12f99438c17b",
+        "name": "@moxie-protocol/plugin-degenfans-alfafrens",
+        "displayName": "DegenFans AlfaFrens",
+        "version": "0.0.2",
+        "author": "DegenFans",
+        "description": "Enables your agent to recommend staking options for AlfaFrens channels",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-degenfans-alfafrens",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-degenfans-alfafrens/images/logo.png",
+        "settings": {},
+        "capabilities": [
+            "show the best staking options for a given staking amount"
+        ],
+        "starterQuestions": [
+            {
+                "label": "What is the Degenfans Alfafrens Skills?",
+                "value": "What is the Degenfans Alfafrens Skills?"
+            },
+            {
+                "label": "What are some staking recommendations you have for Alfafrens?",
+                "value": "What are some staking recommendations you have for Alfafrens?"
+            },
+            {
+                "label": "I have 9000 AF — how should I stake it?",
+                "value": "I have 9000 AF — how should I stake it?"
+            },
+            {
+                "label": "What are your top picks for staking on Alfafrens?",
+                "value": "What are your top picks for staking on Alfafrens?"
+            }
+        ],
+        "mediaUrls": [""],
+        "actions": [
+            "GET_ALFAFRENS_STAKING_RECOMMENDATION",
+            "VIEW_ALFAFRENS_STAKING_RECOMMENDATION",
+            "GIVE_ALFAFRENS_STAKING_RECOMMENDATION",
+            "GET_ALFAFRENS_STAKING_CONSULTANT",
+            "STAKING_RECOMMENDATION_ON_ALFAFRENS",
+            "DEGENFANS_ALFAFRENS_INFO",
+            "WHAT_IS_DEGENFANS_ALFAFRENS",
+            "HOW_DOES_DEGENFANS_ALFAFRENS_WORK",
+            "HOW_TO_USE_DEGENFANS_ALFAFRENS"
+        ],
+        "isPremium": true,
+        "freeQueries": 3,
+        "skillCoinAddress": "0x112cf1cc540eadf234158c0e4044c3b5f2a33e5e",
+        "minimumSkillBalance": 5,
+        "status": "ACTIVE",
+        "isDefault": false,
+        "loaders": [
             "Querying AlfaFrens",
             "Waiting for response",
             "Doing some DegenFans magic"
         ]
+    },
+    {
+        "pluginId": "5f823f62-19f7-460f-a05b-94351a07e00d",
+        "name": "@moxie-protocol/plugin-ai-duster",
+        "displayName": "AI Duster",
+        "version": "0.0.1",
+        "author": "Alex and Yoseph",
+        "description": "A Moxie AI Skill that swaps low-value ERC-20 tokens (dust) into ETH using your agent wallet.",
+        "githubUrl": "https://github.com/<your-repo-url>/tree/main/packages/plugin-ai-duster",
+        "logoUrl": "https://github.com/<your-repo-url>/tree/main/packages/plugin-ai-duster/images/logo.png",
+        "settings": {},
+        "capabilities": ["dusting", "preview", "swap"],
+        "starterQuestions": [
+            {
+                "label": "How does dusting work?",
+                "value": "How does AI Dusting work?"
+            },
+            {
+                "label": "Dust tokens under $10",
+                "value": "Can you dust my wallet under $10?"
+            },
+            {
+                "label": "Preview dust swap",
+                "value": "Show me what tokens would be dusted"
+            },
+            {
+                "label": "Convert small tokens",
+                "value": "Swap anything worth less than $2"
+            }
+        ],
+        "mediaUrls": [],
+        "actions": ["DUST_WALLET_TO_ETH", "EXPLAIN_AI_DUSTING"],
+        "isPremium": true,
+        "freeQueries": 10,
+        "skillCoinAddress": "0xff5a326b85335a8ec1f89b2f7ea0d7d00722aaf7",
+        "minimumSkillBalance": 1,
+        "status": "ACTIVE",
+        "isDefault": false,
+        "loaders": ["Dusting your wallet..."]
     }
 ]
