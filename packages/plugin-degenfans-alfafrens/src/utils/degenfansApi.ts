@@ -147,11 +147,11 @@ export function getUserData(moxieUserInfo: MoxieUser): UserData {
 }
 
 export async function getStakingOptions(user: UserData,userAddress:string, data: StakingRequest): Promise<DegenFansResponse<AlfaFrensResult<StakingResult> | null>> {
-  return callPostDfApi<AlfaFrensResult<StakingResult>>('/alfafrens-staking-consultant/?token=' + process.env.DEGENFANS_API, JSON.stringify({ user,userAddress, staking: data }));
+  return callPostDfApi<AlfaFrensResult<StakingResult>>('/alfafrens-staking-consultant/?token=' + process.env.DEGENFANS_API_KEY, JSON.stringify({ user,userAddress, staking: data }));
 }
 
 export async function getGasUsgae(user: UserData,userAddress:string): Promise<DegenFansResponse<AlfaFrensResult<GasUsageResult> | null>> {
-  return callPostDfApi<AlfaFrensResult<GasUsageResult>>('/alfafrens-gas-usage/?token=' + process.env.DEGENFANS_API, JSON.stringify({ user,userAddress }));
+  return callPostDfApi<AlfaFrensResult<GasUsageResult>>('/alfafrens-gas-usage/?token=' + process.env.DEGENFANS_API_KEY, JSON.stringify({ user,userAddress }));
 }
 
 
