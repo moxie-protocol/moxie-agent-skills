@@ -169,7 +169,7 @@ export async function getStakingOptions(
     data: StakingRequest
 ): Promise<DegenFansResponse<AlfaFrensResult<StakingResult> | null>> {
     return callPostDfApi<AlfaFrensResult<StakingResult>>(
-        "/alfafrens-staking-consultant/?token=" + process.env.DEGENFANS_API,
+        "/alfafrens-staking-consultant/?token=" + process.env.DEGENFANS_API_KEY,
         JSON.stringify({ user, userAddress, staking: data })
     );
 }
@@ -179,7 +179,7 @@ export async function getGasUsgae(
     userAddress: string
 ): Promise<DegenFansResponse<AlfaFrensResult<GasUsageResult> | null>> {
     return callPostDfApi<AlfaFrensResult<GasUsageResult>>(
-        "/alfafrens-gas-usage/?token=" + process.env.DEGENFANS_API,
+        "/alfafrens-gas-usage/?token=" + process.env.DEGENFANS_API_KEY,
         JSON.stringify({ user, userAddress })
     );
 }
