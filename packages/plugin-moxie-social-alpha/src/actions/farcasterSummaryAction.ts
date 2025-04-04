@@ -177,6 +177,8 @@ export const creatorFarcasterSummary: Action = {
             durationInHours,
         } = responseJson;
 
+        elizaLogger.success(`parseJSONObjectFromText: ${JSON.stringify(responseJson)}`);
+
         let durationInHoursToUse = durationInHours;
         if (durationInHours === null) {
             durationInHoursToUse = DATA_FILTER_DURATION_IN_HOURS;
@@ -254,7 +256,9 @@ export const creatorFarcasterSummary: Action = {
 
         const allCasts = await fetchFarcasterCastsByMoxieUserIds(
             userIdToFarcasterUser,
-            runtime
+            runtime,
+            20,
+            durationInHoursToUse
         );
 
         if (allCasts.length === 0) {

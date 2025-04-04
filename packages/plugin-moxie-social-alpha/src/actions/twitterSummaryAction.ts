@@ -148,6 +148,8 @@ async function fetchAndValidateTweets(
         durationInHours,
     } = responseJson;
 
+    elizaLogger.success(`parseJSONObjectFromText: ${JSON.stringify(responseJson)}`);
+
     let durationInHoursToUse = durationInHours;
     if (durationInHours === null) {
         durationInHoursToUse = DATA_FILTER_DURATION_IN_HOURS;
@@ -217,7 +219,9 @@ async function fetchAndValidateTweets(
 
     const allTweets = await fetchTweetsByMoxieUserIds(
         userIdToTwitterUsernames,
-        runtime
+        runtime,
+        20,
+        durationInHoursToUse
     );
 
     if (allTweets.length === 0) {

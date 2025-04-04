@@ -76,6 +76,8 @@ export const creatorSocialSummary: Action = {
             durationInHours,
         } = responseJson;
 
+        elizaLogger.success(`parseJSONObjectFromText: ${JSON.stringify(responseJson)}`);
+
         let durationInHoursToUse = durationInHours;
         if (durationInHours === null) {
             durationInHoursToUse = DATA_FILTER_DURATION_IN_HOURS;
@@ -150,13 +152,13 @@ export const creatorSocialSummary: Action = {
         const promises = [];
         if (userIdToFarcasterUser.size > 0) {
             promises.push(
-                fetchFarcasterCastsByMoxieUserIds(userIdToFarcasterUser, runtime, 10)
+                fetchFarcasterCastsByMoxieUserIds(userIdToFarcasterUser, runtime, 10, durationInHoursToUse)
             );
         }
 
         if (userIdToTwitterUsernames.size > 0) {
             promises.push(
-                fetchTweetsByMoxieUserIds(userIdToTwitterUsernames, runtime, 10)
+                fetchTweetsByMoxieUserIds(userIdToTwitterUsernames, runtime, 10, durationInHoursToUse)
             );
         }
 
