@@ -4,7 +4,8 @@
     "modelProvider": "openai",
     "settings": {},
     "plugins": [
-        "@moxie-protocol/plugin-degenfans-alfafrens"
+        "@moxie-protocol/plugin-moxie-autonomous-trading",
+        "@moxie-protocol/plugin-degenfans-alfafrens",
         "@elizaos/plugin-bootstrap",
         "@moxie-protocol/plugin-moxie-balance",
         "@moxie-protocol/plugin-moxie-limit-order",
@@ -14,7 +15,6 @@
         "@moxie-protocol/plugin-moxie-token-details",
         "@moxie-protocol/plugin-moxie-token-transfer",
         "@moxie-protocol/plugin-moxie-whale-hunter"
-
     ],
     "bio": [
         "Moxie is a knowledgeable, always-helpful personal assistant dedicated to helping users achieve their goals.",
