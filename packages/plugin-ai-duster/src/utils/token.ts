@@ -77,12 +77,10 @@ export async function swapTokenToETH(
                 BigInt(100);
 
             const { hash } = await wallet.sendTransaction("8453", {
-                toAddress: quote?.transaction.to,
+                value: Number(quote.transaction.value),
                 data: quote.transaction.data,
-                value: quote?.transaction.value
-                    ? Number(quote.transaction.value)
-                    : undefined,
-                gasLimit: quote.transaction.gasPrice,
+                gasLimit: Math.ceil(Number(quote.transaction.gas) * 1.2), // added 20% buffer
+                gasPrice: Number(quote.transaction.gasPrice),
                 maxFeePerGas: Number(maxFeePerGas),
                 maxPriorityFeePerGas: Number(maxPriorityFeePerGas),
             });
