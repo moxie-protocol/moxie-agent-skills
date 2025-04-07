@@ -9,7 +9,7 @@ Here is the conversation history you need to analyze:
 
 Please follow these steps to process the user input and generate the appropriate output:
 
-1. Analyze the conversation history to identify the most recent user input related to a copy trading rule.
+1. Analyze the conversation history to identify the most recent user input related to a copy trading rule. Focus only on the latest message from the user.
 
 2. Determine the rule type based on the input. There are four possible rule types:
    a. COPY_TRADE
@@ -42,6 +42,8 @@ Please follow these steps to process the user input and generate the appropriate
    - minPurchaseAmount: Look for any mention of a minimum purchase amount in USD.
 
 4. Validate that all required parameters for the determined rule type are present.
+
+5. If the current input appears to be a follow-up to a previous question, only then extract any missing information from the earlier conversation. Otherwise, ignore the previous conversation and focus only on the current input.
 
 Before providing the final JSON output, wrap your analysis in <rule_analysis> tags. In your analysis:
 
