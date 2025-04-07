@@ -65,28 +65,45 @@ export async function swapTokenToETH(
 
         if (quote.transaction.data) {
             const provider = new ethers.JsonRpcProvider(
-                "https://mainnet.base.org"
+                process.env.BASE_RPC_URL
             );
             const feeData = await provider.getFeeData();
             const maxPriorityFeePerGas =
-                (BigInt(feeData.maxPriorityFeePerGas!.toString()) *
-                    BigInt(120)) /
-                BigInt(100);
+                (feeData.maxPriorityFeePerGas! * BigInt(120)) / BigInt(100);
             const maxFeePerGas =
-                (BigInt(feeData.maxFeePerGas!.toString()) * BigInt(120)) /
-                BigInt(100);
+                (feeData.maxFeePerGas! * BigInt(120)) / BigInt(100);
+            const transactionInput = {
+                address: wallet.address,
+                chainType: "ethereum",
+                caip2: `eip155:${process.env.CHAIN_ID || "8453"}`,
+                transaction: {
+                    to: quote.transaction.to,
+                    value: Number(quote.transaction.value),
+                    data: quote.transaction.data,
+                    gasLimit: Math.ceil(Number(quote.transaction.gas) * 1.2), // added 20% buffer
+                    gasPrice: Number(quote.transaction.gasPrice),
+                    chainId: Number(process.env.CHAIN_ID || "8453"),
+                },
+            };
+            elizaLogger.debug(
+                `[swapTokenToETH] transactionInput: ${JSON.stringify(transactionInput)}`
+            );
+            const tx = await wallet.sendTransaction(
+                process.env.CHAIN_ID || "8453",
+                {
+                    fromAddress: wallet.address,
+                    toAddress: quote.transaction.to,
+                    value: Number(quote.transaction.value),
+                    data: quote.transaction.data,
+                    gasLimit: Math.ceil(Number(quote.transaction.gas) * 1.2), // added 20% buffer
+                    gasPrice: Number(quote.transaction.gasPrice),
+                    maxFeePerGas: Number(maxFeePerGas),
+                    maxPriorityFeePerGas: Number(maxPriorityFeePerGas),
+                }
+            );
+            elizaLogger.debug(`[swapTokenToETH] tx hash: ${tx.hash}`);
 
-            const { hash } = await wallet.sendTransaction("8453", {
-                value: Number(quote.transaction.value),
-                data: quote.transaction.data,
-                gasLimit: Math.ceil(Number(quote.transaction.gas) * 1.2), // added 20% buffer
-                gasPrice: Number(quote.transaction.gasPrice),
-                maxFeePerGas: Number(maxFeePerGas),
-                maxPriorityFeePerGas: Number(maxPriorityFeePerGas),
-            });
-
-            elizaLogger.log(`Swap tx sent: ${hash}`);
-            return hash;
+            return tx.hash;
         } else {
             throw new Error(
                 "Failed to obtain a signature, transaction not sent."
