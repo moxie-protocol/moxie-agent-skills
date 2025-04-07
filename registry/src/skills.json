@@ -561,7 +561,9 @@
             "DEGENFANS_ALFAFRENS_INFO",
             "WHAT_IS_DEGENFANS_ALFAFRENS",
             "HOW_DOES_DEGENFANS_ALFAFRENS_WORK",
-            "HOW_TO_USE_DEGENFANS_ALFAFRENS"
+            "HOW_TO_USE_DEGENFANS_ALFAFRENS",
+            "GET_ALFAFRENS_GAS_USAGE",
+            "VIEW_ALFAFRENS_GAS_USAGE"
         ],
         "isPremium": true,
         "freeQueries": 3,
