@@ -38,7 +38,7 @@ Please follow these steps to process the user input and generate the appropriate
    - amountInUSD: Find the dollar amount mentioned.
    - profitPercentage (for PROFIT rules only): Find the profit percentage mentioned.
    - condition: Determine if it's "ANY" or "ALL" based on the input.
-   - conditionValue: For "ANY" condition, extract the number of people mentioned. For "ALL" condition, set it to null.
+   - conditionValue: - For "ANY" condition, extract the number of people mentioned. If not specified, prepare an error message asking the user to provide this information.
    - minPurchaseAmount: Look for any mention of a minimum purchase amount in USD.
 
 4. Validate that all required parameters for the determined rule type are present.
@@ -59,7 +59,9 @@ Before providing the final JSON output, wrap your analysis in <rule_analysis> ta
    c. Validate if the extracted parameter makes sense in the context of the rule
 8. Consider any edge cases or ambiguities in the input that might affect the rule type or parameter extraction.
 9. Validate the presence of all required parameters for the chosen rule type.
-10. Important: Check if the profitPercentage (if applicable) is negative. If it is, prepare an error message stating that negative profit percentages are not supported.
+10. For GROUP rules, explicitly check if the number of users from the group is specified.
+11. Important: Check if the profitPercentage (if applicable) is negative. If it is, prepare an error message stating that negative profit percentages are not supported.
+12. If 'timeDurationInSec' is not provided, throw an error "Please specify the duration between which copied traders make trades to be counted for the rule".
 
 After completing the rule analysis, provide the JSON output based on your analysis.
 
