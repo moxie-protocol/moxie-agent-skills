@@ -52,3 +52,83 @@ Send 0.5 ETH to tokenstaker.eth
 Here are the recent user messages for context:
 {{recentMessages}}
 `;
+
+export const dustRequestTemplate = `
+Provide the following details to dust tokens in your wallet:
+- **threshold** (Number): The USD threshold for a token to be considered dust tokens.
+
+Provide the values in the following JSON format:
+
+\`\`\`json
+{
+    "threshold": number
+}
+\`\`\`
+
+# Example 1
+
+**Message 1**
+
+\`\`\`
+Dust tokens under $5
+\`\`\`
+
+**Response 1**
+
+\`\`\`json
+{
+    "threshold": 5
+}
+\`\`\`
+
+# Example 2
+
+**Message 2**
+
+\`\`\`
+Dust tokens under $10
+\`\`\`
+
+**Response 2**
+
+\`\`\`json
+{
+    "threshold": 10
+}
+\`\`\`
+
+# Example 3
+
+**Message 3**
+
+\`\`\`
+Dust tokens under $1
+\`\`\`
+
+**Response 3**
+
+\`\`\`json
+{
+    "threshold": 1
+}
+\`\`\`
+
+# Example 4
+
+**Message 4**
+
+\`\`\`
+Dust my tokens
+\`\`\`
+
+**Response 4**
+
+\`\`\`json
+{
+    "threshold": null
+}
+\`\`\`
+
+Here are the recent user messages for context:
+{{recentMessages}}
+`;

@@ -106,7 +106,7 @@ export const mockMoxieUser: MoxieUser = {
 
 // Mock Moxie Wallet Data
 export const mockWallet: MoxieClientWallet = {
-    address: "0xa5cc845ef113c4c0908d4c1f4616a000b9a67b80",
+    address: "0xc6582cd12debdc9cbe4d972615589aba586550e7",
     chainType: "ethereum",
     chainId: "8453",
     walletType: "embedded",
@@ -119,15 +119,15 @@ export const mockWallet: MoxieClientWallet = {
 export const mockPortfolio: Portfolio = {
     tokenBalances: [
         {
-            address: "0x0000000000000000000000000000000000000000",
+            address: "0x4200000000000000000000000000000000000006",
             network: "BASE_MAINNET",
             token: {
-                balance: 1000000000000000000,
-                balanceUSD: 1000000000000000000,
+                balance: 96000000000000,
+                balanceUSD: 0.15,
                 baseToken: {
-                    name: "ETH",
-                    address: "0x0000000000000000000000000000000000000000",
-                    symbol: "ETH",
+                    name: "Wrapped Ether",
+                    address: "0x4200000000000000000000000000000000000006",
+                    symbol: "WETH",
                 },
             },
         },

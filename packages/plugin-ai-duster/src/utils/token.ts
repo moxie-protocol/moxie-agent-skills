@@ -1,5 +1,15 @@
 import qs from "qs";
 import { MoxieWalletClient } from "@moxie-protocol/moxie-agent-lib";
+import {
+    concat,
+    encodeFunctionData,
+    erc20Abi,
+    Hex,
+    numberToHex,
+    size,
+} from "viem";
+import { elizaLogger } from "@moxie-protocol/core";
+import { ethers } from "ethers";
 
 export type TokenBalance = {
     address: string;
@@ -22,11 +32,22 @@ export async function swapTokenToETH(
     sellAmount: string
 ): Promise<string | null> {
     try {
+        const approveTx = await wallet.sendTransaction("8453", {
+            toAddress: sellToken,
+            data: encodeFunctionData({
+                abi: erc20Abi,
+                functionName: "approve",
+                args: [wallet.address as `0x${string}`, BigInt(sellAmount)],
+            }),
+        });
+
+        elizaLogger.log("Approve tx sent:", approveTx);
+
         const params = qs.stringify({
             chainId: 8453,
             taker: wallet.address,
             sellToken,
-            buyToken: "ETH",
+            buyToken: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
             sellAmount,
         });
 
@@ -36,22 +57,44 @@ export async function swapTokenToETH(
 
         if (!response.ok) {
             const errorBody = await response.text();
-            console.error(`0x API error: ${response.status} ${errorBody}`);
+            elizaLogger.error(`0x API error: ${response.status} ${errorBody}`);
             throw new Error(`Failed to fetch 0x quote: ${response.statusText}`);
         }
 
         const quote = await response.json();
 
-        const { hash } = await wallet.sendTransaction("8453", {
-            toAddress: quote.to,
-            data: quote.data,
-            value: quote.value || "0",
-        });
+        if (quote.transaction.data) {
+            const provider = new ethers.JsonRpcProvider(
+                "https://mainnet.base.org"
+            );
+            const feeData = await provider.getFeeData();
+            const maxPriorityFeePerGas =
+                (BigInt(feeData.maxPriorityFeePerGas!.toString()) *
+                    BigInt(120)) /
+                BigInt(100);
+            const maxFeePerGas =
+                (BigInt(feeData.maxFeePerGas!.toString()) * BigInt(120)) /
+                BigInt(100);
 
-        console.log(`Swap tx sent: ${hash}`);
-        return hash;
+            const { hash } = await wallet.sendTransaction("8453", {
+                toAddress: quote?.transaction.to,
+                data: quote.transaction.data,
+                value: quote?.transaction.value
+                    ? Number(quote.transaction.value)
+                    : undefined,
+                gasLimit: quote.transaction.gasPrice,
+                maxFeePerGas: Number(maxFeePerGas),
+                maxPriorityFeePerGas: Number(maxPriorityFeePerGas),
+            });
+
+            elizaLogger.log(`Swap tx sent: ${hash}`);
+            return hash;
+        } else {
+            throw new Error(
+                "Failed to obtain a signature, transaction not sent."
+            );
+        }
     } catch (err) {
-        console.error("Swap failed:", err);
-        return null;
+        throw new Error(`Failed to swap token to ETH: ${err}`);
     }
 }

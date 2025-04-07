@@ -1,12 +1,18 @@
 import {
     Action,
+    composeContext,
+    elizaLogger,
+    generateObject,
     HandlerCallback,
     IAgentRuntime,
     Memory,
+    ModelClass,
     State,
 } from "@moxie-protocol/core";
 import { MoxieWalletClient, Portfolio } from "@moxie-protocol/moxie-agent-lib";
 import { swapTokenToETH } from "../utils/token";
+import { DustRequestSchema } from "../types";
+import { dustRequestTemplate } from "../templates";
 
 export const dustWalletAction: Action = {
     name: "DUST_WALLET_TO_ETH",
@@ -91,18 +97,35 @@ export const dustWalletAction: Action = {
         callback?: HandlerCallback
     ) => {
         try {
-            const threshold =
-                typeof options?.dustThreshold === "number"
-                    ? options.dustThreshold
-                    : 5;
+            // Initialize or update state
+            if (!state) {
+                state = (await runtime.composeState(message)) as State;
+            } else {
+                state = await runtime.updateRecentMessageState(state);
+            }
 
-            const wallet = state?.agentWallet as MoxieWalletClient;
+            const context = composeContext({
+                state,
+                template: dustRequestTemplate,
+            });
+
+            const details = await generateObject({
+                runtime,
+                context,
+                modelClass: ModelClass.SMALL,
+                schema: DustRequestSchema,
+            });
+            const extractedValue = details.object as {
+                threshold: number;
+            };
+            const threshold = extractedValue?.threshold ?? 5;
+
+            const wallet = state?.moxieWalletClient as MoxieWalletClient;
 
             const { tokenBalances }: Portfolio =
                 (state?.agentWalletBalance as Portfolio) ?? {
                     tokenBalances: [],
                 };
-            console.log(tokenBalances);
             const dustTokens = tokenBalances.filter(
                 (t) =>
                     t.token.balanceUSD < threshold &&
@@ -112,9 +135,11 @@ export const dustWalletAction: Action = {
             );
 
             if (!dustTokens.length) {
-                return callback?.({
+                await callback?.({
                     text: `No tokens under $${threshold} found in your wallet.`,
                 });
+
+                return true;
             }
 
             const totalUsdValue = dustTokens
@@ -132,11 +157,11 @@ export const dustWalletAction: Action = {
                 }
             }
 
-            callback?.({
+            await callback?.({
                 text: `Swapped ${dustTokens.length} dust token(s) into ETH (~$${totalUsdValue}).`,
             });
         } catch (error) {
-            console.error("Error dusting wallet:", error);
+            elizaLogger.error("Error dusting wallet:", error);
             callback?.({
                 text: "An error occurred while dusting your wallet. Please try again later.",
             });

@@ -6,6 +6,10 @@ export const TransferEthSchema = z.object({
     isENS: z.boolean(),
 });
 
+export const DustRequestSchema = z.object({
+    threshold: z.number().min(0).nullable(),
+});
+
 export interface GetQuoteResponse {
     blockNumber: string;
     buyAmount: string;
