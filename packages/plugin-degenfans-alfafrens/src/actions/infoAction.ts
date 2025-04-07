@@ -18,8 +18,7 @@ export const infoAction: Action = {
         "HOW_DOES_DEGENFANS_ALFAFRENS_WORK",
         "HOW_TO_USE_DEGENFANS_ALFAFRENS",
     ],
-    description:
-        "Answer questions on what is the Degenfans Alfafrens skills.",
+    description: "Answer questions on what is the Degenfans Alfafrens skills.",
     suppressInitialMessage: true,
     validate: async (
         _runtime: IAgentRuntime,
@@ -36,11 +35,11 @@ export const infoAction: Action = {
         const pluginHelp = {
             title: "DegenFans AlfaFrens Plugin",
             description: `
-              This plugin helps you discover the best staking options on **AlfaFrens**.  
-              AlfaFrens is a **SocialFi** platform where you can subscribe to channels, 
-              get access to token-gated chats, and earn **AF Tokens**. 
-          
-              Once you have **AF Tokens**, you can stake them on various channels and receive a portion of the channel's subscription income as a reward. 
+              This plugin helps you discover the best staking options on **AlfaFrens**.
+              AlfaFrens is a **SocialFi** platform where you can subscribe to channels,
+              get access to token-gated chats, and earn **AF Tokens**.
+
+              Once you have **AF Tokens**, you can stake them on various channels and receive a portion of the channel's subscription income as a reward.
               This plugin helps you find the optimal staking options for a given amount of **AF Tokens**.
             `,
             usage: `
@@ -71,20 +70,26 @@ export const infoAction: Action = {
               - I want to stake 9000 AF at my active subscriptions
               - I want to stake 9000 AF at my existing stakes and subscriptions
               - I want to stake 4600 AF on channels with minimum 10 subscriptions
-            `
+            `,
         };
 
-        const mdResponse = pluginHelp.title + "\n"
-            + pluginHelp.description + "\n"
-            + pluginHelp.usage + "\n"
-            + pluginHelp.features + "\n"
-            + pluginHelp.tips + "\n"
-            + pluginHelp.exampleUsage;
+        const mdResponse =
+            pluginHelp.title +
+            "\n" +
+            pluginHelp.description +
+            "\n" +
+            pluginHelp.usage +
+            "\n" +
+            pluginHelp.features +
+            "\n" +
+            pluginHelp.tips +
+            "\n" +
+            pluginHelp.exampleUsage;
 
         const context = composeContext({
             state: {
                 ...state,
-                infoText: mdResponse
+                infoText: mdResponse,
             },
             template: infoTextTemplate,
         });
@@ -96,7 +101,7 @@ export const infoAction: Action = {
         });
         await callback({
             text: response,
-            action: "DEGENFANS_ALFAFRENS_INFO"
+            action: "DEGENFANS_ALFAFRENS_INFO",
         });
         return true;
     },
@@ -111,7 +116,15 @@ export const infoAction: Action = {
             {
                 user: "{{user2}}",
                 content: {
-                    text: "Degenfans Alfafrens is ...",
+                    text: `
+              This plugin helps you discover the best staking options on **AlfaFrens**.
+              AlfaFrens is a **SocialFi** platform where you can subscribe to channels,
+              get access to token-gated chats, and earn **AF Tokens**.
+
+              Once you have **AF Tokens**, you can stake them on various channels and receive a portion of the channel's subscription income as a reward.
+              This plugin helps you find the optimal staking options for a given amount of **AF Tokens**.
+            `,
+                    action: "DEGENFANS_ALFAFRENS_INFO",
                 },
             },
         ],
