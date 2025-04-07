@@ -199,7 +199,7 @@ export async function createTradingRule(
 
 export const getAutonomousTradingRuleDetails = (currentUser: string) => 
 
-    `Hi ${currentUser}!  
+    `Hi There!  
 I can help you easily set up copy trade automations — so you never miss that alpha. Here are some examples of automations I can currently do:
  
 ### **1) Buy when someone else buys**
