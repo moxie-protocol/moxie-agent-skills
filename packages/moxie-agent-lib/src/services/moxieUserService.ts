@@ -251,7 +251,7 @@ export async function getUserByMoxieIdMultipleTokenGate(
 
                 let res = await response.json();
                 const { data } = res as GetUserInfoBatchResponse;
-                
+
                 if (!data?.GetUserInfoBatch?.users || data.GetUserInfoBatch.users.length === 0) {
                     retryCount++;
                     elizaLogger.warn(`Retry ${retryCount}: Empty users array received`);
@@ -307,38 +307,6 @@ export async function getUserByWalletAddressMultiple(
     }
 }
 
-export async function getTwitteruserNameByMoxieIdMultiple(
-    userIds: string[]
-): Promise<Map<string, string>> {
-    const userIdToTwitterUsername = new Map<string, string>();
-
-    try {
-        const results = await getUserByMoxieIdMultiple(userIds);
-
-        userIds.forEach((userId, index) => {
-            const user = results.get(userId);
-
-            const twitterIdentity = user?.identities?.find(
-                (identity: MoxieIdentity) => identity.type === "TWITTER"
-            );
-
-            const userName = twitterIdentity?.metadata?.username;
-
-            if (userName) {
-                userIdToTwitterUsername.set(userId, userName);
-            }
-        });
-
-        return userIdToTwitterUsername;
-    } catch (error) {
-        elizaLogger.error(
-            "Error in getTwitteruserNameByMoxieIdMultiple:",
-            error
-        );
-    }
-
-    return userIdToTwitterUsername;
-}
 
 export interface SocialProfile {
     twitterUsername?: string;
@@ -427,8 +395,6 @@ export async function getSocialProfilesByMoxieIdMultiple(
         );
     }
 }
-
-// getTwitteruserNameByMoxieIdMultiple(["M4"]).then(console.log)
 
 // getSocialProfilesByMoxieIdMultiple(["M4"]).then(console.log)
 
