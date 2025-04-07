@@ -46,12 +46,18 @@ Please follow these steps to process the user input and generate the appropriate
 Before providing the final JSON output, wrap your analysis in <rule_analysis> tags. In your analysis:
 
 1. Quote the most recent user input related to a copy trading rule.
-2. List all four potential rule types and provide arguments for and against each one. Clearly state which rule type you've identified and explain your final reasoning.
-3. For each required parameter:
+2. Break down the user input step-by-step, identifying key phrases and their relevance to rule type and parameters.
+3. List and analyze key phrases from the user input that are relevant to determining the rule type and parameters.
+4. List all four potential rule types and provide arguments for and against each one. Clearly state which rule type you've identified and explain your final reasoning.
+5. Check if the user is trying to set both copy and group copy trades together. If so, prepare an error message stating that only one type can be set at a time.
+6. List out all potential parameters found in the input, regardless of the rule type.
+7. For each required parameter:
    a. List all potential values from the input
    b. Justify your final choice for the parameter value
    c. Validate if the extracted parameter makes sense in the context of the rule
-4. Validate the presence of all required parameters for the chosen rule type.
+8. Consider any edge cases or ambiguities in the input that might affect the rule type or parameter extraction.
+9. Validate the presence of all required parameters for the chosen rule type.
+10. Important: Check if the profitPercentage (if applicable) is negative. If it is, prepare an error message stating that negative profit percentages are not supported.
 
 After completing the rule analysis, provide the JSON output based on your analysis.
 
