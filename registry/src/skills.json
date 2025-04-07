@@ -667,8 +667,8 @@
         "version": "0.0.1",
         "author": "Alex and Yoseph",
         "description": "A Moxie AI Skill that swaps low-value ERC-20 tokens (dust) into ETH using your agent wallet.",
-        "githubUrl": "https://github.com/<your-repo-url>/tree/main/packages/plugin-ai-duster",
-        "logoUrl": "https://github.com/<your-repo-url>/tree/main/packages/plugin-ai-duster/images/logo.png",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/feat/merge-branch-degenfans-test/packages/plugin-ai-duster",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/feat/merge-branch-degenfans-test/packages/plugin-ai-duster/images/logo.png",
         "settings": {},
         "capabilities": ["dusting", "preview", "swap"],
         "starterQuestions": [
