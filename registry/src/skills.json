@@ -704,7 +704,17 @@
             "HOW_DOES_AI_DUSTING_WORK",
             "WHAT_DOES_THIS_SKILL_DO",
             "EXPLAIN_DUSTING",
-            "WHAT_IS_WALLET_DUSTING"
+            "WHAT_IS_WALLET_DUSTING",
+            "PREVIEW_DUST",
+            "SHOW_DUST_TOKENS",
+            "WHAT_TOKENS_WILL_BE_DUSTED",
+            "SHOW_DUST_SWAP_PREVIEW",
+            "LIST_LOW_VALUE_TOKENS",
+            "SHOW_TOKENS_BELOW_USD",
+            "SHOW_TOKENS_BELOW_VALUE",
+            "SHOW_TOKENS_BELOW_THRESHOLD",
+            "DUST_PREVIEW",
+            "PREVIEW_DUST_TOKENS"
         ],
         "isPremium": true,
         "freeQueries": 10,
