@@ -138,21 +138,18 @@ importers:
       '@moxie-protocol/core':
         specifier: workspace:*
         version: link:../packages/core
-<<<<<<< HEAD
+      '@moxie-protocol/plugin-ai-duster':
+        specifier: workspace:*
+        version: link:../packages/plugin-ai-duster
+      '@moxie-protocol/plugin-betswirl':
+        specifier: workspace:*
+        version: link:../packages/plugin-betswirl
       '@moxie-protocol/plugin-degenfans-alfafrens':
         specifier: workspace:*
         version: link:../packages/plugin-degenfans-alfafrens
       '@moxie-protocol/plugin-moxie-autonomous-trading':
         specifier: workspace:*
         version: link:../packages/plugin-moxie-autonomous-trading
-=======
-      '@moxie-protocol/plugin-ai-duster':
-        specifier: workspace:*
-        version: link:../packages/plugin-ai-duster
-      '@moxie-protocol/plugin-degenfans-alfafrens':
-        specifier: workspace:*
-        version: link:../packages/plugin-degenfans-alfafrens
->>>>>>> 4d49f87bbb8a816c6fb30796192467daa53510b3
       '@moxie-protocol/plugin-moxie-balance':
         specifier: workspace:*
         version: link:../packages/plugin-moxie-balance
@@ -624,16 +621,8 @@ importers:
         specifier: ^8.3.5
         version: 8.3.5(@swc/core@1.11.16(@swc/helpers@0.5.15))(jiti@1.21.7)(postcss@8.5.3)(tsx@4.19.3)(typescript@5.6.3)(yaml@2.7.1)
 
-<<<<<<< HEAD
-  packages/plugin-betswirl:
-    dependencies:
-      '@betswirl/sdk-core':
-        specifier: 0.0.7
-        version: 0.0.7(@apollo/client@3.13.5(@types/react@19.1.0)(graphql-ws@5.16.2(graphql@16.10.0))(graphql@16.10.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(graphql@16.10.0)(typescript@5.6.3)(viem@2.21.58(bufferutil@4.0.9)(typescript@5.6.3)(utf-8-validate@5.0.10)(zod@3.23.8))
-=======
   packages/plugin-ai-duster:
     dependencies:
->>>>>>> 4d49f87bbb8a816c6fb30796192467daa53510b3
       '@moxie-protocol/core':
         specifier: workspace:*
         version: link:../core
@@ -641,14 +630,6 @@ importers:
         specifier: workspace:*
         version: link:../moxie-agent-lib
       ethers:
-<<<<<<< HEAD
-        specifier: ^6.13.5
-        version: 6.13.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-    devDependencies:
-      '@types/node':
-        specifier: ^22.13.5
-        version: 22.13.17
-=======
         specifier: ^6.0.0
         version: 6.13.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       graphql-request:
@@ -658,7 +639,28 @@ importers:
       '@types/node':
         specifier: ^22.10.5
         version: 22.14.0
->>>>>>> 4d49f87bbb8a816c6fb30796192467daa53510b3
+      tsup:
+        specifier: 8.3.5
+        version: 8.3.5(@swc/core@1.11.16(@swc/helpers@0.5.15))(jiti@1.21.7)(postcss@8.5.3)(tsx@4.19.3)(typescript@5.6.3)(yaml@2.7.1)
+
+  packages/plugin-betswirl:
+    dependencies:
+      '@betswirl/sdk-core':
+        specifier: 0.0.7
+        version: 0.0.7(@apollo/client@3.13.5(@types/react@19.1.0)(graphql-ws@5.16.2(graphql@16.10.0))(graphql@16.10.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(graphql@16.10.0)(typescript@5.6.3)(viem@2.21.58(bufferutil@4.0.9)(typescript@5.6.3)(utf-8-validate@5.0.10)(zod@3.23.8))
+      '@moxie-protocol/core':
+        specifier: workspace:*
+        version: link:../core
+      '@moxie-protocol/moxie-agent-lib':
+        specifier: workspace:*
+        version: link:../moxie-agent-lib
+      ethers:
+        specifier: ^6.13.5
+        version: 6.13.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+    devDependencies:
+      '@types/node':
+        specifier: ^22.13.5
+        version: 22.14.0
       tsup:
         specifier: 8.3.5
         version: 8.3.5(@swc/core@1.11.16(@swc/helpers@0.5.15))(jiti@1.21.7)(postcss@8.5.3)(tsx@4.19.3)(typescript@5.6.3)(yaml@2.7.1)
@@ -692,8 +694,7 @@ importers:
     devDependencies:
       '@types/node':
         specifier: ^22.10.5
-<<<<<<< HEAD
-        version: 22.13.17
+        version: 22.14.0
       tsup:
         specifier: 8.3.5
         version: 8.3.5(@swc/core@1.11.16(@swc/helpers@0.5.15))(jiti@1.21.7)(postcss@8.5.3)(tsx@4.19.3)(typescript@5.6.3)(yaml@2.7.1)
@@ -715,10 +716,7 @@ importers:
     devDependencies:
       '@types/node':
         specifier: ^22.10.5
-        version: 22.13.17
-=======
         version: 22.14.0
->>>>>>> 4d49f87bbb8a816c6fb30796192467daa53510b3
       tsup:
         specifier: 8.3.5
         version: 8.3.5(@swc/core@1.11.16(@swc/helpers@0.5.15))(jiti@1.21.7)(postcss@8.5.3)(tsx@4.19.3)(typescript@5.6.3)(yaml@2.7.1)
@@ -761,11 +759,7 @@ importers:
         version: link:../moxie-agent-lib
       '@privy-io/server-auth':
         specifier: ^1.16.6
-<<<<<<< HEAD
-        version: 1.19.2(bufferutil@4.0.9)(encoding@0.1.13)(utf-8-validate@5.0.10)(viem@2.21.58(bufferutil@4.0.9)(typescript@5.6.3)(utf-8-validate@5.0.10)(zod@3.22.4))
-=======
-        version: 1.19.3(bufferutil@4.0.9)(encoding@0.1.13)(utf-8-validate@5.0.10)(viem@2.21.58(bufferutil@4.0.9)(typescript@5.6.3)(utf-8-validate@5.0.10)(zod@3.23.8))
->>>>>>> 4d49f87bbb8a816c6fb30796192467daa53510b3
+        version: 1.19.3(bufferutil@4.0.9)(encoding@0.1.13)(utf-8-validate@5.0.10)(viem@2.21.58(bufferutil@4.0.9)(typescript@5.6.3)(utf-8-validate@5.0.10)(zod@3.22.4))
       axios:
         specifier: ^1.7.9
         version: 1.8.4
@@ -816,11 +810,7 @@ importers:
         version: link:../moxie-agent-lib
       '@privy-io/server-auth':
         specifier: ^1.16.6
-<<<<<<< HEAD
-        version: 1.19.2(bufferutil@4.0.9)(encoding@0.1.13)(utf-8-validate@5.0.10)(viem@2.21.58(bufferutil@4.0.9)(typescript@5.6.3)(utf-8-validate@5.0.10)(zod@3.23.8))
-=======
-        version: 1.19.3(bufferutil@4.0.9)(encoding@0.1.13)(utf-8-validate@5.0.10)(viem@2.21.58(bufferutil@4.0.9)(typescript@5.6.3)(utf-8-validate@5.0.10)(zod@3.22.4))
->>>>>>> 4d49f87bbb8a816c6fb30796192467daa53510b3
+        version: 1.19.3(bufferutil@4.0.9)(encoding@0.1.13)(utf-8-validate@5.0.10)(viem@2.21.58(bufferutil@4.0.9)(typescript@5.6.3)(utf-8-validate@5.0.10)(zod@3.23.8))
       ethers:
         specifier: ^6.13.5
         version: 6.13.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -23220,15 +23210,11 @@ snapshots:
 
   ts-interface-checker@0.1.13: {}
 
-<<<<<<< HEAD
   ts-invariant@0.10.3:
     dependencies:
       tslib: 2.8.1
 
-  ts-jest@29.2.5(@babel/core@7.26.10)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.10))(esbuild@0.24.2)(jest@29.7.0(@types/node@22.13.17)(ts-node@10.9.2(@swc/core@1.11.16(@swc/helpers@0.5.15))(@types/node@22.13.17)(typescript@5.6.3)))(typescript@5.6.3):
-=======
   ts-jest@29.2.5(@babel/core@7.26.10)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.10))(esbuild@0.24.2)(jest@29.7.0(@types/node@22.14.0)(ts-node@10.9.2(@swc/core@1.11.16(@swc/helpers@0.5.15))(@types/node@22.14.0)(typescript@5.6.3)))(typescript@5.6.3):
->>>>>>> 4d49f87bbb8a816c6fb30796192467daa53510b3
     dependencies:
       bs-logger: 0.2.6
       ejs: 3.1.10
