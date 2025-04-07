@@ -12,7 +12,7 @@ import {
     generateObjectDeprecated,
 } from "@moxie-protocol/core";
 import { MoxieUser, formatUserMention } from "@moxie-protocol/moxie-agent-lib";
-import { BaseParams, createTradingRule, getAutonomousTradingRuleDetails, GroupTradeParams, LimitOrderParams, RuleType, UserTradeParams } from "../utils/utility";
+import { BaseParams, createTradingRule, getAutonomousTradingRuleDetails, getErrorMessageFromCode, GroupTradeParams, LimitOrderParams, RuleType, UserTradeParams } from "../utils/utility";
 import { autonomousTradingTemplate } from "../templates";
 
 
@@ -169,8 +169,8 @@ export const autonomousTradingAction: Action = {
 
             } catch (error) {
                 elizaLogger.error(traceId,`[autonomous trading] [${moxieUserId}] [AUTONOMOUS_TRADING] [ADD_RULE] error creating trading rule: ${error.message}`);
-                 callback?.({
-                    text: `Something went wrong while creating autonomous trading rule. Please try again later.`,
+                callback?.({
+                    text: getErrorMessageFromCode(error),
                     action: "AUTONOMOUS_TRADING",
                 });
             }
