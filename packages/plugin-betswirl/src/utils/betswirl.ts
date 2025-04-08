@@ -269,6 +269,7 @@ export async function approveIfERC20(
                 amountToApprove
             );
             await walletClient.sendTransaction(chainId.toString(), {
+                fromAddress: walletClient.address,
                 toAddress: functionData.data.to,
                 data: functionData.encodedData,
             });

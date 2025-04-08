@@ -37,6 +37,13 @@ export const CoinTossBetParameters = z.object({
         .describe("The face of the coin"),
     ...casinoBetParams,
     ...getMaxBetCountParam(CASINO_GAME_TYPE.COINTOSS),
+    isConfirmed: z
+        .boolean()
+        .optional()
+        .nullable()
+        .describe(
+            "Whether the user confirmed the bet based on historical conversation."
+        ),
 });
 export const coinTossTemplate = `
 Extract the following details to flip a coin:
@@ -44,7 +51,9 @@ Extract the following details to flip a coin:
 - **face** (String?): The side of the coin to bet on. Can be either:
   - HEADS
   - TAILS
-- **token** (String?): The token symbol.
+- **token** (String?): The token symbol. Only set this if the user explicitly mentions a token (like ETH, USDC, etc.) in their message. If no token is mentioned, set to null.
+- **isConfirmed** (Boolean?): Whether the bet has been confirmed based on recent messages. Default this to null if there is no confirmation nor denial given by the user.
+
 Where "?" indicates that the value is optional.
 
 Provide the values in the following JSON format:
@@ -52,7 +61,8 @@ Provide the values in the following JSON format:
 {
     "betAmount": string?,
     "face": string?,
-    "token": string?
+    "token": string?,
+    "isConfirmed": boolean?
 }
 \`\`\`
 
@@ -60,35 +70,81 @@ Here are example messages and their corresponding responses:
 
 **Message 1**
 \`\`\`
-Bet 0.01 ETH on heads
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Bet 0.01 ETH on heads"
+        }
+    },
+    {
+        "user": "{{user2}}",
+        "content": {
+            "text": "You are trying to bet on heads with 0.01 ETH, would you like to confirm this bet?"
+        }
+    },
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Yes."
+        }
+    }
+]
 \`\`\`
 
 **Response 1**
 \`\`\`json
 {
     "betAmount": "0.01",
-    "face": "heads",
-    "token" "ETH"
+    "face": "HEADS",
+    "token": "ETH",
+    "isConfirmed": true
 }
 \`\`\`
 
 **Message 2**
 \`\`\`
-Double or nothing 0.5 ETH on heads
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Double or nothing 0.5 ETH on heads"
+        }
+    },
+    {
+        "user": "{{user2}}",
+        "content": {
+            "text": "You are trying to bet on heads with 0.5 ETH, would you like to confirm this bet?"
+        }
+    },
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "No."
+        }
+    }
+]
 \`\`\`
-
 **Response 2**
 \`\`\`json
 {
     "betAmount": "0.5",
     "face": "HEADS",
     "token": "ETH",
+    "isConfirmed": false
 }
 \`\`\`
 
 ** Message 3 **
 \`\`\`
-Flip a coin for me
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Flip a coin for me"
+        }
+    }
+]
 \`\`\`
 
 ** Response 3 **
@@ -97,6 +153,7 @@ Flip a coin for me
     "betAmount": null,
     "face": null,
     "token": null,
+    "isConfirmed": null
 }
 \`\`\`
 
@@ -111,6 +168,7 @@ I want to bet on the tails side
     "betAmount": null,
     "face": "TAILS",
     "token": null,
+    "isConfirmed": null
 }
 \`\`\`
 
@@ -125,6 +183,7 @@ I want to bet 0.01 on heads
     "betAmount": "0.01",
     "face": "HEADS",
     "token": null,
+    "isConfirmed": false
 }
 \`\`\`
 
@@ -139,8 +198,77 @@ I want to bet my ETH on tails
     "betAmount": null,
     "face": "TAILS",
     "token": "ETH",
+    "isConfirmed": null
 }
+\`\`\`
+
+** Message 7 **
+\`\`\`
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "can you place a bet on tails for coin toss with 0.0002 ETH?"
+        },
+        {
+            "user": "{{user2}}",
+            "content": {
+                "text": "You are trying to bet on tails with 0.0002 ETH, would you like to confirm this bet?"
+            }
+        },
+        {
+            "user": "{{user1}}",
+            "content": {
+                "text": "Yes."
+            }
+        }
+    }
+]
+\`\`\`
+
+** Response 7 **
 \`\`\`json
+{
+    "betAmount": "0.0002",
+    "face": "TAILS",
+    "token": "ETH",
+    "isConfirmed": true
+}
+\`\`\`
+
+** Message 8 **
+\`\`\`
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "can you place a bet on tails for coin toss with 0.00003 ETH?"
+        }
+    },
+    {
+        "user": "{{user2}}",
+        "content": {
+            "text": "You are trying to bet on tails with 0.00003 ETH, would you like to confirm this bet?"
+        }
+    },
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Yes."
+        }
+    }
+]
+\`\`\`
+
+** Response 8 **
+\`\`\`json
+{
+    "betAmount": "0.00003",
+    "face": "TAILS",
+    "token": "ETH",
+    "isConfirmed": true
+}
+\`\`\`
 
 Here are the recent user messages for context:
 {{recentMessages}}
@@ -199,11 +327,13 @@ export const coinTossAction: Action = {
                 modelClass: ModelClass.SMALL,
                 schema: CoinTossBetParameters,
             });
-            const { face, betAmount, token } = coinTossDetails.object as {
-                face: string;
-                betAmount: string;
-                token: string;
-            };
+            const { face, betAmount, token, isConfirmed } =
+                coinTossDetails.object as {
+                    face: string;
+                    betAmount: string;
+                    token: string;
+                    isConfirmed: boolean;
+                };
 
             // Validate face is heads or tails
             if (
@@ -216,9 +346,6 @@ export const coinTossAction: Action = {
                     `You must specify the face heads or tails. i.e. "Bet 0.07 ETH on heads". You'll be betting that the rolled face will be the one chosen.`
                 );
             }
-            await callback({
-                text: "Betting on " + face,
-            });
 
             // Get the bet token from the user input
             const selectedToken = await getBetToken(chainId, token);
@@ -229,6 +356,24 @@ export const coinTossAction: Action = {
                 chainId,
                 selectedToken
             );
+
+            if (isConfirmed === null) {
+                await callback({
+                    text: `You are trying to bet on ${face} with ${betAmount} ${token}. Would you like to confirm this bet?`,
+                    action: "COIN_TOSS",
+                });
+                return true;
+            } else if (isConfirmed === false) {
+                await callback({
+                    text: `In that case, let me know anytime if you would like to proceed with the bet, change your bet, or place a new bet.`,
+                });
+                return true;
+            }
+
+            await callback({
+                text: "Betting on " + face,
+            });
+
             await callback({
                 text: ` with ${betAmount} ${tokenForMoxieTerminal}...`,
             });
@@ -289,6 +434,18 @@ Payout: [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) ${to
             {
                 user: "{{user2}}",
                 content: {
+                    text: "You are trying to bet on heads with 0.01 ETH, would you like to confirm this bet?",
+                },
+            },
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "Yes.",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
                     text: "You Won, your Payout is 0.00003 ETH, Bet tx: 0x6ba8a0c3e861b036f052709f56412084806376fbaf24b15bce4920a8a53095af, Resolution tx hash: 0x8ed5541c45b6c7083b3e5795f52f92827748e93e6562ec126f4a1cf22b433f77",
                     action: "COIN_TOSS",
                 },
@@ -302,7 +459,7 @@ Payout: [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) ${to
                 },
             },
             {
-                user: "{{user2}}",
+                user: "{{user1}}",
                 content: {
                     text: "Face must be heads or tails, bet amount and token symbol",
                 },
