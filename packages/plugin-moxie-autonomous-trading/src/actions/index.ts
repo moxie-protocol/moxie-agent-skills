@@ -11,8 +11,9 @@ import {
     composeContext,
     generateObjectDeprecated,
 } from "@moxie-protocol/core";
-import { MoxieUser, formatUserMention } from "@moxie-protocol/moxie-agent-lib";
-import { BaseParams, createTradingRule, getAutonomousTradingRuleDetails, getErrorMessageFromCode, GroupTradeParams, LimitOrderParams, RuleType, UserTradeParams } from "../utils/utility";
+import { MoxieClientWallet, MoxieUser, MoxieWalletClient, formatUserMention } from "@moxie-protocol/moxie-agent-lib";
+import { BaseParams, createTradingRule, getAutonomousTradingRuleDetails, getErrorMessageFromCode, GroupTradeParams, LimitOrderParams, RuleType, 
+    UserTradeParams, agentWalletNotFound, delegateAccessNotFound, moxieWalletClientNotFound, checkUserCommunicationPreferences } from "../utils/utility";
 import { autonomousTradingTemplate } from "../templates";
 
 
@@ -62,8 +63,6 @@ export const autonomousTradingAction: Action = {
         callback: HandlerCallback
     ) => {
 
-        
-
         const traceId = message.id;
         const moxieUserInfo = state.moxieUserInfo as MoxieUser;
         const moxieUserId = moxieUserInfo.id;
@@ -71,6 +70,32 @@ export const autonomousTradingAction: Action = {
         try {
             elizaLogger.debug(traceId,`[AUTONOMOUS_TRADING] [${moxieUserId}] [AUTONOMOUS_TRADING] Starting AUTONOMOUS_TRADING handler with user message: ${JSON.stringify(message)}`);
 
+            // read moxieUserInfo from state
+            const agentWallet = state.agentWallet as MoxieClientWallet;
+
+            if (!agentWallet) {
+                elizaLogger.error(traceId,`[AUTONOMOUS_TRADING] [${moxieUserId}] [AUTONOMOUS_TRADING] agentWallet not found`);
+                await callback?.(agentWalletNotFound);
+                return true;
+            }
+
+            if (!agentWallet.delegated) {
+                elizaLogger.error(traceId,`[AUTONOMOUS_TRADING] [${moxieUserId}] [AUTONOMOUS_TRADING] agentWallet is not delegated`);
+                await callback?.(delegateAccessNotFound);
+                return true;
+            }
+
+            const walletClient = state.moxieWalletClient as MoxieWalletClient;
+            if (!walletClient) {
+                elizaLogger.error(traceId,`[AUTONOMOUS_TRADING] [${moxieUserId}] [AUTONOMOUS_TRADING] walletClient not found`);
+                await callback?.(moxieWalletClientNotFound);
+                return true;
+            }
+
+            const communicationPreference = await checkUserCommunicationPreferences(traceId, moxieUserId);
+            elizaLogger.debug(traceId,`[AUTONOMOUS_TRADING] [${moxieUserId}] [AUTONOMOUS_TRADING] [checkUserCommunicationPreferences] communicationPreference: ${communicationPreference}`);
+
+            // Compose autonomous trading context
             // Compose swap context
             const swapContext = composeContext({
                 state,
@@ -165,6 +190,7 @@ export const autonomousTradingAction: Action = {
                 await callback?.({
                     text: `✅ Automation Rule Created Successfully!\n\n📌 Instruction: ${response.instructions}`,
                      action: "AUTONOMOUS_TRADING",
+                     cta: communicationPreference === null ? "SETUP_ALERTS" : null
                 });
 
             } catch (error) {
