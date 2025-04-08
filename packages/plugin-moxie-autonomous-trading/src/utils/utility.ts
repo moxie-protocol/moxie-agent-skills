@@ -218,7 +218,7 @@ I can help you easily set up copy trade automations — so you never miss that a
 
 Go to **Groups** to set up your **#copytrade** group.  
 Then just use **#copytrade** as a reference in your automation.
-<br><br>
+\n\n
 Copy and edit the prompts above or start with one of the templates below — just tweak it to fit your strategy!
 `;
 
@@ -237,7 +237,7 @@ export const moxieWalletClientNotFound = {
 
 export async function checkUserCommunicationPreferences(traceId: string, moxieUserId: string): Promise<string | null> {
     try {
-        const response = await fetch(process.env.MOXIE_API_URL, {
+        const response = await fetch(process.env.MOXIE_API_URL_INTERNAL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
