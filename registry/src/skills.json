@@ -17,7 +17,7 @@
         "author": "Romuald Hog <romuald@betswirl.com>",
         "description": "Enabled your agent to place bets on BetSwirl's games of luck, and retrieving bets information.",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-betswirl",
-        "logoUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-betswirl/images/logo.png",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-betswirl/images/logo.png",
         "settings": {},
         "capabilities": [
             "Flip a Coin",
