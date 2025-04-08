@@ -80,7 +80,10 @@
             "BETSWIRL_INFO",
             "WHAT_IS_BETSWIRL",
             "HOW_DOES_BETSWIRL_WORK",
-            "HOW_TO_PLAY_BETSWIRL"
+            "HOW_TO_PLAY_BETSWIRL",
+            "WHAT_IS_PLAY_GAMES_OF_LUCK",
+            "HOW_DOES_PLAY_GAMES_OF_LUCK_WORK",
+            "HOW_TO_PLAY_GAMES_OF_LUCK",
         ],
         "isPremium": false,
         "freeQueries": 0,
