@@ -212,12 +212,58 @@ I can help you easily set up copy trade automations — so you never miss that a
 - If **3 people** in my **#copytrade** group buy the same token within an hour of each other, then buy me **$100** of it.
 
 ### **3) Buy then take profits**
-- If **3 people** in my **#copytrade** group buy the same token within an hour of each other, then buy me **$100** of it, and then **sell if the price increases by 50%**.
+- If **3 people** in my **#copytrade** group buy the same token within an hour of each other, then buy me **$100** of it, and then sell if the price increases by **50%**.
 
 ---
 
 Go to **Groups** to set up your **#copytrade** group.  
 Then just use **#copytrade** as a reference in your automation.
-
+\n\n
 Copy and edit the prompts above or start with one of the templates below — just tweak it to fit your strategy!
 `;
+
+
+export const agentWalletNotFound = {
+    text: `\nPlease make sure to set up your agent wallet first and try again.`,
+};
+
+export const delegateAccessNotFound = {
+    text: `\nPlease make sure to set up your agent wallet first and try again. (delegate access not found)`,
+};
+
+export const moxieWalletClientNotFound = {
+    text: `\nUnable to access moxie wallet details. Please ensure your moxie wallet is properly setup and try again.`,
+};
+
+export async function checkUserCommunicationPreferences(traceId: string, moxieUserId: string): Promise<string | null> {
+    try {
+        const response = await fetch(process.env.MOXIE_API_URL_INTERNAL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                query: `
+                    query GetUser {
+                        GetUser(input: { userId: "${moxieUserId}" }) {
+                            communicationPreference
+                        }
+                    }
+                `
+            })
+        });
+
+        if (!response.ok) {
+            elizaLogger.error(traceId, `[AUTONOMOUS_TRADING] [${moxieUserId}] Failed to fetch user preferences: ${response.statusText}`);
+            return null;
+        }
+
+        const data = await response.json();
+        elizaLogger.debug(traceId, `[AUTONOMOUS_TRADING] [${moxieUserId}] User communication preferences:`, data?.data?.GetUser?.communicationPreference);
+        return data?.data?.GetUser?.communicationPreference;
+
+    } catch (error) {
+        elizaLogger.error(traceId, `[AUTONOMOUS_TRADING] [${moxieUserId}] Error checking user preferences: ${error.message}`);
+        return null;
+    }
+}
