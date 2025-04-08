@@ -30,7 +30,25 @@ export const infoAction: Action = {
         callback: HandlerCallback
     ) => {
         await callback({
-            text: `BetSwirl's skills offers you onchain casino games: Dice, Coin Toss and Roulette.`,
+            text: `Play Games Of Luck/BetSwirl Skills offers you to play onchain casino games on Base:
+
+**🪙 Coin Toss**
+- Classic heads or tails game
+- Choose heads or tails
+- Win if the coin lands on your chosen side
+
+**🎲 Dice**
+- 100-sided dice game
+- Choose a number between 1-99
+- Win if the rolled number is above your chosen number
+
+**🎯 Roulette**
+- Choose up to 36 numbers
+- Win if the ball lands on any of your chosen numbers
+
+All games use Chainlink VRF for verifiable randomness. Place bets with ${tokenSymbols}. Winnings are paid out instantly to your wallet.
+
+[🎮 Start playing now](https://www.betswirl.com)`,
             action: "BETSWIRL_INFO",
         });
         return true;
