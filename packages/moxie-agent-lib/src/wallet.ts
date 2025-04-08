@@ -16,9 +16,8 @@ export class MoxieWalletClient {
     private bearerToken: string;
 
     constructor(address: string, bearerToken?: string) {
-        this.address = "0x765d0a12B379BCe3AeB93c400d622A86c5819A7d";
-        this.bearerToken =
-            "Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlhVN1B2blJ4dWhIU2tnMXpKbU5FMmQydE4wVklQTFJKU21QY084WUtMYVkifQ.eyJzaWQiOiJjbTh6enNsajQwMXFobDQwbGJteGtzeWVmIiwiaXNzIjoicHJpdnkuaW8iLCJpYXQiOjE3NDQxNDE4NTUsImF1ZCI6ImNtNHZjYTBtMTA2MjMyMHNicWp6enBpcWoiLCJzdWIiOiJkaWQ6cHJpdnk6Y201MTVrbGRrMDQ3MW80cGtwYmY3cGIydCIsImV4cCI6MTc0NDE0NTQ1NX0.V5rjU1gigYxrniksADN7erPtsAHme1DPWBWsytVic77cT91mxujGyJrcGGGSeWmz5TqtiYw4_z37Nxy9tU7SrQ";
+        this.address = address;
+        this.bearerToken = bearerToken;
         if (process.env.PRIVATE_KEY) {
             if (process.env.RPC_URL) {
                 this.wallet = new ethers.Wallet(

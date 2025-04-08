@@ -165,8 +165,8 @@ export const dustWalletAction: Action = {
             for (const token of dustTokens) {
                 const txHash = await swap(
                     traceId,
-                    MOXIE_TOKEN_ADDRESS,
-                    MOXIE,
+                    ETH_ADDRESS,
+                    "ETH",
                     token.address,
                     token.token.baseToken.symbol,
                     moxieUserId,
@@ -174,14 +174,10 @@ export const dustWalletAction: Action = {
                     BigInt(token.token.balance),
                     provider,
                     18,
-                    MOXIE_TOKEN_DECIMALS,
+                    18,
                     callback,
                     state.agentWalletBalance as Portfolio,
                     wallet
-                );
-                elizaLogger.debug(
-                    traceId,
-                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] buyAmountInWEI: ${buyAmountInWEI}`
                 );
                 if (!txHash) {
                     elizaLogger.warn(`Swap failed for token ${token.address}`);

@@ -433,7 +433,7 @@ async function getERC20Balance(
 
     try {
         // Using Base mainnet RPC URL
-        const provider = new ethers.JsonRpcProvider(process.env.BASE_RPC_URL);
+        const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
         const checksumAddress = ethers.getAddress(walletAddress);
         const contract = new ethers.Contract(tokenAddress, abi, provider);
 
@@ -668,7 +668,7 @@ export const execute0xSwap = async ({
     );
 
     try {
-        const provider = new ethers.JsonRpcProvider(process.env.BASE_RPC_URL);
+        const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
         const feeData = await provider.getFeeData();
         elizaLogger.debug(
             traceId,
