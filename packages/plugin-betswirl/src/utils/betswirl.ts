@@ -214,9 +214,11 @@ export async function placeBet(
             )) *
                 120n) /
             100n;
+
         const { hash: betHash } = await walletClient.sendTransaction(
             chainId.toString(),
             {
+                fromAddress: walletClient.address,
                 toAddress: functionData.data.to,
                 data: functionData.encodedData,
                 value: functionData.extraData.getValue(
