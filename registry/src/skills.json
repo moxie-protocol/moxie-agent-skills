@@ -665,13 +665,13 @@
     },
     {
         "pluginId": "5f823f62-19f7-460f-a05b-94351a07e00d",
-        "name": "@moxie-protocol/plugin-ai-duster",
+        "name": "@moxie-protocol/plugin-wallet-duster",
         "displayName": "Wallet Duster",
         "version": "0.0.1",
         "author": "Alex and Yoseph",
         "description": "A Moxie AI Skill that swaps low-value ERC-20 tokens (dust) into ETH using your agent wallet.",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/feat/merge-branch-degenfans-test/packages/plugin-ai-duster",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/feat/merge-branch-degenfans-test/packages/plugin-ai-duster/images/logo.png",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/feat/merge-branch-degenfans-test/packages/plugin-wallet-duster",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/feat/merge-branch-degenfans-test/packages/plugin-wallet-duster/images/logo.png",
         "settings": {},
         "capabilities": [
             "Swap low-value tokens in the user's agent wallet into ETH via the 0x API.",

@@ -1,4 +1,4 @@
-# 🧠 Moxie AI Skill: `plugin-ai-duster`
+# 🧠 Moxie AI Skill: `plugin-wallet-duster`
 
 Turn your dust into ETH.
 AI Duster scans your Moxie Agent wallet for low-value ERC-20 tokens and
@@ -44,7 +44,7 @@ pnpm env use --global 23.3.0
 # Clone and set up the monorepo
 git clone git@github.com:moxie-protocol/moxie-agent-skills.git
 cd moxie-agent-skills
-git checkout -b feature/plugin-ai-duster
+git checkout -b feature/plugin-wallet-duster
 pnpm install --no-frozen-lockfile
 
 # Build agent libs and workspace

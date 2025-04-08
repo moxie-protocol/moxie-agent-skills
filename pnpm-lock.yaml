@@ -138,9 +138,9 @@ importers:
       '@moxie-protocol/core':
         specifier: workspace:*
         version: link:../packages/core
-      '@moxie-protocol/plugin-ai-duster':
+      '@moxie-protocol/plugin-wallet-duster':
         specifier: workspace:*
-        version: link:../packages/plugin-ai-duster
+        version: link:../packages/plugin-wallet-duster
       '@moxie-protocol/plugin-betswirl':
         specifier: workspace:*
         version: link:../packages/plugin-betswirl
@@ -621,7 +621,7 @@ importers:
         specifier: ^8.3.5
         version: 8.3.5(@swc/core@1.11.16(@swc/helpers@0.5.15))(jiti@1.21.7)(postcss@8.5.3)(tsx@4.19.3)(typescript@5.6.3)(yaml@2.7.1)
 
-  packages/plugin-ai-duster:
+  packages/plugin-wallet-duster:
     dependencies:
       '@moxie-protocol/core':
         specifier: workspace:*
