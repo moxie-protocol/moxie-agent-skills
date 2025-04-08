@@ -37,6 +37,13 @@ export const CoinTossBetParameters = z.object({
         .describe("The face of the coin"),
     ...casinoBetParams,
     ...getMaxBetCountParam(CASINO_GAME_TYPE.COINTOSS),
+    isConfirmed: z
+        .boolean()
+        .optional()
+        .nullable()
+        .describe(
+            "Whether the user confirmed the bet based on historical conversation."
+        ),
 });
 export const coinTossTemplate = `
 Extract the following details to flip a coin:
