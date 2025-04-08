@@ -132,3 +132,23 @@ Dust my tokens
 Here are the recent user messages for context:
 {{recentMessages}}
 `;
+
+export const swapInProgressTemplate = (
+    sellTokenSymbol: string,
+    buyTokenSymbol: string,
+    txHash: string
+) => ({
+    text: `\n${sellTokenSymbol} to ${buyTokenSymbol} conversion is in progress.\nView transaction status on [BaseScan](https://basescan.org/tx/${txHash})`,
+    content: {
+        url: `https://basescan.org/tx/${txHash}`,
+    },
+});
+
+export const swapCompletedTemplate = (
+    sellTokenSymbol: string,
+    buyTokenSymbol: string,
+    buyAmountInWEI: bigint,
+    buyTokenDecimals: number
+) => ({
+    text: `\n${sellTokenSymbol} to ${buyTokenSymbol} conversion completed successfully. ${buyAmountInWEI && buyAmountInWEI > 0n ? `\n${ethers.formatUnits(buyAmountInWEI.toString(), buyTokenDecimals)} ${buyTokenSymbol} received.` : ""}`,
+});
