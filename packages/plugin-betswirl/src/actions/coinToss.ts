@@ -44,7 +44,9 @@ Extract the following details to flip a coin:
 - **face** (String?): The side of the coin to bet on. Can be either:
   - HEADS
   - TAILS
-- **token** (String?): The token symbol.
+- **token** (String?): The token symbol. Only set this if the user explicitly mentions a token (like ETH, USDC, etc.) in their message. If no token is mentioned, set to null.
+- **isConfirmed** (Boolean?): Whether the bet has been confirmed based on recent messages. Default this to null if there is no confirmation nor denial given by the user.
+
 Where "?" indicates that the value is optional.
 
 Provide the values in the following JSON format:
@@ -52,7 +54,8 @@ Provide the values in the following JSON format:
 {
     "betAmount": string?,
     "face": string?,
-    "token": string?
+    "token": string?,
+    "isConfirmed": boolean?
 }
 \`\`\`
 
@@ -60,35 +63,81 @@ Here are example messages and their corresponding responses:
 
 **Message 1**
 \`\`\`
-Bet 0.01 ETH on heads
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Bet 0.01 ETH on heads"
+        }
+    },
+    {
+        "user": "{{user2}}",
+        "content": {
+            "text": "You are trying to bet on heads with 0.01 ETH, would you like to confirm this bet?"
+        }
+    },
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Yes."
+        }
+    }
+]
 \`\`\`
 
 **Response 1**
 \`\`\`json
 {
     "betAmount": "0.01",
-    "face": "heads",
-    "token" "ETH"
+    "face": "HEADS",
+    "token": "ETH",
+    "isConfirmed": true
 }
 \`\`\`
 
 **Message 2**
 \`\`\`
-Double or nothing 0.5 ETH on heads
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Double or nothing 0.5 ETH on heads"
+        }
+    },
+    {
+        "user": "{{user2}}",
+        "content": {
+            "text": "You are trying to bet on heads with 0.5 ETH, would you like to confirm this bet?"
+        }
+    },
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "No."
+        }
+    }
+]
 \`\`\`
-
 **Response 2**
 \`\`\`json
 {
     "betAmount": "0.5",
     "face": "HEADS",
     "token": "ETH",
+    "isConfirmed": false
 }
 \`\`\`
 
 ** Message 3 **
 \`\`\`
-Flip a coin for me
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Flip a coin for me"
+        }
+    }
+]
 \`\`\`
 
 ** Response 3 **
@@ -97,6 +146,7 @@ Flip a coin for me
     "betAmount": null,
     "face": null,
     "token": null,
+    "isConfirmed": null
 }
 \`\`\`
 
@@ -111,6 +161,7 @@ I want to bet on the tails side
     "betAmount": null,
     "face": "TAILS",
     "token": null,
+    "isConfirmed": null
 }
 \`\`\`
 
@@ -125,6 +176,7 @@ I want to bet 0.01 on heads
     "betAmount": "0.01",
     "face": "HEADS",
     "token": null,
+    "isConfirmed": false
 }
 \`\`\`
 
@@ -139,8 +191,77 @@ I want to bet my ETH on tails
     "betAmount": null,
     "face": "TAILS",
     "token": "ETH",
+    "isConfirmed": null
 }
+\`\`\`
+
+** Message 7 **
+\`\`\`
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "can you place a bet on tails for coin toss with 0.0002 ETH?"
+        },
+        {
+            "user": "{{user2}}",
+            "content": {
+                "text": "You are trying to bet on tails with 0.0002 ETH, would you like to confirm this bet?"
+            }
+        },
+        {
+            "user": "{{user1}}",
+            "content": {
+                "text": "Yes."
+            }
+        }
+    }
+]
+\`\`\`
+
+** Response 7 **
 \`\`\`json
+{
+    "betAmount": "0.0002",
+    "face": "TAILS",
+    "token": "ETH",
+    "isConfirmed": true
+}
+\`\`\`
+
+** Message 8 **
+\`\`\`
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "can you place a bet on tails for coin toss with 0.00003 ETH?"
+        }
+    },
+    {
+        "user": "{{user2}}",
+        "content": {
+            "text": "You are trying to bet on tails with 0.00003 ETH, would you like to confirm this bet?"
+        }
+    },
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Yes."
+        }
+    }
+]
+\`\`\`
+
+** Response 8 **
+\`\`\`json
+{
+    "betAmount": "0.00003",
+    "face": "TAILS",
+    "token": "ETH",
+    "isConfirmed": true
+}
+\`\`\`
 
 Here are the recent user messages for context:
 {{recentMessages}}
