@@ -666,30 +666,33 @@
     {
         "pluginId": "5f823f62-19f7-460f-a05b-94351a07e00d",
         "name": "@moxie-protocol/plugin-ai-duster",
-        "displayName": "AI Duster",
+        "displayName": "Wallet Duster",
         "version": "0.0.1",
         "author": "Alex and Yoseph",
         "description": "A Moxie AI Skill that swaps low-value ERC-20 tokens (dust) into ETH using your agent wallet.",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/feat/merge-branch-degenfans-test/packages/plugin-ai-duster",
         "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/feat/merge-branch-degenfans-test/packages/plugin-ai-duster/images/logo.png",
         "settings": {},
-        "capabilities": ["dusting", "preview", "swap"],
+        "capabilities": [
+            "Swap low-value tokens in the user's agent wallet into ETH via the 0x API.",
+            "Simulate which tokens would be dusted without sending any transactions."
+        ],
         "starterQuestions": [
             {
-                "label": "How does dusting work?",
-                "value": "How does AI Dusting work?"
+                "label": "How does wallet dusting work",
+                "value": "How does wallet dusting work?"
             },
             {
-                "label": "Dust tokens under $10",
-                "value": "Can you dust my wallet under $10?"
+                "label": "Preview dusting my wallet",
+                "value": "Preview what tokens you’d dust from my wallet."
             },
             {
-                "label": "Preview dust swap",
-                "value": "Show me what tokens would be dusted"
+                "label": "Dust tokens under $5",
+                "value": "Dust my wallet for anything under $5."
             },
             {
-                "label": "Convert small tokens",
-                "value": "Swap anything worth less than $2"
+                "label": "How much dust is in my wallet?",
+                "value": "How much dust is in my wallet?"
             }
         ],
         "mediaUrls": [],
@@ -719,10 +722,10 @@
             "DUST_PREVIEW",
             "PREVIEW_DUST_TOKENS"
         ],
-        "isPremium": true,
-        "freeQueries": 10,
-        "skillCoinAddress": "0xff5a326b85335a8ec1f89b2f7ea0d7d00722aaf7",
-        "minimumSkillBalance": 1,
+        "isPremium": false,
+        "freeQueries": 0,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": false,
         "loaders": ["Dusting your wallet..."]

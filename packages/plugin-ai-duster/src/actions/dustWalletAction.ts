@@ -9,10 +9,23 @@ import {
     ModelClass,
     State,
 } from "@moxie-protocol/core";
-import { MoxieWalletClient, Portfolio } from "@moxie-protocol/moxie-agent-lib";
+import {
+    MoxieClientWallet,
+    MoxieUser,
+    MoxieWalletClient,
+    Portfolio,
+} from "@moxie-protocol/moxie-agent-lib";
 import { swapTokenToETH } from "../utils/token";
 import { DustRequestSchema } from "../types";
 import { dustRequestTemplate } from "../templates";
+import { swap } from "../utils/swap";
+import {
+    ETH_ADDRESS,
+    MOXIE,
+    MOXIE_TOKEN_ADDRESS,
+    MOXIE_TOKEN_DECIMALS,
+} from "../constants/constants";
+import { ethers } from "ethers";
 
 export const dustWalletAction: Action = {
     name: "DUST_WALLET_TO_ETH",
@@ -97,6 +110,7 @@ export const dustWalletAction: Action = {
         callback?: HandlerCallback
     ) => {
         try {
+            const traceId = message.id;
             // Initialize or update state
             if (!state) {
                 state = (await runtime.composeState(message)) as State;
@@ -121,6 +135,8 @@ export const dustWalletAction: Action = {
             const threshold = extractedValue?.threshold ?? 5;
 
             const wallet = state?.moxieWalletClient as MoxieWalletClient;
+            const agentWallet = state?.agentWallet as MoxieClientWallet;
+            const moxieUserId = (state?.moxieUserInfo as MoxieUser)?.id;
 
             const { tokenBalances }: Portfolio =
                 (state?.agentWalletBalance as Portfolio) ?? {
@@ -131,7 +147,7 @@ export const dustWalletAction: Action = {
                     t.token.balanceUSD < threshold &&
                     t.token.balance > 0 &&
                     // ignore ETH
-                    t.address !== "0x0000000000000000000000000000000000000000"
+                    t.address !== ETH_ADDRESS.toLowerCase()
             );
 
             if (!dustTokens.length) {
@@ -145,15 +161,33 @@ export const dustWalletAction: Action = {
             const totalUsdValue = dustTokens
                 .reduce((sum, token) => sum + token.token.balanceUSD, 0)
                 .toFixed(2);
-
+            const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
             for (const token of dustTokens) {
-                const txHash = await swapTokenToETH(
-                    wallet,
+                const txHash = await swap(
+                    traceId,
+                    MOXIE_TOKEN_ADDRESS,
+                    MOXIE,
                     token.address,
-                    token.token.balance.toString()
+                    token.token.baseToken.symbol,
+                    moxieUserId,
+                    agentWallet.address,
+                    BigInt(token.token.balance),
+                    provider,
+                    18,
+                    MOXIE_TOKEN_DECIMALS,
+                    callback,
+                    state.agentWalletBalance as Portfolio,
+                    wallet
+                );
+                elizaLogger.debug(
+                    traceId,
+                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] buyAmountInWEI: ${buyAmountInWEI}`
                 );
                 if (!txHash) {
-                    console.warn(`Swap failed for token ${token.address}`);
+                    elizaLogger.warn(`Swap failed for token ${token.address}`);
+                    await callback({
+                        text: ``,
+                    });
                 }
             }
 

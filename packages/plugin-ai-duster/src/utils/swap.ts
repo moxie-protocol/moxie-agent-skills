@@ -1,15 +1,59 @@
-import { elizaLogger } from "@moxie-protocol/core";
+import { elizaLogger, HandlerCallback } from "@moxie-protocol/core";
 import {
+    getTokenDetails,
     MoxieHex,
     MoxieWalletClient,
+    MoxieWalletSendTransactionInputType,
     MoxieWalletSendTransactionResponseType,
     MoxieWalletSignTypedDataResponseType,
     Portfolio,
 } from "@moxie-protocol/moxie-agent-lib";
 import { concat, ethers } from "ethers";
-import { numberToHex, size } from "viem";
+import { encodeFunctionData, numberToHex, size } from "viem";
 import { GetQuoteResponse } from "../types";
-import { swapCompletedTemplate, swapInProgressTemplate } from "../templates";
+import {
+    approvalTransactionConfirmed,
+    approvalTransactionFailed,
+    approvalTransactionSubmitted,
+    swapCompletedTemplate,
+    swapInProgressTemplate,
+} from "../templates";
+import Decimal from "decimal.js";
+import { ERC20_ABI } from "../constants/constants";
+import { createClientV2 } from "@0x/swap-ts-sdk";
+import {
+    BASE_NETWORK_ID,
+    ERC20_TXN_SLIPPAGE_BPS,
+    ETH_ADDRESS,
+    MAX_UINT256,
+    mockGetQuoteResponse,
+    TRANSACTION_RECEIPT_TIMEOUT,
+    USDC,
+    USDC_ADDRESS,
+    USDC_TOKEN_DECIMALS,
+    WETH_ADDRESS,
+} from "../constants/constants";
+
+const initializeClients = () => {
+    if (!process.env.ZERO_EX_API_KEY) {
+        elizaLogger.error(
+            "ZERO_EX_API_KEY environment variable is not given, will use mock data"
+        );
+        return { zxClient: null };
+    }
+
+    try {
+        const zxClient = createClientV2({
+            apiKey: process.env.ZERO_EX_API_KEY,
+        });
+        return { zxClient };
+    } catch (error) {
+        elizaLogger.error(`Failed to initialize clients: ${error}`);
+        throw new Error("Failed to initialize clients");
+    }
+};
+
+const { zxClient } = initializeClients();
 
 /**
  * Swaps tokens using 0x protocol
@@ -617,7 +661,7 @@ export const execute0xSwap = async ({
     walletAddress: string;
     quote: GetQuoteResponse;
     walletClient: MoxieWalletClient;
-}) => {
+}): Promise<MoxieWalletSendTransactionResponseType> => {
     elizaLogger.debug(
         traceId,
         `[execute0xSwap] [${moxieUserId}] input details: [${walletAddress}] [${quote.transaction.to}] [${quote.transaction.value}] [${quote.transaction.data}] [${quote.transaction.gas}] [${quote.transaction.gasPrice}]`
@@ -914,5 +958,159 @@ export async function handleTransactionStatus(
             `[${moxieUserId}] [handleTransactionStatus] Error waiting for transaction receipt: ${errorMessage}`
         );
         return null;
+    }
+}
+
+/**
+ * Get the price of a token in USD
+ * @param context
+ * @param amount
+ * @param tokenAddress
+ * @param tokenDecimals
+ * @param output
+ * @returns the amount of tokens equivalent to the USD amount
+ */
+export async function getPrice(
+    traceId: string,
+    moxieUserId: string,
+    amount: string,
+    sourceTokenAddress: string,
+    sourceTokenDecimals: number,
+    sourceTokenSymbol: string,
+    targetTokenAddress: string,
+    targetTokenDecimals: number,
+    targetTokenSymbol: string
+): Promise<string> {
+    try {
+        elizaLogger.debug(
+            traceId,
+            `[getPrice] started with [${moxieUserId}] ` +
+                `[amount]: ${amount}, ` +
+                `[sourceTokenAddress]: ${sourceTokenAddress}, ` +
+                `[sourceTokenDecimals]: ${sourceTokenDecimals}, ` +
+                `[sourceTokenSymbol]: ${sourceTokenSymbol}, ` +
+                `[targetTokenAddress]: ${targetTokenAddress}, ` +
+                `[targetTokenDecimals]: ${targetTokenDecimals}, ` +
+                `[targetTokenSymbol]: ${targetTokenSymbol}`
+        );
+
+        // check if the source token is ETH
+        if (sourceTokenAddress === ETH_ADDRESS) {
+            sourceTokenAddress = WETH_ADDRESS;
+        }
+        // check if the target token is ETH
+        if (targetTokenAddress === ETH_ADDRESS) {
+            targetTokenAddress = WETH_ADDRESS;
+        }
+
+        const sourceTokenWithNetworkId = `${sourceTokenAddress}:${BASE_NETWORK_ID}`;
+        const targetTokenWithNetworkId = `${targetTokenAddress}:${BASE_NETWORK_ID}`;
+
+        const tokenDetails = await getTokenDetails([
+            sourceTokenWithNetworkId,
+            targetTokenWithNetworkId,
+        ]);
+        elizaLogger.debug(
+            traceId,
+            `[getPrice] [${moxieUserId}] [TOKEN_DETAILS] ${JSON.stringify(tokenDetails)}`
+        );
+
+        if (!tokenDetails || tokenDetails.length === 0) {
+            elizaLogger.error(
+                traceId,
+                `[getPrice] [${moxieUserId}] [ERROR] Error getting token details: ${tokenDetails}`
+            );
+            throw new Error(
+                `Failed to get token details from codex with error`
+            );
+        }
+
+        const sourceTokenDetail = tokenDetails.find(
+            (token) =>
+                token.tokenAddress.toLowerCase() ===
+                sourceTokenAddress.toLowerCase()
+        );
+        const targetTokenDetail = tokenDetails.find(
+            (token) =>
+                token.tokenAddress.toLowerCase() ===
+                targetTokenAddress.toLowerCase()
+        );
+
+        // if source / target token details are not found, throw an error
+        if (!sourceTokenDetail || !targetTokenDetail) {
+            elizaLogger.error(
+                traceId,
+                `[getPrice] [${moxieUserId}] [ERROR] source / target token details not found`
+            );
+            throw new Error(
+                `Failed to get token details from codex with error`
+            );
+        }
+        if (!sourceTokenDetail?.priceUSD) {
+            elizaLogger.error(
+                traceId,
+                `[getPrice] [${moxieUserId}] [ERROR] priceUSD not found for source token: ${sourceTokenDetail}`
+            );
+            throw new Error(
+                `Failed to get token price in USD for token: ${sourceTokenWithNetworkId}`
+            );
+        }
+
+        const sourceTokenPriceInUSD = new Decimal(sourceTokenDetail.priceUSD);
+        elizaLogger.debug(
+            traceId,
+            `[getPrice] [${moxieUserId}] [${sourceTokenSymbol}] Price USD: ${sourceTokenPriceInUSD}`
+        );
+
+        // check for the target token price in USD
+        if (!targetTokenDetail?.priceUSD) {
+            elizaLogger.error(
+                traceId,
+                `[getPrice] [${moxieUserId}] [ERROR] priceUSD not found for target token: ${targetTokenDetail}`
+            );
+            throw new Error(
+                `Failed to get token price in USD for token: ${targetTokenWithNetworkId}`
+            );
+        }
+
+        const targetTokenPriceInUSD = new Decimal(targetTokenDetail.priceUSD);
+        elizaLogger.debug(
+            traceId,
+            `[getPrice] [${moxieUserId}] [${targetTokenSymbol}] Price USD: ${targetTokenPriceInUSD}`
+        );
+
+        // convert the amount to ether
+        const amountinEther = ethers.formatUnits(amount, sourceTokenDecimals);
+
+        elizaLogger.debug(
+            traceId,
+            `[getPrice] [${moxieUserId}] [${sourceTokenSymbol}] amount in ether: ${amountinEther}`
+        );
+
+        // calculate the amount of target token that can be bought with the amount using the source token price in USD
+        const amountInTargetToken = new Decimal(amountinEther.toString())
+            .mul(sourceTokenPriceInUSD.toString())
+            .div(targetTokenPriceInUSD.toString())
+            .toString();
+
+        const amountInTargetTokenFixed = new Decimal(amountInTargetToken)
+            .toFixed(Number(targetTokenDecimals))
+            .replace(/\.?0+$/, ""); // Remove trailing zeros and decimal point if whole number
+
+        elizaLogger.debug(
+            traceId,
+            `[getPrice] [${moxieUserId}] [${targetTokenSymbol}] amount: ${amountInTargetTokenFixed}`
+        );
+
+        // convert to wei
+        return ethers
+            .parseUnits(amountInTargetTokenFixed, targetTokenDecimals)
+            .toString();
+    } catch (error) {
+        elizaLogger.error(
+            traceId,
+            `[getPrice] [${moxieUserId}] [ERROR] Unhandled error: ${error.message}`
+        );
+        throw error;
     }
 }

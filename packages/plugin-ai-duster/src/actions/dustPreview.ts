@@ -12,6 +12,7 @@ import {
 import { Portfolio } from "@moxie-protocol/moxie-agent-lib";
 import { DustRequestSchema } from "../types";
 import { dustRequestTemplate } from "../templates";
+import { ETH_ADDRESS } from "../constants/constants";
 
 export const previewDustAction: Action = {
     name: "PREVIEW_DUST_TOKENS",
@@ -157,7 +158,7 @@ export const previewDustAction: Action = {
                     t.token.balanceUSD < threshold &&
                     t.token.balance > 0 &&
                     // ignore ETH
-                    t.address !== "0x0000000000000000000000000000000000000000"
+                    t.address !== ETH_ADDRESS.toLowerCase()
             );
 
             if (!dustTokens.length) {

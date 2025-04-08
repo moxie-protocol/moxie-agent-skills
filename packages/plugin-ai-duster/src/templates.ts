@@ -152,3 +152,21 @@ export const swapCompletedTemplate = (
 ) => ({
     text: `\n${sellTokenSymbol} to ${buyTokenSymbol} conversion completed successfully. ${buyAmountInWEI && buyAmountInWEI > 0n ? `\n${ethers.formatUnits(buyAmountInWEI.toString(), buyTokenDecimals)} ${buyTokenSymbol} received.` : ""}`,
 });
+
+export const approvalTransactionConfirmed = (approvalTxHash: string) => ({
+    text: `\nApproval transaction is confirmed!`,
+    content: {
+        url: `https://basescan.org/tx/${approvalTxHash}`,
+    },
+});
+
+export const approvalTransactionFailed = (approvalTxHash: string) => ({
+    text: `\nApproval transaction is failed!`,
+});
+
+export const approvalTransactionSubmitted = (approvalTxHash: string) => ({
+    text: `\nApproval transaction submitted. Awaiting confirmation.\nView on [BaseScan](https://basescan.org/tx/${approvalTxHash})`,
+    content: {
+        url: `https://basescan.org/tx/${approvalTxHash}`,
+    },
+});
