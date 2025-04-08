@@ -132,7 +132,7 @@ export async function getUserByMoxieId(
             }
         `;
 
-        const response = await fetch(process.env.MOXIE_API_URL, {
+        const response = await fetch(process.env.MOXIE_API_URL_INTERNAL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

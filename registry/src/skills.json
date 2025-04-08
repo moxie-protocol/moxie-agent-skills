@@ -202,7 +202,7 @@
         "displayName": "Social Alpha",
         "version": "0.1.8+build.1",
         "author": null,
-        "description": "In-depth analysis on Base users, including trades, portfolios, and posts on Farcaster and X. Buy user’s coins to add them to your Social Alpha list.",
+        "description": "In-depth analysis on Base users, including trades, portfolios, and posts on Farcaster and X.",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-social-alpha",
         "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-social-alpha/images/logo.svg",
         "settings": {},
@@ -545,6 +545,61 @@
             "Feeling the vibes",
             "Synthesizing results",
             "Preparing insights"
+        ]
+    }, 
+    {
+      "pluginId": "79449cd9-0590-4ccc-9d9f-12f99438c17b",
+      "name": "@moxie-protocol/plugin-degenfans-alfafrens",
+      "displayName": "DegenFans AlfaFrens",
+      "version": "0.0.2",
+      "author": "DegenFans",
+      "description": "Enables your agent to recommend staking options for AlfaFrens channels",
+      "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-degenfans-alfafrens",
+      "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-degenfans-alfafrens/images/logo.png",
+      "settings": {},
+      "capabilities": ["show the best staking options for a given staking amount"],
+      "starterQuestions": [
+        {
+          "label": "What is the Degenfans Alfafrens Skills?",
+          "value": "What is the Degenfans Alfafrens Skills?"
+        },
+        {
+          "label": "What are some staking recommendations you have for Alfafrens?",
+          "value": "What are some staking recommendations you have for Alfafrens?"
+        },
+        {
+          "label": "I have 9000 AF — how should I stake it?",
+          "value": "I have 9000 AF — how should I stake it?"
+        },
+        {
+          "label": "What are your top picks for staking on Alfafrens?",
+          "value": "What are your top picks for staking on Alfafrens?"
+        }
+      ],
+      "mediaUrls": [
+        ""
+      ],
+      "actions":  [
+          "GET_ALFAFRENS_STAKING_RECOMMENDATION",
+          "VIEW_ALFAFRENS_STAKING_RECOMMENDATION",
+          "GIVE_ALFAFRENS_STAKING_RECOMMENDATION",
+          "GET_ALFAFRENS_STAKING_CONSULTANT",
+          "STAKING_RECOMMENDATION_ON_ALFAFRENS",
+          "DEGENFANS_ALFAFRENS_INFO",
+          "WHAT_IS_DEGENFANS_ALFAFRENS",
+          "HOW_DOES_DEGENFANS_ALFAFRENS_WORK",
+          "HOW_TO_USE_DEGENFANS_ALFAFRENS"
+      ],
+      "isPremium": true,
+      "freeQueries": 3,
+      "skillCoinAddress": "0x112cf1cc540eadf234158c0e4044c3b5f2a33e5e",
+      "minimumSkillBalance": 5,
+      "status": "ACTIVE",
+      "isDefault": false,
+      "loaders": [
+            "Querying AlfaFrens",
+            "Waiting for response",
+            "Doing some DegenFans magic"
         ]
     }
 ]

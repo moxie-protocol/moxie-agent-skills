@@ -24,14 +24,20 @@ export const mockMoxieUser: MoxieUser = {
     identities: [
         {
             id: "fd14e2a4-11a2-4115-81b4-4b1d266ade64",
-            userId: "M8",
+            userId: "M1",
             type: "FARCASTER",
             connectedIdentitiesFetchStatus: "SUCCESS",
             metadata: {
                 bio: "hullo",
-                profileTokenId: "5650",
                 username: "vitalik.eth",
                 displayName: "Vitalik Buterin",
+                fid: 15971,
+                pfp: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfC2vsceENh7G_Q-hg6Ju6YwVYqn6f_VXsMA&s",
+                type: "farcaster",
+                verifiedAt: "2025-02-03T06:50:41.000Z",
+                ownerAddress: "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                firstVerifiedAt: "2025-02-03T06:50:41.000Z",
+                latestVerifiedAt: "2025-02-03T06:50:41.000Z",
             },
             profileId: "5650",
             isActive: true,

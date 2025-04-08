@@ -84,6 +84,9 @@ export async function getTokenDetails(tokenAddresses: string[]): Promise<TokenDe
     try {
         const tokenDetails = await client.queries.filterTokens({
             tokens: tokenAddresses,
+            filters: {
+                network: [BASE_NETWORK_ID],
+            },
         });
 
         if (!tokenDetails.filterTokens?.results) {
