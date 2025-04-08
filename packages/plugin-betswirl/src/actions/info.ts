@@ -5,6 +5,7 @@ import {
     type HandlerCallback,
     type State,
     type ActionExample,
+    elizaLogger,
 } from "@moxie-protocol/core";
 import { getCasinoTokens } from "../providers/casinoTokens";
 import { casinoChainById } from "@betswirl/sdk-core";
@@ -34,11 +35,12 @@ export const infoAction: Action = {
         _options: { [key: string]: unknown },
         callback: HandlerCallback
     ) => {
-        const casinoTokens = await getCasinoTokens();
-        const tokenSymbols = casinoTokens.map((token) => token.symbol);
-        const tokenSymbolsString = tokenSymbols.join(", ");
-        await callback({
-            text: `Play Games Of Luck/BetSwirl Skills offers you to play onchain casino games on Base:
+        try {
+            const casinoTokens = await getCasinoTokens();
+            const tokenSymbols = casinoTokens.map((token) => token.symbol);
+            const tokenSymbolsString = tokenSymbols.join(", ");
+            await callback({
+                text: `Play Games Of Luck/BetSwirl Skills offers you to play onchain casino games on Base:
 
 **🪙 Coin Toss**
 - Classic heads or tails game
@@ -57,9 +59,16 @@ export const infoAction: Action = {
 All games use Chainlink VRF for verifiable randomness. Place bets with ${tokenSymbolsString}. Winnings are paid out instantly to your wallet.
 
 [🎮 Start playing now](https://www.betswirl.com)`,
-            action: "BETSWIRL_INFO",
-        });
-        return true;
+                action: "BETSWIRL_INFO",
+            });
+            return true;
+        } catch (error) {
+            elizaLogger.error(error);
+            await callback({
+                text: "Error fetching betswirl info.",
+            });
+            return true;
+        }
     },
     examples: [
         [
