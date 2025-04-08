@@ -340,6 +340,15 @@ export const rouletteAction: Action = {
 
             const formattedNumbers = numbers.join(", ");
 
+            // Get the bet token from the user input
+            const selectedToken = await getBetToken(chainId, token);
+
+            // Validate the bet amount
+            const betAmountInWei = getBetAmountInWei(betAmount, selectedToken);
+            const tokenForMoxieTerminal = formatTokenForMoxieTerminal(
+                chainId,
+                selectedToken
+            );
             // if confirmation is not given yet
             if (isConfirmed === null) {
                 await callback({
@@ -356,20 +365,7 @@ export const rouletteAction: Action = {
             }
 
             await callback({
-                text: "Placing a Roulette bet on " + formattedNumbers,
-            });
-
-            // Get the bet token from the user input
-            const selectedToken = await getBetToken(chainId, token);
-
-            // Validate the bet amount
-            const betAmountInWei = getBetAmountInWei(betAmount, selectedToken);
-            const tokenForMoxieTerminal = formatTokenForMoxieTerminal(
-                chainId,
-                selectedToken
-            );
-            await callback({
-                text: ` with ${betAmount} ${tokenForMoxieTerminal}...`,
+                text: `Placing a Roulette bet on ${formattedNumbers} with ${betAmount} ${tokenForMoxieTerminal}... `,
             });
 
             elizaLogger.log(
