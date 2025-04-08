@@ -336,7 +336,17 @@ export const diceAction: Action = {
                 );
             }
 
-            // if confirmation is not given yet
+            // Get the bet token from the user input
+            const selectedToken = await getBetToken(chainId, token);
+
+            // Validate the bet amount
+            const betAmountInWei = getBetAmountInWei(betAmount, selectedToken);
+            const tokenForMoxieTerminal = formatTokenForMoxieTerminal(
+                chainId,
+                selectedToken
+            );
+            
+             // if confirmation is not given yet
             if (isConfirmed === null) {
                 await callback({
                     text: `You are trying to bet on ${number} with ${betAmount} ${token}. Would you like to confirm this bet?`,
@@ -352,20 +362,7 @@ export const diceAction: Action = {
             }
 
             await callback({
-                text: "Placing a Dice bet on " + number,
-            });
-
-            // Get the bet token from the user input
-            const selectedToken = await getBetToken(chainId, token);
-
-            // Validate the bet amount
-            const betAmountInWei = getBetAmountInWei(betAmount, selectedToken);
-            const tokenForMoxieTerminal = formatTokenForMoxieTerminal(
-                chainId,
-                selectedToken
-            );
-            await callback({
-                text: ` with ${betAmount} ${tokenForMoxieTerminal}...`,
+                text: `Placing a Dice bet on ${number} with ${betAmount} ${tokenForMoxieTerminal}... `,
             });
 
             elizaLogger.log(
