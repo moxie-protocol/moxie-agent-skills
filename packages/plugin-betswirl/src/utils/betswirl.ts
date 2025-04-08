@@ -217,6 +217,7 @@ export async function placeBet(
         const { hash: betHash } = await walletClient.sendTransaction(
             chainId.toString(),
             {
+                fromAddress: walletClient.address,
                 toAddress: functionData.data.to,
                 data: functionData.encodedData,
                 value: functionData.extraData.getValue(
