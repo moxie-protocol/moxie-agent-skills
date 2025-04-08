@@ -203,7 +203,7 @@ I want to bet my ETH on tails
 \`\`\`
 
 ** Message 7 **
-\`\`\`
+\`\`\`json
 [
     {
         "user": "{{user1}}",
@@ -237,7 +237,7 @@ I want to bet my ETH on tails
 \`\`\`
 
 ** Message 8 **
-\`\`\`
+\`\`\`json
 [
     {
         "user": "{{user1}}",
@@ -327,12 +327,13 @@ export const coinTossAction: Action = {
                 modelClass: ModelClass.SMALL,
                 schema: CoinTossBetParameters,
             });
-            const { face, betAmount, token, isConfirmed } = coinTossDetails.object as {
-                face: string;
-                betAmount: string;
-                token: string;
-                isConfirmed: boolean;
-            };
+            const { face, betAmount, token, isConfirmed } =
+                coinTossDetails.object as {
+                    face: string;
+                    betAmount: string;
+                    token: string;
+                    isConfirmed: boolean;
+                };
 
             // Validate face is heads or tails
             if (
@@ -354,7 +355,7 @@ export const coinTossAction: Action = {
                 chainId,
                 selectedToken
             );
-            
+
             // if confirmation is not given yet
             if (isConfirmed === null) {
                 await callback({
@@ -362,19 +363,16 @@ export const coinTossAction: Action = {
                     action: "COIN_TOSS",
                 });
                 return true;
-            // if user denied
+                // if user denied
             } else if (isConfirmed === false) {
                 await callback({
                     text: `In that case, let me know anytime if you would like to proceed with the bet, change your bet, or place a new bet.`,
                 });
                 return true;
             }
-            
+
             await callback({
-                text: "Betting on " + face,
-            });
-            await callback({
-                text: ` with ${betAmount} ${tokenForMoxieTerminal}...`,
+                text: `Betting on ${face} with ${betAmount} ${tokenForMoxieTerminal}...`,
             });
 
             elizaLogger.log(

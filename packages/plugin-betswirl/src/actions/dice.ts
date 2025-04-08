@@ -41,12 +41,21 @@ export const DiceBetParameters = z.object({
         .describe("The number to bet on"),
     ...casinoBetParams,
     ...getMaxBetCountParam(CASINO_GAME_TYPE.DICE),
+    isConfirmed: z
+        .boolean()
+        .optional()
+        .nullable()
+        .describe(
+            "Whether the user confirmed the bet based on historical conversation."
+        ),
 });
 export const diceTemplate = `
 Extract the following details to play on Dice:
 - **betAmount** (String?): The amount to wager.
 - **number** (Number?): The number to bet on. Can be from ${MIN_SELECTABLE_DICE_NUMBER} to ${MAX_SELECTABLE_DICE_NUMBER}.
 - **token** (String?): The token symbol.
+- **isConfirmed** (Boolean?): Whether the bet has been confirmed based on recent messages. Default this to null if there is no confirmation nor denial given by the user.
+
 Where "?" indicates that the value is optional.
 
 Provide the values in the following JSON format:
@@ -54,7 +63,8 @@ Provide the values in the following JSON format:
 {
     "betAmount": string?,
     "number": number?,
-    "token": string?
+    "token": string?,
+    "isConfirmed": boolean?
 }
 \`\`\`
 
@@ -62,7 +72,26 @@ Here are example messages and their corresponding responses:
 
 **Message 1**
 \`\`\`
-Bet 0.01 ETH above 44
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Bet 0.01 ETH above 44"
+        }
+    },
+    {
+        "user": "{{user2}}",
+        "content": {
+            "text": "You are trying to bet on 44 with 0.01 ETH, would you like to confirm this bet?"
+        }
+    },
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Yes."
+        }
+    }
+]
 \`\`\`
 
 **Response 1**
@@ -70,13 +99,33 @@ Bet 0.01 ETH above 44
 {
     "betAmount": "0.01",
     "number": 44,
-    "token" "ETH"
+    "token" "ETH",
+    "isConfirmed": true
 }
 \`\`\`
 
 **Message 2**
 \`\`\`
-Roll the dice with 0.01 ETH on 23
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Roll the dice with 0.01 ETH on 23"
+        }
+    },
+    {
+        "user": "{{user2}}",
+        "content": {
+            "text": "You are trying to bet on 23 with 0.1 ETH, would you like to confirm this bet?"
+        }
+    },
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "No."
+        }
+    }
+]
 \`\`\`
 
 **Response 2**
@@ -84,13 +133,21 @@ Roll the dice with 0.01 ETH on 23
 {
     "betAmount": "0.5",
     "number": 23,
-    "token": "ETH",
+    "token": "ETH",,
+    "isConfirmed": false
 }
 \`\`\`
 
 ** Message 3 **
 \`\`\`
-Roll a dice for me
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Roll a dice for me"
+        }
+    }
+]
 \`\`\`
 
 ** Response 3 **
@@ -99,6 +156,7 @@ Roll a dice for me
     "betAmount": null,
     "number": null,
     "token": null,
+    "isConfirmed": null
 }
 \`\`\`
 
@@ -113,6 +171,7 @@ I want to bet on the 8
     "betAmount": null,
     "number": 8,
     "token": null,
+    "isConfirmed": null
 }
 \`\`\`
 
@@ -127,6 +186,7 @@ I want to bet 0.01 on 8
     "betAmount": "0.01",
     "number": 8,
     "token": null,
+    "isConfirmed": false
 }
 \`\`\`
 
@@ -141,8 +201,76 @@ I want to bet my ETH on 8
     "betAmount": null,
     "number": 8,
     "token": "ETH",
+    "isConfirmed": null
 }
+\`\`\`
+
+** Message 7 **
 \`\`\`json
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "can you place a bet on 88 for dice with 0.0002 ETH?"
+        },
+        {
+            "user": "{{user2}}",
+            "content": {
+                "text": "You are trying to bet on 88 with 0.0002 ETH, would you like to confirm this bet?"
+            }
+        },
+        {
+            "user": "{{user1}}",
+            "content": {
+                "text": "Yes."
+            }
+        }
+    }
+]
+\`\`\`
+
+** Response 7 **
+\`\`\`json
+{
+    "betAmount": "0.0002",
+    "number": 88,
+    "token": "ETH",
+    "isConfirmed": true
+}
+\`\`\`
+
+** Message 8 **
+\`\`\`json
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "can you place a bet on 88 for dice with 0.00003 ETH?"
+        },
+    {
+        "user": "{{user2}}",
+        "content": {
+            "text": "You are trying to bet on 88 with 0.00003 ETH, would you like to confirm this bet?"
+        }
+    },
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Yes."
+        }
+    }
+]
+\`\`\`
+
+** Response 8 **
+\`\`\`json
+{
+    "betAmount": "0.00003",
+    "number": 88,
+    "token": "ETH",
+    "isConfirmed": true
+}
+\`\`\`
 
 Here are the recent user messages for context:
 {{recentMessages}}
@@ -194,10 +322,11 @@ export const diceAction: Action = {
                 modelClass: ModelClass.SMALL,
                 schema: DiceBetParameters,
             });
-            const { number, betAmount, token } = diceDetails.object as {
+            const { number, betAmount, token, isConfirmed } = diceDetails.object as {
                 number: DiceNumber;
                 betAmount: string;
                 token: string;
+                isConfirmed: boolean;
             };
 
             // Validate face is heads or tails
@@ -206,6 +335,22 @@ export const diceAction: Action = {
                     `You must provide a number between ${MIN_SELECTABLE_DICE_NUMBER} and ${MAX_SELECTABLE_DICE_NUMBER} as it's a 100 sided Dice. i.e. "Bet 0.07 ETH on 77". You'll be betting that the rolled number will be above this chosen number.`
                 );
             }
+
+            // if confirmation is not given yet
+            if (isConfirmed === null) {
+                await callback({
+                    text: `You are trying to bet on ${number} with ${betAmount} ${token}. Would you like to confirm this bet?`,
+                    action: "DICE",
+                });
+                return true;
+                // if user denied
+            } else if (isConfirmed === false) {
+                await callback({
+                    text: `In that case, let me know anytime if you would like to proceed with the bet, change your bet, or place a new bet.`,
+                });
+                return true;
+            }
+
             await callback({
                 text: "Placing a Dice bet on " + number,
             });
