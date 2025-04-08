@@ -345,10 +345,6 @@ export const coinTossAction: Action = {
                     `You must specify the face heads or tails. i.e. "Bet 0.07 ETH on heads". You'll be betting that the rolled face will be the one chosen.`
                 );
             }
-            await callback({
-                text: "Betting on " + face,
-            });
-
             // Get the bet token from the user input
             const selectedToken = await getBetToken(chainId, token);
 
@@ -358,6 +354,25 @@ export const coinTossAction: Action = {
                 chainId,
                 selectedToken
             );
+            
+            // if confirmation is not given yet
+            if (isConfirmed === null) {
+                await callback({
+                    text: `You are trying to bet on ${face} with ${betAmount} ${token}. Would you like to confirm this bet?`,
+                    action: "COIN_TOSS",
+                });
+                return true;
+            // if user denied
+            } else if (isConfirmed === false) {
+                await callback({
+                    text: `In that case, let me know anytime if you would like to proceed with the bet, change your bet, or place a new bet.`,
+                });
+                return true;
+            }
+            
+            await callback({
+                text: "Betting on " + face,
+            });
             await callback({
                 text: ` with ${betAmount} ${tokenForMoxieTerminal}...`,
             });
