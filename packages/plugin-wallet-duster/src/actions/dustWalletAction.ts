@@ -15,17 +15,15 @@ import {
     MoxieWalletClient,
     Portfolio,
 } from "@moxie-protocol/moxie-agent-lib";
-import { swapTokenToETH } from "../utils/token";
 import { DustRequestSchema } from "../types";
 import { dustRequestTemplate } from "../templates";
 import { swap } from "../utils/swap";
 import {
     ETH_ADDRESS,
-    MOXIE,
     MOXIE_TOKEN_ADDRESS,
     MOXIE_TOKEN_DECIMALS,
 } from "../constants/constants";
-import { ethers } from "ethers";
+import { ethers, Contract } from "ethers";
 
 export const dustWalletAction: Action = {
     name: "DUST_WALLET_TO_ETH",
@@ -163,15 +161,17 @@ export const dustWalletAction: Action = {
                 .toFixed(2);
             const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
             for (const token of dustTokens) {
-                const txHash = await swap(
+                if (token.token.baseToken.symbol === "WETH") continue;
+                elizaLogger.info("Dusting token", JSON.stringify(token));
+                await swap(
                     traceId,
                     ETH_ADDRESS,
                     "ETH",
-                    token.address,
+                    token.token.baseToken.address,
                     token.token.baseToken.symbol,
                     moxieUserId,
                     agentWallet.address,
-                    BigInt(token.token.balance),
+                    ethers.parseUnits(token.token.balance.toString(), 18),
                     provider,
                     18,
                     18,
@@ -179,16 +179,10 @@ export const dustWalletAction: Action = {
                     state.agentWalletBalance as Portfolio,
                     wallet
                 );
-                if (!txHash) {
-                    elizaLogger.warn(`Swap failed for token ${token.address}`);
-                    await callback({
-                        text: ``,
-                    });
-                }
             }
 
             await callback?.({
-                text: `Swapped ${dustTokens.length} dust token(s) into ETH (~$${totalUsdValue}).`,
+                text: `\nSwapped ${dustTokens.length} dust token(s) into ETH (~$${totalUsdValue}).`,
             });
         } catch (error) {
             elizaLogger.error("Error dusting wallet:", error);
