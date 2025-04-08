@@ -327,10 +327,11 @@ export const coinTossAction: Action = {
                 modelClass: ModelClass.SMALL,
                 schema: CoinTossBetParameters,
             });
-            const { face, betAmount, token } = coinTossDetails.object as {
+            const { face, betAmount, token, isConfirmed } = coinTossDetails.object as {
                 face: string;
                 betAmount: string;
                 token: string;
+                isConfirmed: boolean;
             };
 
             // Validate face is heads or tails
