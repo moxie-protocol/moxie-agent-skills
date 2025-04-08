@@ -13,6 +13,9 @@ export const infoAction: Action = {
         "WHAT_IS_BETSWIRL",
         "HOW_DOES_BETSWIRL_WORK",
         "HOW_TO_PLAY_BETSWIRL",
+        "WHAT_IS_PLAY_GAMES_OF_LUCK",
+        "HOW_DOES_PLAY_GAMES_OF_LUCK_WORK",
+        "HOW_TO_PLAY_GAMES_OF_LUCK",
     ],
     description:
         "BetSwirl's skills offers you onchain casino games: Dice, Coin Toss and Roulette. Once you placed the bet, a randomness is drawn from Chainlink VRF and used to resolve the game, and you immediately receive your payout in your wallet if you win. If you want more details, visit https://www.betswirl.com.",
