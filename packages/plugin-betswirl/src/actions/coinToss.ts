@@ -203,7 +203,7 @@ I want to bet my ETH on tails
 \`\`\`
 
 ** Message 7 **
-\`\`\`
+\`\`\`json
 [
     {
         "user": "{{user1}}",
@@ -237,7 +237,7 @@ I want to bet my ETH on tails
 \`\`\`
 
 ** Message 8 **
-\`\`\`
+\`\`\`json
 [
     {
         "user": "{{user1}}",
@@ -346,7 +346,6 @@ export const coinTossAction: Action = {
                     `You must specify the face heads or tails. i.e. "Bet 0.07 ETH on heads". You'll be betting that the rolled face will be the one chosen.`
                 );
             }
-
             // Get the bet token from the user input
             const selectedToken = await getBetToken(chainId, token);
 
@@ -357,12 +356,14 @@ export const coinTossAction: Action = {
                 selectedToken
             );
 
+            // if confirmation is not given yet
             if (isConfirmed === null) {
                 await callback({
                     text: `You are trying to bet on ${face} with ${betAmount} ${token}. Would you like to confirm this bet?`,
                     action: "COIN_TOSS",
                 });
                 return true;
+                // if user denied
             } else if (isConfirmed === false) {
                 await callback({
                     text: `In that case, let me know anytime if you would like to proceed with the bet, change your bet, or place a new bet.`,
@@ -371,11 +372,7 @@ export const coinTossAction: Action = {
             }
 
             await callback({
-                text: "Betting on " + face,
-            });
-
-            await callback({
-                text: ` with ${betAmount} ${tokenForMoxieTerminal}...`,
+                text: `Betting on ${face} with ${betAmount} ${tokenForMoxieTerminal}...`,
             });
 
             elizaLogger.log(
@@ -434,18 +431,6 @@ Payout: [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) ${to
             {
                 user: "{{user2}}",
                 content: {
-                    text: "You are trying to bet on heads with 0.01 ETH, would you like to confirm this bet?",
-                },
-            },
-            {
-                user: "{{user1}}",
-                content: {
-                    text: "Yes.",
-                },
-            },
-            {
-                user: "{{user2}}",
-                content: {
                     text: "You Won, your Payout is 0.00003 ETH, Bet tx: 0x6ba8a0c3e861b036f052709f56412084806376fbaf24b15bce4920a8a53095af, Resolution tx hash: 0x8ed5541c45b6c7083b3e5795f52f92827748e93e6562ec126f4a1cf22b433f77",
                     action: "COIN_TOSS",
                 },
@@ -459,7 +444,7 @@ Payout: [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) ${to
                 },
             },
             {
-                user: "{{user1}}",
+                user: "{{user2}}",
                 content: {
                     text: "Face must be heads or tails, bet amount and token symbol",
                 },

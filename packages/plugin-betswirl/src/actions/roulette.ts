@@ -44,12 +44,21 @@ export const RouletteBetParameters = z.object({
         .describe("The numbers to bet on"),
     ...casinoBetParams,
     ...getMaxBetCountParam(CASINO_GAME_TYPE.ROULETTE),
+    isConfirmed: z
+        .boolean()
+        .optional()
+        .nullable()
+        .describe(
+            "Whether the user confirmed the bet based on historical conversation."
+        ),
 });
 export const rouletteTemplate = `
 Extract the following details to play on Roulette:
 - **betAmount** (String?): The amount to wager.
 - **numbers** (Array<number>?): The numbers to bet on. Can be several unique numbers from ${MIN_SELECTABLE_ROULETTE_NUMBER} to ${MAX_SELECTABLE_ROULETTE_NUMBER}.
 - **token** (String?): The token symbol.
+- **isConfirmed** (Boolean?): Whether the bet has been confirmed based on recent messages. Default this to null if there is no confirmation nor denial given by the user.
+
 Where "?" indicates that the value is optional.
 
 Provide the values in the following JSON format:
@@ -57,7 +66,8 @@ Provide the values in the following JSON format:
 {
     "betAmount": string?,
     "numbers": Array<number>?,
-    "token": string?
+    "token": string?,
+    "isConfirmed": boolean?
 }
 \`\`\`
 
@@ -65,7 +75,26 @@ Here are example messages and their corresponding responses:
 
 **Message 1**
 \`\`\`
-Bet 0.01 ETH on 3,6,8 and 10
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Bet 0.01 ETH on 3,6,8 and 10"
+        }
+    },
+    {
+        "user": "{{user2}}",
+        "content": {
+            "text": "You are trying to bet on 3,6,8 and 10 with 0.01 ETH, would you like to confirm this bet?"
+        }
+    },
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Yes."
+        }
+    }
+]
 \`\`\`
 
 **Response 1**
@@ -73,13 +102,33 @@ Bet 0.01 ETH on 3,6,8 and 10
 {
     "betAmount": "0.01",
     "numbers": [3, 6, 8, 10],
-    "token" "ETH"
+    "token" "ETH",
+    "isConfirmed": true
 }
 \`\`\`
 
 **Message 2**
 \`\`\`
-Bet 0.01 ETH on 8 11 3 9
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Bet 0.01 ETH on 8 11 3 9"
+        }
+    },
+    {
+        "user": "{{user2}}",
+        "content": {
+            "text": "You are trying to bet on 8, 11, 3, and 9 with 0.1 ETH, would you like to confirm this bet?"
+        }
+    },
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "No."
+        }
+    }
+]
 \`\`\`
 
 **Response 2**
@@ -88,12 +137,20 @@ Bet 0.01 ETH on 8 11 3 9
     "betAmount": "0.5",
     "numbers": [8, 11, 3, 9],
     "token": "ETH",
+    "isConfirmed": false
 }
 \`\`\`
 
 ** Message 3 **
 \`\`\`
-Spin a roulette for me
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Spin a roulette for me"
+        }
+    }
+]
 \`\`\`
 
 ** Response 3 **
@@ -102,6 +159,7 @@ Spin a roulette for me
     "betAmount": null,
     "numbers": null,
     "token": null,
+    "isConfirmed": null
 }
 \`\`\`
 
@@ -116,6 +174,7 @@ I want to bet on the 8, 5, and 26
     "betAmount": null,
     "numbers": [8, 5, 26],
     "token": null,
+    "isConfirmed": null
 }
 \`\`\`
 
@@ -130,6 +189,7 @@ I want to bet 0.01 on 8, 5, and 26
     "betAmount": "0.01",
     "numbers": [8, 5, 26],
     "token": null,
+    "isConfirmed": false
 }
 \`\`\`
 
@@ -144,8 +204,76 @@ I want to bet my ETH on 8, 5, 26
     "betAmount": null,
     "numbers": [8, 5, 26],
     "token": "ETH",
+    "isConfirmed": null
 }
+\`\`\`
+
+** Message 7 **
+\`\`\`
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "can you place a bet on 8, 5 and 26 for roulette with 0.0002 ETH?"
+        },
+        {
+            "user": "{{user2}}",
+            "content": {
+                "text": "You are trying to bet on 8, 5 and 26 with 0.0002 ETH, would you like to confirm this bet?"
+            }
+        },
+        {
+            "user": "{{user1}}",
+            "content": {
+                "text": "Yes."
+            }
+        }
+    }
+]
+\`\`\`
+
+** Response 7 **
 \`\`\`json
+{
+    "betAmount": "0.0002",
+    "numbers": [8, 5, 26],
+    "token": "ETH",
+    "isConfirmed": true
+}
+\`\`\`
+
+** Message 8 **
+\`\`\`
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "can you place a bet on 8, 5, and 26 for roulette with 0.00003 ETH?"
+        },
+    {
+        "user": "{{user2}}",
+        "content": {
+            "text": "You are trying to bet on 8, 5, and 26 with 0.00003 ETH, would you like to confirm this bet?"
+        }
+    },
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Yes."
+        }
+    }
+]
+\`\`\`
+
+** Response 8 **
+\`\`\`json
+{
+    "betAmount": "0.00003",
+    "numbers": [8, 5, 26],
+    "token": "ETH",
+    "isConfirmed": true
+}
+\`\`\`
 
 Here are the recent user messages for context:
 {{recentMessages}}
@@ -196,10 +324,11 @@ export const rouletteAction: Action = {
                 modelClass: ModelClass.SMALL,
                 schema: RouletteBetParameters,
             });
-            const { numbers, betAmount, token } = rouletteDetails.object as {
+            const { numbers, betAmount, token, isConfirmed } = rouletteDetails.object as {
                 numbers: Array<RouletteNumber>;
                 betAmount: string;
                 token: string;
+                isConfirmed: boolean;
             };
 
             // Validate face is heads or tails
@@ -208,7 +337,24 @@ export const rouletteAction: Action = {
                     `You must provide from 1 to ${MAX_SELECTABLE_ROULETTE_NUMBER} numbers between ${MIN_SELECTABLE_ROULETTE_NUMBER} and ${MAX_SELECTABLE_ROULETTE_NUMBER}. i.e. "Bet 0.07 ETH on 3, 18, 26, and 31". You'll be betting that the rolled number will be one of the chosen numbers.`
                 );
             }
+
             const formattedNumbers = numbers.join(", ");
+
+            // if confirmation is not given yet
+            if (isConfirmed === null) {
+                await callback({
+                    text: `You are trying to bet on ${formattedNumbers} with ${betAmount} ${token}. Would you like to confirm this bet?`,
+                    action: "ROULETTE",
+                });
+                return true;
+                // if user denied
+            } else if (isConfirmed === false) {
+                await callback({
+                    text: `In that case, let me know anytime if you would like to proceed with the bet, change your bet, or place a new bet.`,
+                });
+                return true;
+            }
+
             await callback({
                 text: "Placing a Roulette bet on " + formattedNumbers,
             });
