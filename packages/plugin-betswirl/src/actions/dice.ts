@@ -322,12 +322,13 @@ export const diceAction: Action = {
                 modelClass: ModelClass.SMALL,
                 schema: DiceBetParameters,
             });
-            const { number, betAmount, token, isConfirmed } = diceDetails.object as {
-                number: DiceNumber;
-                betAmount: string;
-                token: string;
-                isConfirmed: boolean;
-            };
+            const { number, betAmount, token, isConfirmed } =
+                diceDetails.object as {
+                    number: DiceNumber;
+                    betAmount: string;
+                    token: string;
+                    isConfirmed: boolean;
+                };
 
             // Validate face is heads or tails
             if (!number) {
@@ -335,6 +336,20 @@ export const diceAction: Action = {
                     `You must provide a number between ${MIN_SELECTABLE_DICE_NUMBER} and ${MAX_SELECTABLE_DICE_NUMBER} as it's a 100 sided Dice. i.e. "Bet 0.07 ETH on 77". You'll be betting that the rolled number will be above this chosen number.`
                 );
             }
+
+            await callback({
+                text: "Placing a Dice bet on " + number,
+            });
+
+            // Get the bet token from the user input
+            const selectedToken = await getBetToken(chainId, token);
+
+            // Validate the bet amount
+            const betAmountInWei = getBetAmountInWei(betAmount, selectedToken);
+            const tokenForMoxieTerminal = formatTokenForMoxieTerminal(
+                chainId,
+                selectedToken
+            );
 
             // if confirmation is not given yet
             if (isConfirmed === null) {
@@ -351,19 +366,6 @@ export const diceAction: Action = {
                 return true;
             }
 
-            await callback({
-                text: "Placing a Dice bet on " + number,
-            });
-
-            // Get the bet token from the user input
-            const selectedToken = await getBetToken(chainId, token);
-
-            // Validate the bet amount
-            const betAmountInWei = getBetAmountInWei(betAmount, selectedToken);
-            const tokenForMoxieTerminal = formatTokenForMoxieTerminal(
-                chainId,
-                selectedToken
-            );
             await callback({
                 text: ` with ${betAmount} ${tokenForMoxieTerminal}...`,
             });
