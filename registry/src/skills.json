@@ -356,10 +356,10 @@
             "WHALE_HUNTER",
             "WHALE_TOKEN_HOLDERS"
         ],
-        "isPremium": true,
+        "isPremium": false,
         "freeQueries": 10,
-        "skillCoinAddress": "0x125490489a27d541e39813c08d260debac071bb7",
-        "minimumSkillBalance": 1,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": true,
         "loaders": [
@@ -460,7 +460,7 @@
             "Synthesizing results",
             "Preparing insights"
         ]
-    }, 
+    },
     {
       "pluginId": "79449cd9-0590-4ccc-9d9f-12f99438c17b",
       "name": "@moxie-protocol/plugin-degenfans-alfafrens",
