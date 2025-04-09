@@ -118,14 +118,11 @@ export async function swap(
         if (!quote.liquidityAvailable) {
             elizaLogger.error(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [swap] liquidity not available for ${sellTokenSymbol} to ${buyTokenSymbol} swap`
+                `[tokenSwap] [${moxieUserId}] [swap] liquidity not available for $${sellTokenSymbol} to $${buyTokenSymbol} swap`
             );
             await callback?.({
-                text: `\nInsufficient liquidity to complete this transaction. Please try with a smaller amount.`,
+                text: `\nInsufficient liquidity to complete this transaction.`,
             });
-            throw new Error(
-                `[tokenSwap] [${moxieUserId}] [swap] Insufficient liquidity for ${sellTokenSymbol} to ${buyTokenSymbol} swap`
-            );
         }
         // for other currencies we need to check allowance and approve spending
         // check allowance and approve spending

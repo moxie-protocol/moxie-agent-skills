@@ -120,7 +120,7 @@ export const dustWalletAction: Action = {
                     t.token.balance > 0 &&
                     // ignore ETH
                     (t.token.baseToken.address.toLowerCase() !==
-                        ETH_ADDRESS.toLowerCase() ||
+                        "0x0000000000000000000000000000000000000000".toLowerCase() ||
                         t.token.baseToken.address.toLowerCase() !==
                             ETH_ADDRESS.toLowerCase())
             );
