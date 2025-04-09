@@ -133,7 +133,7 @@ export async function swap(
             `[tokenSwap] [${moxieUserId}] [swap] issues from get0xSwapQuote: ${JSON.stringify(issues)}`
         );
         // check allowance and approve spending
-        if (issues.allowance && issues.allowance != null) {
+        if (issues?.allowance && issues?.allowance != null) {
             await checkAllowanceAndApproveSpendRequest(
                 traceId,
                 moxieUserId,
@@ -151,7 +151,7 @@ export async function swap(
             );
         }
         // check balance and approve spending
-        if (issues.balance && issues.balance != null) {
+        if (issues?.balance && issues?.balance != null) {
             const balance = await getERC20Balance(
                 traceId,
                 sellTokenAddress,
