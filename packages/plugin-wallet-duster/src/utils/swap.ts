@@ -123,6 +123,7 @@ export async function swap(
             await callback?.({
                 text: `\nInsufficient liquidity to complete this transaction.`,
             });
+            return null;
         }
         // for other currencies we need to check allowance and approve spending
         // check allowance and approve spending

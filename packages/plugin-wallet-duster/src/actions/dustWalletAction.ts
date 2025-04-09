@@ -133,12 +133,11 @@ export const dustWalletAction: Action = {
                 return true;
             }
 
-            const totalUsdValue = dustTokens
-                .reduce((sum, token) => sum + token.token.balanceUSD, 0)
-                .toFixed(2);
+            let totalUsdValue = 0;
             const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
+            let dustedTokenCount = 0;
             for (const token of dustTokens) {
-                await swap(
+                const dustedToken = await swap(
                     traceId,
                     token.token.baseToken.address,
                     token.token.baseToken.symbol,
@@ -148,10 +147,14 @@ export const dustWalletAction: Action = {
                     callback,
                     wallet
                 );
+                if (dustedToken) {
+                    dustedTokenCount++;
+                    totalUsdValue += token.token.balanceUSD;
+                }
             }
 
             await callback?.({
-                text: `\nDusted ${dustTokens.length} dust token(s) into ETH (~$${totalUsdValue}).`,
+                text: `\nDusted ${dustedTokenCount} dust token(s) into ETH (~$${totalUsdValue.toFixed(2)}).`,
             });
         } catch (error) {
             elizaLogger.error("Error dusting wallet:", error);
