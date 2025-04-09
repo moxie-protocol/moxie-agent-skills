@@ -683,12 +683,12 @@
                 "value": "How does wallet dusting work?"
             },
             {
-                "label": "Preview dusting my wallet",
-                "value": "Preview what tokens you’d dust from my wallet."
+                "label": "Preview dusting my wallet.",
+                "value": "Preview dusting my wallet."
             },
             {
-                "label": "Dust tokens under $5",
-                "value": "Dust my wallet for anything under $5."
+                "label": "Dust tokens under $5.",
+                "value": "Dust tokens under $5."
             },
             {
                 "label": "How much dust is in my wallet?",
