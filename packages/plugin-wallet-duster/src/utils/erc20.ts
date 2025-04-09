@@ -1,60 +1,6 @@
 import { elizaLogger } from "@moxie-protocol/core";
 import { ethers } from "ethers";
 
-/**
- * Fetches the number of decimals for an ERC20 token
- * @param tokenAddress - The address of the ERC20 token
- * @returns The number of decimals for the token
- * @throws Error if the token address is invalid or the decimals cannot be fetched
- */
-export async function getERC20Decimals(traceId: string, tokenAddress: string) {
-    const abi = [
-        {
-            constant: true,
-            inputs: [],
-            name: "decimals",
-            outputs: [{ name: "decimals", type: "uint8" }],
-            payable: false,
-            stateMutability: "view",
-            type: "function",
-        },
-    ];
-    try {
-        // Verify checksum address
-        const checksumAddress = ethers.getAddress(tokenAddress);
-        const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
-        const contract = new ethers.Contract(checksumAddress, abi, provider);
-
-        // Add retry logic with exponential backoff
-        let retries = 3;
-        let delay = 1000; // Start with 1 second delay
-
-        while (retries > 0) {
-            try {
-                const decimals = await contract.decimals();
-                elizaLogger.debug(
-                    traceId,
-                    `[getERC20Decimals] [${tokenAddress}] fetched decimals: ${decimals}`
-                );
-                return decimals;
-            } catch (err) {
-                retries--;
-                if (retries === 0) throw err;
-
-                // Wait with exponential backoff before retrying
-                await new Promise((resolve) => setTimeout(resolve, delay));
-                delay *= 2; // Double the delay for next retry
-            }
-        }
-    } catch (error) {
-        elizaLogger.error(
-            traceId,
-            `[getERC20Decimals] [${tokenAddress}] Error fetching token decimals: ${JSON.stringify(error)}`
-        );
-        throw error;
-    }
-}
-
 export async function getERC20Balance(
     traceId: string,
     tokenAddress: string,

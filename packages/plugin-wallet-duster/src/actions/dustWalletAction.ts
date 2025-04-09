@@ -119,7 +119,10 @@ export const dustWalletAction: Action = {
                     t.token.balanceUSD < threshold &&
                     t.token.balance > 0 &&
                     // ignore ETH
-                    t.address !== ETH_ADDRESS.toLowerCase()
+                    (t.token.baseToken.address.toLowerCase() !==
+                        ETH_ADDRESS.toLowerCase() ||
+                        t.token.baseToken.address.toLowerCase() !==
+                            ETH_ADDRESS.toLowerCase())
             );
 
             if (!dustTokens.length) {
@@ -135,18 +138,14 @@ export const dustWalletAction: Action = {
                 .toFixed(2);
             const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
             for (const token of dustTokens) {
-                if (token.token.baseToken.symbol === "WETH") continue;
-                elizaLogger.info("Dusting token", JSON.stringify(token));
                 await swap(
                     traceId,
                     token.token.baseToken.address,
                     token.token.baseToken.symbol,
                     moxieUserId,
                     agentWallet.address,
-                    ethers.parseUnits(token.token.balance.toString(), 18),
                     provider,
                     callback,
-                    state.agentWalletBalance as Portfolio,
                     wallet
                 );
             }

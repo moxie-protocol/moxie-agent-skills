@@ -198,7 +198,7 @@ export const previewDustAction: Action = {
 
             const lines = dustTokens.map(
                 (t) =>
-                    `| $[${t.token.baseToken.symbol}|${t.token.baseToken.address}] | [${t.token.baseToken.address}](https://basescan.org/token/${t.token.baseToken.address}) | $${t.token.balance < 0.01 ? "< $0.01" : t.token.balanceUSD.toFixed(2)} |`
+                    `| $${t.token.baseToken.symbol} | [${t.token.baseToken.address}](https://basescan.org/token/${t.token.baseToken.address}) | $${t.token.balance < 0.01 ? "< $0.01" : t.token.balanceUSD.toFixed(2)} |`
             );
             const response = `You have ${dustTokens.length} dust token(s) totaling ~$${totalUsdValue}:\n| Token Symbol | Token Address | Value |\n|-------|-------|-------|\n${lines.join("\n")}`;
 

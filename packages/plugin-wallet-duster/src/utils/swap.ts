@@ -1,4 +1,4 @@
-import { elizaLogger, HandlerCallback } from "@moxie-protocol/core";
+import { elizaLogger } from "@moxie-protocol/core";
 import {
     getTokenDetails,
     MoxieHex,
@@ -6,7 +6,6 @@ import {
     MoxieWalletSendTransactionInputType,
     MoxieWalletSendTransactionResponseType,
     MoxieWalletSignTypedDataResponseType,
-    Portfolio,
 } from "@moxie-protocol/moxie-agent-lib";
 import { concat, ethers } from "ethers";
 import { encodeFunctionData, numberToHex, size } from "viem";
@@ -22,12 +21,9 @@ import {
     MAX_UINT256,
     mockGetQuoteResponse,
     TRANSACTION_RECEIPT_TIMEOUT,
-    USDC,
-    USDC_ADDRESS,
-    USDC_TOKEN_DECIMALS,
     WETH_ADDRESS,
 } from "../constants/constants";
-import { getERC20Balance, getERC20Decimals } from "./erc20";
+import { getERC20Balance } from "./erc20";
 
 const initializeClients = () => {
     if (!process.env.ZERO_EX_API_KEY) {
@@ -52,32 +48,21 @@ const { zxClient } = initializeClients();
 
 /**
  * Swaps tokens using 0x protocol
- * @param buyTokenAddress The address of the token to buy
- * @param buyTokenSymbol The symbol of the token to buy
  * @param sellTokenAddress The address of the token to sell
  * @param sellTokenSymbol The symbol of the token to sell
  * @param moxieUserId The user ID of the person performing the swap
  * @param agentWalletAddress The wallet address of the person performing the swap
- * @param sellAmountInWEI The amount of the token to sell in WEI
  * @param provider The ethers JsonRpcProvider instance
- * @param sellTokenDecimals The number of decimals of the token to sell
- * @param buyTokenDecimals The number of decimals of the token to buy
  * @param callback Optional callback function to receive status updates
  */
 export async function swap(
     traceId: string,
-    // buyTokenAddress: string,
-    // buyTokenSymbol: string,
     sellTokenAddress: string,
     sellTokenSymbol: string,
     moxieUserId: string,
     agentWalletAddress: string,
-    sellAmountInWEI: bigint,
     provider: ethers.JsonRpcProvider,
-    // sellTokenDecimals: number,
-    // buyTokenDecimals: number,
     callback: any,
-    agentWalletBalance: Portfolio,
     walletClient: MoxieWalletClient
 ): Promise<bigint> {
     // Set buy token to ETH
@@ -85,64 +70,41 @@ export async function swap(
     const buyTokenSymbol = "ETH";
     const buyTokenAddress = ETH_ADDRESS;
     await callback?.({
-        text: `# Dusting $[${sellTokenSymbol}|${sellTokenAddress}] to $${buyTokenSymbol}`,
+        text: `# Dusting $${sellTokenSymbol} to $${buyTokenSymbol}\n`,
     });
     elizaLogger.debug(
         traceId,
-        `[tokenSwap] [${moxieUserId}] [swap] called, buyTokenAddress: ${buyTokenAddress}, buyTokenSymbol: ${buyTokenSymbol}, sellTokenAddress: ${sellTokenAddress}, sellTokenSymbol: ${sellTokenSymbol}, agentWalletAddress: ${agentWalletAddress}, sellAmountInWEI: ${sellAmountInWEI}`
+        `[tokenSwap] [${moxieUserId}] [swap] called, buyTokenAddress: ${buyTokenAddress}, buyTokenSymbol: ${buyTokenSymbol}, sellTokenAddress: ${sellTokenAddress}, sellTokenSymbol: ${sellTokenSymbol}, agentWalletAddress: ${agentWalletAddress}`
     );
     let buyAmountInWEI: bigint;
     let tokenBalance: bigint;
     let quote: GetQuoteResponse | null = null;
 
     try {
-        const sellTokenDecimals = await getERC20Decimals(
-            traceId,
-            sellTokenAddress
-        );
         // do balance check first
-        const balance =
-            sellTokenSymbol === "ETH"
-                ? await provider.getBalance(agentWalletAddress)
-                : await getERC20Balance(
-                      traceId,
-                      sellTokenAddress,
-                      agentWalletAddress
-                  );
+        const balance = await getERC20Balance(
+            traceId,
+            sellTokenAddress,
+            agentWalletAddress
+        );
         elizaLogger.debug(
             traceId,
             `[tokenSwap] [${moxieUserId}] [swap] balance: ${balance}`
         );
         tokenBalance = balance ? BigInt(balance) : BigInt(0);
 
-        if (tokenBalance < sellAmountInWEI) {
-            await handleInsufficientBalance(
-                traceId,
-                agentWalletBalance,
-                moxieUserId,
-                sellTokenAddress,
-                sellTokenSymbol,
-                sellAmountInWEI,
-                tokenBalance,
-                sellTokenDecimals,
-                agentWalletAddress,
-                callback,
-                buyTokenAddress
-            );
-            elizaLogger.debug(
-                traceId,
-                `[tokenSwap] [${moxieUserId}] [swap] Insufficient balance for ${sellTokenSymbol} to ${buyTokenSymbol} swap. Token balance: ${tokenBalance}, required: ${sellAmountInWEI}`
-            );
-            throw new Error(
-                `[tokenSwap] [${moxieUserId}] [swap] Insufficient balance for ${sellTokenSymbol} to ${buyTokenSymbol} swap. Token balance: ${tokenBalance}, required: ${sellAmountInWEI}`
-            );
+        if (tokenBalance === BigInt(0)) {
+            await callback?.({
+                text: `\nNo ${sellTokenSymbol} found in your wallet.`,
+            });
+            return tokenBalance;
         }
 
         // call 0x api to get quote
         quote = await get0xSwapQuote({
             traceId: traceId,
             moxieUserId: moxieUserId,
-            sellAmountBaseUnits: sellAmountInWEI.toString(),
+            sellAmountBaseUnits: tokenBalance.toString(),
             buyTokenAddress: buyTokenAddress,
             walletAddress: agentWalletAddress,
             sellTokenAddress: sellTokenAddress,
@@ -181,10 +143,9 @@ export async function swap(
                 sellTokenAddress,
                 // @ts-expect-error - allowance.spender is not properly typed in the 0x API response
                 issues.allowance.spender,
-                sellAmountInWEI,
+                tokenBalance,
                 provider,
-                walletClient,
-                callback
+                walletClient
             );
             elizaLogger.debug(
                 traceId,
@@ -204,28 +165,6 @@ export async function swap(
             );
             if (balance) {
                 tokenBalance = BigInt(balance);
-            }
-            if (tokenBalance < sellAmountInWEI) {
-                await handleInsufficientBalance(
-                    traceId,
-                    agentWalletBalance,
-                    moxieUserId,
-                    sellTokenAddress,
-                    sellTokenSymbol,
-                    sellAmountInWEI,
-                    tokenBalance,
-                    sellTokenDecimals,
-                    agentWalletAddress,
-                    callback,
-                    buyTokenAddress
-                );
-                elizaLogger.debug(
-                    traceId,
-                    `[tokenSwap] [${moxieUserId}] [swap] Insufficient balance for ${sellTokenSymbol} to ${buyTokenSymbol} swap. Token balance: ${tokenBalance}, required: ${sellAmountInWEI}`
-                );
-                throw new Error(
-                    `Insufficient balance for ${sellTokenSymbol} to ${buyTokenSymbol} swap. Token balance: ${tokenBalance}, required: ${sellAmountInWEI}`
-                );
             }
         }
     } catch (error) {
@@ -427,131 +366,6 @@ export async function swap(
         });
         return buyAmountInWEI;
     }
-}
-
-/**
- * Handle insufficient balance
- * @param currentWalletBalance - The current wallet balance
- * @param moxieUserId - The user ID of the person performing the swap
- * @param sellTokenAddress - The address of the sell token
- * @param sellTokenSymbol - The symbol of the sell token
- * @param sellAmountInWEI - The amount of the sell token in WEI
- * @param tokenBalance - The balance of the sell token
- * @param sellTokenDecimals - The decimals of the sell token
- * @param agentWalletAddress - The address of the agent wallet
- * @param callback - The callback function to receive status updates
- */
-async function handleInsufficientBalance(
-    traceId: string,
-    currentWalletBalance: Portfolio,
-    moxieUserId: string,
-    sellTokenAddress: string,
-    sellTokenSymbol: string,
-    sellAmountInWEI: bigint,
-    tokenBalance: bigint,
-    sellTokenDecimals: number,
-    agentWalletAddress: string,
-    callback: HandlerCallback,
-    buyTokenAddress: string
-) {
-    elizaLogger.debug(
-        traceId,
-        `[tokenSwap] [${moxieUserId}] [handleInsufficientBalance] [currentWalletBalance]: ${JSON.stringify(currentWalletBalance)}`
-    );
-    // Get indicative price of buy token in USD
-    let indicativePriceOfBuyTokenInUSD: string;
-    if (sellTokenAddress !== USDC_ADDRESS) {
-        // const priceResponse = await get0xPrice({
-        //     moxieUserId,
-        //     sellAmountBaseUnits: sellAmountInWEI.toString(),
-        //     buyTokenAddress: USDC_ADDRESS,
-        //     walletAddress: agentWalletAddress,
-        //     sellTokenAddress: sellTokenAddress,
-        // });
-
-        // use codex to get the price
-        const price = await getPrice(
-            traceId,
-            moxieUserId,
-            sellAmountInWEI.toString(),
-            sellTokenAddress,
-            sellTokenDecimals,
-            sellTokenSymbol,
-            USDC_ADDRESS,
-            USDC_TOKEN_DECIMALS,
-            USDC
-        );
-        indicativePriceOfBuyTokenInUSD = ethers.formatUnits(
-            price,
-            USDC_TOKEN_DECIMALS
-        );
-    } else {
-        indicativePriceOfBuyTokenInUSD = ethers.formatUnits(
-            sellAmountInWEI,
-            sellTokenDecimals
-        );
-    }
-    const otherTokensWithSufficientBalance =
-        currentWalletBalance.tokenBalances.filter(
-            (token) =>
-                (!buyTokenAddress ||
-                    token.token.baseToken.address.toLowerCase() !==
-                        buyTokenAddress.toLowerCase()) &&
-                Decimal(token.token.balanceUSD).gt(
-                    Decimal(indicativePriceOfBuyTokenInUSD.toString())
-                )
-        );
-    elizaLogger.debug(
-        traceId,
-        `[tokenSwap] [${moxieUserId}] [handleInsufficientBalance] [otherTokensWithSufficientBalance]: ${JSON.stringify(otherTokensWithSufficientBalance)}`
-    );
-
-    // extract the symbols from otherTokensWithSufficientBalance
-    const otherTokenSymbols = otherTokensWithSufficientBalance
-        .sort((a, b) =>
-            Decimal(b.token.balanceUSD).minus(a.token.balanceUSD).toNumber()
-        )
-        .slice(0, 3)
-        .map((token) => token.token.baseToken.symbol);
-    elizaLogger.debug(
-        traceId,
-        `[tokenSwap] [${moxieUserId}] [handleInsufficientBalance] [otherTokenSymbols]: ${JSON.stringify(otherTokenSymbols)}`
-    );
-
-    // extract a map with symbol as key and token as value
-    const otherTokenSymbolsMap = otherTokensWithSufficientBalance.reduce(
-        (acc, token) => {
-            acc[token.token.baseToken.symbol] = token;
-            return acc;
-        },
-        {}
-    );
-    elizaLogger.debug(
-        traceId,
-        `[tokenSwap] [${moxieUserId}] [handleInsufficientBalance] [otherTokenSymbolsMap]: ${JSON.stringify(otherTokenSymbolsMap)}`
-    );
-
-    await callback?.({
-        text:
-            otherTokensWithSufficientBalance.length === 0
-                ? `\nInsufficient ${sellTokenSymbol} balance to complete this transaction. \n Current balance: ${ethers.formatUnits(tokenBalance, sellTokenDecimals)} ${sellTokenSymbol} \n Required balance: ${ethers.formatUnits(sellAmountInWEI, sellTokenDecimals)} ${sellTokenSymbol} \n\nPlease add more ${sellTokenSymbol} funds to your agent wallet to complete this transaction.`
-                : `\nI can do that for you. Would you like me to use your ${otherTokenSymbols.slice(0, -1).join(", ")}${otherTokenSymbols.length > 1 ? " or " : ""}${otherTokenSymbols[otherTokenSymbols.length - 1]} ?
-                \n<!--
-                \n${otherTokenSymbols
-                    .map((symbol) => {
-                        const token = otherTokenSymbolsMap[symbol];
-                        return `• ${symbol} (${
-                            symbol === "ETH"
-                                ? ETH_ADDRESS
-                                : symbol === "USDC"
-                                  ? USDC_ADDRESS
-                                  : token.token.baseToken.address
-                        }): ${token.token.balance} (${token.token.balanceUSD} USD)`;
-                    })
-                    .join("\n")}
-                \n-->
-            `,
-    });
 }
 
 /**

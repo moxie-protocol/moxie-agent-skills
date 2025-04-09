@@ -141,7 +141,7 @@ export const swapInProgressTemplate = (
     buyTokenSymbol: string,
     txHash: string
 ) => ({
-    text: `\nDusting $[${sellTokenSymbol}|${sellTokenAddress}] to $${buyTokenSymbol} is in progress.\nView transaction status on [BaseScan](https://basescan.org/tx/${txHash})`,
+    text: `\nDusting $${sellTokenSymbol} to $${buyTokenSymbol} is in progress.\nView transaction status on [BaseScan](https://basescan.org/tx/${txHash})`,
     content: {
         url: `https://basescan.org/tx/${txHash}`,
     },
@@ -154,5 +154,5 @@ export const swapCompletedTemplate = (
     buyAmountInWEI: bigint,
     buyTokenDecimals: number
 ) => ({
-    text: `\nDusting $[${sellTokenSymbol}|${sellTokenAddress}] to $${buyTokenSymbol} completed successfully. ${buyAmountInWEI && buyAmountInWEI > 0n ? `\n${ethers.formatUnits(buyAmountInWEI.toString(), buyTokenDecimals)} ${buyTokenSymbol} received.` : ""}\n`,
+    text: `\nDusting $${sellTokenSymbol} to $${buyTokenSymbol} completed successfully. ${buyAmountInWEI && buyAmountInWEI > 0n ? `\n${ethers.formatUnits(buyAmountInWEI.toString(), buyTokenDecimals)} ${buyTokenSymbol} received.` : ""}\n`,
 });
