@@ -115,6 +115,32 @@ export const previewDustAction: Action = {
                 },
             },
         ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "Preview what tokens you'd dust from my wallet.",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: `Preview: You have 4 dust token(s) totaling ~$12.45:\n- 0xabc... (100000 tokens worth ~$2.14)\n- 0xdef... (90000 tokens worth ~$3.20)\n- 0x123... (5000 tokens worth ~$2.08)\n- 0x456... (30000 tokens worth ~$5.03)`,
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: { text: "Show me the dust before swapping anything." },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: `Preview: You have 2 dust token(s) totaling ~$6.78:\n- 0x789... (12000 tokens worth ~$3.30)\n- 0xabc... (18000 tokens worth ~$3.48)`,
+                },
+            },
+        ],
     ],
     handler: async (
         runtime: IAgentRuntime,
@@ -152,13 +178,12 @@ export const previewDustAction: Action = {
                 (state.agentWalletBalance as Portfolio) ?? {
                     tokenBalances: [],
                 };
-            elizaLogger.log("tokenBalances", tokenBalances);
             const dustTokens = tokenBalances.filter(
                 (t) =>
                     t.token.balanceUSD < threshold &&
                     t.token.balance > 0 &&
                     // ignore ETH
-                    t.address !== ETH_ADDRESS.toLowerCase()
+                    t.address.toLowerCase() !== ETH_ADDRESS.toLowerCase()
             );
 
             if (!dustTokens.length) {
@@ -173,9 +198,9 @@ export const previewDustAction: Action = {
 
             const lines = dustTokens.map(
                 (t) =>
-                    `| ${t.token.baseToken.symbol ?? t.address} | $${t.token.balanceUSD.toFixed(2)} |`
+                    `| $[${t.token.baseToken.symbol}|${t.token.baseToken.address}] | [${t.token.baseToken.address}](https://basescan.org/token/${t.token.baseToken.address}) | $${t.token.balance < 0.01 ? "< $0.01" : t.token.balanceUSD.toFixed(2)} |`
             );
-            const response = `You have ${dustTokens.length} dust token(s) totaling ~$${totalUsdValue}:\n| Token | Value |\n|-------|-------|\n${lines.join("\n")}`;
+            const response = `You have ${dustTokens.length} dust token(s) totaling ~$${totalUsdValue}:\n| Token Symbol | Token Address | Value |\n|-------|-------|-------|\n${lines.join("\n")}`;
 
             return callback?.({ text: response });
         } catch (error) {

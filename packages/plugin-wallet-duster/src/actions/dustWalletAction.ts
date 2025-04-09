@@ -18,12 +18,8 @@ import {
 import { DustRequestSchema } from "../types";
 import { dustRequestTemplate } from "../templates";
 import { swap } from "../utils/swap";
-import {
-    ETH_ADDRESS,
-    MOXIE_TOKEN_ADDRESS,
-    MOXIE_TOKEN_DECIMALS,
-} from "../constants/constants";
-import { ethers, Contract } from "ethers";
+import { ETH_ADDRESS } from "../constants/constants";
+import { ethers } from "ethers";
 
 export const dustWalletAction: Action = {
     name: "DUST_WALLET_TO_ETH",
@@ -73,32 +69,6 @@ export const dustWalletAction: Action = {
                 content: { text: "Swapped 2 dust tokens into ETH." },
             },
         ],
-        [
-            {
-                user: "{{user1}}",
-                content: {
-                    text: "Preview what tokens you'd dust from my wallet.",
-                },
-            },
-            {
-                user: "{{user2}}",
-                content: {
-                    text: `Preview: You have 4 dust token(s) totaling ~$12.45:\n- 0xabc... (100000 tokens worth ~$2.14)\n- 0xdef... (90000 tokens worth ~$3.20)\n- 0x123... (5000 tokens worth ~$2.08)\n- 0x456... (30000 tokens worth ~$5.03)`,
-                },
-            },
-        ],
-        [
-            {
-                user: "{{user1}}",
-                content: { text: "Show me the dust before swapping anything." },
-            },
-            {
-                user: "{{user2}}",
-                content: {
-                    text: `Preview: You have 2 dust token(s) totaling ~$6.78:\n- 0x789... (12000 tokens worth ~$3.30)\n- 0xabc... (18000 tokens worth ~$3.48)`,
-                },
-            },
-        ],
     ],
     handler: async (
         runtime: IAgentRuntime,
@@ -131,6 +101,10 @@ export const dustWalletAction: Action = {
                 threshold: number;
             };
             const threshold = extractedValue?.threshold ?? 5;
+
+            await callback?.({
+                text: `Initializing dusting process on your agent wallet for tokens under $${threshold}...\n`,
+            });
 
             const wallet = state?.moxieWalletClient as MoxieWalletClient;
             const agentWallet = state?.agentWallet as MoxieClientWallet;
@@ -165,16 +139,12 @@ export const dustWalletAction: Action = {
                 elizaLogger.info("Dusting token", JSON.stringify(token));
                 await swap(
                     traceId,
-                    ETH_ADDRESS,
-                    "ETH",
                     token.token.baseToken.address,
                     token.token.baseToken.symbol,
                     moxieUserId,
                     agentWallet.address,
                     ethers.parseUnits(token.token.balance.toString(), 18),
                     provider,
-                    18,
-                    18,
                     callback,
                     state.agentWalletBalance as Portfolio,
                     wallet
@@ -182,7 +152,7 @@ export const dustWalletAction: Action = {
             }
 
             await callback?.({
-                text: `\nSwapped ${dustTokens.length} dust token(s) into ETH (~$${totalUsdValue}).`,
+                text: `\nDusted ${dustTokens.length} dust token(s) into ETH (~$${totalUsdValue}).`,
             });
         } catch (error) {
             elizaLogger.error("Error dusting wallet:", error);

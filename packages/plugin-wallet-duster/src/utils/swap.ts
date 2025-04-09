@@ -11,13 +11,7 @@ import {
 import { concat, ethers } from "ethers";
 import { encodeFunctionData, numberToHex, size } from "viem";
 import { GetQuoteResponse } from "../types";
-import {
-    approvalTransactionConfirmed,
-    approvalTransactionFailed,
-    approvalTransactionSubmitted,
-    swapCompletedTemplate,
-    swapInProgressTemplate,
-} from "../templates";
+import { swapCompletedTemplate, swapInProgressTemplate } from "../templates";
 import Decimal from "decimal.js";
 import { ERC20_ABI } from "../constants/constants";
 import { createClientV2 } from "@0x/swap-ts-sdk";
@@ -33,6 +27,7 @@ import {
     USDC_TOKEN_DECIMALS,
     WETH_ADDRESS,
 } from "../constants/constants";
+import { getERC20Balance, getERC20Decimals } from "./erc20";
 
 const initializeClients = () => {
     if (!process.env.ZERO_EX_API_KEY) {
@@ -71,20 +66,27 @@ const { zxClient } = initializeClients();
  */
 export async function swap(
     traceId: string,
-    buyTokenAddress: string,
-    buyTokenSymbol: string,
+    // buyTokenAddress: string,
+    // buyTokenSymbol: string,
     sellTokenAddress: string,
     sellTokenSymbol: string,
     moxieUserId: string,
     agentWalletAddress: string,
     sellAmountInWEI: bigint,
     provider: ethers.JsonRpcProvider,
-    sellTokenDecimals: number,
-    buyTokenDecimals: number,
+    // sellTokenDecimals: number,
+    // buyTokenDecimals: number,
     callback: any,
     agentWalletBalance: Portfolio,
     walletClient: MoxieWalletClient
 ): Promise<bigint> {
+    // Set buy token to ETH
+    const buyTokenDecimals = 18;
+    const buyTokenSymbol = "ETH";
+    const buyTokenAddress = ETH_ADDRESS;
+    await callback?.({
+        text: `# Dusting $[${sellTokenSymbol}|${sellTokenAddress}] to $${buyTokenSymbol}`,
+    });
     elizaLogger.debug(
         traceId,
         `[tokenSwap] [${moxieUserId}] [swap] called, buyTokenAddress: ${buyTokenAddress}, buyTokenSymbol: ${buyTokenSymbol}, sellTokenAddress: ${sellTokenAddress}, sellTokenSymbol: ${sellTokenSymbol}, agentWalletAddress: ${agentWalletAddress}, sellAmountInWEI: ${sellAmountInWEI}`
@@ -92,7 +94,12 @@ export async function swap(
     let buyAmountInWEI: bigint;
     let tokenBalance: bigint;
     let quote: GetQuoteResponse | null = null;
+
     try {
+        const sellTokenDecimals = await getERC20Decimals(
+            traceId,
+            sellTokenAddress
+        );
         // do balance check first
         const balance =
             sellTokenSymbol === "ETH"
@@ -345,7 +352,12 @@ export async function swap(
     }
 
     await callback?.(
-        swapInProgressTemplate(sellTokenSymbol, buyTokenSymbol, tx.hash)
+        swapInProgressTemplate(
+            sellTokenSymbol,
+            sellTokenAddress,
+            buyTokenSymbol,
+            tx.hash
+        )
     );
 
     // wait for tx to be mined
@@ -394,6 +406,7 @@ export async function swap(
         await callback?.(
             swapCompletedTemplate(
                 sellTokenSymbol,
+                sellTokenAddress,
                 buyTokenSymbol,
                 buyAmountInWEI,
                 buyTokenDecimals
@@ -413,56 +426,6 @@ export async function swap(
             },
         });
         return buyAmountInWEI;
-    }
-}
-
-async function getERC20Balance(
-    traceId: string,
-    tokenAddress: string,
-    walletAddress: string
-): Promise<string> {
-    const abi = [
-        {
-            constant: true,
-            inputs: [{ name: "_owner", type: "address" }],
-            name: "balanceOf",
-            outputs: [{ name: "balance", type: "uint256" }],
-            type: "function",
-        },
-    ];
-
-    try {
-        // Using Base mainnet RPC URL
-        const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
-        const checksumAddress = ethers.getAddress(walletAddress);
-        const contract = new ethers.Contract(tokenAddress, abi, provider);
-
-        let retries = 3;
-        let delay = 1000; // Start with 1 second delay
-
-        while (retries > 0) {
-            try {
-                const balanceWEI = await contract.balanceOf(checksumAddress);
-                elizaLogger.debug(
-                    traceId,
-                    `[getERC20Balance] [${tokenAddress}] [${walletAddress}] fetched balance: ${balanceWEI.toString()}`
-                );
-                return balanceWEI.toString();
-            } catch (error) {
-                retries--;
-                if (retries === 0) throw error;
-
-                // Wait with exponential backoff before retrying
-                await new Promise((resolve) => setTimeout(resolve, delay));
-                delay *= 2; // Double the delay for next retry
-            }
-        }
-    } catch (error) {
-        elizaLogger.error(
-            traceId,
-            `[getERC20Balance] [${tokenAddress}] [${walletAddress}] Error fetching token balance: ${JSON.stringify(error)}`
-        );
-        throw error;
     }
 }
 
@@ -741,8 +704,7 @@ export async function checkAllowanceAndApproveSpendRequest(
     spenderAddress: string,
     amountInWEI: bigint,
     provider: ethers.Provider,
-    walletClient: MoxieWalletClient,
-    callback: HandlerCallback
+    walletClient: MoxieWalletClient
 ) {
     // Add input validation
     if (!walletAddress || !ethers.isAddress(walletAddress)) {
@@ -851,7 +813,6 @@ export async function checkAllowanceAndApproveSpendRequest(
             `[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] approval txn_hash: ${JSON.stringify(approveResponse)}`
         );
         const approvalTxHash = approveResponse.hash;
-        await callback(approvalTransactionSubmitted(approvalTxHash));
 
         // check if the approve txn is success.
         if (approveResponse && approvalTxHash) {
@@ -877,13 +838,11 @@ export async function checkAllowanceAndApproveSpendRequest(
                     traceId,
                     `[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] [SUCCESS] Approval transaction successful: ${approvalTxHash}`
                 );
-                await callback(approvalTransactionConfirmed(approvalTxHash));
             } else {
                 elizaLogger.error(
                     traceId,
                     `[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] [ERROR] Approval transaction failed: ${approvalTxHash}`
                 );
-                await callback(approvalTransactionFailed(approvalTxHash));
                 throw new Error(`Approval transaction failed`);
             }
         } else {

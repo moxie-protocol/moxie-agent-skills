@@ -8,26 +8,27 @@ import {
 export const explainAiDustingAction: Action = {
     name: "EXPLAIN_AI_DUSTING",
     similes: [
-        "WHAT_IS_DUSTING",
-        "HOW_DOES_AI_DUSTING_WORK",
-        "WHAT_DOES_THIS_SKILL_DO",
-        "EXPLAIN_DUSTING",
+        "EXPLAIN_WALLET_DUSTING",
+        "WHAT_IS_WALLET_DUSTING",
+        "HOW_DOES_WALLET_DUSTING_WORK",
+        "WHAT_DOES_THE_WALLET_DUSTING_SKILL_DO",
+        "EXPLAIN_WALLET_DUSTING",
         "WHAT_IS_WALLET_DUSTING",
     ],
     description:
-        "Explains how the AI Dusting skill works without performing any swaps.",
+        "Explains how the Wallet Dusting skill works without performing any swaps.",
     validate: async () => true,
     suppressInitialMessage: true,
     examples: [
         [
             {
                 user: "{{user1}}",
-                content: { text: "How does AI Dusting work?" },
+                content: { text: "How does Wallet Dusting work?" },
             },
             {
                 user: "{{user2}}",
                 content: {
-                    text: "AI Dusting automatically scans your wallet for low-value tokens — often called 'dust' — and converts them into ETH...",
+                    text: "Wallet Dusting automatically scans your wallet for low-value tokens — often called 'dust' — and converts them into ETH...",
                 },
             },
         ],

@@ -1,3 +1,5 @@
+import { ethers } from "ethers";
+
 export const transferEthTemplate = `
 Extract the following details to transfer ETH on Base:
 - **amount** (Number): The amount of ETH on Base to transfer in wei.
@@ -135,10 +137,11 @@ Here are the recent user messages for context:
 
 export const swapInProgressTemplate = (
     sellTokenSymbol: string,
+    sellTokenAddress: string,
     buyTokenSymbol: string,
     txHash: string
 ) => ({
-    text: `\n${sellTokenSymbol} to ${buyTokenSymbol} conversion is in progress.\nView transaction status on [BaseScan](https://basescan.org/tx/${txHash})`,
+    text: `\nDusting $[${sellTokenSymbol}|${sellTokenAddress}] to $${buyTokenSymbol} is in progress.\nView transaction status on [BaseScan](https://basescan.org/tx/${txHash})`,
     content: {
         url: `https://basescan.org/tx/${txHash}`,
     },
@@ -146,27 +149,10 @@ export const swapInProgressTemplate = (
 
 export const swapCompletedTemplate = (
     sellTokenSymbol: string,
+    sellTokenAddress: string,
     buyTokenSymbol: string,
     buyAmountInWEI: bigint,
     buyTokenDecimals: number
 ) => ({
-    text: `\n${sellTokenSymbol} to ${buyTokenSymbol} conversion completed successfully. ${buyAmountInWEI && buyAmountInWEI > 0n ? `\n${ethers.formatUnits(buyAmountInWEI.toString(), buyTokenDecimals)} ${buyTokenSymbol} received.` : ""}`,
-});
-
-export const approvalTransactionConfirmed = (approvalTxHash: string) => ({
-    text: `\nApproval transaction is confirmed!`,
-    content: {
-        url: `https://basescan.org/tx/${approvalTxHash}`,
-    },
-});
-
-export const approvalTransactionFailed = (approvalTxHash: string) => ({
-    text: `\nApproval transaction is failed!`,
-});
-
-export const approvalTransactionSubmitted = (approvalTxHash: string) => ({
-    text: `\nApproval transaction submitted. Awaiting confirmation.\nView on [BaseScan](https://basescan.org/tx/${approvalTxHash})`,
-    content: {
-        url: `https://basescan.org/tx/${approvalTxHash}`,
-    },
+    text: `\nDusting $[${sellTokenSymbol}|${sellTokenAddress}] to $${buyTokenSymbol} completed successfully. ${buyAmountInWEI && buyAmountInWEI > 0n ? `\n${ethers.formatUnits(buyAmountInWEI.toString(), buyTokenDecimals)} ${buyTokenSymbol} received.` : ""}\n`,
 });
