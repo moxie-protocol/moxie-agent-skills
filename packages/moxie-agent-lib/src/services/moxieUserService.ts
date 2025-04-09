@@ -20,79 +20,6 @@ import {
     MoxieUserMinimal,
 } from "./types";
 
-export async function getUserMoxieWalletAddress(
-    walletAddress: string
-): Promise<MoxieUser | undefined> {
-    try {
-        const query = `
-            query GetUser($walletAddress: String!) {
-                GetUser(input: { walletAddress: $walletAddress }) {
-                    id
-                    userName
-                    identities {
-                        id
-                        userId
-                        type
-                        dataSource
-                        connectedIdentitiesFetchStatus
-                        metadata
-                        profileId
-                        isActive
-                        createdAt
-                        updatedAt
-                    }
-                    wallets {
-                        id
-                        userId
-                        walletAddress
-                        walletType
-                        dataSource
-                        createdAt
-                        deletedAt
-                    }
-                }
-            }
-        `;
-
-        const response = await fetch(process.env.MOXIE_API_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                query,
-                variables: { walletAddress },
-            }),
-        });
-
-        if (!response.ok) {
-            elizaLogger.error(`HTTP error! status: ${response.status}`);
-            return undefined;
-        }
-
-        const result = await response.json();
-
-        if (!result.data) {
-            elizaLogger.error(
-                `No data in response for walletAddress ${walletAddress}:`,
-                result
-            );
-            return undefined;
-        }
-
-        if (!result.data.GetUser) {
-            elizaLogger.error(
-                `No user found for walletAddress ${walletAddress}`
-            );
-            return undefined;
-        }
-
-        return result.data.GetUser;
-    } catch (error) {
-        elizaLogger.error("Error in getUserMoxieWalletAddress:", error);
-        return undefined;
-    }
-}
 
 export async function getUserByMoxieId(
     userId: string
@@ -251,7 +178,7 @@ export async function getUserByMoxieIdMultipleTokenGate(
 
                 let res = await response.json();
                 const { data } = res as GetUserInfoBatchResponse;
-                
+
                 if (!data?.GetUserInfoBatch?.users || data.GetUserInfoBatch.users.length === 0) {
                     retryCount++;
                     elizaLogger.warn(`Retry ${retryCount}: Empty users array received`);
@@ -278,67 +205,7 @@ export async function getUserByMoxieIdMultipleTokenGate(
     }
 }
 
-export async function getUserByWalletAddressMultiple(
-    walletAddresses: string[]
-): Promise<Map<string, MoxieUser>> {
-    try {
-        const results = await Promise.all(
-            walletAddresses.map((walletAddress) =>
-                getUserMoxieWalletAddress(walletAddress)
-            )
-        );
 
-        const walletAddressToUser = new Map<string, MoxieUser>();
-
-        walletAddresses.forEach((walletAddress, index) => {
-            const user = results[index];
-
-            if (user) {
-                walletAddressToUser.set(walletAddress, user);
-            }
-        });
-
-        elizaLogger.info(`results: ${walletAddressToUser.size}`);
-
-        return walletAddressToUser;
-    } catch (error) {
-        elizaLogger.error("Error in getUserByWalletAddressMultiple:", error);
-        return new Map();
-    }
-}
-
-export async function getTwitteruserNameByMoxieIdMultiple(
-    userIds: string[]
-): Promise<Map<string, string>> {
-    const userIdToTwitterUsername = new Map<string, string>();
-
-    try {
-        const results = await getUserByMoxieIdMultiple(userIds);
-
-        userIds.forEach((userId, index) => {
-            const user = results.get(userId);
-
-            const twitterIdentity = user?.identities?.find(
-                (identity: MoxieIdentity) => identity.type === "TWITTER"
-            );
-
-            const userName = twitterIdentity?.metadata?.username;
-
-            if (userName) {
-                userIdToTwitterUsername.set(userId, userName);
-            }
-        });
-
-        return userIdToTwitterUsername;
-    } catch (error) {
-        elizaLogger.error(
-            "Error in getTwitteruserNameByMoxieIdMultiple:",
-            error
-        );
-    }
-
-    return userIdToTwitterUsername;
-}
 
 export interface SocialProfile {
     twitterUsername?: string;
@@ -427,10 +294,6 @@ export async function getSocialProfilesByMoxieIdMultiple(
         );
     }
 }
-
-// getTwitteruserNameByMoxieIdMultiple(["M4"]).then(console.log)
-
-// getSocialProfilesByMoxieIdMultiple(["M4"]).then(console.log)
 
 export async function getUserByPrivyBearerToken(
     bearerToken: string
