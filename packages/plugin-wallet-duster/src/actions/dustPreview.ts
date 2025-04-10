@@ -173,6 +173,20 @@ export const previewDustAction: Action = {
                 },
             },
         ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "How much dust is in my wallet?",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: `Preview: You have 4 dust token(s) totaling ~$12.45:\n- 0xabc... (100000 tokens worth ~$2.14)\n- 0xdef... (90000 tokens worth ~$3.20)\n- 0x123... (5000 tokens worth ~$2.08)\n- 0x456... (30000 tokens worth ~$5.03)`,
+                },
+            },
+        ],
     ],
     handler: async (
         runtime: IAgentRuntime,
