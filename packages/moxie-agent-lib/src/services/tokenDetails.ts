@@ -144,7 +144,20 @@ export async function getTokenDetails(tokenAddresses: string[]): Promise<TokenDe
             })
         );
 
-        return tokens;
+        const tokenDetailsMap = new Map(
+            tokens.map(token =>
+                [token.tokenAddress?.toLowerCase(), token]
+            )
+        );
+
+        const tokensResponse = []
+        for (const tokenAddress of tokenAddresses) {
+            const token = tokenDetailsMap.get(tokenAddress.toLowerCase());
+            if (token) {
+                tokensResponse.push(token);
+            }
+        }
+        return tokensResponse;
     } catch (error) {
         elizaLogger.error(`Error in getTokenDetailsFromCodex:  ${error}`);
         throw error;
