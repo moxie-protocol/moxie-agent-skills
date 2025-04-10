@@ -691,8 +691,8 @@
                 "value": "Dust tokens under $5."
             },
             {
-                "label": "How much dust is in my wallet?",
-                "value": "How much dust is in my wallet?"
+                "label": "How much dust tokens are in my wallet?",
+                "value": "How much dust tokens are in my wallet?"
             }
         ],
         "mediaUrls": [],
