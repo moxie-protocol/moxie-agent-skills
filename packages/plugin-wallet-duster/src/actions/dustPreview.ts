@@ -20,14 +20,14 @@ export const previewDustAction: Action = {
         "PREVIEW_DUST",
         "SHOW_DUST_TOKENS",
         "WHAT_TOKENS_WILL_BE_DUSTED",
-        "SHOW_DUST_SWAP_PREVIEW",
         "LIST_LOW_VALUE_TOKENS",
         "SHOW_TOKENS_BELOW_USD",
         "SHOW_TOKENS_BELOW_VALUE",
         "SHOW_TOKENS_BELOW_THRESHOLD",
         "DUST_PREVIEW",
     ],
-    description: "Preview what tokens would be dusted based on USD threshold.",
+    description:
+        "Preview/Show what dust or low-value tokens would be dusted based on USD threshold given by user. By default, the threshold is $5.",
     validate: async () => true,
     suppressInitialMessage: true,
     examples: [
@@ -105,7 +105,7 @@ export const previewDustAction: Action = {
             {
                 user: "{{user1}}",
                 content: {
-                    text: "Can you show me all the tokens below $10 in my wallet?",
+                    text: "Can you show me all the dust tokens below $10 in my wallet?",
                 },
             },
             {
@@ -132,7 +132,9 @@ export const previewDustAction: Action = {
         [
             {
                 user: "{{user1}}",
-                content: { text: "Show me the dust before swapping anything." },
+                content: {
+                    text: "Show me the all the dust tokens in my wallet.",
+                },
             },
             {
                 user: "{{user2}}",
@@ -195,19 +197,20 @@ export const previewDustAction: Action = {
 
             if (!dustTokens.length) {
                 return callback?.({
-                    text: `No tokens under $${threshold} found in your wallet.`,
+                    text: `No tokens under $${threshold} found in your wallet.${threshold > 0.01 ? `\n\nOnly tokens above $0.01 have been shown. To show dust tokens below $0.01, set the threshold to $0.01 or below.` : ""}`,
                 });
             }
 
-            const totalUsdValue = dustTokens
-                .reduce((sum, token) => sum + token.token.balanceUSD, 0)
-                .toFixed(2);
+            const totalUsdValue = dustTokens.reduce(
+                (sum, token) => sum + token.token.balanceUSD,
+                0
+            );
 
             const lines = dustTokens.map(
                 (t) =>
                     `| $${t.token.baseToken.symbol} | [${t.token.baseToken.address}](https://basescan.org/token/${t.token.baseToken.address}) | ${t.token.balanceUSD < 0.01 ? "< $0.01" : `$${t.token.balanceUSD.toFixed(2)}`} |`
             );
-            const response = `You have ${dustTokens.length} dust token(s) totaling ~$${totalUsdValue}:\n| Token Symbol | Token Address | Value |\n|-------|-------|-------|\n${lines.join("\n")}`;
+            const response = `You have ${dustTokens.length} dust token(s) totaling ${totalUsdValue < 0.01 ? "< $0.01" : `~ $${totalUsdValue.toFixed(2)}`}:\n| Token Symbol | Token Address | Value |\n|-------|-------|-------|\n${lines.join("\n")}${threshold > 0.01 ? `\n\nOnly tokens above $0.01 have been displayed. To display tokens below $0.01, set the threshold to $0.01 or below.` : ""}`;
 
             return callback?.({ text: response });
         } catch (error) {

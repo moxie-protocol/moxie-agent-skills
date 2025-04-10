@@ -27,14 +27,14 @@ export const dustWalletAction: Action = {
         "CLEAN_WALLET",
         "DUST_MY_TOKENS",
         "REMOVE_DUST",
-        "SWAP_DUST_TO_ETH",
+        "DUST_TO_ETH",
         "CLEAR_LOW_VALUE_TOKENS",
         "CLEAR_THE_DUST_OUT",
         "SELL_ALL_TOKENS_UNDER",
     ],
     validate: async () => true,
     description:
-        "Checks the agent wallet for any tokens under a given USD value and swaps them to ETH.",
+        "Checks the agent wallet for any dust tokens or low-value tokens under a given USD value threshold and dusts them to ETH on Base.",
     suppressInitialMessage: true,
     examples: [
         [
@@ -44,17 +44,29 @@ export const dustWalletAction: Action = {
             },
             {
                 user: "{{user2}}",
-                content: { text: "Swapped 3 dust tokens into ETH." },
+                content: { text: "Dusted 3 dust tokens into ETH." },
             },
         ],
         [
             {
                 user: "{{user1}}",
-                content: { text: "Swap tokens under $10 into ETH." },
+                content: { text: "Dust my wallet" },
             },
             {
                 user: "{{user2}}",
-                content: { text: "Swapped 4 tokens under $10 into ETH." },
+                content: { text: "Dusted 1 token under $5 into ETH." },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "Dust my agent wallet for tokens under $10 into ETH.",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: { text: "Dusted 4 tokens under $10 into ETH." },
             },
         ],
         [
@@ -131,7 +143,7 @@ export const dustWalletAction: Action = {
 
             if (!dustTokens.length) {
                 await callback?.({
-                    text: `No tokens under $${threshold} found in your wallet.`,
+                    text: `No tokens under $${threshold} found in your wallet.${threshold > 0.01 ? `\n\nOnly tokens above $0.01 have been checked for dusting. To dust tokens below $0.01, set the threshold to $0.01 or below.` : ""}`,
                 });
 
                 return true;
@@ -158,7 +170,7 @@ export const dustWalletAction: Action = {
             }
 
             await callback?.({
-                text: `\nDusted ${dustedTokenCount} dust token(s) into ETH (~$${totalUsdValue.toFixed(2)}).`,
+                text: `\nDusted ${dustedTokenCount} dust token${dustedTokenCount === 1 ? "" : "s"} into ETH ($${totalUsdValue < 0.01 ? "< $0.01" : `~ $${totalUsdValue.toFixed(2)}`}).${threshold > 0.01 ? `\n\nOnly tokens above $0.01 have been dusted. To dust tokens below $0.01, set the threshold to $0.01 or below.` : ""}`,
             });
         } catch (error) {
             elizaLogger.error("Error dusting wallet:", error);
