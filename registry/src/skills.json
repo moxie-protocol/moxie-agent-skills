@@ -720,7 +720,13 @@
             "SHOW_TOKENS_BELOW_VALUE",
             "SHOW_TOKENS_BELOW_THRESHOLD",
             "DUST_PREVIEW",
-            "PREVIEW_DUST_TOKENS"
+            "PREVIEW_DUST_TOKENS",
+            "DUST_TOKENS",
+            "DUST_WALLET",
+            "DUST_TOKENS_UNDER",
+            "DUST_TOKENS_BELOW",
+            "HOW_MUCH_DUST_IN_WALLET",
+            "HOW_MANY_DUST_TOKENS_IN_WALLET"
         ],
         "isPremium": false,
         "freeQueries": 0,

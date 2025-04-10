@@ -31,6 +31,10 @@ export const dustWalletAction: Action = {
         "CLEAR_LOW_VALUE_TOKENS",
         "CLEAR_THE_DUST_OUT",
         "SELL_ALL_TOKENS_UNDER",
+        "DUST_TOKENS",
+        "DUST_WALLET",
+        "DUST_TOKENS_UNDER",
+        "DUST_TOKENS_BELOW",
     ],
     validate: async () => true,
     description:
@@ -79,6 +83,16 @@ export const dustWalletAction: Action = {
             {
                 user: "{{user2}}",
                 content: { text: "Swapped 2 dust tokens into ETH." },
+            },
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "Dust tokens under $10",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: { text: "Dusted 4 tokens under $10 into ETH." },
             },
         ],
     ],

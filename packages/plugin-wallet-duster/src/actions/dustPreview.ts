@@ -25,6 +25,8 @@ export const previewDustAction: Action = {
         "SHOW_TOKENS_BELOW_VALUE",
         "SHOW_TOKENS_BELOW_THRESHOLD",
         "DUST_PREVIEW",
+        "HOW_MUCH_DUST_IN_WALLET",
+        "HOW_MANY_DUST_TOKENS_IN_WALLET",
     ],
     description:
         "Preview/Show what dust or low-value tokens would be dusted based on USD threshold given by user. By default, the threshold is $5.",
@@ -140,6 +142,34 @@ export const previewDustAction: Action = {
                 user: "{{user2}}",
                 content: {
                     text: `Preview: You have 2 dust token(s) totaling ~$6.78:\n- 0x789... (12000 tokens worth ~$3.30)\n- 0xabc... (18000 tokens worth ~$3.48)`,
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "How many dust is in my wallet?",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: `You have 2 dust token(s) totaling ~$6.78:\n- 0x789... (12000 tokens worth ~$3.30)\n- 0xabc... (18000 tokens worth ~$3.48)`,
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "How many dust tokens are in my wallet?",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: `You have 2 dust token(s) totaling ~$6.78:\n- 0x789... (12000 tokens worth ~$3.30)\n- 0xabc... (18000 tokens worth ~$3.48)`,
                 },
             },
         ],
