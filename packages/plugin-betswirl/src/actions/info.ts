@@ -39,7 +39,7 @@ export const infoAction: Action = {
             const tokenSymbols = casinoTokens.map((token) => token.symbol);
             const tokenSymbolsString = tokenSymbols.join(", ");
             await callback({
-                text: `Play Games Of Luck/BetSwirl Skills offers you to play onchain casino games on Base:
+                text: `BetSwirl Skills offers you to play onchain casino games on Base:
 
 **🪙 Coin Toss**
 - Classic heads or tails game
