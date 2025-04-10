@@ -5,7 +5,9 @@ import {
     type HandlerCallback,
     type State,
     type ActionExample,
+    elizaLogger,
 } from "@moxie-protocol/core";
+import { getCasinoTokens } from "../providers/casinoTokens";
 
 export const infoAction: Action = {
     name: "BETSWIRL_INFO",
