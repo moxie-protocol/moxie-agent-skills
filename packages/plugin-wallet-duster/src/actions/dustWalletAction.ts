@@ -48,6 +48,16 @@ export const dustWalletAction: Action = {
             },
             {
                 user: "{{user2}}",
+                content: {
+                    text: "You are trying to dust tokens under $5 from your agent wallet. Depending on the number of tokens, this may take a several minutes to complete. \n\nDo you want to proceed?",
+                },
+            },
+            {
+                user: "{{user1}}",
+                content: { text: "Yes, proceed" },
+            },
+            {
+                user: "{{user2}}",
                 content: { text: "Dusted 3 dust tokens into ETH." },
             },
         ],
@@ -55,6 +65,16 @@ export const dustWalletAction: Action = {
             {
                 user: "{{user1}}",
                 content: { text: "Dust my wallet" },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "You are trying to dust tokens under $5 from your agent wallet. Depending on the number of tokens, this may take a several minutes to complete. \n\nDo you want to proceed?",
+                },
+            },
+            {
+                user: "{{user1}}",
+                content: { text: "Yes, proceed" },
             },
             {
                 user: "{{user2}}",
@@ -70,6 +90,16 @@ export const dustWalletAction: Action = {
             },
             {
                 user: "{{user2}}",
+                content: {
+                    text: "You are trying to dust tokens under $10 from your agent wallet. Depending on the number of tokens, this may take a several minutes to complete. \n\nDo you want to proceed?",
+                },
+            },
+            {
+                user: "{{user1}}",
+                content: { text: "Yes, proceed" },
+            },
+            {
+                user: "{{user2}}",
                 content: { text: "Dusted 4 tokens under $10 into ETH." },
             },
         ],
@@ -82,8 +112,20 @@ export const dustWalletAction: Action = {
             },
             {
                 user: "{{user2}}",
+                content: {
+                    text: "You are trying to dust tokens under $5 from your agent wallet. Depending on the number of tokens, this may take a several minutes to complete. \n\nDo you want to proceed?",
+                },
+            },
+            {
+                user: "{{user1}}",
+                content: { text: "Yes, proceed" },
+            },
+            {
+                user: "{{user2}}",
                 content: { text: "Swapped 2 dust tokens into ETH." },
             },
+        ],
+        [
             {
                 user: "{{user1}}",
                 content: {
@@ -92,7 +134,35 @@ export const dustWalletAction: Action = {
             },
             {
                 user: "{{user2}}",
+                content: {
+                    text: "You are trying to dust tokens under $10 from your agent wallet. Depending on the number of tokens, this may take a several minutes to complete. \n\nDo you want to proceed?",
+                },
+            },
+            {
+                user: "{{user1}}",
+                content: { text: "Yes, proceed" },
+            },
+            {
+                user: "{{user2}}",
                 content: { text: "Dusted 4 tokens under $10 into ETH." },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "Dust tokens under $5",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "You are trying to dust tokens under $5 from your agent wallet. Depending on the number of tokens, this may take a several minutes to complete. \n\nDo you want to proceed?",
+                },
+            },
+            {
+                user: "{{user1}}",
+                content: { text: "No." },
             },
         ],
     ],
@@ -125,12 +195,22 @@ export const dustWalletAction: Action = {
             });
             const extractedValue = details.object as {
                 threshold: number;
+                isConfirmed: boolean;
             };
             const threshold = extractedValue?.threshold ?? 5;
+            const isConfirmed = extractedValue?.isConfirmed;
 
-            await callback?.({
-                text: `Initializing dusting process on your agent wallet for tokens under $${threshold}...\n`,
-            });
+            if (isConfirmed === null) {
+                await callback?.({
+                    text: `You are trying to dust tokens under $${threshold} from your agent wallet. Depending on the number of tokens, this may take a several minutes to complete. \n\nDo you want to proceed?`,
+                });
+                return true;
+            } else if (isConfirmed === false) {
+                await callback?.({
+                    text: "Dusting process cancelled.",
+                });
+                return true;
+            }
 
             const wallet = state?.moxieWalletClient as MoxieWalletClient;
             const agentWallet = state?.agentWallet as MoxieClientWallet;
@@ -162,6 +242,10 @@ export const dustWalletAction: Action = {
 
                 return true;
             }
+
+            await callback?.({
+                text: `Initializing dusting process on your agent wallet for tokens under $${threshold}...\n`,
+            });
 
             let totalUsdValue = 0;
             const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);

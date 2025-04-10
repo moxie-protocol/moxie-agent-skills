@@ -58,28 +58,52 @@ Here are the recent user messages for context:
 export const dustRequestTemplate = `
 Provide the following details to dust tokens in your wallet:
 - **threshold** (Number): The USD threshold for a token to be considered dust tokens.
+- **isConfirmed** (Boolean): Whether the user has confirmed the dusting.
 
 Provide the values in the following JSON format:
 
 \`\`\`json
 {
-    "threshold": number
+    "threshold": number?,
+    "isConfirmed": boolean?
 }
 \`\`\`
+
+"?" indicates that the value is optional.
 
 # Example 1
 
 **Message 1**
 
 \`\`\`
-Dust tokens under $5
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Dust tokens under $5"
+        }
+    },
+    {
+        "user": "{{user2}}",
+        "content": {
+            "text": "You are trying to dust tokens under $5 from your agent wallet. Depending on the number of tokens, this may take a several minutes to complete. \n\nDo you want to proceed?"
+        }
+    },
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Yes, proceed"
+        }
+    }
+]
 \`\`\`
 
 **Response 1**
 
 \`\`\`json
 {
-    "threshold": 5
+    "threshold": 5,
+    "isConfirmed": true
 }
 \`\`\`
 
@@ -88,14 +112,34 @@ Dust tokens under $5
 **Message 2**
 
 \`\`\`
-Dust tokens under $10
+[
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "Dust tokens under $10"
+        }
+    },
+    {
+        "user": "{{user2}}",
+        "content": {
+            "text": "You are trying to dust tokens under $10 from your agent wallet. Depending on the number of tokens, this may take a several minutes to complete. \n\nDo you want to proceed?"
+        }
+    },
+    {
+        "user": "{{user1}}",
+        "content": {
+            "text": "No."
+        }
+    }
+]
 \`\`\`
 
 **Response 2**
 
 \`\`\`json
 {
-    "threshold": 10
+    "threshold": 10,
+    "isConfirmed": false
 }
 \`\`\`
 
@@ -111,7 +155,8 @@ Dust tokens under $1
 
 \`\`\`json
 {
-    "threshold": 1
+    "threshold": 1,
+    "isConfirmed": null
 }
 \`\`\`
 
@@ -127,7 +172,8 @@ Dust my tokens
 
 \`\`\`json
 {
-    "threshold": null
+    "threshold": null,
+    "isConfirmed": null
 }
 \`\`\`
 
@@ -137,7 +183,6 @@ Here are the recent user messages for context:
 
 export const swapInProgressTemplate = (
     sellTokenSymbol: string,
-    sellTokenAddress: string,
     buyTokenSymbol: string,
     txHash: string
 ) => ({
@@ -149,7 +194,6 @@ export const swapInProgressTemplate = (
 
 export const swapCompletedTemplate = (
     sellTokenSymbol: string,
-    sellTokenAddress: string,
     buyTokenSymbol: string,
     buyAmountInWEI: bigint,
     buyTokenDecimals: number

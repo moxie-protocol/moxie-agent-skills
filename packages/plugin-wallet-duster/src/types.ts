@@ -7,7 +7,8 @@ export const TransferEthSchema = z.object({
 });
 
 export const DustRequestSchema = z.object({
-    threshold: z.number().min(0).nullable(),
+    threshold: z.number().min(0).nullable().optional(),
+    isConfirmed: z.boolean().nullable().optional(),
 });
 
 export interface GetQuoteResponse {
