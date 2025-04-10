@@ -29,7 +29,7 @@ export const previewDustAction: Action = {
         "HOW_MANY_DUST_TOKENS_IN_WALLET",
     ],
     description:
-        "Preview/Show what dust or low-value tokens would be dusted based on USD threshold given by user. By default, the threshold is $5.",
+        "Preview/Show how much or how many dust or low-value tokens would be dusted based on USD threshold given by user. By default, the threshold is $5. Use this action if user only ask to preview or display the dust tokens.",
     validate: async () => true,
     suppressInitialMessage: true,
     examples: [
@@ -44,6 +44,7 @@ export const previewDustAction: Action = {
                 user: "{{user2}}",
                 content: {
                     text: `You have 3 dust token(s) totaling ~$7.85:\n- USDC: ~$2.50\n- PEPE: ~$1.15\n- DINO: ~$4.20`,
+                    action: "PREVIEW_DUST_TOKENS",
                 },
             },
         ],
@@ -58,6 +59,7 @@ export const previewDustAction: Action = {
                 user: "{{user2}}",
                 content: {
                     text: `You have 3 dust token(s) totaling ~$7.85:\n- USDC: ~$2.50\n- PEPE: ~$1.15\n- DINO: ~$4.20`,
+                    action: "PREVIEW_DUST_TOKENS",
                 },
             },
         ],
@@ -72,6 +74,7 @@ export const previewDustAction: Action = {
                 user: "{{user2}}",
                 content: {
                     text: `You have 3 dust token(s) totaling ~$7.85:\n- USDC: ~$2.50\n- PEPE: ~$1.15\n- DINO: ~$4.20`,
+                    action: "PREVIEW_DUST_TOKENS",
                 },
             },
         ],
@@ -86,6 +89,7 @@ export const previewDustAction: Action = {
                 user: "{{user2}}",
                 content: {
                     text: `You have 3 dust token(s) totaling ~$7.85:\n- USDC: ~$2.50\n- PEPE: ~$1.15\n- DINO: ~$4.20`,
+                    action: "PREVIEW_DUST_TOKENS",
                 },
             },
         ],
@@ -100,6 +104,7 @@ export const previewDustAction: Action = {
                 user: "{{user2}}",
                 content: {
                     text: `You have 3 dust token(s) totaling ~$7.85:\n- USDC: ~$2.50\n- PEPE: ~$1.15\n- DINO: ~$4.20`,
+                    action: "PREVIEW_DUST_TOKENS",
                 },
             },
         ],
@@ -114,6 +119,7 @@ export const previewDustAction: Action = {
                 user: "{{user2}}",
                 content: {
                     text: `You have 3 dust token(s) totaling ~$7.85:\n- USDC: ~$2.50\n- PEPE: ~$1.15\n- DINO: ~$4.20`,
+                    action: "PREVIEW_DUST_TOKENS",
                 },
             },
         ],
@@ -128,6 +134,7 @@ export const previewDustAction: Action = {
                 user: "{{user2}}",
                 content: {
                     text: `Preview: You have 4 dust token(s) totaling ~$12.45:\n- 0xabc... (100000 tokens worth ~$2.14)\n- 0xdef... (90000 tokens worth ~$3.20)\n- 0x123... (5000 tokens worth ~$2.08)\n- 0x456... (30000 tokens worth ~$5.03)`,
+                    action: "PREVIEW_DUST_TOKENS",
                 },
             },
         ],
@@ -142,6 +149,7 @@ export const previewDustAction: Action = {
                 user: "{{user2}}",
                 content: {
                     text: `Preview: You have 2 dust token(s) totaling ~$6.78:\n- 0x789... (12000 tokens worth ~$3.30)\n- 0xabc... (18000 tokens worth ~$3.48)`,
+                    action: "PREVIEW_DUST_TOKENS",
                 },
             },
         ],
@@ -156,6 +164,7 @@ export const previewDustAction: Action = {
                 user: "{{user2}}",
                 content: {
                     text: `You have 2 dust token(s) totaling ~$6.78:\n- 0x789... (12000 tokens worth ~$3.30)\n- 0xabc... (18000 tokens worth ~$3.48)`,
+                    action: "PREVIEW_DUST_TOKENS",
                 },
             },
         ],
@@ -170,6 +179,7 @@ export const previewDustAction: Action = {
                 user: "{{user2}}",
                 content: {
                     text: `You have 2 dust token(s) totaling ~$6.78:\n- 0x789... (12000 tokens worth ~$3.30)\n- 0xabc... (18000 tokens worth ~$3.48)`,
+                    action: "PREVIEW_DUST_TOKENS",
                 },
             },
         ],
@@ -184,6 +194,7 @@ export const previewDustAction: Action = {
                 user: "{{user2}}",
                 content: {
                     text: `Preview: You have 4 dust token(s) totaling ~$12.45:\n- 0xabc... (100000 tokens worth ~$2.14)\n- 0xdef... (90000 tokens worth ~$3.20)\n- 0x123... (5000 tokens worth ~$2.08)\n- 0x456... (30000 tokens worth ~$5.03)`,
+                    action: "PREVIEW_DUST_TOKENS",
                 },
             },
         ],

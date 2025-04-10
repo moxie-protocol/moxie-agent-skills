@@ -29,6 +29,7 @@ export const explainAiDustingAction: Action = {
                 user: "{{user2}}",
                 content: {
                     text: "Wallet Dusting automatically scans your wallet for low-value tokens — often called 'dust' — and converts them into ETH...",
+                    action: "EXPLAIN_AI_DUSTING",
                 },
             },
         ],

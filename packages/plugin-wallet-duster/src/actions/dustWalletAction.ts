@@ -38,7 +38,7 @@ export const dustWalletAction: Action = {
     ],
     validate: async () => true,
     description:
-        "Checks the agent wallet for any dust tokens or low-value tokens under a given USD value threshold and dusts them to ETH on Base.",
+        "Dust any dust or low-value tokens in your agent wallet under a given USD value threshold and dusts them to ETH on Base.",
     suppressInitialMessage: true,
     examples: [
         [
@@ -50,6 +50,7 @@ export const dustWalletAction: Action = {
                 user: "{{user2}}",
                 content: {
                     text: "You are trying to dust tokens under $5 from your agent wallet. Depending on the number of tokens, this may take a several minutes to complete. \n\nDo you want to proceed?",
+                    action: "DUST_WALLET_TO_ETH",
                 },
             },
             {
@@ -58,7 +59,10 @@ export const dustWalletAction: Action = {
             },
             {
                 user: "{{user2}}",
-                content: { text: "Dusted 3 dust tokens into ETH." },
+                content: {
+                    text: "Dusted 3 dust tokens into ETH.",
+                    action: "DUST_WALLET_TO_ETH",
+                },
             },
         ],
         [
@@ -78,7 +82,10 @@ export const dustWalletAction: Action = {
             },
             {
                 user: "{{user2}}",
-                content: { text: "Dusted 1 token under $5 into ETH." },
+                content: {
+                    text: "Dusted 1 token under $5 into ETH.",
+                    action: "DUST_WALLET_TO_ETH",
+                },
             },
         ],
         [
@@ -100,7 +107,10 @@ export const dustWalletAction: Action = {
             },
             {
                 user: "{{user2}}",
-                content: { text: "Dusted 4 tokens under $10 into ETH." },
+                content: {
+                    text: "Dusted 4 tokens under $10 into ETH.",
+                    action: "DUST_WALLET_TO_ETH",
+                },
             },
         ],
         [
@@ -122,7 +132,10 @@ export const dustWalletAction: Action = {
             },
             {
                 user: "{{user2}}",
-                content: { text: "Swapped 2 dust tokens into ETH." },
+                content: {
+                    text: "Swapped 2 dust tokens into ETH.",
+                    action: "DUST_WALLET_TO_ETH",
+                },
             },
         ],
         [
@@ -144,7 +157,10 @@ export const dustWalletAction: Action = {
             },
             {
                 user: "{{user2}}",
-                content: { text: "Dusted 4 tokens under $10 into ETH." },
+                content: {
+                    text: "Dusted 4 tokens under $10 into ETH.",
+                    action: "DUST_WALLET_TO_ETH",
+                },
             },
         ],
         [
@@ -162,7 +178,7 @@ export const dustWalletAction: Action = {
             },
             {
                 user: "{{user1}}",
-                content: { text: "No." },
+                content: { text: "No.", action: "DUST_WALLET_TO_ETH" },
             },
         ],
     ],
