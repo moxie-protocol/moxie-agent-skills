@@ -4,7 +4,6 @@
     "modelProvider": "openai",
     "settings": {},
     "plugins": [
-        "@moxie-protocol/plugin-moxie-autonomous-trading",
         "@moxie-protocol/plugin-degenfans-alfafrens",
         "@elizaos/plugin-bootstrap",
         "@moxie-protocol/plugin-moxie-balance",

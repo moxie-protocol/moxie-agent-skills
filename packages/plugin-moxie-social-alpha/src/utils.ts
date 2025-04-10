@@ -19,6 +19,7 @@ interface TokenSwapSummary {
     sell_volume_usd: number;
     unique_buyers: number;
     unique_sellers: number;
+    net_volume_usd: number;
     top_buyers: TopTrader[];
     top_sellers: TopTrader[];
 }
@@ -34,25 +35,37 @@ interface GetUserSwapsSummaryResponse {
 export async function fetchSwapData(
     userIds: string[],
     tokenType: "ALL" | "CREATOR_COIN" | "NON_CREATOR_COIN",
-    fetchOnlyResultsFromGivenMoxieIds: boolean
+    fetchOnlyResultsFromGivenMoxieIds: boolean,
+    timeFilter: {
+        startTimestamp: string;
+        endTimestamp: string;
+    }
 ): Promise<TokenSwapSummary[]> {
     try {
         const startTime = Date.now();
+        let startTimestamp = new Date(Date.now() - 24 * 60 * 60 * 1000)
+            .toISOString()
+            .replace("T", " ")
+            .slice(0, 19);
+
+        let endTimestamp = new Date()
+            .toISOString()
+            .replace("T", " ")
+            .slice(0, 19);
+
+        if ( tokenType ==='NON_CREATOR_COIN' && timeFilter &&  timeFilter.startTimestamp != timeFilter.endTimestamp) {
+            startTimestamp = timeFilter.startTimestamp;
+            endTimestamp = timeFilter.endTimestamp;
+        }
         const variables = {
             input: {
                 filter: {
                     moxie_ids: userIds,
                     // Get timestamp from 24 hours ago by subtracting milliseconds (24 * 60 * 60 * 1000)
                     // Convert to ISO string, replace T with space, and take first 19 chars (YYYY-MM-DD HH:mm:ss)
-                    start_time: new Date(Date.now() - 24 * 60 * 60 * 1000)
-                        .toISOString()
-                        .replace("T", " ")
-                        .slice(0, 19),
+                    start_time: startTimestamp,
                     // Get current timestamp in same format
-                    end_time: new Date()
-                        .toISOString()
-                        .replace("T", " ")
-                        .slice(0, 19),
+                    end_time: endTimestamp,
                     token_type: tokenType,
                     only_results_from_given_moxie_ids:
                         fetchOnlyResultsFromGivenMoxieIds,
@@ -93,6 +106,7 @@ export async function fetchSwapData(
                                     sell_volume_usd
                                     unique_buyers
                                     unique_sellers
+                                    net_volume_usd
                                     top_buyers {
                                         user_id
                                         buy_volume

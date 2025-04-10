@@ -358,7 +358,8 @@ async function swapSummaryHandler(
     const allSwaps = await fetchSwapData(
         eligibleMoxieIds,
         tokenType,
-        onlyIncludeSpecifiedMoxieIds
+        onlyIncludeSpecifiedMoxieIds,
+        timeFilter
     );
 
     if (allSwaps.length === 0) {
