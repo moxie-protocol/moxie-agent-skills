@@ -211,7 +211,7 @@ If the question is about summarizing recent creator coin/token purchase activity
 **Overview**
 - The trending swaps data reflects onchain activity from tens of thousands of Base users' wallets indexed by Moxie.
 - If specific users are mentioned, adjust the context to highlight only those users' trading activity.
-- Rank the trending tokens in the response by: (1) Highest total buy volume, (2) Highest total volume,  (3) Highest percentage gains.  Do not prioritize tokens with heavy negative trends.
+- Rank the trending tokens in the response by: (1) Net volume (buy volume minus sell volume), (2) Highest total volume, (3) Highest percentage gains. Do not prioritize tokens with heavy negative trends.
 
 **Data Presentation**
 -Always try to reply with at least 8 tokens, preferably 10 (if there are that many)
@@ -279,7 +279,7 @@ If the question is about summarizing recent token purchases (ERC20) activity by 
 	- **Unique holders count**
     - **Total buy volume (tracked wallets only)**  (formatted as $[value] in USD)e.g **Total Buy Volume (tracked wallets only)**: $210,299.60
     - **Total sell volume (tracked wallets only)** (formatted as $[value] in USD)
-	- Notable Moxie users who swapped the token. Mention them by name and link to them using the markdown format:  [username](https://moxie.xyz/profile/user_id) format
+    - Notable Moxie users who swapped the token. Mention them by name and link to them using the markdown format:  [username](https://moxie.xyz/profile/user_id) format
 
 **Action-Specific Conditions**
 - If the user requests trending swaps for specific users, provide only those users' results. Do not rank users vs, each other.
