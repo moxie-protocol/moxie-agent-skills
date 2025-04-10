@@ -116,7 +116,11 @@ export const dustWalletAction: Action = {
                 };
             const dustTokens = tokenBalances.filter(
                 (t) =>
-                    t.token.balanceUSD < threshold &&
+                    ((threshold > 0.01 &&
+                        t.token.balanceUSD < threshold &&
+                        t.token.balanceUSD > 0.01) ||
+                        (threshold <= 0.01 &&
+                            t.token.balanceUSD < threshold)) &&
                     t.token.balance > 0 &&
                     // ignore ETH
                     t.token.baseToken.address.toLowerCase() !==
@@ -147,7 +151,7 @@ export const dustWalletAction: Action = {
                     callback,
                     wallet
                 );
-                if (dustedToken) {
+                if (dustedToken !== null) {
                     dustedTokenCount++;
                     totalUsdValue += token.token.balanceUSD;
                 }

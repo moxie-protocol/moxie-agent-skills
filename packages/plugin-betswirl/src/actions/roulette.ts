@@ -324,13 +324,12 @@ export const rouletteAction: Action = {
                 modelClass: ModelClass.SMALL,
                 schema: RouletteBetParameters,
             });
-            const { numbers, betAmount, token, isConfirmed } =
-                rouletteDetails.object as {
-                    numbers: Array<RouletteNumber>;
-                    betAmount: string;
-                    token: string;
-                    isConfirmed: boolean;
-                };
+            const { numbers, betAmount, token, isConfirmed } = rouletteDetails.object as {
+                numbers: Array<RouletteNumber>;
+                betAmount: string;
+                token: string;
+                isConfirmed: boolean;
+            };
 
             // Validate face is heads or tails
             if (!numbers || !numbers.length) {
@@ -341,10 +340,6 @@ export const rouletteAction: Action = {
 
             const formattedNumbers = numbers.join(", ");
 
-            await callback({
-                text: "Placing a Roulette bet on " + formattedNumbers,
-            });
-
             // Get the bet token from the user input
             const selectedToken = await getBetToken(chainId, token);
 
@@ -354,7 +349,6 @@ export const rouletteAction: Action = {
                 chainId,
                 selectedToken
             );
-
             // if confirmation is not given yet
             if (isConfirmed === null) {
                 await callback({
@@ -371,7 +365,7 @@ export const rouletteAction: Action = {
             }
 
             await callback({
-                text: ` with ${betAmount} ${tokenForMoxieTerminal}...`,
+                text: `Placing a Roulette bet on ${formattedNumbers} with ${betAmount} ${tokenForMoxieTerminal}... `,
             });
 
             elizaLogger.log(

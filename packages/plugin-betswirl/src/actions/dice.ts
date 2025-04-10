@@ -322,13 +322,12 @@ export const diceAction: Action = {
                 modelClass: ModelClass.SMALL,
                 schema: DiceBetParameters,
             });
-            const { number, betAmount, token, isConfirmed } =
-                diceDetails.object as {
-                    number: DiceNumber;
-                    betAmount: string;
-                    token: string;
-                    isConfirmed: boolean;
-                };
+            const { number, betAmount, token, isConfirmed } = diceDetails.object as {
+                number: DiceNumber;
+                betAmount: string;
+                token: string;
+                isConfirmed: boolean;
+            };
 
             // Validate face is heads or tails
             if (!number) {
@@ -336,10 +335,6 @@ export const diceAction: Action = {
                     `You must provide a number between ${MIN_SELECTABLE_DICE_NUMBER} and ${MAX_SELECTABLE_DICE_NUMBER} as it's a 100 sided Dice. i.e. "Bet 0.07 ETH on 77". You'll be betting that the rolled number will be above this chosen number.`
                 );
             }
-
-            await callback({
-                text: "Placing a Dice bet on " + number,
-            });
 
             // Get the bet token from the user input
             const selectedToken = await getBetToken(chainId, token);
@@ -350,8 +345,8 @@ export const diceAction: Action = {
                 chainId,
                 selectedToken
             );
-
-            // if confirmation is not given yet
+            
+             // if confirmation is not given yet
             if (isConfirmed === null) {
                 await callback({
                     text: `You are trying to bet on ${number} with ${betAmount} ${token}. Would you like to confirm this bet?`,
@@ -367,7 +362,7 @@ export const diceAction: Action = {
             }
 
             await callback({
-                text: ` with ${betAmount} ${tokenForMoxieTerminal}...`,
+                text: `Placing a Dice bet on ${number} with ${betAmount} ${tokenForMoxieTerminal}... `,
             });
 
             elizaLogger.log(

@@ -180,7 +180,11 @@ export const previewDustAction: Action = {
                 };
             const dustTokens = tokenBalances.filter(
                 (t) =>
-                    t.token.balanceUSD < threshold &&
+                    ((threshold > 0.01 &&
+                        t.token.balanceUSD < threshold &&
+                        t.token.balanceUSD > 0.01) ||
+                        (threshold <= 0.01 &&
+                            t.token.balanceUSD < threshold)) &&
                     t.token.balance > 0 &&
                     // ignore ETH
                     t.token.baseToken.address.toLowerCase() !==
@@ -201,7 +205,7 @@ export const previewDustAction: Action = {
 
             const lines = dustTokens.map(
                 (t) =>
-                    `| $${t.token.baseToken.symbol} | [${t.token.baseToken.address}](https://basescan.org/token/${t.token.baseToken.address}) | $${t.token.balance < 0.01 ? "< $0.01" : t.token.balanceUSD.toFixed(2)} |`
+                    `| $${t.token.baseToken.symbol} | [${t.token.baseToken.address}](https://basescan.org/token/${t.token.baseToken.address}) | ${t.token.balanceUSD < 0.01 ? "< $0.01" : `$${t.token.balanceUSD.toFixed(2)}`} |`
             );
             const response = `You have ${dustTokens.length} dust token(s) totaling ~$${totalUsdValue}:\n| Token Symbol | Token Address | Value |\n|-------|-------|-------|\n${lines.join("\n")}`;
 

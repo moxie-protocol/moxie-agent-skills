@@ -8,7 +8,6 @@ import {
     elizaLogger,
 } from "@moxie-protocol/core";
 import { getCasinoTokens } from "../providers/casinoTokens";
-import { casinoChainById } from "@betswirl/sdk-core";
 
 export const infoAction: Action = {
     name: "BETSWIRL_INFO",
