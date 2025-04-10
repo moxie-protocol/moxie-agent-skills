@@ -580,7 +580,7 @@
     {
         "pluginId": "ba2e0746-d089-4539-a23b-84882bc8eafd",
         "name": "@moxie-protocol/plugin-betswirl",
-        "displayName": "Play Games of Luck",
+        "displayName": "BetSwirl",
         "version": "0.0.1",
         "author": "Romuald Hog <romuald@betswirl.com>",
         "description": "Enabled your agent to place bets on BetSwirl's games of luck, and retrieving bets information.",
