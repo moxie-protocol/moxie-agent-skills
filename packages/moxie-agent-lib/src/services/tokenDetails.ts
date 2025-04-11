@@ -107,26 +107,10 @@ export async function getTokenDetails(tokenAddresses: string[]): Promise<TokenDe
                     priceUSD: token?.priceUSD ?? undefined,
                     fullyDilutedMarketCapUSD: token?.marketCap ?? undefined,
                     uniqueHolders: token?.holders ?? undefined,
-                    uniqueBuysLast1Hour: token?.uniqueBuys1 ?? undefined,
-                    uniqueBuysLast4Hours: token?.uniqueBuys4 ?? undefined,
-                    uniqueBuysLast12Hours: token?.uniqueBuys12 ?? undefined,
-                    uniqueBuysLast24Hours: token?.uniqueBuys24 ?? undefined,
-                    uniqueSellsLast1Hour: token?.uniqueSells1 ?? undefined,
-                    uniqueSellsLast4Hours: token?.uniqueSells4 ?? undefined,
-                    uniqueSellsLast12Hours: token?.uniqueSells12 ?? undefined,
-                    uniqueSellsLast24Hours: token?.uniqueSells24 ?? undefined,
                     changePercent1Hour: token?.change1 ? (Number(token.change1) * 100).toString() : undefined,
                     changePercent4Hours: token?.change4 ? (Number(token.change4) * 100).toString() : undefined,
                     changePercent12Hours: token?.change12 ? (Number(token.change12) * 100).toString() : undefined,
                     changePercent24Hours: token?.change24 ? (Number(token.change24) * 100).toString() : undefined,
-                    high1Hour: token?.high1 ?? undefined,
-                    high4Hours: token?.high4 ?? undefined,
-                    high12Hours: token?.high12 ?? undefined,
-                    high24Hours: token?.high24 ?? undefined,
-                    low1Hour: token?.low1 ?? undefined,
-                    low4Hours: token?.low4 ?? undefined,
-                    low12Hours: token?.low12 ?? undefined,
-                    low24Hours: token?.low24 ?? undefined,
                     volumeChange1Hour: token?.volumeChange1 ? (Number(token.volumeChange1) * 100).toString() : undefined,
                     volumeChange4Hours: token?.volumeChange4 ? (Number(token.volumeChange4) * 100).toString() : undefined,
                     volumeChange12Hours: token?.volumeChange12 ? (Number(token.volumeChange12) * 100).toString() : undefined,
@@ -139,7 +123,6 @@ export async function getTokenDetails(tokenAddresses: string[]): Promise<TokenDe
                     Number(token?.priceUSD ?? 0)
                 );
                 details.liquidityTop3PoolsUSD = totalLiquiditySum.toString();
-                details.liquidityPools = pairs;
                 return details;
             })
         );
