@@ -509,5 +509,53 @@
             "Waiting for response",
             "Doing some DegenFans magic"
         ]
+    },
+    {
+        "pluginId": "c92bb34a-2b16-498f-9a6d-454c2b4095ec",
+        "name": "@moxie-protocol/plugin-bankless-claimables",
+        "displayName": "Airdrop Hunter",
+        "version": "0.0.1",
+        "author": "Alex and Yoseph",
+        "description": "Check all claimables (inculding airdrops, rewards, etc.) across your connected wallets",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-airdrop-hunter",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/feat/add-airdrop-hunter-skill/packages/plugin-airdrop-hunter/images/logo.png",
+        "settings": {},
+        "capabilities": [
+            "List all my claimable airdrops from your connected wallets"
+        ],
+        "starterQuestions": [
+            {
+                "label": "How does the Airdrop Hunter Skill work?",
+                "value": "How does the Airdrop Hunter Skill work?"
+            },
+            {
+                "label": "Check my wallet for available airdrops.",
+                "value": "Check my wallet for available airdrops."
+            }
+        ],
+        "mediaUrls": [],
+        "actions": [
+            "EXPLAIN_BANKLESS_CLAIMABLES_CAPABILITIES",
+            "HOW_DOES_BANKLESS_CLAIMABLES_WORK",
+            "HOW_DOES_BANKLESS_CLAIMABLES_FIND_CLAIMABLE_AIRDROPS",
+            "HOW_DOES_BANKLESS_CLAIMABLES_FIND_MY_CLAIMABLE_AIRDROPS",
+            "HOW_DOES_BANKLESS_CLAIMABLES_FIND_MY_CLAIMABLE_AIRDROPS",
+            "WHAT_EXAMPLE_QUESTIONS_CAN_I_ASK_ABOUT_BANKLESS_CLAIMABLES",
+            "EXPLAIN_BANKLESS_CLAIMABLES",
+            "CHECK_AVAILABLE_CLAIMABLES",
+            "CHECK_CLAIMABLES",
+            "AVAILABLE_CLAIMABLES",
+            "CLAIMABLE_AIRDROPS",
+            "FETCH_CLAIMABLES",
+            "LIST_MY_CLAIMABLES",
+            "SHOW_ME_MY_CLAIMABLES"
+        ],
+        "isPremium": false,
+        "freeQueries": 0,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
+        "status": "ACTIVE",
+        "isDefault": true,
+        "loaders": ["Checking your wallets for available airdrops..."]
     }
 ]
