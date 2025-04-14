@@ -521,18 +521,18 @@ export function createMoxieApiRouter(
             }
 
             // check if the user has creator coin or not
-            const ftaResponse = await ftaService.getUserFtaData(moxieUserId);
-            if (!ftaResponse) {
-                res.status(403).json(
-                    ResponseHelper.error<null>(
-                        "USER_NOT_ELIGIBILE",
-                        `user must have creator coin to create an agent`,
-                        req.path,
-                        req.traceId
-                    )
-                );
-                return;
-            }
+            // const ftaResponse = await ftaService.getUserFtaData(moxieUserId);
+            // if (!ftaResponse) {
+            //     res.status(403).json(
+            //         ResponseHelper.error<null>(
+            //             "USER_NOT_ELIGIBILE",
+            //             `user must have creator coin to create an agent`,
+            //             req.path,
+            //             req.traceId
+            //         )
+            //     );
+            //     return;
+            // }
 
             // create an account for the user
             const accountCreationResponse = await moxieClient.db.createAccount({
