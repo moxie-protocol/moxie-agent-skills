@@ -516,13 +516,13 @@
         "displayName": "Wallet Duster",
         "version": "0.0.1",
         "author": "Alex and Yoseph",
-        "description": "A Moxie AI Skill that swaps low-value ERC-20 tokens (dust) into ETH using your agent wallet.",
+        "description": "Swap low-value ERC-20 tokens (dust) into ETH in your agent wallet.",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-wallet-duster",
         "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-wallet-duster/images/logo.png",
         "settings": {},
         "capabilities": [
-            "Swap low-value tokens in the user's agent wallet into ETH via the 0x API.",
-            "Simulate which tokens would be dusted without sending any transactions."
+            "Swap low-value tokens in the agent wallet to ETH.",
+            "Simulate which tokens would be swapped without executing a transaction."
         ],
         "starterQuestions": [
             {
@@ -538,8 +538,8 @@
                 "value": "Dust tokens under $5."
             },
             {
-                "label": "How much dust tokens are in my wallet?",
-                "value": "How much dust tokens are in my wallet?"
+                "label": "What's the value of dust in my agent wallet?",
+                "value": "What's the value of dust in my agent wallet?"
             }
         ],
         "mediaUrls": [],
