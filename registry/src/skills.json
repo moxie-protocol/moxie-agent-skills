@@ -744,7 +744,7 @@
         "author": "Alex and Yoseph",
         "description": "Check all claimables (inculding airdrops, rewards, etc.) across your connected wallets",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-airdrop-hunter",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/feat/add-airdrop-hunter-skill/packages/plugin-airdrop-hunter/images/logo.png",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/feat/add-airdrop-hunter-skill/packages/plugin-bankless-claimables/images/logo.png",
         "settings": {},
         "capabilities": [
             "List all my claimable airdrops from your connected wallets"
@@ -781,7 +781,7 @@
         "skillCoinAddress": "",
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
-        "isDefault": true,
+        "isDefault": false,
         "loaders": ["Checking your wallets for available claimables..."]
     }
 ]
