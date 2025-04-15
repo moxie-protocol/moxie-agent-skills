@@ -171,7 +171,7 @@ export const autonomousTradingAction: Action = {
                         sellPercentage: 100,
                         priceChangePercentage: params.profitPercentage
                     },
-                    limitOrderValidityInSeconds: params.timeDurationInSec
+                    limitOrderValidityInSeconds: 7 * 24 * 60 * 60 // 7 days in seconds
                 };
             }
 
