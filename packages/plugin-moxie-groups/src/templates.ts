@@ -113,15 +113,15 @@ Example of an error response:
 Now, please process the user's conversation history and provide your response in the JSON format. 
 `;
 
-export const viewGroupsTemplate = `
+export const groupDetailsTemplate = `
 You are tasked with creating a markdown table that displays group information based on two JSON objects: group details and user details. Here are the input variables:
 
 <group_details>
-{{GROUP_DETAILS}}
+{{group_details}}
 </group_details>
 
 <user_details>
-{{USER_DETAILS}}
+{{user_details}}
 </user_details>
 
 Your goal is to create a markdown table with the following columns: Group ID, Group Name, and Members. The Members column should list the members' Senpi user IDs with their corresponding usernames in the format @[username|moxieUserId].
