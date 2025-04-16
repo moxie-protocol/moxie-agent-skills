@@ -53,7 +53,10 @@ const checkClaimablesAction: Action = {
         const traceId = message.id;
         const moxieUserId = (state?.moxieUserInfo as MoxieUser)?.id;
         try {
-            const wallets = (state?.moxieUserInfo as MoxieUser)?.wallets ?? [];
+            const wallets =
+                (state?.moxieUserInfo as MoxieUser)?.wallets?.filter(
+                    (w) => w.walletType !== "embedded"
+                ) ?? [];
 
             if (!wallets.length) {
                 await callback?.({
@@ -125,12 +128,12 @@ const checkClaimablesAction: Action = {
 
             await callback?.({
                 text:
-                    `You have in total ${unclaimedClaimables.length} claimables to claim amounting to ${unclaimedClaimables.reduce((acc, item) => acc + (item.worth?.worthUSDFloat ?? 0), 0).toFixed(2)} USD. Here are the top ${unclaimedClaimables.length > 10 ? 10 : unclaimedClaimables.length} claimables:\n\n` +
+                    `You have in total ${unclaimedClaimables.length} claimables to claim amounting to ${unclaimedClaimables.reduce((acc, item) => acc + (item.worth?.worthUSDFloat ?? 0), 0).toFixed(2)} USD across ${wallets.length} connectedwallets. Here are the top ${unclaimedClaimables.length > 10 ? 10 : unclaimedClaimables.length} claimables:\n\n` +
                     tableRows.join("\n") +
                     (unclaimedClaimables?.length > 10
                         ? `\n\nClick [here](https://claimables.bankless.com/claimables/${moxieUserId}) to view all your claimables.`
                         : "") +
-                    `\n\n**Note:** You will need to go to the Bankless Claimables links and connect your wallet on the site to claim your claimables.`,
+                    `\n\nFeel free to connect more wallets to see more claimables that you may have missed.\n\n**Note:** You will need to go to the Bankless Claimables links and connect your wallet on the site to claim your claimables.`,
             });
 
             return true;
