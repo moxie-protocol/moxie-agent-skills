@@ -68,3 +68,5 @@ MIT License © Alex and Yoseph
 Please report any vulnerabilities responsibly via the method outlined in the root SECURITY.md file.
 
 ---
+
+\* Note: You will need to go to the Bankless Claimables website and c

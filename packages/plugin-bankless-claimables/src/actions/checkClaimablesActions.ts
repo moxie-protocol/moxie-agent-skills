@@ -113,12 +113,13 @@ const checkClaimablesAction: Action = {
                 .slice(0, 10);
 
             unclaimedClaimables.forEach((item) => {
-                const { walletAddress, title, type, worth, action } = item;
+                const { walletAddress, title, type, worth } = item;
+                const url = `https://bankless.com/claimables/${walletAddress}`;
 
                 tableRows.push(
                     `| ${title} | ${type.charAt(0).toUpperCase() + type.slice(1)} | ${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)} | ${
                         worth?.worthUSDString ?? "N/A"
-                    } | ${action?.url} |`
+                    } | ${url} |`
                 );
             });
 
@@ -129,7 +130,7 @@ const checkClaimablesAction: Action = {
                     (unclaimedClaimables?.length > 10
                         ? `\n\nClick [here](https://claimables.bankless.com/claimables/${moxieUserId}) to view all your claimables.`
                         : "") +
-                    `\n\n\* Note: You will need to go to the Bankless Claimables website and connect your wallet on the site to claim your claimables.`,
+                    `\n\n**Note:** You will need to go to the Bankless Claimables links and connect your wallet on the site to claim your claimables.`,
             });
 
             return true;
