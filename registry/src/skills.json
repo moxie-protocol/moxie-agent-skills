@@ -734,7 +734,7 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": false,
-        "loaders": ["Dusting your wallet..."]
+        "loaders": ["Dusting your wallet"]
     },
     {
         "pluginId": "c92bb34a-2b16-498f-9a6d-454c2b4095ec",
