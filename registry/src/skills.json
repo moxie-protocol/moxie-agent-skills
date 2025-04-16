@@ -783,5 +783,51 @@
         "status": "ACTIVE",
         "isDefault": false,
         "loaders": ["Checking your wallets for available claimables..."]
+    },
+    {
+        "pluginId": "3d5e16f1-40e0-5df0-89c0-b2216bfa8850",
+        "name": "@moxie-protocol/plugin-moxie-groups",
+        "displayName": "Senpi Groups",
+        "version": "0.1.8+build.1",
+        "author": "Senpi",
+        "description": "Enables your agent to manage groups of Senpi users",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-groups",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-groups/images/logo.png",
+        "settings": {},
+        "capabilities": ["Manage groups of Senpi users"],
+        "starterQuestions": [
+            {
+                "label": "Please create a group called 'Social Alpha Group'",
+                "value": "Please create a group called 'Social Alpha Group'"
+            },
+            {
+                "label": "Please add @[betashop|M4] to the 'Social Alpha Group'",
+                "value": "Please add @[betashop|M4] to the 'Social Alpha Group'"
+            },
+            {
+                "label": "Please remove @[betashop|M4] from the 'Social Alpha Group'",
+                "value": "Please remove @[betashop|M4] from the 'Social Alpha Group'"
+            }
+        ],
+        "actions": [
+            "MANAGE_GROUPS",
+            "CREATE_GROUP",
+            "ADD_GROUP_MEMBER",
+            "REMOVE_GROUP_MEMBER",
+            "DELETE_GROUP",
+            "GET_GROUP_DETAILS",
+            "UPDATE_GROUP"
+        ],
+        "isPremium": false,
+        "freeQueries": 0,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
+        "status": "ACTIVE",
+        "isDefault": true,
+        "loaders": [
+            "Analyzing request",
+            "Doing some Senpi magic",
+            "Processing request"
+        ]
     }
 ]
