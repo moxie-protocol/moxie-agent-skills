@@ -131,9 +131,9 @@ const checkClaimablesAction: Action = {
                     `You have in total ${unclaimedClaimables.length} claimables to claim amounting to ${unclaimedClaimables.reduce((acc, item) => acc + (item.worth?.worthUSDFloat ?? 0), 0).toFixed(2)} USD across ${wallets.length} connected wallets. Here are the top ${unclaimedClaimables.length > 10 ? 10 : unclaimedClaimables.length} claimables:\n\n` +
                     tableRows.join("\n") +
                     (unclaimedClaimables?.length > 10
-                        ? `\n\nClick [here](https://claimables.bankless.com/claimables/${moxieUserId}) to view all your claimables.`
+                        ? `\n\nClick on the Bankless Claimables links to view all your claimables.`
                         : "") +
-                    `\n\nFeel free to connect more wallets to see more claimables that you may have missed.\n\n**Note:** You will need to go to the Bankless Claimables links and connect your wallet on the site to claim your claimables.`,
+                    `\n\nCurrently, this only shows all claimables from your connected wallets and excludes any claimables from your agent wallet. Feel free to connect more wallets to see more claimables that you might have missed.\n\n**Note:** You will need to go to the Bankless Claimables links and connect your wallet on the site to claim your claimables.`,
             });
 
             return true;
