@@ -27,14 +27,14 @@ Please follow these steps to process the user input and generate the appropriate
 
    For COPY_TRADE and COPY_TRADE_AND_PROFIT:
    - moxieIds: Find all matches of @[username|id] and extract the 'id' part.
-   - timeDurationInSec: Look for time-related phrases and convert to seconds.
+   - timeDurationInSec: Look for time-related phrases and convert to seconds. Note: This is not required if there's only one user whose trades are copied.
    - amountInUSD: Find the dollar amount mentioned to "buy" (not sell).
    - profitPercentage (for PROFIT rules only): Find the profit percentage mentioned.
    - minPurchaseAmount: Look for any mention of a minimum purchase amount in USD.
 
    For GROUP_COPY_TRADE and GROUP_COPY_TRADE_AND_PROFIT:
    - groupId: Find the match of #[groupname|id] and extract the 'id' part.
-   - timeDurationInSec: Look for time-related phrases and convert to seconds.
+   - timeDurationInSec: Look for time-related phrases and convert them to seconds. Note: This is not required if there's only one user from the group whose trades are copied.
    - amountInUSD: Find the dollar amount mentioned to "buy" (not sell).
    - profitPercentage (for PROFIT rules only): Find the profit percentage mentioned.
    - condition: Determine if it's "ANY" or "ALL" based on the input.
@@ -61,7 +61,7 @@ Before providing the final JSON output, wrap your analysis in <rule_analysis> ta
 9. Validate the presence of all required parameters for the chosen rule type.
 10. For GROUP rules, explicitly check if the number of users from the group is specified.
 11. Check if the profitPercentage (if applicable) is negative. If it is, prepare an error message stating that negative profit percentages (stop losses) are not supported currently.
-12. If 'timeDurationInSec' is not provided, throw an error "Please specify the duration between which copied traders make trades to be counted for the rule"
+12. If 'timeDurationInSec' is not provided and there is more than one user or group member involved, throw an error "Please specify the duration between which copied traders make trades to be counted for the rule"
 13. Important: Copy trading rules must replicate the same trade action as the source. Only buy trades can be copied — initiating a sell trade in response to a buy, or copying a sell trade with a buy, is not supported. However, it's valid to specify exit conditions (like selling at a target profit) for the copied buy trade.
 
 After completing the rule analysis, provide the JSON output based on your analysis.
