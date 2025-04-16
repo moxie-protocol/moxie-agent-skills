@@ -11,28 +11,31 @@ import {
     composeContext,
     generateObjectDeprecated,
 } from "@moxie-protocol/core";
-import { MoxieClientWallet, MoxieUser, MoxieWalletClient, formatUserMention } from "@moxie-protocol/moxie-agent-lib";
-import { BaseParams, createTradingRule, getAutonomousTradingRuleDetails, getErrorMessageFromCode, GroupTradeParams, LimitOrderParams, RuleType, 
-    UserTradeParams, agentWalletNotFound, delegateAccessNotFound, moxieWalletClientNotFound, checkUserCommunicationPreferences } from "../utils/utility";
-import { autonomousTradingTemplate } from "../templates";
-import { addMembersToGroup, createGroup } from "../utils";
-import { GroupOutput } from "../types";
+import { MoxieUser } from "@moxie-protocol/moxie-agent-lib";
+import { manageGroupsTemplate } from "../templates";
+import { addMembersToGroup, createGroup, deleteGroup, getGroupDetails, removeMembersFromGroup, updateGroup } from "../utils";
+import { GetGroupsOutput, GroupOutput } from "../types";
 
-export interface AutonomousTradingError {
+export interface ManageGroupsError {
     missing_fields: string[];
     prompt_message: string;
+}
+
+export interface GroupParams {
+    groupId?: string;
+    groupName?: string;
+    senpiUserIdsToAdd?: string[];
+    senpiUserIdsToRemove?: string[];
 }
 
 export interface ManageGroupsResponse {
     success: boolean;
     actionType?: string;
-    pa
-    params?: AutonomousTradingRuleParams;
-    error: AutonomousTradingError | null;
+    params?: GroupParams;
+    error: ManageGroupsError | null;
 }
 
-
-export const autonomousTradingAction: Action = {
+export const manageGroupsAction: Action = {
     name: "MANAGE_GROUPS",
     similes: [
         "MANAGE_GROUPS",
@@ -50,21 +53,18 @@ export const autonomousTradingAction: Action = {
         _options: { [key: string]: unknown },
         callback: HandlerCallback
     ) => {
-
         const traceId = message.id;
         const moxieUserInfo = state.moxieUserInfo as MoxieUser;
         const moxieUserId = moxieUserInfo.id;
-        
-        try {
-            elizaLogger.debug(traceId,`[MANAGE_GROUPS] [${moxieUserId}] [MANAGE_GROUPS] Starting MANAGE_GROUPS handler with user message: ${JSON.stringify(message)}`);
 
-            // Compose manage groups context
+        try {
+            elizaLogger.debug(traceId, `[MANAGE_GROUPS] [${moxieUserId}] Starting handler with user message: ${JSON.stringify(message)}`);
+
             const manageGroupsContext = composeContext({
                 state,
                 template: manageGroupsTemplate,
             });
 
-            // Generate manage groups content
             const manageGroupsResponse = await generateObjectDeprecated({
                 runtime,
                 context: manageGroupsContext,
@@ -78,177 +78,298 @@ export const autonomousTradingAction: Action = {
                 }
             }) as ManageGroupsResponse;
 
-            if (!manageGroupsResponse.success ) {
-                elizaLogger.warn(traceId,`[manage groups] [${moxieUserId}] [MANAGE_GROUPS] [ADD_RULE] error occured while performing add rule operation: ${JSON.stringify(manageGroupsResponse.error)}`);
-                 callback?.({
+            if (!manageGroupsResponse.success) {
+                elizaLogger.warn(traceId, `[MANAGE_GROUPS] Error: ${JSON.stringify(manageGroupsResponse.error)}`);
+                callback?.({
                     text: manageGroupsResponse.error.prompt_message,
                     action: "MANAGE_GROUPS",
                 });
                 return true;
             }
 
-            // Extract parameters from response
             const { actionType, params } = manageGroupsResponse;
-            
-            if (actionType === 'CREATE_GROUP') {
-                try {
-                    const { groupName, groupDescription } = params;
-                    const response = await createGroup(
-                        state.authorizationHeader as string,
-                        groupName
-                    ) as GroupOutput;
 
-                    await callback?.({
-                        text: `✅ Group Created Successfully ! Group ID: ${response.group?.id}`,
+            switch (actionType) {
+                case 'CREATE_GROUP':
+                    await handleCreateGroup(traceId, moxieUserId, state, params, callback);
+                    break;
+                case 'CREATE_GROUP_AND_ADD_GROUP_MEMBER':
+                    await handleCreateGroupAndAddMember(traceId, moxieUserId, state, params, callback);
+                    break;
+                case 'ADD_GROUP_MEMBER':
+                    await handleAddGroupMember(traceId, moxieUserId, state, params, callback);
+                    break;
+                case 'DELETE_GROUP':
+                    await handleDeleteGroup(traceId, moxieUserId, state, params, callback);
+                    break;
+                case 'REMOVE_GROUP_MEMBER':
+                    await handleRemoveGroupMember(traceId, moxieUserId, state, params, callback);
+                    break;
+                case 'GET_GROUP_DETAILS':
+                    await handleGetGroupDetails(traceId, moxieUserId, state, params, callback);
+                    break;
+                case 'UPDATE_GROUP':
+                    await handleUpdateGroup(traceId, moxieUserId, state, params, callback);
+                    break;
+                default:
+                    elizaLogger.error(traceId, `[MANAGE_GROUPS] Invalid action type: ${actionType}`);
+                    callback?.({
+                        text: `Something went wrong while managing groups. Please try again later.`,
                         action: "MANAGE_GROUPS",
                     });
-                } catch (error) {
-                    elizaLogger.error(traceId, `[manage groups] [${moxieUserId}] [MANAGE_GROUPS] Error creating group: ${error.message}`);
-                    await callback?.({
-                        text: `❌ Failed to create group. Please try again later.`,
-                        action: "MANAGE_GROUPS",
-                    });
-                }
-            } else if (actionType === 'CREATE_GROUP_AND_ADD_GROUP_MEMBER') {
-                try {
-                    const { groupName, groupDescription, moxieUserId } = params;
-                    const response = await createGroup(
-                        state.authorizationHeader as string,
-                        groupName
-                    ) as GroupOutput;
-
-                    const addMembersResponse = await addMembersToGroup(
-                        state.authorizationHeader as string,
-                        response.group?.id,
-                        [moxieUserId]
-                    ) as GroupOutput;
-
-                    if (addMembersResponse.success) {
-                        await callback?.({
-                            text: `✅ Group Created Successfully and added member! Group ID: ${response.group?.id}, Number of members added: ${addMembersResponse.group?.members.length}`,
-                            action: "MANAGE_GROUPS",
-                        });
-                    } else {
-                        await callback?.({
-                            text: `❌ Failed to add member to group. Please try again later.`,
-                            action: "MANAGE_GROUPS",
-                        });
-                    }
-                } catch (error) {
-                    elizaLogger.error(traceId, `[manage groups] [${moxieUserId}] [MANAGE_GROUPS] Error creating group and adding member: ${error.message}`);
-                    await callback?.({
-                        text: `❌ An error occurred while creating the group and adding the member. Please try again later.`,
-                        action: "MANAGE_GROUPS",
-                    });
-                }
-            } else if (actionType === 'ADD_GROUP_MEMBER') {
-                const { groupId, moxieUserId } = params;
-            } else if (actionType === 'DELETE_GROUP') {
-                const { groupId } = params;
-            } else if (actionType === 'REMOVE_GROUP_MEMBER') {
-                const { groupId } = params;
-            } else if (actionType === 'GET_GROUP_DETAILS') {
-                const { groupId } = params;
-            } else {
-                elizaLogger.error(traceId,`[manage groups] [${moxieUserId}] [MANAGE_GROUPS] [ADD_RULE] invalid action type: ${actionType}`);
-                callback?.({
-                    text: `Something went wrong while managing groups. Please try again later.`,
-                    action: "MANAGE_GROUPS",
-                });
-                return true;
+                    return true;
             }
-
-
-
-            try {
-                const response = await createTradingRule(
-                    state.authorizationHeader as string,
-                    traceId,
-                    ruleType as RuleType,
-                    baseParams,
-                    ruleTriggers,
-                    groupTradeParams,
-                    userTradeParams,
-                    limitOrderParams
-                );
-
-                await callback?.({
-                    text: `✅ Automation Rule Created Successfully!\n\n📌 Instruction: ${response.instructions}`,
-                     action: "AUTONOMOUS_TRADING",
-                     cta: communicationPreference === null ? "SETUP_ALERTS" : null
-                });
-
-            } catch (error) {
-                elizaLogger.error(traceId,`[autonomous trading] [${moxieUserId}] [AUTONOMOUS_TRADING] [ADD_RULE] error creating trading rule: ${error.message}`);
-                callback?.({
-                    text: getErrorMessageFromCode(error),
-                    action: "AUTONOMOUS_TRADING",
-                });
-            }
-
-                
-        } catch(error) {
+        } catch (error) {
+            elizaLogger.error(traceId, `[MANAGE_GROUPS] Unexpected error: ${JSON.stringify(error)}`);
             callback?.({
-                text: `Something went wrong while creating autonomous trading rule. Please try again later.`,
-                action: "AUTONOMOUS_TRADING",
+                text: `An unexpected error occurred. Please try again later.`,
+                action: "MANAGE_GROUPS",
             });
-            elizaLogger.error(traceId,`[[autonomous trading]] [${moxieUserId}] [AUTONOMOUS_TRADING] [ADD_RULE] error occured while performing add rule operation: ${JSON.stringify(error)}`);
-
         }
 
         return true;
-
     },
-    examples: [
-        [
-            {
-                user: "{{user1}}",
-                content: {
-                    text: "buy 10$ worth tokens whenever @betashop and @jessepollak buy any token in 6 hours",
-                },
-            },
-            {
-                user: "{{user2}}",
-                content: {
-                    text: "buy 10$ worth tokens whenever @betashop and @jessepollak buy any token in 6 hours and sell it off when it makes a profit of 40%",
-                    action: "AUTONOMOUS_TRADING",
-                },
-            },
-        ],
-    ] as ActionExample[][],
+    examples: [[],] as ActionExample[][],
 };
 
-export const getAutonomousTradingRuleDetailAction: Action = {
-    name: "COPY_TRADE_RULE_DETAILS",
-    similes: ["AUTONOMOUS_TRADING_RULE_DETAILS"],
-    description: "Select this action when the request is seeking information about possible automation types, available parameters, or general questions about what copy trading functionality exists. Example: 'What automations are possible?' or 'What kinds of trading rules can I create?",
-    suppressInitialMessage: true,
-    validate: async () => true,
-    handler: async (
-        runtime: IAgentRuntime,
-        message: Memory,
-        state: State,
-        _options: { [key: string]: unknown },
-        callback: HandlerCallback
-    ) => {
+async function handleCreateGroup(traceId: string, moxieUserId: string, state: State, params: GroupParams, callback: HandlerCallback) {
+    try {
+        const { groupName } = params;
+        if (!groupName) {
+            elizaLogger.warn(traceId, `[MANAGE_GROUPS] [CREATE_GROUP] Group name is required`);
+            await callback?.({
+                text: `❌ Group name is required. Please try again.`,
+                action: "MANAGE_GROUPS",
+            });
+            return;
+        }
 
-        const user = state.moxieUserInfo as MoxieUser;
-
-        const response = getAutonomousTradingRuleDetails(formatUserMention(user.id, user.userName));
-        callback({
-            text: response, 
-            action: "COPY_TRADE_RULE_DETAILS",
-            cta: ["COPY_TRADE", "GROUP_COPY_TRADE"]
+        const response = await createGroup(state.authorizationHeader as string, groupName) as GroupOutput;
+        await callback?.({
+            text: `✅ Group Created Successfully! Group ID: ${response.group?.id}, Group Name: ${response.group?.name}, Members: ${response.group?.members.length}`,
+            action: "MANAGE_GROUPS",
         });
-    },
-    examples: [
-        [
-            {
-                user: "{{user1}}",
-                content: {
-                    text: "get details for a copy trade rule",
-                },
-            },
-        ],
-    ] as ActionExample[][],
-};  
+    } catch (error) {
+        elizaLogger.error(traceId, `[MANAGE_GROUPS] Error creating group: ${error.message}`);
+        await callback?.({
+            text: `❌ Failed to create group. Please try again later.`,
+            action: "MANAGE_GROUPS",
+        });
+    }
+}
+
+async function handleCreateGroupAndAddMember(traceId: string, moxieUserId: string, state: State, params: GroupParams, callback: HandlerCallback) {
+    try {
+        const { groupName, senpiUserIdsToAdd } = params;
+
+        if (!groupName) {
+            elizaLogger.warn(traceId, `[MANAGE_GROUPS] [CREATE_GROUP_AND_ADD_GROUP_MEMBER] Group name is required`);
+            await callback?.({
+                text: `❌ Group name is required. Please try again.`,
+                action: "MANAGE_GROUPS",
+            });
+            return;
+        }
+
+        if (!senpiUserIdsToAdd) {
+            elizaLogger.warn(traceId, `[MANAGE_GROUPS] [CREATE_GROUP_AND_ADD_GROUP_MEMBER] Senpi user IDs to add is required`);
+            await callback?.({
+                text: `❌ Senpi user IDs to add is required. Please try again.`,
+                action: "MANAGE_GROUPS",
+            });
+            return;
+        }
+
+        const response = await createGroup(state.authorizationHeader as string, groupName) as GroupOutput;
+
+        const addMembersResponse = await addMembersToGroup(state.authorizationHeader as string, response.group?.id, senpiUserIdsToAdd) as GroupOutput;
+
+        if (addMembersResponse.success) {
+            await callback?.({
+                text: `✅ Group Created Successfully and added member! Group ID: ${response.group?.id}| Group Name: ${response.group?.name}| Number of members added: ${addMembersResponse.group?.members.length}`,
+                action: "MANAGE_GROUPS",
+            });
+        } else {
+            await callback?.({
+                text: `❌ Failed to add member to group. Please try again later.`,
+                action: "MANAGE_GROUPS",
+            });
+        }
+    } catch (error) {
+        elizaLogger.error(traceId, `[MANAGE_GROUPS] Error creating group and adding member: ${error.message}`);
+        await callback?.({
+            text: `❌ An error occurred while creating the group and adding the member. Please try again later.`,
+            action: "MANAGE_GROUPS",
+        });
+    }
+}
+
+async function handleAddGroupMember(traceId: string, moxieUserId: string, state: State, params: GroupParams, callback: HandlerCallback) {
+    try {
+        const { groupId, senpiUserIdsToAdd } = params;
+        if (!groupId || !senpiUserIdsToAdd) {
+            elizaLogger.warn(traceId, `[MANAGE_GROUPS] [ADD_GROUP_MEMBER] Group ID and Senpi user IDs to add are required`);
+            await callback?.({
+                text: `❌ Group ID and Senpi user IDs to add are required. Please try again.`,
+                action: "MANAGE_GROUPS",
+            });
+            return;
+        }
+
+        const response = await addMembersToGroup(state.authorizationHeader as string, groupId, senpiUserIdsToAdd) as GroupOutput;
+
+        if (response.success) {
+            await callback?.({
+                text: `✅ Member added to group successfully! Group ID: ${groupId}, Number of members added: ${response.group?.members.length}`,
+                action: "MANAGE_GROUPS",
+            });
+        } else {
+            await callback?.({
+                text: `❌ Failed to add member to group. Please try again later.`,
+                action: "MANAGE_GROUPS",
+            });
+        }
+    } catch (error) {
+        elizaLogger.error(traceId, `[MANAGE_GROUPS] Error adding member to group: ${error.message}`);
+        await callback?.({
+            text: `❌ An error occurred while adding the member to the group. Please try again later.`,
+            action: "MANAGE_GROUPS",
+        });
+    }
+}
+
+async function handleDeleteGroup(traceId: string, moxieUserId: string, state: State, params: GroupParams, callback: HandlerCallback) {
+    try {
+        const { groupId } = params;
+        if (!groupId) {
+            elizaLogger.warn(traceId, `[MANAGE_GROUPS] [DELETE_GROUP] Group ID is required`);
+            await callback?.({
+                text: `❌ Group ID is required. Please try again.`,
+                action: "MANAGE_GROUPS",
+            });
+            return;
+        }
+
+        const response = await deleteGroup(state.authorizationHeader as string, groupId) as GroupOutput;
+
+        if (response.success) {
+            await callback?.({
+                text: `✅ Group deleted successfully! Group ID: ${groupId}`,
+                action: "MANAGE_GROUPS",
+            });
+        } else {
+            await callback?.({
+                text: `❌ Failed to delete group. Please try again later.`,
+                action: "MANAGE_GROUPS",
+            });
+        }
+    } catch (error) {
+        elizaLogger.error(traceId, `[MANAGE_GROUPS] Error deleting group: ${error.message}`);
+        await callback?.({
+            text: `❌ An error occurred while deleting the group. Please try again later.`,
+            action: "MANAGE_GROUPS",
+        });
+    }
+}
+
+async function handleRemoveGroupMember(traceId: string, moxieUserId: string, state: State, params: GroupParams, callback: HandlerCallback) {
+    try {
+        const { groupId, senpiUserIdsToRemove } = params;
+        if (!groupId || !senpiUserIdsToRemove) {
+            elizaLogger.warn(traceId, `[MANAGE_GROUPS] [REMOVE_GROUP_MEMBER] Group ID and Senpi user IDs to remove are required`);
+            await callback?.({
+                text: `❌ Group ID and Senpi user IDs to remove are required. Please try again.`,
+                action: "MANAGE_GROUPS",
+            });
+            return;
+        }
+
+        const response = await removeMembersFromGroup(state.authorizationHeader as string, groupId, senpiUserIdsToRemove) as GroupOutput;
+
+        if (response.success) {
+            await callback?.({
+                text: `✅ Member removed from group successfully! Group ID: ${groupId}, Number of members removed: ${response.group?.members.length}`,
+                action: "MANAGE_GROUPS",
+            });
+        } else {
+            await callback?.({
+                text: `❌ Failed to remove member from group. Please try again later.`,
+                action: "MANAGE_GROUPS",
+            });
+        }
+    } catch (error) {
+        elizaLogger.error(traceId, `[MANAGE_GROUPS] Error removing member from group: ${error.message}`);
+        await callback?.({
+            text: `❌ An error occurred while removing the member from the group. Please try again later.`,
+            action: "MANAGE_GROUPS",
+        });
+    }
+}
+
+async function handleGetGroupDetails(traceId: string, moxieUserId: string, state: State, params: GroupParams, callback: HandlerCallback) {
+    try {
+        const { groupId } = params;
+        if (!groupId) {
+            elizaLogger.warn(traceId, `[MANAGE_GROUPS] [GET_GROUP_DETAILS] Group ID is required`);
+            await callback?.({
+                text: `❌ Group ID is required. Please try again.`,
+                action: "MANAGE_GROUPS",
+            });
+            return;
+        }
+
+        const response = await getGroupDetails(state.authorizationHeader as string, groupId) as GetGroupsOutput;
+
+        if (response.groups.length > 0) {
+            await callback?.({
+                text: `✅ Group details retrieved successfully! Group ID: ${groupId}`,
+                action: "MANAGE_GROUPS",
+            });
+        } else {
+            await callback?.({
+                text: `❌ Failed to retrieve group details. Please try again later.`,
+                action: "MANAGE_GROUPS",
+            });
+        }
+    } catch (error) {
+        elizaLogger.error(traceId, `[MANAGE_GROUPS] Error retrieving group details: ${error.message}`);
+        await callback?.({
+            text: `❌ An error occurred while retrieving the group details. Please try again later.`,
+            action: "MANAGE_GROUPS",
+        });
+    }
+}
+
+async function handleUpdateGroup(traceId: string, moxieUserId: string, state: State, params: GroupParams, callback: HandlerCallback) {
+    try {
+        const { groupId, groupName } = params;
+        if (!groupId || !groupName) {
+            elizaLogger.warn(traceId, `[MANAGE_GROUPS] [UPDATE_GROUP] Group ID and Group Name are required`);
+            await callback?.({
+                text: `❌ Group ID and Group Name are required. Please try again.`,
+                action: "MANAGE_GROUPS",
+            });
+            return;
+        }
+
+        const response = await updateGroup(state.authorizationHeader as string, groupId, groupName) as GroupOutput;
+
+        if (response.success) {
+            await callback?.({
+                text: `✅ Group updated successfully! Group ID: ${groupId}, Group Name: ${groupName}`,
+                action: "MANAGE_GROUPS",
+            });
+        } else {
+            await callback?.({
+                text: `❌ Failed to update group. Please try again later.`,
+                action: "MANAGE_GROUPS",
+            });
+        }
+    } catch (error) {
+        elizaLogger.error(traceId, `[MANAGE_GROUPS] Error updating group: ${error.message}`);
+        await callback?.({
+            text: `❌ An error occurred while updating the group. Please try again later.`,
+            action: "MANAGE_GROUPS",
+        });
+    }
+}

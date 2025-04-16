@@ -2,7 +2,7 @@ import { elizaLogger } from '@moxie-protocol/core';
 import { gql } from 'graphql-request';
 import { GetGroupsInput, GetGroupsOutput, GroupOutput, CreateGroupInput, UpdateGroupInput, DeleteGroupInput, ModifyGroupMembersInput, Status, DeleteGroupOutput } from '../types';
 
-export const GET_GROUPS = gql`
+export const GET_GROUP_DETAILS = gql`
     query GetGroups($input: GetGroupsInput!) {
         GetGroups(input: $input) {
             groups {
@@ -114,14 +114,14 @@ export const REMOVE_MEMBERS_FROM_GROUP = gql`
     }
 `;
 
-export async function getGroups(
+export async function getGroupDetails(
     authorizationHeader: string,
     groupId?: string,
     groupName?: string,
     skip: number = 0,
     take: number = 10,
 ): Promise<GetGroupsOutput> {
-    elizaLogger.info('getGroups called', { groupId, groupName, skip, take });
+    elizaLogger.info('getGroupDetails called', { groupId, groupName, skip, take });
 
     try {
         const input: GetGroupsInput = {
@@ -131,7 +131,7 @@ export async function getGroups(
             ...(take !== undefined && { take })
         };
 
-        elizaLogger.debug('getGroups input constructed', { input });
+        elizaLogger.debug('getGroupDetails input constructed', { input });
 
         const data = await fetch(process.env.RULE_API_MOXIE_API_URL, {
             method: 'POST',
@@ -140,7 +140,7 @@ export async function getGroups(
                 'Authorization': authorizationHeader
             },
             body: JSON.stringify({
-                query: GET_GROUPS,
+                query: GET_GROUP_DETAILS,
                 variables: { input }
             })
         });
@@ -168,10 +168,6 @@ export async function createGroup(
     elizaLogger.info('createGroup called', { name });
 
     try {
-        if (!name) {
-            elizaLogger.warn('createGroup failed due to missing name');
-            throw new Error('Group name is required to create a group');
-        }
 
         const input: CreateGroupInput = { name };
         elizaLogger.debug('createGroup input constructed', { input });
@@ -213,11 +209,6 @@ export async function updateGroup(
     elizaLogger.info('updateGroup called', { groupId, name, groupStatus });
 
     try {
-        if (!groupId) {
-            elizaLogger.warn('updateGroup failed due to missing groupId');
-            throw new Error('Group ID is required to update a group');
-        }
-
         const input: UpdateGroupInput = { groupId, ...(name && { name }), ...(groupStatus && { groupStatus }) };
         elizaLogger.debug('updateGroup input constructed', { input });
 
@@ -257,10 +248,6 @@ export async function deleteGroup(
     elizaLogger.info('deleteGroup called', { groupId, groupName });
 
     try {
-        if (!groupId) {
-            elizaLogger.warn('deleteGroup failed due to missing groupId');
-            throw new Error('Group ID is required to delete a group');
-        }
 
         const input: DeleteGroupInput = { groupId, ...(groupName && { groupName }) };
         elizaLogger.debug('deleteGroup input constructed', { input });
@@ -301,10 +288,6 @@ export async function addMembersToGroup(
     elizaLogger.info('addMembersToGroup called', { groupId, members });
 
     try {
-        if (!groupId) {
-            elizaLogger.warn('addMembersToGroup failed due to missing groupId');
-            throw new Error('Group ID is required to add members to a group');
-        }
 
         const input: ModifyGroupMembersInput = { groupId, members };
         elizaLogger.debug('addMembersToGroup input constructed', { input });
@@ -345,10 +328,6 @@ export async function removeMembersFromGroup(
     elizaLogger.info('removeMembersFromGroup called', { groupId, members });
 
     try {
-        if (!groupId) {
-            elizaLogger.warn('removeMembersFromGroup failed due to missing groupId');
-            throw new Error('Group ID is required to remove members from a group');
-        }
 
         const input: ModifyGroupMembersInput = { groupId, members };
         elizaLogger.debug('removeMembersFromGroup input constructed', { input });

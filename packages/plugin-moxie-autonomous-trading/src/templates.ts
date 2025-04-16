@@ -38,7 +38,7 @@ Please follow these steps to process the user input and generate the appropriate
    - amountInUSD: Find the dollar amount mentioned to "buy" (not sell).
    - profitPercentage (for PROFIT rules only): Find the profit percentage mentioned.
    - condition: Determine if it's "ANY" or "ALL" based on the input.
-   - conditionValue: - For "ANY" condition, extract the number of people mentioned. If not specified, prepare an error message asking the user to provide this information.
+   - conditionValue: - For "ANY" condition, extract the number of people mentioned (default to 1 if not specified).
    - minPurchaseAmount: Look for any mention of a minimum purchase amount in USD.
 
 4. Validate that all required parameters for the determined rule type are present.
