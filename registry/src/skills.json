@@ -556,6 +556,6 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": false,
-        "loaders": ["Checking your wallets for available claimables..."]
+        "loaders": ["Checking your wallets for available claimables"]
     }
 ]

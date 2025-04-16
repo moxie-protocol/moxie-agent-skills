@@ -128,7 +128,7 @@ const checkClaimablesAction: Action = {
 
             await callback?.({
                 text:
-                    `You have in total ${unclaimedClaimables.length} claimables to claim amounting to ${unclaimedClaimables.reduce((acc, item) => acc + (item.worth?.worthUSDFloat ?? 0), 0).toFixed(2)} USD across ${wallets.length} connectedwallets. Here are the top ${unclaimedClaimables.length > 10 ? 10 : unclaimedClaimables.length} claimables:\n\n` +
+                    `You have in total ${unclaimedClaimables.length} claimables to claim amounting to ${unclaimedClaimables.reduce((acc, item) => acc + (item.worth?.worthUSDFloat ?? 0), 0).toFixed(2)} USD across ${wallets.length} connected wallets. Here are the top ${unclaimedClaimables.length > 10 ? 10 : unclaimedClaimables.length} claimables:\n\n` +
                     tableRows.join("\n") +
                     (unclaimedClaimables?.length > 10
                         ? `\n\nClick [here](https://claimables.bankless.com/claimables/${moxieUserId}) to view all your claimables.`
