@@ -84,6 +84,8 @@ Before providing your final response, conduct your analysis inside <analysis> ta
 After your analysis, provide the final JSON response.
 
 Example of a successful response:
+
+\`\`\`json
 {
   "success": true,
   "actionType": "CREATE_GROUP", 
@@ -92,8 +94,11 @@ Example of a successful response:
   },
   "error": null
 }
+\`\`\`
 
 Example of an error response:
+
+\`\`\`json
 {
   "success": false,
   "actionType": null,
@@ -103,6 +108,62 @@ Example of an error response:
     "missingFields": ["groupName"]
   }
 }
+\`\`\`
 
 Now, please process the user's conversation history and provide your response in the JSON format. 
+`;
+
+export const viewGroupsTemplate = `
+You are tasked with creating a markdown table that displays group information based on two JSON objects: group details and user details. Here are the input variables:
+
+<group_details>
+{{GROUP_DETAILS}}
+</group_details>
+
+<user_details>
+{{USER_DETAILS}}
+</user_details>
+
+Your goal is to create a markdown table with the following columns: Group ID, Group Name, and Members. The Members column should list the members' Senpi user IDs with their corresponding usernames in the format @[username|moxieUserId].
+
+Instructions:
+
+1. Parse the JSON data:
+   - Extract the group information from the "groups" array in the GROUP_DETAILS JSON.
+   - Extract the user information from the USER_DETAILS JSON.
+
+2. Create the table structure using markdown syntax:
+   - Use | to separate columns.
+   - Use - to create the header separator row.
+
+3. Populate the table:
+   - Group ID: Use the "id" field from the group information.
+   - Group Name: Use the "name" field from the group information.
+   - Members: For each member in the "members" array:
+     a. Get the Senpi user ID from the "moxieUserId" field.
+     b. Look up the corresponding username in the USER_DETAILS JSON.
+     c. Format as @[username|moxieUserId].
+     d. Separate multiple members with a space.
+
+4. Format the output:
+   - Ensure proper alignment of the table columns.
+   - Present the table in markdown format.
+
+Before creating the final table, wrap your data extraction and processing steps inside <data_extraction> tags:
+
+a. List all groups extracted from GROUP_DETAILS, including their IDs and names.
+b. List all users extracted from USER_DETAILS, including their moxieUserIds and usernames.
+c. For each group, list its members and look up their usernames from the user list.
+
+This will help ensure accuracy in the final output. It's OK for this section to be quite long.
+
+Example table structure:
+
+\`\`\`markdown
+| Group ID | Group Name | Members |
+|----------|------------|---------|
+| 1234 | Example Group | @[user1|5678], @[user2|9012] |
+\`\`\`
+
+Your final output should be only the markdown-formatted table, without any explanatory text before or after it.
 `;
