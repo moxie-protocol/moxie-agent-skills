@@ -13,8 +13,6 @@ interface TopTrader {
 interface TokenSwapSummary {
     token_address: string;
     token_symbol: string;
-    buy_volume: number;
-    sell_volume: number;
     buy_volume_usd: number;
     sell_volume_usd: number;
     unique_buyers: number;
@@ -100,8 +98,6 @@ export async function fetchSwapData(
                                 user_swap_summaries {
                                     token_address
                                     token_symbol
-                                    buy_volume
-                                    sell_volume
                                     buy_volume_usd
                                     sell_volume_usd
                                     unique_buyers

@@ -48,10 +48,7 @@ export async function getPrice(
             targetTokenAddress = WETH_ADDRESS;
         }
 
-        const sourceTokenWithNetworkId = `${sourceTokenAddress}:${BASE_NETWORK_ID}`;
-        const targetTokenWithNetworkId = `${targetTokenAddress}:${BASE_NETWORK_ID}`;
-
-        const tokenDetails = await getTokenDetails([sourceTokenWithNetworkId, targetTokenWithNetworkId]);
+        const tokenDetails = await getTokenDetails([sourceTokenAddress, targetTokenAddress]);
         elizaLogger.debug(
             traceId,
             `[getPrice] [${moxieUserId}] [TOKEN_DETAILS] ${JSON.stringify(tokenDetails)}`
@@ -81,7 +78,7 @@ export async function getPrice(
                 traceId,
                 `[getPrice] [${moxieUserId}] [ERROR] priceUSD not found for source token: ${sourceTokenDetail}`
             );
-            throw new Error(`Failed to get token price in USD for token: ${sourceTokenWithNetworkId}`)
+            throw new Error(`Failed to get token price in USD for token: ${sourceTokenAddress}`)
         }
 
         const sourceTokenPriceInUSD = new Decimal(sourceTokenDetail.priceUSD);
@@ -96,7 +93,7 @@ export async function getPrice(
                 traceId,
                 `[getPrice] [${moxieUserId}] [ERROR] priceUSD not found for target token: ${targetTokenDetail}`
             );
-            throw new Error(`Failed to get token price in USD for token: ${targetTokenWithNetworkId}`)
+            throw new Error(`Failed to get token price in USD for token: ${targetTokenAddress}`)
         }
 
         const targetTokenPriceInUSD = new Decimal(targetTokenDetail.priceUSD);
