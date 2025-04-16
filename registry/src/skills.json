@@ -581,6 +581,6 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": false,
-        "loaders": ["Dusting your wallet..."]
+        "loaders": ["Dusting your wallet"]
     }
 ]
