@@ -513,7 +513,7 @@
     {
         "pluginId": "c92bb34a-2b16-498f-9a6d-454c2b4095ec",
         "name": "@moxie-protocol/plugin-bankless-claimables",
-        "displayName": "Airdrop Hunter",
+        "displayName": "Bankless Claimables",
         "version": "0.0.1",
         "author": "Alex and Yoseph",
         "description": "Check all claimables (inculding airdrops, rewards, etc.) across your connected wallets",
@@ -525,12 +525,12 @@
         ],
         "starterQuestions": [
             {
-                "label": "How does the Airdrop Hunter Skill work?",
-                "value": "How does the Airdrop Hunter Skill work?"
+                "label": "How does the Bankless Claimables Skill work?",
+                "value": "How does the Bankless Claimables Skill work?"
             },
             {
-                "label": "Check my wallet for available airdrops.",
-                "value": "Check my wallet for available airdrops."
+                "label": "Check my wallets for available claimables.",
+                "value": "Check my wallets for available claimables."
             }
         ],
         "mediaUrls": [],
@@ -555,7 +555,7 @@
         "skillCoinAddress": "",
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
-        "isDefault": true,
-        "loaders": ["Checking your wallets for available airdrops..."]
+        "isDefault": false,
+        "loaders": ["Checking your wallets for available claimables..."]
     }
 ]
