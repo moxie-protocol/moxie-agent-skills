@@ -782,7 +782,7 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": false,
-        "loaders": ["Checking your wallets for available claimables..."]
+        "loaders": ["Checking your wallets for available claimables"]
     },
     {
         "pluginId": "3d5e16f1-40e0-5df0-89c0-b2216bfa8850",
