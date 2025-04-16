@@ -128,7 +128,8 @@ const checkClaimablesAction: Action = {
                     tableRows.join("\n") +
                     (unclaimedClaimables?.length > 10
                         ? `\n\nClick [here](https://claimables.bankless.com/claimables/${moxieUserId}) to view all your claimables.`
-                        : ""),
+                        : "") +
+                    `\n\n\* Note: You will need to go to the Bankless Claimables website and connect your wallet on the site to claim your claimables.`,
             });
 
             return true;
