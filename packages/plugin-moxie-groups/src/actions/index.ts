@@ -325,16 +325,13 @@ async function handleRemoveGroupMember(traceId: string, moxieUserId: string, sta
 async function handleGetGroupDetails(traceId: string, runtime: IAgentRuntime, message: Memory, state: State, params: GroupParams, callback: HandlerCallback) {
     try {
         const { groupId } = params;
-        if (!groupId) {
-            elizaLogger.warn(traceId, `[MANAGE_GROUPS] [GET_GROUP_DETAILS] Group ID is required`);
-            await callback?.({
-                text: `❌ Group ID is required. Please try again.`,
-                action: "MANAGE_GROUPS",
-            });
-            return;
-        }
 
-        const response = await getGroupDetails(state.authorizationHeader as string, groupId) as GetGroupsOutput;
+        let response: GetGroupsOutput;
+        if (!groupId) {
+            response = await getGroupDetails(state.authorizationHeader as string) as GetGroupsOutput;
+        } else {
+            response = await getGroupDetails(state.authorizationHeader as string, groupId) as GetGroupsOutput;
+        }
 
         if (response.groups.length === 0) {
             await callback?.({
