@@ -17,6 +17,8 @@ const queryBasenameAvailabilityAction: Action = {
     name: "QUERY_BASENAME_AVAILABILITY",
     similes: ["CHECK_BASENAME", "IS_BASENAME_AVAILABLE", "VERIFY_BASENAME"],
     description: "Checks if a given Basename is available for registration.",
+    validate: async () => true,
+    suppressInitialMessage: true,
     examples: [
         [
             {
@@ -40,7 +42,7 @@ const queryBasenameAvailabilityAction: Action = {
     ) => {
         const basename = message.content.parameters.basename as string;
         // Added explicit input validation
-        if (!basename || !/^[a-z0-9\-]{3,32}$/.test(basename)) {
+        if (!basename || !/^[a-z0-9-]{3,32}$/.test(basename)) {
             await callback?.({
                 text: "Please provide a valid basename to check availability.",
             });
@@ -57,9 +59,7 @@ const queryBasenameAvailabilityAction: Action = {
                 await registrarController.available(basename);
             // Changed: structured output
             await callback?.({
-                basename,
-                available: isAvailable,
-                message: isAvailable
+                text: isAvailable
                     ? `'${basename}.base' is available for registration.`
                     : `'${basename}.base' is already registered.`,
             });

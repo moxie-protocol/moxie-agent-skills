@@ -1,9 +1,9 @@
 import type { Plugin } from "@moxie-protocol/core";
 import viewOwnedBasenamesAction from "./actions/viewOwnedBasenames";
-import queryBasenameAvailabilityAction from "./actions/queryBasenameAvailability";
-import registerBasenameAction from "./actions/registerBasename";
+// import queryBasenameAvailabilityAction from "./actions/queryBasenameAvailability";
+// import registerBasenameAction from "./actions/registerBasename";
 import describeBasenamesSkillAction from "./actions/describeBasenamesSkill";
-import suggestBasenameAlternativesAction from "./actions/suggestBasenameAlternatives"; // NEW: LLM-powered suggestions
+// import suggestBasenameAlternativesAction from "./actions/suggestBasenameAlternatives"; // NEW: LLM-powered suggestions
 
 // All actions now have explicit parameter/output typing and validation for audit compliance
 
@@ -12,10 +12,10 @@ const basenamesPlugin: Plugin = {
     description: "Manage your Basenames with natural language commands.",
     actions: [
         viewOwnedBasenamesAction,
-        queryBasenameAvailabilityAction,
-        registerBasenameAction,
+        // queryBasenameAvailabilityAction,
+        // registerBasenameAction,
         describeBasenamesSkillAction,
-        suggestBasenameAlternativesAction,
+        // suggestBasenameAlternativesAction,
     ],
     providers: [],
     evaluators: [],

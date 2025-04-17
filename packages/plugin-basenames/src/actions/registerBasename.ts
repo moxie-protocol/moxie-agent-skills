@@ -21,6 +21,8 @@ const registerBasenameAction: Action = {
     similes: ["REGISTER_NAME", "BUY_BASENAME", "ACQUIRE_BASENAME"],
     description:
         "Registers a Basename if available, after presenting cost and receiving user confirmation.",
+    validate: async () => true,
+    suppressInitialMessage: true,
     examples: [
         [
             {
@@ -118,7 +120,7 @@ const registerBasenameAction: Action = {
             // Added input validation
             if (
                 !basename ||
-                !/^[a-z0-9\-]{3,32}$/.test(basename) ||
+                !/^[a-z0-9-]{3,32}$/.test(basename) ||
                 isNaN(durationYears) ||
                 durationYears < 1 ||
                 durationYears > 5
@@ -151,11 +153,7 @@ const registerBasenameAction: Action = {
             });
             // Changed: explicit output structure for prompt
             await callback?.({
-                basename,
-                duration: durationYears,
-                cost: cost.toString(),
-                cost_eth: costInETH,
-                message: `'${basename}.base' is available and costs ${costInETH} ETH to register for ${durationYears} year(s). Reply 'Yes' to confirm.`,
+                text: `'${basename}.base' is available and costs ${costInETH} ETH to register for ${durationYears} year(s). Reply 'Yes' to confirm.`,
             });
         }
     },

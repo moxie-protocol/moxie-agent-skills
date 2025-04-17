@@ -30,6 +30,7 @@ const suggestBasenameAlternativesAction: Action = {
             },
         ],
     ],
+    suppressInitialMessage: true,
     handler: async (
         runtime: IAgentRuntime,
         message: Memory,
@@ -42,7 +43,7 @@ const suggestBasenameAlternativesAction: Action = {
             ? Math.min(Number(message.content.parameters.max_suggestions), 10)
             : MAX_SUGGESTIONS;
 
-        if (!basename || !/^[a-z0-9\-]{3,32}$/.test(basename)) {
+        if (!basename || !/^[a-z0-9-]{3,32}$/.test(basename)) {
             await callback?.({
                 text: "Please provide a valid basename to suggest alternatives.",
             });
@@ -60,10 +61,7 @@ const suggestBasenameAlternativesAction: Action = {
         const isAvailable = await registrarController.available(basename);
         if (isAvailable) {
             await callback?.({
-                requested: basename,
-                available: true,
-                alternatives: [],
-                message: `'${basename}.base' is available!`,
+                text: `'${basename}.base' is available!`,
             });
             return;
         }
@@ -88,23 +86,21 @@ const suggestBasenameAlternativesAction: Action = {
                 if (availableAlternatives.length >= maxSuggestions) break;
             } catch (e) {
                 // Ignore errors for individual checks
+                console.error(e);
             }
         }
 
-        let message: string;
+        let text: string;
         if (availableAlternatives.length === 0) {
-            message = `Sorry, '${basename}.base' is taken and no similar alternatives are currently available.`;
+            text = `Sorry, '${basename}.base' is taken and no similar alternatives are currently available.`;
         } else {
-            message =
+            text =
                 `'${basename}.base' is taken. Here are some available alternatives:\n` +
                 availableAlternatives.map((a) => `- ${a}.base`).join("\n");
         }
 
         await callback?.({
-            requested: basename,
-            available: false,
-            alternatives: availableAlternatives,
-            message,
+            text,
         });
     },
 };

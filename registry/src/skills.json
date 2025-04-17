@@ -514,34 +514,33 @@
         "pluginId": "769d33e0-33a3-4ab2-9b1e-8c7ce2ec81f2",
         "name": "@moxie-protocol/plugin-basenames",
         "displayName": "Basenames",
-        "version": "0.1.0",
+        "version": "0.0.1",
         "author": "Yoseph and Alex",
-        "description": "Easily manage your Basenames—view ownership, check availability, and register directly from your Moxie AI. All actions are audit-ready and compliant with Moxie Eliza Skills Framework.",
+        "description": "Easily manage your Basenames ownership, check availability, and register directly using AI Agent.",
         "githubUrl": "https://github.com/your-github/plugin-basenames",
-        "logoUrl": "https://github.com/your-github/plugin-basenames/blob/main/registry/images/logo.png",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/feat/add-basename-skill/packages/plugin-basenames/images/logo.png",
         "settings": {},
         "capabilities": [
             "View Owned Basenames",
             "Query Basename Availability",
             "Register a Basename",
-            "Describe Basenames Skill",
             "Suggest Basename Alternatives"
         ],
         "starterQuestions": [
             {
-                "label": "About Basenames Skill",
+                "label": "What can I do with the Basenames skill?",
                 "value": "What can I do with the Basenames skill?"
             },
             {
-                "label": "View My Basenames",
+                "label": "Show me all my Basenames.",
                 "value": "Show me all my Basenames."
             },
             {
-                "label": "Check Basename Availability",
+                "label": "Is 'charlie.base' available?",
                 "value": "Is 'charlie.base' available?"
             },
             {
-                "label": "Register a Basename",
+                "label": "Register 'charlie.base' for 1 year.",
                 "value": "Register 'charlie.base' for 1 year."
             }
         ],

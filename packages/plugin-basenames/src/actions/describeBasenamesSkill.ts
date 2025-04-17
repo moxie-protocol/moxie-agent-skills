@@ -11,6 +11,7 @@ const describeBasenamesSkillAction: Action = {
     similes: ["WHAT_IS_BASENAMES", "EXPLAIN_BASENAMES", "ABOUT_BASENAMES"],
     description:
         "Provides a detailed description of what the Basenames skill can do.",
+    validate: async () => true,
     examples: [
         [
             {
@@ -25,6 +26,7 @@ const describeBasenamesSkillAction: Action = {
             },
         ],
     ],
+    suppressInitialMessage: true,
     handler: async (
         runtime: IAgentRuntime,
         message: Memory,
@@ -39,7 +41,7 @@ The Basenames skill makes managing your Basenames easy and intuitive. With this 
 - **Register Basenames**: If a Basename is available, see the cost upfront and register it directly, using simple confirmation prompts and secure transactions via your embedded wallet.
 Just ask naturally—I'm here to help manage your Basenames smoothly!
     `;
-        await callback?.({ description: description.trim() }); // Changed: explicit output field
+        await callback?.({ text: description.trim() }); // Changed: explicit output field
     },
 };
 
