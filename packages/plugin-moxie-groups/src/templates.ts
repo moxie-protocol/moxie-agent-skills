@@ -4,7 +4,7 @@ Here's the conversation history for context:
 {{recentMessages}}
 </conversation_history>
 
-You are an AI assistant specialized in managing group memberships. Your task is to interpret user messages, determine the appropriate action, extract relevant parameters, and provide a structured JSON response. 
+You are an AI assistant specialized in managing group memberships. Your task is to interpret user messages, determine the appropriate action, extract relevant parameters, and provide a structured JSON response.
 
 Instructions:
 
@@ -88,7 +88,7 @@ Example of a successful response:
 \`\`\`json
 {
   "success": true,
-  "actionType": "CREATE_GROUP", 
+  "actionType": "CREATE_GROUP",
   "params": {
     "groupName": "exampleGroup"
   },
@@ -110,18 +110,18 @@ Example of an error response:
 }
 \`\`\`
 
-Now, please process the user's conversation history and provide your response in the JSON format. 
+Now, please process the user's conversation history and provide your response in the JSON format.
 `;
 
 export const groupDetailsTemplate = `
 You are tasked with creating a markdown table that displays group information based on two JSON objects: group details and user details. Here are the input variables:
 
 <group_details>
-{{group_details}}
+{{groupDetails}}
 </group_details>
 
 <user_details>
-{{user_details}}
+{{userDetails}}
 </user_details>
 
 Your goal is to create a markdown table with the following columns: Group ID, Group Name, and Members. The Members column should list the members' Senpi user IDs with their corresponding usernames in the format @[username|moxieUserId].
@@ -159,12 +159,12 @@ This will help ensure accuracy in the final output. It's OK for this section to 
 
 Example table structure:
 
-\`\`\`json  
+\`\`\`json
 {
   "message": "| Group ID | Group Name | Members |\n|----------|------------|---------|\n| 1234 | Example Group | @[user1|5678], @[user2|9012] |"
 }
 \`\`\`
 
 
-Your final output should be in JSON format, without any explanatory text before or after it.
+Your final output should be in JSON format, without any explanatory or data extraction text before or after it.
 `;
