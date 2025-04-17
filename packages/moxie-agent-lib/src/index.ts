@@ -18,7 +18,7 @@ export { getMoxiePortfolioInfoByCreatorTokenDetails } from "./services/portfolio
 
 export { MoxieAgentDBAdapter } from "./services/MoxieAgentDBAdapter";
 
-export { getTokenDetails } from "./services/tokenDetails";
+export { getTokenDetails, getTrendingTokenDetails } from "./services/tokenDetails";
 
 export type {
     TwitterMetadata,
