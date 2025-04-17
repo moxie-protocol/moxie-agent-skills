@@ -339,14 +339,22 @@ async function handleGetGroupDetails(traceId: string, runtime: IAgentRuntime, me
                 action: "MANAGE_GROUPS",
             });
             return;
-        } 
-        
+        }
+
         const groupDetails = response.groups;
         const memberIds = new Set(groupDetails.flatMap(group => group.members.map(member => member.moxieUserId)));
         const moxieUserProfiles = await moxieUserService.getUserByMoxieIdMultipleMinimal(Array.from(memberIds));
-        const userDetails = new Map();
-        moxieUserProfiles.forEach((user, id) => {
-            userDetails.set(id, user.userName || id);
+        const userDetails = new Map<string, string>();
+
+        moxieUserProfiles.forEach(user => {
+            userDetails.set(user.id, user.userName || user.id);
+        });
+
+        memberIds.forEach(id => {
+            if (!userDetails.has(id)) {
+                elizaLogger.warn(`[MANAGE_GROUPS] Missing user profile for ID: ${id}`);
+                userDetails.set(id, id); // Fallback to ID if user profile is missing
+            }
         });
 
         elizaLogger.debug(traceId, `[MANAGE_GROUPS] [GET_GROUP_DETAILS] Group details: ${JSON.stringify(groupDetails)}`);
@@ -357,7 +365,9 @@ async function handleGetGroupDetails(traceId: string, runtime: IAgentRuntime, me
             groupDetails: JSON.stringify(groupDetails),
             userDetails: JSON.stringify(userDetails),
         });
-        
+
+        elizaLogger.debug(traceId, `[MANAGE_GROUPS] [GET_GROUP_DETAILS] New state: ${JSON.stringify(newState)}`);
+
         const context = composeContext({
             state: newState,
             template: groupDetailsTemplate,
