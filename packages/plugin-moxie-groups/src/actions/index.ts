@@ -10,9 +10,10 @@ import {
     elizaLogger,
     composeContext,
     generateObjectDeprecated,
+    streamText,
 } from "@moxie-protocol/core";
-import { MoxieUser } from "@moxie-protocol/moxie-agent-lib";
-import { manageGroupsTemplate } from "../templates";
+import { MoxieUser, moxieUserService } from "@moxie-protocol/moxie-agent-lib";
+import { manageGroupsTemplate, groupDetailsTemplate } from "../templates";
 import { addMembersToGroup, createGroup, deleteGroup, getGroupDetails, removeMembersFromGroup, updateGroup } from "../utils";
 import { GetGroupsOutput, GroupOutput } from "../types";
 
@@ -33,6 +34,10 @@ export interface ManageGroupsResponse {
     actionType?: string;
     params?: GroupParams;
     error: ManageGroupsError | null;
+}
+
+export interface GroupDetailsResponse {
+    message: string;
 }
 
 export const manageGroupsAction: Action = {
@@ -106,7 +111,7 @@ export const manageGroupsAction: Action = {
                     await handleRemoveGroupMember(traceId, moxieUserId, state, params, callback);
                     break;
                 case 'GET_GROUP_DETAILS':
-                    await handleGetGroupDetails(traceId, moxieUserId, state, params, callback);
+                    await handleGetGroupDetails(traceId, runtime, message, state, params, callback);
                     break;
                 case 'UPDATE_GROUP':
                     await handleUpdateGroup(traceId, moxieUserId, state, params, callback);
@@ -146,7 +151,7 @@ async function handleCreateGroup(traceId: string, moxieUserId: string, state: St
 
         const response = await createGroup(state.authorizationHeader as string, groupName) as GroupOutput;
         await callback?.({
-            text: `✅ Group Created Successfully! Group ID: ${response.group?.id}, Group Name: ${response.group?.name}, Members: ${response.group?.members.length}`,
+            text: `✅ Group #[${response.group?.name}|${response.group?.id}] created successfully! Start adding members to the group.`,
             action: "MANAGE_GROUPS",
         });
     } catch (error) {
@@ -186,8 +191,8 @@ async function handleCreateGroupAndAddMember(traceId: string, moxieUserId: strin
 
         if (addMembersResponse.success) {
             await callback?.({
-                text: `✅ Group Created Successfully and added member! Group ID: ${response.group?.id}| Group Name: ${response.group?.name}| Number of members added: ${addMembersResponse.group?.members.length}`,
-                action: "MANAGE_GROUPS",
+                    text: `✅ Group #[${response.group?.name}|${response.group?.id}] created successfully and added ${addMembersResponse.group?.members.length} members to the group.`,
+                    action: "MANAGE_GROUPS",
             });
         } else {
             await callback?.({
@@ -217,10 +222,15 @@ async function handleAddGroupMember(traceId: string, moxieUserId: string, state:
         }
 
         const response = await addMembersToGroup(state.authorizationHeader as string, groupId, senpiUserIdsToAdd) as GroupOutput;
+        const moxieUserProfiles = await moxieUserService.getUserByMoxieIdMultipleMinimal(senpiUserIdsToAdd);
+        const idToUsernameMap = new Map();
+        moxieUserProfiles.forEach((user, id) => {
+            idToUsernameMap.set(id, user.userName || id);
+        });
 
         if (response.success) {
             await callback?.({
-                text: `✅ Member added to group successfully! Group ID: ${groupId}, Number of members added: ${response.group?.members.length}`,
+                text: `✅ ${senpiUserIdsToAdd?.length} member(s) added to group #[${response.group?.name}|${response.group?.id}] successfully! Added members: ${Array.from(idToUsernameMap.entries()).map(([id, username]) => `@[${username}|${id}]`).join(', ')}`,
                 action: "MANAGE_GROUPS",
             });
         } else {
@@ -254,7 +264,7 @@ async function handleDeleteGroup(traceId: string, moxieUserId: string, state: St
 
         if (response.success) {
             await callback?.({
-                text: `✅ Group deleted successfully! Group ID: ${groupId}`,
+                text: `✅ Group #[${response.group?.name}|${response.group?.id}] deleted successfully!`,
                 action: "MANAGE_GROUPS",
             });
         } else {
@@ -286,9 +296,15 @@ async function handleRemoveGroupMember(traceId: string, moxieUserId: string, sta
 
         const response = await removeMembersFromGroup(state.authorizationHeader as string, groupId, senpiUserIdsToRemove) as GroupOutput;
 
+        const moxieUserProfiles = await moxieUserService.getUserByMoxieIdMultipleMinimal(senpiUserIdsToRemove);
+        const idToUsernameMap = new Map();
+        moxieUserProfiles.forEach((user, id) => {
+            idToUsernameMap.set(id, user.userName || id);
+        });
+
         if (response.success) {
             await callback?.({
-                text: `✅ Member removed from group successfully! Group ID: ${groupId}, Number of members removed: ${response.group?.members.length}`,
+                text: `✅ ${senpiUserIdsToRemove?.length} member(s) removed from group #[${response.group?.name}|${response.group?.id}] successfully! Removed members: ${Array.from(idToUsernameMap.entries()).map(([id, username]) => `@[${username}|${id}]`).join(', ')}`,
                 action: "MANAGE_GROUPS",
             });
         } else {
@@ -306,31 +322,60 @@ async function handleRemoveGroupMember(traceId: string, moxieUserId: string, sta
     }
 }
 
-async function handleGetGroupDetails(traceId: string, moxieUserId: string, state: State, params: GroupParams, callback: HandlerCallback) {
+async function handleGetGroupDetails(traceId: string, runtime: IAgentRuntime, message: Memory, state: State, params: GroupParams, callback: HandlerCallback) {
     try {
         const { groupId } = params;
+
+        let response: GetGroupsOutput;
         if (!groupId) {
-            elizaLogger.warn(traceId, `[MANAGE_GROUPS] [GET_GROUP_DETAILS] Group ID is required`);
-            await callback?.({
-                text: `❌ Group ID is required. Please try again.`,
-                action: "MANAGE_GROUPS",
-            });
-            return;
-        }
-
-        const response = await getGroupDetails(state.authorizationHeader as string, groupId) as GetGroupsOutput;
-
-        if (response.groups.length > 0) {
-            await callback?.({
-                text: `✅ Group details retrieved successfully! Group ID: ${groupId}`,
-                action: "MANAGE_GROUPS",
-            });
+            response = await getGroupDetails(state.authorizationHeader as string) as GetGroupsOutput;
         } else {
+            response = await getGroupDetails(state.authorizationHeader as string, groupId) as GetGroupsOutput;
+        }
+
+        if (response.groups.length === 0) {
             await callback?.({
-                text: `❌ Failed to retrieve group details. Please try again later.`,
+                text: `No groups found!`,
                 action: "MANAGE_GROUPS",
             });
+        } 
+        
+        const groupDetails = response.groups;
+        const memberIds = new Set(groupDetails.flatMap(group => group.members.map(member => member.moxieUserId)));
+        const moxieUserProfiles = await moxieUserService.getUserByMoxieIdMultipleMinimal(Array.from(memberIds));
+        const userDetails = new Map();
+        moxieUserProfiles.forEach((user, id) => {
+            userDetails.set(id, user.userName || id);
+        });
+
+        const newState = await runtime.composeState(message, {
+            currentDate: new Date().toLocaleString(),
+            groupDetails: JSON.stringify(groupDetails),
+            userDetails: JSON.stringify(userDetails),
+        });
+        
+        const context = composeContext({
+            state: newState,
+            template: groupDetailsTemplate,
+        });
+
+        const groupDetailsResponse = await generateObjectDeprecated({
+            runtime,
+            context,
+            modelClass: ModelClass.LARGE,
+            modelConfigOptions: {
+                temperature: 0.1,
+                maxOutputTokens: 8192,
+                modelProvider: ModelProviderName.ANTHROPIC,
+                apiKey: process.env.ANTHROPIC_API_KEY,
+                modelClass: ModelClass.LARGE,
+            }
+        }) as GroupDetailsResponse;
+
+        for await (const textPart of groupDetailsResponse.message) {
+            callback({ text: textPart, action: "MANAGE_GROUPS" });
         }
+
     } catch (error) {
         elizaLogger.error(traceId, `[MANAGE_GROUPS] Error retrieving group details: ${error.message}`);
         await callback?.({
@@ -356,7 +401,7 @@ async function handleUpdateGroup(traceId: string, moxieUserId: string, state: St
 
         if (response.success) {
             await callback?.({
-                text: `✅ Group updated successfully! Group ID: ${groupId}, Group Name: ${groupName}`,
+                text: `✅ Group updated successfully! Updated group name is: ${groupName}`,
                 action: "MANAGE_GROUPS",
             });
         } else {

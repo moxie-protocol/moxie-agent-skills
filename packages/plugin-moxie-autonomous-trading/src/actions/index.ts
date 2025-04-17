@@ -130,7 +130,7 @@ export const autonomousTradingAction: Action = {
             
             const baseParams: BaseParams = {
                 buyAmount: params.amountInUSD,
-                duration: params.timeDurationInSec || 86400,
+                duration: params.timeDurationInSec,
                 buyAmountValueType: 'USD',
                 sellToken:  {
                     symbol: 'ETH',
