@@ -38,6 +38,7 @@
         "@moxie-protocol/plugin-moxie-whale-hunter": "workspace:*",
         "@moxie-protocol/plugin-wallet-duster": "workspace:*",
         "@moxie-protocol/plugin-bankless-claimables": "workspace:*",
+        "@moxie-protocol/plugin-basenames": "workspace:*",
         "readline": "1.3.0",
         "ws": "8.18.0",
         "yargs": "17.7.2",

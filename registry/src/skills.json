@@ -829,5 +829,59 @@
             "Doing some Senpi magic",
             "Processing request"
         ]
+    },
+    {
+        "pluginId": "769d33e0-33a3-4ab2-9b1e-8c7ce2ec81f2",
+        "name": "@moxie-protocol/plugin-basenames",
+        "displayName": "Basenames",
+        "version": "0.0.1",
+        "author": "Yoseph and Alex",
+        "description": "Easily manage your Basenames ownership, check availability, and register directly using AI Agent.",
+        "githubUrl": "https://github.com/your-github/plugin-basenames",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/feat/add-basename-skill/packages/plugin-basenames/images/logo.png",
+        "settings": {},
+        "capabilities": [
+            "View Owned Basenames",
+            "Query Basename Availability",
+            "Register a Basename",
+            "Suggest Basename Alternatives"
+        ],
+        "starterQuestions": [
+            {
+                "label": "What can I do with the Basenames skill?",
+                "value": "What can I do with the Basenames skill?"
+            },
+            {
+                "label": "Show me all my Basenames.",
+                "value": "Show me all my Basenames."
+            },
+            {
+                "label": "Is 'charlie.base' available?",
+                "value": "Is 'charlie.base' available?"
+            },
+            {
+                "label": "Register 'charlie.base' for 1 year.",
+                "value": "Register 'charlie.base' for 1 year."
+            }
+        ],
+        "mediaUrls": [],
+        "actions": [
+            "DESCRIBE_BASENAMES_SKILL",
+            "VIEW_OWNED_BASENAMES",
+            "QUERY_BASENAME_AVAILABILITY",
+            "REGISTER_BASENAME",
+            "SUGGEST_BASENAME_ALTERNATIVES"
+        ],
+        "isPremium": false,
+        "freeQueries": 0,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
+        "status": "ACTIVE",
+        "isDefault": false,
+        "loaders": [
+            "Fetching your Basenames",
+            "Checking availability",
+            "Initiating registration"
+        ]
     }
 ]

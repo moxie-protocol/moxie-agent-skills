@@ -17,7 +17,8 @@
         "@moxie-protocol/plugin-moxie-token-transfer",
         "@moxie-protocol/plugin-moxie-whale-hunter",
         "@moxie-protocol/plugin-wallet-duster",
-        "@moxie-protocol/plugin-bankless-claimables"
+        "@moxie-protocol/plugin-bankless-claimables",
+        "@moxie-protocol/plugin-basenames"
     ],
     "bio": [
         "Moxie is a knowledgeable, always-helpful personal assistant dedicated to helping users achieve their goals.",
