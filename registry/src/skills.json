@@ -580,12 +580,12 @@
     {
         "pluginId": "ba2e0746-d089-4539-a23b-84882bc8eafd",
         "name": "@moxie-protocol/plugin-betswirl",
-        "displayName": "BetSwirl",
         "version": "0.0.1",
-        "author": "Romuald Hog <romuald@betswirl.com>",
-        "description": "Enabled your agent to place bets on BetSwirl's games of luck, and retrieving bets information.",
+        "displayName": "BetSwirl",
+        "author": "M74373",
+        "description": "Enable your agent to place bets and retrieve results from BetSwirl’s onchain games of luck on Base. Play Coin Toss, Dice, and Roulette — all provably fair using Chainlink VRF. Supports ETH, BETS, PEPE, and DEGEN with instant payouts to your agent wallet.",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-betswirl",
-        "logoUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-betswirl/images/logo.png",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-betswirl/images/logo.png",
         "settings": {},
         "capabilities": [
             "Flip a Coin",
