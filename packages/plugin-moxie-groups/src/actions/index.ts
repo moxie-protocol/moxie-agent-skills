@@ -338,6 +338,7 @@ async function handleGetGroupDetails(traceId: string, runtime: IAgentRuntime, me
                 text: `No groups found!`,
                 action: "MANAGE_GROUPS",
             });
+            return;
         } 
         
         const groupDetails = response.groups;
@@ -347,6 +348,9 @@ async function handleGetGroupDetails(traceId: string, runtime: IAgentRuntime, me
         moxieUserProfiles.forEach((user, id) => {
             userDetails.set(id, user.userName || id);
         });
+
+        elizaLogger.debug(traceId, `[MANAGE_GROUPS] [GET_GROUP_DETAILS] Group details: ${JSON.stringify(groupDetails)}`);
+        elizaLogger.debug(traceId, `[MANAGE_GROUPS] [GET_GROUP_DETAILS] User details: ${JSON.stringify(userDetails)}`);
 
         const newState = await runtime.composeState(message, {
             currentDate: new Date().toLocaleString(),
