@@ -159,11 +159,12 @@ This will help ensure accuracy in the final output. It's OK for this section to 
 
 Example table structure:
 
-\`\`\`markdown
-| Group ID | Group Name | Members |
-|----------|------------|---------|
-| 1234 | Example Group | @[user1|5678], @[user2|9012] |
+\`\`\`json  
+{
+  "message": "| Group ID | Group Name | Members |\n|----------|------------|---------|\n| 1234 | Example Group | @[user1|5678], @[user2|9012] |"
+}
 \`\`\`
 
-Your final output should be only the markdown-formatted table, without any explanatory text before or after it.
+
+Your final output should be in JSON format, without any explanatory text before or after it.
 `;
