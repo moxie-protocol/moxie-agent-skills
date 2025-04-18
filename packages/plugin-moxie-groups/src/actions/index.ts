@@ -342,20 +342,36 @@ async function handleGetGroupDetails(traceId: string, runtime: IAgentRuntime, me
         }
 
         const groupDetails = response.groups;
-        const memberIds = new Set(groupDetails.flatMap(group => group.members.map(member => member.moxieUserId)));
+
+        elizaLogger.debug(traceId, `[MANAGE_GROUPS] [GET_GROUP_DETAILS] <<<Group details>>>: ${JSON.stringify(groupDetails)}`);
+
+        const memberIds: Set<string> = new Set();
+            groupDetails.forEach(group => {
+                (group.members || []).forEach(member => {
+                if (member?.moxieUserId) {
+                    memberIds.add(member.moxieUserId);
+                }
+                });
+        });
+
+        elizaLogger.debug(traceId, `[MANAGE_GROUPS] [GET_GROUP_DETAILS] Member IDs: ${Array.from(memberIds).join(", ")}`);
+
         const moxieUserProfiles = await moxieUserService.getUserByMoxieIdMultipleMinimal(Array.from(memberIds));
-        const userDetails = new Map<string, string>();
 
-        moxieUserProfiles.forEach(user => {
-            userDetails.set(user.id, user.userName || user.id);
-        });
+        const userDetails: Record<string, string> = {};
 
-        memberIds.forEach(id => {
-            if (!userDetails.has(id)) {
+        // Step 1: Fill from user profiles
+        for (const [id, user] of moxieUserProfiles.entries()) {
+            userDetails[id] = user.userName ?? id;
+        }
+
+        // Step 2: Add fallback for any missing member IDs
+        for (const id of memberIds) {
+            if (!(id in userDetails)) {
                 elizaLogger.warn(`[MANAGE_GROUPS] Missing user profile for ID: ${id}`);
-                userDetails.set(id, id); // Fallback to ID if user profile is missing
+                userDetails[id] = id;
             }
-        });
+        }
 
         elizaLogger.debug(traceId, `[MANAGE_GROUPS] [GET_GROUP_DETAILS] Group details: ${JSON.stringify(groupDetails)}`);
         elizaLogger.debug(traceId, `[MANAGE_GROUPS] [GET_GROUP_DETAILS] User details: ${JSON.stringify(userDetails)}`);
