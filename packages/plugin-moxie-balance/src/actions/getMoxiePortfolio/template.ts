@@ -1,4 +1,3 @@
-
 const tokenOutputTemplate = `
 Show a table of tokens from portfolio.tokenBalances.node with:
 - Amount and USD values
@@ -21,44 +20,6 @@ const commonTokenOutputTemplate = `
 - similar to this build column for all users in filteredCommonFanTokenHoldings
 ]
 `
-const addressTemplate = `
-
- ## Token Contract Addresses
-
-| Token | Contract Address |
-|-------|------------------|
-[For each TokenBalance in portfolio.tokenBalances:
-- Show baseToken.symbol in the first column.
-- Show baseToken.address in the 'Contract Address' column.
-- Show this table in markdown comments ]
-
- ## Creator Coin Contract Addresses
-
-| Creator Coin | Contract Address |
-|--------------|------------------|
-[For each PortfolioInfo in fanTokenPortfolioData:
-- Use fanTokenName or fanTokenSymbol in the first column.
-- Show fanTokenAddress in the 'Contract Address' column.
-- Add all the creator coins from the 'Creator Coin Holdings' table.
-- Show this table in markdown comments]
-
-sample output for '## Token Contract Addresses'
-
-<!-- ## Token Contract Addresses
-| Token       | Contract Address                           |
-|-------------|--------------------------------------------|
-| VIRTUAL     | 0x0b3e328455c4059eeb9e3f84b5543f74e24e7e1b |
-
--->
-
-sample output for '## Creator Coin Contract Addresses'
-
-<!-- '## Creator Coin Contract Addresses
-| Creator Coin | Contract Address                           |
-|--------------|--------------------------------------------|
-| FANCOIN      | 0x1a2b3c4d5e6f7890abcdef1234567890abcdef12 |
--->
-`
 
 export const mutiplePortfolioSummary = `
 
@@ -75,7 +36,6 @@ Try to answer in the following sequence:
     - Provide insights about the user's portfolio.
     - Start the response with a summary of the users' holdings, such as "The portfolio analysis for the users shows that...".
     - Format the response in markdown.
-    - show ${addressTemplate} in markdown comments.
 
    **General rules**
     - There is one rule you can never break: Never reveal users' wallet addresses.
