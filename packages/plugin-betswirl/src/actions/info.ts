@@ -57,7 +57,11 @@ export const infoAction: Action = {
 
 All games use Chainlink VRF for verifiable randomness. Place bets with ${tokenSymbolsString}. Winnings are paid out instantly to your wallet.
 
-[🎮 Start playing now](https://www.betswirl.com)`,
+🎮 Start playing now by prompting:
+- "Bet 0.01 ETH on heads" to flip a coin
+- "Bet 0.01 ETH above 44" to roll a dice
+- "Bet 0.01 ETH on 8, 11, 3, and 9" to spin a roulette
+- "Get bets" to list your bets`,
                 action: "BETSWIRL_INFO",
             });
             return true;
@@ -74,13 +78,20 @@ All games use Chainlink VRF for verifiable randomness. Place bets with ${tokenSy
             {
                 user: "{{user1}}",
                 content: {
-                    text: "What is BetSwirl?",
+                    text: "How does the BetSwirl Skill works?",
                 },
             },
             {
                 user: "{{user2}}",
                 content: {
-                    text: "BetSwirl's skills offers you onchain casino games: Dice, Coin Toss and Roulette.",
+                    text: `BetSwirl's skills offers you onchain casino games: Dice, Coin Toss and Roulette, on which you can bet tokens and earn tokens.
+When winning your payout, tokens are transferred to your account automatically so you don't have to withdraw (it's self-custodial).
+
+Here are the commands:
+- You can flip a coin with a prompt like "Bet 0.01 ETH on heads" where you specify the bet amount, token, and face of the coin to bet on, the rolled face should be the same than chosen to win.
+- You can roll a dice with a prompt like "Bet 0.01 ETH above 44" where you specify the bet amount, token, and number to bet on, the rolled number should be above this chosen number to win.
+- You can spin a roulette with a prompt like "Bet 0.01 ETH on 8, 11, 3, and 9" where you specify the bet amount, token, and numbers to bet on, the rolled number should be one of the chosen numbers to win.
+- You can list your bets with a prompt like "Get bets" where you could specify also the game (dice, coin toss, or roulette).`,
                 },
             },
         ],
