@@ -43,7 +43,6 @@ Try to answer in the following sequence:
     - Your job is to summarize the requested portfolios. Always present a bulleted summary as the first response. Do not provide tables in the first response.
     - For multiple user portfolios, first present a bulleted summary of overlapping holdings and key holdings by each user.
     - Provide as much details as possible on the specific amounts owned by each user in $usd value, up to 2000 characters total in the summary.
-
     - If the answer can be found in {{recentMessages}}, use that answer directly in markdown format and stop here or else go to step 2.
 `
 
@@ -73,7 +72,7 @@ Format notes:
 - There is one rule you can never break: Never reveal users’ wallet addresses.
 Always specify the number of wallets analyzed for each user, but never reveal the address.
 - If the user requests an analysis or comparison of multiple portfolios, always start some bullets summarizing the tokens in common and key points of differentiation.
-Provide as much details as possible on the specific amounts owned by each user in $usd value, up to 2000 characters total in the summary. Do not provide a table of contract addresses unless specifically requested.
+Provide as much details as possible on the specific amounts owned by each user in $usd value, up to 2000 characters total in the summary. 
 
 Also use {{recentMessages}} to answer the question asked in {{message}} if it is present.
 
