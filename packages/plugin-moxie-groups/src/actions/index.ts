@@ -264,7 +264,7 @@ async function handleDeleteGroup(traceId: string, moxieUserId: string, state: St
 
         if (response.success) {
             await callback?.({
-                text: `✅ Group #[${response.group?.name}|${response.group?.id}] deleted successfully!`,
+                text: `✅ Group deleted successfully!`,
                 action: "MANAGE_GROUPS",
             });
         } else {
