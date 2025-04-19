@@ -229,23 +229,23 @@ export function createMoxieApiRouter(
                         );
                         return;
                     }
-                    if (!hasSufficientBalance) {
-                        res.status(403).json(
-                            ResponseHelper.error<null>(
-                                "USER_NOT_ELIGIBILE",
-                                `user need to hold ${MINIMUM_CREATOR_AGENT_COINS} creator agent tokens to interact with agent. current balance is ${creatorAgentBalance}`,
-                                req.path,
-                                req.traceId,
-                                {
-                                    minimumCreatorAgentCoins:
-                                        MINIMUM_CREATOR_AGENT_COINS,
-                                    currentCreatorAgentCoinsBalance:
-                                        creatorAgentBalance,
-                                }
-                            )
-                        );
-                        return;
-                    }
+                    // if (!hasSufficientBalance) {
+                    //     res.status(403).json(
+                    //         ResponseHelper.error<null>(
+                    //             "USER_NOT_ELIGIBILE",
+                    //             `user need to hold ${MINIMUM_CREATOR_AGENT_COINS} creator agent tokens to interact with agent. current balance is ${creatorAgentBalance}`,
+                    //             req.path,
+                    //             req.traceId,
+                    //             {
+                    //                 minimumCreatorAgentCoins:
+                    //                     MINIMUM_CREATOR_AGENT_COINS,
+                    //                 currentCreatorAgentCoinsBalance:
+                    //                     creatorAgentBalance,
+                    //             }
+                    //         )
+                    //     );
+                    //     return;
+                    // }
                 }
 
                 const userId = stringToUuid(moxieUserId);
@@ -562,18 +562,18 @@ export function createMoxieApiRouter(
             }
 
             // check if the user has creator coin or not
-            const ftaResponse = await ftaService.getUserFtaData(moxieUserId);
-            if (!ftaResponse) {
-                res.status(403).json(
-                    ResponseHelper.error<null>(
-                        "USER_NOT_ELIGIBILE",
-                        `user must have creator coin to create an agent`,
-                        req.path,
-                        req.traceId
-                    )
-                );
-                return;
-            }
+            // const ftaResponse = await ftaService.getUserFtaData(moxieUserId);
+            // if (!ftaResponse) {
+            //     res.status(403).json(
+            //         ResponseHelper.error<null>(
+            //             "USER_NOT_ELIGIBILE",
+            //             `user must have creator coin to create an agent`,
+            //             req.path,
+            //             req.traceId
+            //         )
+            //     );
+            //     return;
+            // }
 
             // create an account for the user
             const accountCreationResponse = await moxieClient.db.createAccount({
