@@ -9,7 +9,7 @@ Guidelines to generate the text use the instructions from current Message: {{lat
 - Maintain the key message while being brief
 - Format appropriately for the target platform
 - Keep the tone consistent with the original message
-- Promote senpi agent in the post
+- Promote senpi agent handle[@senpi.eth] and website [https://senpi.xyz] in the post
 - Just respond with summary text that user can copy and paste on social media
 
 `;

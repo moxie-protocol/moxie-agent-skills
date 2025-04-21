@@ -54,7 +54,7 @@ export default {
                 .reverse()
                 .filter(msg => msg?.content?.action === 'POST_CONTENT_SUMMARY_SUCCESS');
 
-            if (hasRecentPostContent.length > 0) {
+            if (hasRecentPostContent.length > 0 && message.content.text.toLowerCase().includes('cast')) {
                 const summaryText = hasRecentPostContent[0]?.content?.text;
                     const postResponse = await moxieUserService.publishPost({
                         text: summaryText,
