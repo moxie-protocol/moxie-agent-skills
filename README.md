@@ -2,9 +2,9 @@
 <a align="center" href="https://moxie.xyz" target="_blank">
     <img src="./assets/logo.avif" alt="code snippets" height=50/>
   </a>
-  <h1 align="center">Moxie Eliza AI Skills Framework</h1>
+  <h1 align="center">Senpi Eliza AI Skills Framework</h1>
 
-📖 [Developer Docs](https://developer.moxie.xyz/) |
+📖 [Developer Docs](https://developer.moxie.xyz/)
 
 </div>
 
@@ -12,11 +12,11 @@
 
 - [Table of Contents](#table-of-contents)
 - [🚀 Quick Start](#-quick-start)
-    - [Prerequisites](#prerequisites)
-    - [Get Started](#get-started)
-    - [Create Your First Skills](#create-your-first-skills)
-    - [General Guidelines For Skills Development](#general-guidelines-for-skills-development)
-    - [Register Your Skills to Moxie](#register-your-skills-to-moxie)
+  - [Prerequisites](#prerequisites)
+  - [Get Started](#get-started)
+  - [Create Your First Skills](#create-your-first-skills)
+  - [General Guidelines For Skills Development](#general-guidelines-for-skills-development)
+  - [Register Your Skills to Senpi](#register-your-skills-to-senpi)
 - [📋 General Guidelines For Skills Registration](#-general-guidelines-for-skills-registration)
 - [💬 Community \& Contact](#-community--contact)
 - [👥 Contributors](#-contributors)
@@ -47,11 +47,11 @@ Open another terminal and move to same directory and then run below command and 
 pnpm start:client
 ```
 
-Once you're all setup, you can start developing your Moxie Creator Agent Skills.
+Once you're all setup, you can start developing your Senpi Creator Agent Skills.
 
 ### Create Your First Skills
 
-You can start creating your first Moxie Skills by first creating a separate branch in your forked repository:
+You can start creating your first Senpi Skills by first creating a separate branch in your forked repository:
 
 ```sh
 git checkout -b <new-branch>
@@ -81,7 +81,7 @@ For further customization, you can refer to the Eliza docs [here](https://elizao
 
 3. Place image for your Creator Agent Skill to be displayed Skills Marketplace under `packages/plugin-<skills-name>/images/logo.png` with size 400x400 px.
 
-### Register Your Skills to Moxie
+### Register Your Skills to Senpi
 
 Once you completed development on your skills, you can register your skills to the Skills Marketplace by the following steps:
 
@@ -123,7 +123,7 @@ pnpm start:registry
 
 You should see the skills you added in the Registry client app if the skills metadata is added properly.
 
-2. If your Creator Agent Skill require environment variable for production purpose, then fill in [this form](https://forms.gle/8hzDyCVKKLs4MkTEA) to request submission. The Moxie team shall directly reach out to you either through **Email** ([support@airstack.xyz](mailto:support@airstack.xyz)) or **Farcaster** (group chat) for submission.
+2. If your Creator Agent Skill require environment variable for production purpose, then fill in [this form](https://forms.gle/8hzDyCVKKLs4MkTEA) to request submission. The Senpi team shall directly reach out to you either through **Email** ([support@airstack.xyz](mailto:support@airstack.xyz)) or **Farcaster** (group chat) for submission.
 
 3. Lastly, commit all the changes you made on your branches and create a new [PR](https://github.com/moxie-protocol/moxie-agent-skills/pulls) to the repository's `main` branch.
 
@@ -141,12 +141,12 @@ To ensure that your Skills is registered successfully to the Skills Marketplace,
 8. Does not contain any code that interacts with smart contracts that has not verified and published its source code.
 9. Have audited smart contracts if the skills contain code that interacts with smart contracts has volume/balance above 100k USD.
 
-The Moxie team will review the newly created Creator Agent Skills and once merged, your Skills will automatically be registered to the Skills Marketplace where it's accessible for Moxie users to use.
+The Senpi team will review the newly created Creator Agent Skills and once merged, your Skills will automatically be registered to the Skills Marketplace where it's accessible for Moxie users to use.
 
 ## 💬 Community & Contact
 
 - [GitHub Issues](https://github.com/moxie-protocol/moxie-agent-skills/issues). Best for: bugs you encounter when developing new Creator Agent Skills, and feature proposals.
-- [Telegram](https://t.me/+QVjX1VPh3SpmNjMx). Best for: sharing your Creator Agent Skills and hanging out with the Moxie Developer Community.
+- [Telegram](https://t.me/+QVjX1VPh3SpmNjMx). Best for: sharing your Creator Agent Skills and hanging out with the Senpi Developer Community.
 
 ## 👥 Contributors
 
