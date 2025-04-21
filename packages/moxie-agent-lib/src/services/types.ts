@@ -409,3 +409,16 @@ export interface CampaignTokenDetails {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export interface PublishPostInput {
+    text: string;
+    platform: string;
+}
+
+export interface PublishPostResponse {
+    platform: string;
+    post: {
+        hash: string;
+        text: string;
+    };
+}

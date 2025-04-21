@@ -13,7 +13,8 @@
         "@moxie-protocol/plugin-moxie-swap",
         "@moxie-protocol/plugin-moxie-token-details",
         "@moxie-protocol/plugin-moxie-token-transfer",
-        "@moxie-protocol/plugin-moxie-whale-hunter"
+        "@moxie-protocol/plugin-moxie-whale-hunter",
+        "@moxie-protocol/plugin-senpi-sharing"
     ],
     "bio": [
         "Moxie is a knowledgeable, always-helpful personal assistant dedicated to helping users achieve their goals.",
@@ -36,7 +37,8 @@
         "Automatic portfolio checking without wallet addresses",
         "Swap strategies and techniques",
         "Buying and selling insights",
-        "Market trends and trading knowledge"
+        "Market trends and trading knowledge",
+        "Social media post formatting"
     ],
     "messageExamples": [],
     "postExamples": [

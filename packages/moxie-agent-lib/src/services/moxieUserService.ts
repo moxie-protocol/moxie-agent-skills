@@ -18,6 +18,8 @@ import {
     GetUserInfoBatchOutput,
     GetUserInfoMinimalResponse,
     MoxieUserMinimal,
+    PublishPostInput,
+    PublishPostResponse,
 } from "./types";
 
 
@@ -869,5 +871,51 @@ export async function getUserByMoxieIdMultipleMinimal(
     } catch (error) {
         elizaLogger.error("Error in getUserByMoxieIdMultipleMinimal:", error);
         return new Map();
+    }
+}
+
+
+export async function publishPost(
+    input: PublishPostInput,
+    bearerToken: string
+): Promise<PublishPostResponse> {
+    try {
+        const mutation = `
+            mutation PublishPost($text: String!, $platform: SocialPlatform!) {
+                PublishPost(input: {text: $text, platform: $platform}) {
+                    platform
+                    post {
+                        hash
+                        text
+                    }
+                }
+            }
+        `;
+        const response = await fetch(process.env.MOXIE_BACKEND_INTERNAL_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: bearerToken,
+            },
+            body: JSON.stringify({
+                query: mutation,
+                variables: { text: input.text, platform: input.platform },
+            }),
+        });
+
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const { data, errors } = await response.json();
+
+        if (errors) {
+            throw new Error(errors[0]?.message || 'GraphQL error occurred');
+        }
+        return data?.PublishPost;
+    } catch (error) {
+        elizaLogger.error("Error in publishPost:", error);
+        throw error;
     }
 }

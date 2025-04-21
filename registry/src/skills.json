@@ -509,5 +509,49 @@
             "Waiting for response",
             "Doing some DegenFans magic"
         ]
+    },
+    {
+        "pluginId": "b30be45e-ff5a-4ef9-9674-7e27bdc8d1d8",
+        "name": "@moxie-protocol/plugin-senpi-sharing",
+        "displayName": "Content Sharing",
+        "version": "0.1.0",
+        "author": null,
+        "description": "Creates and shares summarized content across social platforms",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-senpi-sharing",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/e9ac0912aba19398350aeaa63006211f0ccca403/packages/plugin-moxie-token-social-sentiment/images/logo.svg",
+        "settings": {},
+        "capabilities": ["Create and share content"],
+        "starterQuestions": [
+            {
+                "label": "Create a tweet-sized summary of our conversation",
+                "value": "Create a tweet-sized summary of our conversation"
+            },
+            {
+                "label": "Share this discussion as a social media post",
+                "value": "Share this discussion as a social media post"
+            },
+            {
+                "label": "Make this conversation shareable on social media",
+                "value": "Make this conversation shareable on social media"
+            },
+            {
+                "label": "Turn our chat into a concise social post",
+                "value": "Turn our chat into a concise social post"
+            }
+        ],
+        "mediaUrls": [""],
+        "actions": ["POST_CONTENT"],
+        "isPremium": false,
+        "freeQueries": 10,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
+        "status": "ACTIVE",
+        "isDefault": false,
+        "loaders": [
+            "Analyzing conversation",
+            "Crafting social content",
+            "Optimizing for platforms",
+            "Preparing shareable summary"
+        ]
     }
 ]
