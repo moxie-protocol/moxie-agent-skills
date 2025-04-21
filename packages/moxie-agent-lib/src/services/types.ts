@@ -420,5 +420,6 @@ export interface PublishPostResponse {
     post: {
         hash: string;
         text: string;
+        username: string;
     };
 }

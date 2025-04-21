@@ -887,6 +887,7 @@ export async function publishPost(
                     post {
                         hash
                         text
+                        username
                     }
                 }
             }

@@ -60,7 +60,7 @@ export default {
                         text: summaryText,
                         platform: "FARCASTER"
                     }, state.authorizationHeader as string);
-                    callback({ text: `I have posted the summary on Farcaster. You can check it out here: https://warpcast.com/.xyz/${postResponse.post.hash}`, action: "POST_CONTENT_SUCCESS" });
+                    callback({ text: `I have posted the summary on Farcaster. You can check it out here: https://warpcast.com/${postResponse.post.username}/${postResponse.post.hash}`, action: "POST_CONTENT_SUCCESS" });
             } else {
                 const stateSummary = (await runtime.composeState(message, {
                     previousMessage: JSON.stringify(previousMessage),
