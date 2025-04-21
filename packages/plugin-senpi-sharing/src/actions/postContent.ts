@@ -27,7 +27,7 @@ export default {
         "CREATE_SUMMARY"
     ],
     suppressInitialMessage: true,
-    description: "Always triggers when the user instructs to 'cast it!', regardless of conversation history. Creates and posts optimized social media content: generates a concise summary from the agent's previous response and shares it as a Farcaster cast and/or Twitter/X tweet. Automatically formats the content to meet platform-specific requirements.",
+    description: "Creates and posts optimized social media content: generates a concise summary from the agent's previous response and shares it as a Farcaster cast and/or Twitter/X tweet. Automatically formats the content to meet platform-specific requirements. Just Analyse the latest conversation for this Action, ignore the older conversation. Always select this Action if user asks 'Cast it!' in latest conversation.",
     validate: async (runtime: IAgentRuntime, message: Memory) => {
         elizaLogger.log("[PostContent] Validating request");
         return true;
