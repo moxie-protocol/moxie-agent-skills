@@ -251,6 +251,7 @@ async function handlePluginImporting(plugins: string[]) {
                         importedPlugin.default || importedPlugin[functionName]
                     );
                 } catch (importError) {
+                    console.log(importError);
                     elizaLogger.error(
                         `Failed to import plugin: ${plugin}`,
                         importError

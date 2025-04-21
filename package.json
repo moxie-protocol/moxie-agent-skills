@@ -10,7 +10,7 @@
         "start": "pnpm --filter \"@moxie-protocol/agent\" start --isRoot --character=\"characters/moxie.character.json\"",
         "start:client": "pnpm --dir client dev",
         "start:registry": "pnpm --dir registry dev",
-        "start:debug": "cross-env NODE_ENV=development VERBOSE=true DEBUG=eliza:* pnpm --dir moxie-agent start --isRoot",
+        "start:debug": "cross-env NODE_ENV=development VERBOSE=true DEBUG=eliza:* pnpm --dir agent start --isRoot",
         "start-broadcaster:debug": "cross-env NODE_ENV=development VERBOSE=true DEBUG=eliza:* pnpm --dir moxie-broadcasting-agent start --isRoot",
         "dev": "bash ./scripts/dev.sh",
         "dev-broadcaster": "bash ./scripts/dev-broadcaster.sh",
