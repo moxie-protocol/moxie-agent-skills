@@ -11,6 +11,7 @@ import {
     ModelProviderName,
     ModelClass,
     generateObjectDeprecated,
+    formatMessages,
 } from "@moxie-protocol/core";
 import { postTemplate } from "../templates/postTemplate";
 import { sharingExamples } from "./examples";
@@ -42,7 +43,7 @@ export default {
         elizaLogger.log("[PostContent] Starting post content");
 
         try {
-            const previousMessage = state?.recentMessagesData?.slice(-3)
+            const previousMessage = state?.recentMessagesData?.slice(-3).forEach(msg => msg.embedding = [])
 
             if (previousMessage.length === 0) {
                 callback({ text: "I cannot find the previous conversation. Please try again.", action: "POST_CONTENT_ERROR" });
