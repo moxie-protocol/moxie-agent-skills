@@ -43,7 +43,8 @@ export default {
         elizaLogger.log("[PostContent] Starting post content");
 
         try {
-            const previousMessage = state?.recentMessagesData?.slice(-3).forEach(msg => msg.embedding = [])
+            const previousMessage = state?.recentMessagesData?.slice(-3)
+            previousMessage.forEach(msg => msg.embedding = [])
 
             if (previousMessage.length === 0) {
                 callback({ text: "I cannot find the previous conversation. Please try again.", action: "POST_CONTENT_ERROR" });
