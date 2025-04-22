@@ -9,7 +9,7 @@ import {
     type Memory,
     type State
 } from "@moxie-protocol/core";
-import { ftaService, MoxieClientWallet, MoxieHex, MoxieUser, MoxieWalletClient, MoxieWalletSendTransactionResponseType, MoxieWalletSignTypedDataResponseType, Portfolio } from "@moxie-protocol/moxie-agent-lib";
+import { ftaService, getERC20TokenSymbol, MoxieClientWallet, MoxieHex, MoxieUser, MoxieWalletClient, MoxieWalletSendTransactionResponseType, MoxieWalletSignTypedDataResponseType, Portfolio } from "@moxie-protocol/moxie-agent-lib";
 import {
     tokenSwapTemplate,
 } from "../templates/tokenSwapTemplate";
@@ -150,12 +150,7 @@ export const tokenSwapAction = {
                     if (ethers.isAddress(sellToken)) {
                         extractedSellTokenAddress = sellToken;
                         try {
-                            const sellTokenContract = new ethers.Contract(
-                                sellToken,
-                                ['function symbol() view returns (string)'],
-                                provider
-                            );
-                            extractedSellTokenSymbol = await sellTokenContract.symbol();
+                            extractedSellTokenSymbol = await getERC20TokenSymbol(sellToken);
                         } catch (error) {
                             elizaLogger.warn(traceId,`[tokenSwap] [${moxieUserId}] Failed to fetch sell token symbol from RPC: ${error}`);
                             const extracted = extractTokenDetails(sellToken);

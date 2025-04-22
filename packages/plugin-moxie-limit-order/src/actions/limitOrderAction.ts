@@ -20,6 +20,7 @@ import { numberToHex } from "viem";
 import { size } from "viem";
 import { swapCompletedTemplate, swapInProgressTemplate } from "../utils/callbackTemplates";
 import { createCowLimitOrder } from "../service/cowLimitOrder";
+import { getERC20TokenSymbol } from "@moxie-protocol/moxie-agent-lib";
 
 export const limitOrderAction = {
     suppressInitialMessage: true,
@@ -455,17 +456,11 @@ async function processSingleLimitOrder(
     let buyTokenAddress: string;
     let buyTokenSymbol: string;
     
-    const provider = new ethers.providers.JsonRpcProvider(process.env.BASE_RPC_URL);
     // Extract token details and check if raw tokens are Ethereum addresses
     if (ethers.utils.isAddress(sellToken)) {
         sellTokenAddress = sellToken;
         try {
-            const sellTokenContract = new ethers.Contract(
-                sellToken,
-                ['function symbol() view returns (string)'],
-                provider
-            );
-            sellTokenSymbol = await sellTokenContract.symbol();
+            sellTokenSymbol = await getERC20TokenSymbol(sellToken);
         } catch (error) {
             elizaLogger.warn(context.traceId,`[limitOrder] [${context.moxieUserId}] Failed to fetch sell token symbol from RPC: ${error}`);
             const extracted = extractTokenDetails(sellToken);
@@ -480,12 +475,7 @@ async function processSingleLimitOrder(
     if (ethers.utils.isAddress(buyToken)) {
         buyTokenAddress = buyToken;
         try {
-            const buyTokenContract = new ethers.Contract(
-                buyToken,
-                ['function symbol() view returns (string)'],
-                provider
-            );
-            buyTokenSymbol = await buyTokenContract.symbol();
+            buyTokenSymbol = await getERC20TokenSymbol(buyToken);
         } catch (error) {
             elizaLogger.warn(context.traceId,`[limitOrder] [${context.moxieUserId}] Failed to fetch buy token symbol from RPC: ${error}`);
             const extracted = extractTokenDetails(buyToken);
