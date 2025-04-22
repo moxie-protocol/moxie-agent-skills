@@ -8,10 +8,26 @@ export interface SellToken {
     address: string;
 }
 
+export interface BuyToken {
+    symbol: string;
+    address: string;
+}
 
 export interface Amount {
     valueType: 'USD';
     amount: number;
+}
+
+export enum Condition {
+    ALL = "ALL",
+    ANY = "ANY"
+}
+
+export interface SellConfig {
+    buyToken: BuyToken;
+    triggerPercentage: number;
+    condition: Condition;
+    conditionValue?: number;
 }
 
 export interface BaseParams {
@@ -19,6 +35,7 @@ export interface BaseParams {
     duration: number;
     buyAmountValueType: 'USD';
     sellToken: SellToken;
+    sellConfig?: SellConfig;
 }
 
 export interface LimitOrderParams {
@@ -114,7 +131,15 @@ const errorMessages: Record<string, string> = {
     AERR036: "We had trouble loading your automation logs. Please try again.",
     AERR037: "We couldn’t find the group. Please check the group ID.",
     AERR038: "You’ve set a condition that’s higher than the number of people in the group.",
-  };
+    AERR039: "The token name you're selling to from the token you bought is missing. Please provide it.",
+    AERR040: "The address of the token you're selling to from the token you bought is missing. Please add it.",
+    AERR041: "The address of the token you're selling to from the token you bought is not a valid Base address. Please add a valid address.",
+    AERR042: "The trigger percentage must be a positive number",
+    AERR043: "The condition for selling is a mandatory field. Please provide it.",
+    AERR044: "The sell condition value must be a non-negative number",
+    AERR045: "Number of users for sell condition is provided bigger than the actual users in the rule. Please provide lower number.",
+    AERR046: "Number of users for sell condition is provided bigger than actual users in the group. Please provide lower number.",
+};
   
 export function getErrorMessageFromCode(error: Error | string): string {
     const errorMsg = typeof error === "string" ? error : error.message;

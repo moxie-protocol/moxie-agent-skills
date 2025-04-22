@@ -13,7 +13,7 @@ import {
 } from "@moxie-protocol/core";
 import { MoxieClientWallet, MoxieUser, MoxieWalletClient, formatUserMention } from "@moxie-protocol/moxie-agent-lib";
 import { BaseParams, createTradingRule, getAutonomousTradingRuleDetails, getErrorMessageFromCode, GroupTradeParams, LimitOrderParams, RuleType, 
-    UserTradeParams, agentWalletNotFound, delegateAccessNotFound, moxieWalletClientNotFound, checkUserCommunicationPreferences } from "../utils/utility";
+    UserTradeParams, agentWalletNotFound, delegateAccessNotFound, moxieWalletClientNotFound, checkUserCommunicationPreferences, Condition } from "../utils/utility";
 import { autonomousTradingTemplate } from "../templates";
 
 
@@ -26,6 +26,10 @@ export interface AutonomousTradingRuleParams {
     condition?: 'ANY' | 'ALL';
     conditionValue?: number;
     minPurchaseAmount?: number;
+    sellTriggerType?: 'LIMIT_ORDER' | 'COPY_SELL' | 'BOTH';
+    sellTriggerCondition?: 'ANY' | 'ALL';
+    sellTriggerCount?: number;
+    sellPercentage?: number;
 }
 
 export interface AutonomousTradingError {
@@ -136,6 +140,18 @@ export const autonomousTradingAction: Action = {
                     symbol: 'ETH',
                     address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
                 }
+            };
+
+            if (params.sellTriggerType === 'COPY_SELL' || params.sellTriggerType === 'BOTH') {
+                baseParams.sellConfig = {
+                    buyToken: {
+                        symbol: 'ETH',
+                        address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
+                    },
+                    triggerPercentage: params.sellPercentage,
+                    condition: params.sellTriggerCondition === 'ANY' ? Condition.ANY : Condition.ALL,
+                    conditionValue: params.sellTriggerCount
+                };
             };
 
             let groupTradeParams: GroupTradeParams;
