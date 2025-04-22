@@ -30,6 +30,17 @@ if (!process.env.CHAIN_ID || isNaN(Number(process.env.CHAIN_ID))) {
     elizaLogger.error('CHAIN_ID environment variable is not set, using default value 8453');
 }
 
+if (!process.env.SWAP_FEE_BPS || isNaN(Number(process.env.SWAP_FEE_BPS))) {
+    elizaLogger.error('SWAP_FEE_BPS environment variable is not set');
+    throw new Error('SWAP_FEE_BPS environment variable is not set');
+}
+
+if (!process.env.SWAP_FEE_RECIPIENT) {
+    elizaLogger.error('SWAP_FEE_RECIPIENT environment variable is not set');
+    throw new Error('SWAP_FEE_RECIPIENT environment variable is not set');
+}
+
+
 /**
  * Get 0x swap quote
  * @param moxieUserId - The moxie user id
@@ -65,7 +76,10 @@ export const get0xSwapQuote = async ({
             buyToken: buyTokenAddress,
             chainId: Number(process.env.CHAIN_ID || '8453'),
             taker: walletAddress,
-            slippageBps: ERC20_TXN_SLIPPAGE_BPS
+            slippageBps: ERC20_TXN_SLIPPAGE_BPS,
+            swapFeeToken: sellTokenAddress,
+            swapFeeBps: Number(process.env.SWAP_FEE_BPS),
+            swapFeeRecipient: process.env.SWAP_FEE_RECIPIENT
         })) as GetQuoteResponse;
 
         return quote;
