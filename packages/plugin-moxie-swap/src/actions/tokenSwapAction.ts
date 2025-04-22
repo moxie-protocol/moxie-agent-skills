@@ -144,9 +144,51 @@ export const tokenSwapAction = {
                     let buyTokenAddress: string;
                     let buyTokenSymbol: string;
 
-                    // Extract token details
-                    const { tokenSymbol: extractedSellTokenSymbol, tokenAddress: extractedSellTokenAddress } = extractTokenDetails(sellToken);
-                    const { tokenSymbol: extractedBuyTokenSymbol, tokenAddress: extractedBuyTokenAddress } = extractTokenDetails(buyToken);
+                    // Extract token details and check if raw tokens are Ethereum addresses
+                    let extractedSellTokenSymbol, extractedSellTokenAddress;
+                    
+                    if (ethers.isAddress(sellToken)) {
+                        extractedSellTokenAddress = sellToken;
+                        try {
+                            const sellTokenContract = new ethers.Contract(
+                                sellToken,
+                                ['function symbol() view returns (string)'],
+                                provider
+                            );
+                            extractedSellTokenSymbol = await sellTokenContract.symbol();
+                        } catch (error) {
+                            elizaLogger.warn(traceId,`[tokenSwap] [${moxieUserId}] Failed to fetch sell token symbol from RPC: ${error}`);
+                            const extracted = extractTokenDetails(sellToken);
+                            extractedSellTokenSymbol = extracted.tokenSymbol;
+                        }
+                    } else {
+                        const extracted = extractTokenDetails(sellToken);
+                        extractedSellTokenSymbol = extracted.tokenSymbol;
+                        extractedSellTokenAddress = extracted.tokenAddress;
+                    }
+
+                    let extractedBuyTokenSymbol, extractedBuyTokenAddress;
+                    
+                    if (ethers.isAddress(buyToken)) {
+                        extractedBuyTokenAddress = buyToken;
+                        try {
+                            const buyTokenContract = new ethers.Contract(
+                                buyToken,
+                                ['function symbol() view returns (string)'],
+                                provider
+                            );
+                            extractedBuyTokenSymbol = await buyTokenContract.symbol();
+                        } catch (error) {
+                            elizaLogger.warn(traceId,`[tokenSwap] [${moxieUserId}] Failed to fetch buy token symbol from RPC: ${error}`);
+                            const extracted = extractTokenDetails(buyToken);
+                            extractedBuyTokenSymbol = extracted.tokenSymbol;
+                        }
+                    } else {
+                        const extracted = extractTokenDetails(buyToken);
+                        extractedBuyTokenSymbol = extracted.tokenSymbol;
+                        extractedBuyTokenAddress = extracted.tokenAddress;
+                    }
+
                     elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] extractedSellTokenSymbol: ${extractedSellTokenSymbol} and extractedSellTokenAddress: ${extractedSellTokenAddress} and extractedBuyTokenSymbol: ${extractedBuyTokenSymbol} and extractedBuyTokenAddress: ${extractedBuyTokenAddress}`);
 
                     // Extract creator details

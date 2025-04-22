@@ -33,7 +33,7 @@ To process the transfer intent, follow these steps:
    - Categorize the type of transfer (single, multi, balance-based)
    - Validate each mentioned token against the specified formats:
      * Creator coins should be in the format @[username|userId]
-     * ERC20 tokens should be in the format $[symbol|address]
+     * ERC20 tokens should be in the format $[symbol|address] or valid ethereum token address
    - List all required fields and their current status (present, missing, or invalid)
    - Determine if this is a follow-up message or a new request
    - Identify the main action (TRANSFER)
@@ -48,7 +48,7 @@ To process the transfer intent, follow these steps:
 
 2. Handle special cases and defaults:
     - For tokens, ALWAYS maintain the exact format:
-        * ERC20 tokens MUST be in format: $[symbol|address]
+        * ERC20 tokens MUST be in format: $[symbol|address] or valid ethereum token address
         * NEVER strip down to just the address
         * NEVER modify the original token format from input
         * Examples:
@@ -74,7 +74,7 @@ To process the transfer intent, follow these steps:
    - sender: Always set to the value in <agent_wallet_address> tags
    - recipient: Must be an ENS address, wallet address, creator coin (@[username|userId])should be indicated by 'to')
    - transferAmount: Must specify either a numeric value or a balance-based transfer (FULL/PERCENTAGE)
-   - token: Must be in $[symbol|address] format and match exactly what was validated from user intent, preserving this format in all response fields (transfer object, balance, source_token)
+   - token: Must be in $[symbol|address] format or valid ethereum token address and match exactly what was validated from user intent, preserving this format in all response fields (transfer object, balance, source_token)
    - value_type: Required ONLY for USD-based transfers
    IMPORTANT TOKEN VALIDATION RULES:
     - NEVER assume, guess, modify or truncate ANY transaction details including:
@@ -98,14 +98,14 @@ To process the transfer intent, follow these steps:
         * Never have assumed or guessed userIds
         * Return error if incomplete format is provided
     - ERC20 tokens MUST:
-        * Be explicitly provided in complete $[token_symbol|token_address] format
-        * Have both symbol AND address present
+        * Be explicitly provided in complete $[token_symbol|token_address] format or valid ethereum token address
+        * Have both symbol AND address present if token format is in $[token_symbol|token_address]
         * Never have assumed or guessed addresses
         * Return error if incomplete format is provided
     - If proper token format is missing in the question or message history, return error with a message "Please specify the token using '$' mention, or '@' mention for creator/data coins."
     - When validating token formats:
         * Check for presence of both parts (username|userId or symbol|address)
-        * Ensure the format matches exactly (@[...]|[...] or $[...]|[...])
+        * Ensure the format matches exactly (@[...]|[...] or $[...]|[...]) or valid ethereum token address
         * Return error if either part is missing
         * Never attempt to complete or guess missing parts
 

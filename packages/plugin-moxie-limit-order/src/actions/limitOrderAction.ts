@@ -450,12 +450,52 @@ async function processSingleLimitOrder(
     const { sellToken, buyToken, type, execution_type, limitPrice, buyQuantity, order_type, sellQuantity, value_type, balance } = limitOrder;
     const agentWallet = context.state.agentWallet as agentLib.MoxieClientWallet;
     // extract the sell token address and symbol
-    const sellTokenDetails = extractTokenDetails(sellToken);
-    const buyTokenDetails = extractTokenDetails(buyToken);
-    let sellTokenAddress = sellTokenDetails.tokenAddress;
-    let sellTokenSymbol = sellTokenDetails.tokenSymbol;
-    const buyTokenAddress = buyTokenDetails.tokenAddress;
-    const buyTokenSymbol = buyTokenDetails.tokenSymbol;
+    let sellTokenAddress: string;
+    let sellTokenSymbol: string;
+    let buyTokenAddress: string;
+    let buyTokenSymbol: string;
+    
+    const provider = new ethers.providers.JsonRpcProvider(process.env.BASE_RPC_URL);
+    // Extract token details and check if raw tokens are Ethereum addresses
+    if (ethers.utils.isAddress(sellToken)) {
+        sellTokenAddress = sellToken;
+        try {
+            const sellTokenContract = new ethers.Contract(
+                sellToken,
+                ['function symbol() view returns (string)'],
+                provider
+            );
+            sellTokenSymbol = await sellTokenContract.symbol();
+        } catch (error) {
+            elizaLogger.warn(context.traceId,`[limitOrder] [${context.moxieUserId}] Failed to fetch sell token symbol from RPC: ${error}`);
+            const extracted = extractTokenDetails(sellToken);
+            sellTokenSymbol = extracted.tokenSymbol;
+        }
+    } else {
+        const extracted = extractTokenDetails(sellToken);
+        sellTokenSymbol = extracted.tokenSymbol;
+        sellTokenAddress = extracted.tokenAddress;
+    }
+
+    if (ethers.utils.isAddress(buyToken)) {
+        buyTokenAddress = buyToken;
+        try {
+            const buyTokenContract = new ethers.Contract(
+                buyToken,
+                ['function symbol() view returns (string)'],
+                provider
+            );
+            buyTokenSymbol = await buyTokenContract.symbol();
+        } catch (error) {
+            elizaLogger.warn(context.traceId,`[limitOrder] [${context.moxieUserId}] Failed to fetch buy token symbol from RPC: ${error}`);
+            const extracted = extractTokenDetails(buyToken);
+            buyTokenSymbol = extracted.tokenSymbol;
+        }
+    } else {
+        const extracted = extractTokenDetails(buyToken);
+        buyTokenSymbol = extracted.tokenSymbol;
+        buyTokenAddress = extracted.tokenAddress;
+    }
 
     try {
         const traceId = context.traceId;
