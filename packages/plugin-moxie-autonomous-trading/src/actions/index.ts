@@ -148,7 +148,8 @@ export const autonomousTradingAction: Action = {
                         symbol: 'ETH',
                         address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
                     },
-                    triggerPercentage: params.sellPercentage,
+                    // triggerPercentage: params.sellPercentage,
+                    triggerPercentage: 50, // Hardcoded for now
                     condition: params.sellTriggerCondition === 'ANY' ? Condition.ANY : Condition.ALL,
                     conditionValue: params.sellTriggerCount
                 };
@@ -161,6 +162,15 @@ export const autonomousTradingAction: Action = {
 
             if (ruleType === 'GROUP_COPY_TRADE' || ruleType === 'GROUP_COPY_TRADE_AND_PROFIT') {
                 ruleTriggers = 'GROUP';
+
+                if (params.condition === 'ANY' && params.sellTriggerCount > params.conditionValue) {
+                    callback?.({
+                        text: `The sell trigger count exceeds the numbers of members in the group you are tracking.Please try again with a lower sell trigger count.`,
+                        action: "AUTONOMOUS_TRADING",
+                    });
+                    return true;
+                }
+
                 groupTradeParams = {
                     groupId: params.groupId,
                     condition: params.condition,
@@ -172,6 +182,13 @@ export const autonomousTradingAction: Action = {
                 };
             } else {
                 ruleTriggers = 'USER';
+                if (params.sellTriggerCount > params.moxieIds.length) {
+                    callback?.({
+                        text: `The number of users you are tracking is less than the number of users you are setting the sell trigger count to. Please try again with a lower sell trigger count.`,
+                        action: "AUTONOMOUS_TRADING",
+                    });
+                    return true;
+                }
                 userTradeParams = {
                     moxieUsers: params.moxieIds,
                     minPurchaseAmount: {
