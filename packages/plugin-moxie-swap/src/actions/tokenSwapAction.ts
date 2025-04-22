@@ -153,8 +153,6 @@ export const tokenSwapAction = {
                             extractedSellTokenSymbol = await getERC20TokenSymbol(sellToken);
                         } catch (error) {
                             elizaLogger.warn(traceId,`[tokenSwap] [${moxieUserId}] Failed to fetch sell token symbol from RPC: ${error}`);
-                            const extracted = extractTokenDetails(sellToken);
-                            extractedSellTokenSymbol = extracted.tokenSymbol;
                         }
                     } else {
                         const extracted = extractTokenDetails(sellToken);
@@ -167,16 +165,9 @@ export const tokenSwapAction = {
                     if (ethers.isAddress(buyToken)) {
                         extractedBuyTokenAddress = buyToken;
                         try {
-                            const buyTokenContract = new ethers.Contract(
-                                buyToken,
-                                ['function symbol() view returns (string)'],
-                                provider
-                            );
-                            extractedBuyTokenSymbol = await buyTokenContract.symbol();
+                            extractedBuyTokenSymbol = await getERC20TokenSymbol(buyToken);
                         } catch (error) {
                             elizaLogger.warn(traceId,`[tokenSwap] [${moxieUserId}] Failed to fetch buy token symbol from RPC: ${error}`);
-                            const extracted = extractTokenDetails(buyToken);
-                            extractedBuyTokenSymbol = extracted.tokenSymbol;
                         }
                     } else {
                         const extracted = extractTokenDetails(buyToken);
