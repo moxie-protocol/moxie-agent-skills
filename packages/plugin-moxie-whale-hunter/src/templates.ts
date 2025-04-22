@@ -136,6 +136,7 @@ Here are the top holders of tokenName ($[tokenSymbol]) amongst tens of thousands
 | profile_link | total_balance | total_balance_in_usd|
 
 [Actual data from topTokenHolders]
+Do not make any changes to the profile_link. It should start with '@' and be in the format of @[username|user_id].
 
 [Only include observations based on actual data]
 
