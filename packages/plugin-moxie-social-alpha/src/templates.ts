@@ -211,7 +211,7 @@ If the question is about summarizing recent creator coin/token purchase activity
 **Overview**
 - The trending swaps data reflects onchain activity from tens of thousands of Base users' wallets indexed by Moxie.
 - If specific users are mentioned, adjust the context to highlight only those users' trading activity.
-- Rank the trending tokens in the response by: (1) Highest total buy volume, (2) Highest total volume,  (3) Highest percentage gains.  Do not prioritize tokens with heavy negative trends.
+- Rank the trending tokens in the response by: (1) Net volume (buy volume minus sell volume), (2) Highest total volume, (3) Highest percentage gains. Do not prioritize tokens with heavy negative trends.
 
 **Data Presentation**
 -Always try to reply with at least 8 tokens, preferably 10 (if there are that many)
@@ -263,42 +263,36 @@ If the question is about summarizing recent token purchases (ERC20) activity by 
 {{ineligibleMoxieUsers}}
 
 **Overview**
-- The trending swaps data reflects onchain activity from tens of thousands of Base users' wallets indexed by Moxie.
 - If specific users are mentioned, adjust the context to highlight only those users' trading activity.
-- Rank the trending tokens in the response by: (1) Highest total buy volume, (2) Highest total volume,  (3) Highest percentage gains.  Do not prioritize tokens with heavy negative trends.
+- Output all 10 tokens.
 
 **Data Presentation**
-- Always try to reply with at least 8 tokens, preferably 10
 - For each token in the summary, always include:
-    - **Token name**
-    - **Token symbol (case-sensitive, prefixed with $)**
-    - **Full token_address in the format: [<token_address>](https://basescan.org/token/<token_address>) format e.g. [0x...](https://basescan.org/token/0x...)**
-    - **Current price**
-    - **24-hour % price change**
+    - **Token name first & symbol (case-sensitive, prefixed with $)**
+    - **Full token_address in the format: token_address**
+    - **Unique holders count**
     - **Fully diluted market cap**
-	- **Unique holders count**
-    - **Total buy volume (tracked wallets only)**  (formatted as $[value] in USD)e.g **Total Buy Volume (tracked wallets only)**: $210,299.60
-    - **Total sell volume (tracked wallets only)** (formatted as $[value] in USD)
-	- Notable Moxie users who swapped the token. Mention them by name and link to them using the markdown format:  [username](https://moxie.xyz/profile/user_id) format
+    - **Current price**
+    - **% Price Change (last hour)**
+    - **Top 3 LP Liquidity (sum)**
+    - **Net buy volume$**
+    - **Buy volume$**
+    - **Sell volume$**
+    - Notable Moxie users who swapped the token. Mention them by name and link to them using the markdown format:  [username](https://moxie.xyz/profile/user_id) format
 
 **Action-Specific Conditions**
 - If the user requests trending swaps for specific users, provide only those users' results. Do not rank users vs, each other.
-- If the user asks explicitly for buys or sells, exclude the other. Otherwise, include both.
-- If a mentioned user is in the ineligibleMoxieUsers list, exclude them from the response.
 - If an invalid mention format error occurs, prompt the user to select a user by pressing @ instead of fabricating a response.
 
 **Limitations**
-- Only the last 24 hours of swaps are considered. Other timeframes cannot be requested.
-- Swaps = Trades (terms are interchangeable).
 - The only available dataset is swaps. Queries like "find trending swaps from my portfolio" or "based on market cap/liquidity" are not supported. For these queries, you can should mention that the sell and buy volume is for tracked wallets only.
 - No pagination is available (e.g., "show me the next set of trending swaps" is unsupported).
 - If a request falls outside these limitations, explain the specific reason why the agent cannot provide the summary.
 
 **Final Notes**
-- If the user asks for Trending Tokens overall, at the top of each response, always start with: This is analysis is based on tens of thousands of Base users' wallets indexed by Moxie.
+- If the user asks for Trending Tokens overall, at the top of each response, always start with: This is analysis is based on tens of thousands of Base users' wallets indexed by Moxie. Tokens are ranked based on Net Buy Volume based on the timeframe in the question (if there is no timeframe, default is 24 hours)
 - If the user asks for Trending Tokens or token swaps from specific users, always start with: Here are the trending tokens or swaps from these users (cite them by name).
-- At the end of each response, ask the user if you can help the buy any of the tokens
-`
+- At the end of each response, ask the user if you can help the buy any of the tokens, or check any other timeframe.`
 + footerPrompt;
 }
 

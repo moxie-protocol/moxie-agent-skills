@@ -18,7 +18,7 @@ import * as templates from "../templates";
 import { fetchSwapData } from "../utils";
 import { TOP_CREATORS_COUNT } from "../config";
 import { getMoxieIdsFromMessage, streamTextByLines, handleIneligibleMoxieUsers } from "./utils";
-import { getTokenDetails, MoxieAgentDBAdapter, MoxieUser, moxieUserService } from "@moxie-protocol/moxie-agent-lib";
+import { getTokenDetails, getTrendingTokenDetails, MoxieAgentDBAdapter, MoxieUser, moxieUserService } from "@moxie-protocol/moxie-agent-lib";
 export const tokenSwapSummary: Action = {
     name: "TRENDING_TOKENS",
     suppressInitialMessage: true,
@@ -358,7 +358,8 @@ async function swapSummaryHandler(
     const allSwaps = await fetchSwapData(
         eligibleMoxieIds,
         tokenType,
-        onlyIncludeSpecifiedMoxieIds
+        onlyIncludeSpecifiedMoxieIds,
+        timeFilter
     );
 
     if (allSwaps.length === 0) {
@@ -398,7 +399,11 @@ async function swapSummaryHandler(
 
     elizaLogger.debug(`tokenAddresses: ${tokenAddresses}`);
 
-    const tokenDetails = await getTokenDetails(tokenAddresses);
+    let tokenDetails = await getTokenDetails(tokenAddresses);
+
+    if (tokenType === "NON_CREATOR_COIN") {
+        tokenDetails = await getTrendingTokenDetails(tokenAddresses);
+    }
 
     elizaLogger.debug(`tokenDetails: ${JSON.stringify(tokenDetails)}`)
 

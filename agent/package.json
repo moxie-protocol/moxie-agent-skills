@@ -25,6 +25,7 @@
         "@moxie-protocol/core": "workspace:*",
         "@moxie-protocol/plugin-sample": "workspace:*",
         "@moxie-protocol/plugin-moxie-autonomous-trading": "workspace:*",
+        "@moxie-protocol/plugin-betswirl": "workspace:*",
         "@moxie-protocol/plugin-degenfans-alfafrens": "workspace:*",
         "@elizaos/plugin-bootstrap": "workspace:*",
         "@moxie-protocol/plugin-moxie-balance": "workspace:*",
