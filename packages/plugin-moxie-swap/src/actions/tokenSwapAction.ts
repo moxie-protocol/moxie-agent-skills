@@ -1755,8 +1755,10 @@ async function swap(
             moxieUserId: moxieUserId,
             sellAmountBaseUnits: sellAmountInWEI.toString(),
             buyTokenAddress: buyTokenAddress,
+            buyTokenSymbol: buyTokenSymbol,
             walletAddress: agentWalletAddress,
             sellTokenAddress: sellTokenAddress,
+            sellTokenSymbol: sellTokenSymbol,
         });
         elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [swap] get0xSwapQuote: ${JSON.stringify(quote)}`);
 
