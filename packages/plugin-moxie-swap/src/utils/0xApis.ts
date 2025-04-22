@@ -55,21 +55,25 @@ export const get0xSwapQuote = async ({
     moxieUserId,
     sellAmountBaseUnits,
     buyTokenAddress,
+    buyTokenSymbol,
     walletAddress,
     sellTokenAddress,
+    sellTokenSymbol,
 }: {
     traceId: string;
     moxieUserId: string;
     sellAmountBaseUnits: string;
     buyTokenAddress: string;
+    buyTokenSymbol: string;
     walletAddress: string;
     sellTokenAddress: string;
+    sellTokenSymbol: string;
 }) => {
     try {
         if(!process.env.ZERO_EX_API_KEY) {
             return mockGetQuoteResponse;
         }
-        elizaLogger.debug(traceId,`[get0xSwapQuote] [${moxieUserId}] input details: [${walletAddress}] [${sellTokenAddress}] [${buyTokenAddress}] [${sellAmountBaseUnits}]`)
+        elizaLogger.debug(traceId,`[get0xSwapQuote] [${moxieUserId}] input details: [${walletAddress}] [${sellTokenAddress}] [${buyTokenAddress}] [${sellAmountBaseUnits}] [${buyTokenSymbol}] [${sellTokenSymbol}]`)
         const quote = (await zxClient.swap.permit2.getQuote.query({
             sellAmount: sellAmountBaseUnits,
             sellToken: sellTokenAddress,
@@ -77,7 +81,9 @@ export const get0xSwapQuote = async ({
             chainId: Number(process.env.CHAIN_ID || '8453'),
             taker: walletAddress,
             slippageBps: ERC20_TXN_SLIPPAGE_BPS,
-            swapFeeToken: sellTokenAddress,
+            swapFeeToken: isStableCoin(buyTokenSymbol) ? buyTokenAddress : 
+                         isStableCoin(sellTokenSymbol) ? sellTokenAddress : 
+                         sellTokenAddress, // default to sellToken if neither present in stableCoins env variable
             swapFeeBps: Number(process.env.SWAP_FEE_BPS),
             swapFeeRecipient: process.env.SWAP_FEE_RECIPIENT
         })) as GetQuoteResponse;
@@ -88,6 +94,12 @@ export const get0xSwapQuote = async ({
         throw error;
     }
 };
+
+const isStableCoin = (tokenSymbol: string) => {
+    // Map of stable coins by symbol
+    const stableCoins = (process.env.STABLE_COINS || 'USDC,USDT,DAI,ETH,WETH').split(',').map(coin => coin.trim());
+    return stableCoins.includes(tokenSymbol.toUpperCase());
+}
 
 /**
  * Execute 0x swap with 20% buffer for gas limit
