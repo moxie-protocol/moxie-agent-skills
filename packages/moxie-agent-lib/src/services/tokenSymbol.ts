@@ -18,7 +18,11 @@ export async function getERC20TokenSymbol(tokenAddress: string) {
         }
       ];
 
-    const provider = new ethers.JsonRpcProvider(process.env.BASE_RPC_URL);
-    const contract = new ethers.Contract(tokenAddress, abi, provider);
-    return await contract.symbol();
+    try {
+        const provider = new ethers.JsonRpcProvider(process.env.BASE_RPC_URL);
+        const contract = new ethers.Contract(tokenAddress, abi, provider);
+        return await contract.symbol();
+    } catch (error) {
+        throw new Error(`Failed to fetch token symbol for address ${tokenAddress}: ${error.message}`);
+    }
 }
