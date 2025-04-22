@@ -463,8 +463,6 @@ async function processSingleLimitOrder(
             sellTokenSymbol = await getERC20TokenSymbol(sellToken);
         } catch (error) {
             elizaLogger.warn(context.traceId,`[limitOrder] [${context.moxieUserId}] Failed to fetch sell token symbol from RPC: ${error}`);
-            const extracted = extractTokenDetails(sellToken);
-            sellTokenSymbol = extracted.tokenSymbol;
         }
     } else {
         const extracted = extractTokenDetails(sellToken);
@@ -478,8 +476,6 @@ async function processSingleLimitOrder(
             buyTokenSymbol = await getERC20TokenSymbol(buyToken);
         } catch (error) {
             elizaLogger.warn(context.traceId,`[limitOrder] [${context.moxieUserId}] Failed to fetch buy token symbol from RPC: ${error}`);
-            const extracted = extractTokenDetails(buyToken);
-            buyTokenSymbol = extracted.tokenSymbol;
         }
     } else {
         const extracted = extractTokenDetails(buyToken);
