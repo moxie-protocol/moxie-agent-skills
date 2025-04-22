@@ -31,7 +31,7 @@ Try to answer in the following sequence:
 1. Check if {{portfolioSummaries}} is present answer from these details and stop here, Try to answer the question asked in {{message}} with these details:
    - If yes, use only these to generate the summary and stop here.
    - Here, one item in the list portfolioSummaries belongs to one user.
-   - Provide details about the tokens as "Token Holdings" and app balances as "Creator Coin Holdings" common in portfolioSummaries in tabular form similar to # Token Holdings ${tokenOutputTemplate} and # Creator Coin Holdings ${creatorCoinOutputTemplate}.
+   - Provide details about the tokens as "Token Holdings" and app balances as "Creator Coin Holdings" common in portfolioSummaries in tabular form similar to # Token Holdings ${tokenOutputTemplate}.
    - Provide details about common holdings in {{filteredCommonFanTokenHoldings}} for Creator coins, use ${commonTokenOutputTemplate} table format for this, show upto 10 common holdings for each unless asked for more in {{message}}.
    - Provide details about common holdings in {{filteredCommonTokenHoldings}} for Tokens, use ${commonTokenOutputTemplate} table format for this, show upto 10 common holdings for each unless asked for more in {{message}}.
    - Provide insights about the user's portfolio.
