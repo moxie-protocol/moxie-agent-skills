@@ -88,7 +88,12 @@ export default {
                     runtime,
                     context: stateSummaryContext,
                     modelClass: ModelClass.MEDIUM,
-                });
+                    modelConfigOptions: {
+                        temperature: 0.5,
+                        modelProvider: ModelProviderName.OPENAI,
+                        apiKey: process.env.OPENAI_API_KEY!,
+                        modelClass: ModelClass.MEDIUM
+                    }                });
                 for await (const textPart of summaryStream) {
                     callback({ text: textPart, action: "POST_CONTENT_SUMMARY_SUCCESS", cta: "FARCASTER_CAST" });
                 }
