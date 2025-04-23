@@ -55,9 +55,10 @@ To process the transfer intent, follow these steps:
             - $[MOXIE|0x8C9037D1Ef5c6D1f6816278C7AAF5491d24CD527]
             - $[ETH|0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE]
             - $[USDC|0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913]
-   - For dollar amounts ($X):
-     * Default to $[USDC|0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913]
-     * Set value_type to "USD"
+   -  For amounts with $ prefix (e.g. $50, $0.5):
+     * Set value_type to "USD" in the transfer object
+     * This indicates the amount is in USD value rather than token quantity
+     * Example: "$50 ETH" means $50 worth of ETH, not 50 ETH tokens
    - For ETH mentions:
      * Use $[ETH|0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE]
    - For MOXIE mentions:
