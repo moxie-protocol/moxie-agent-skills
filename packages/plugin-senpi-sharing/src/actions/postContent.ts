@@ -46,8 +46,8 @@ export default {
             const previousMessage = state?.recentMessagesData?.slice(-3)
             previousMessage.forEach(msg => msg.embedding = [])
 
-            if (previousMessage.length === 0) {
-                callback({ text: "I cannot find the previous conversation. Please try again.", action: "POST_CONTENT_ERROR" });
+            if (previousMessage.length < 3) {
+                callback({ text: "I can't find enough previous conversation to summarize. Ask me some questions first, and then I'll be able to create a summary for you!", action: "POST_CONTENT_ERROR" });
                 return false;
             }
             // Check for recent POST_CONTENT_SUMMARY_SUCCESS action that will contaion the summary text if asked previously
@@ -55,6 +55,16 @@ export default {
                 .slice()
                 .reverse()
                 .filter(msg => msg?.content?.action === 'POST_CONTENT_SUMMARY_SUCCESS');
+
+            const hasCastedPreviously = previousMessage
+                .slice()
+                .reverse()
+                .filter(msg => msg?.content?.action === 'POST_CONTENT_SUCCESS');
+
+            if (hasCastedPreviously.length > 0) {
+                callback({ text: "You have already casted the content. Please ask me something else before summarizing or casting again.", action: "POST_CONTENT_ERROR" });
+                return false;
+            }
 
             if (hasRecentPostContent.length > 0 && message.content.text.toLowerCase().includes('cast')) {
                 const summaryText = hasRecentPostContent[0]?.content?.text;
