@@ -30,6 +30,17 @@ if (!process.env.CHAIN_ID || isNaN(Number(process.env.CHAIN_ID))) {
     elizaLogger.error('CHAIN_ID environment variable is not set, using default value 8453');
 }
 
+if (!process.env.SWAP_FEE_BPS || isNaN(Number(process.env.SWAP_FEE_BPS))) {
+    elizaLogger.error('SWAP_FEE_BPS environment variable is not set');
+    throw new Error('SWAP_FEE_BPS environment variable is not set');
+}
+
+if (!process.env.SWAP_FEE_RECIPIENT) {
+    elizaLogger.error('SWAP_FEE_RECIPIENT environment variable is not set');
+    throw new Error('SWAP_FEE_RECIPIENT environment variable is not set');
+}
+
+
 /**
  * Get 0x swap quote
  * @param moxieUserId - The moxie user id
@@ -44,28 +55,37 @@ export const get0xSwapQuote = async ({
     moxieUserId,
     sellAmountBaseUnits,
     buyTokenAddress,
+    buyTokenSymbol,
     walletAddress,
     sellTokenAddress,
+    sellTokenSymbol,
 }: {
     traceId: string;
     moxieUserId: string;
     sellAmountBaseUnits: string;
     buyTokenAddress: string;
+    buyTokenSymbol: string;
     walletAddress: string;
     sellTokenAddress: string;
+    sellTokenSymbol: string;
 }) => {
     try {
         if(!process.env.ZERO_EX_API_KEY) {
             return mockGetQuoteResponse;
         }
-        elizaLogger.debug(traceId,`[get0xSwapQuote] [${moxieUserId}] input details: [${walletAddress}] [${sellTokenAddress}] [${buyTokenAddress}] [${sellAmountBaseUnits}]`)
+        elizaLogger.debug(traceId,`[get0xSwapQuote] [${moxieUserId}] input details: [${walletAddress}] [${sellTokenAddress}] [${buyTokenAddress}] [${sellAmountBaseUnits}] [${buyTokenSymbol}] [${sellTokenSymbol}]`)
         const quote = (await zxClient.swap.permit2.getQuote.query({
             sellAmount: sellAmountBaseUnits,
             sellToken: sellTokenAddress,
             buyToken: buyTokenAddress,
             chainId: Number(process.env.CHAIN_ID || '8453'),
             taker: walletAddress,
-            slippageBps: ERC20_TXN_SLIPPAGE_BPS
+            slippageBps: ERC20_TXN_SLIPPAGE_BPS,
+            swapFeeToken: isStableCoin(buyTokenSymbol) ? buyTokenAddress : 
+                         isStableCoin(sellTokenSymbol) ? sellTokenAddress : 
+                         sellTokenAddress, // default to sellToken if neither present in stableCoins env variable
+            swapFeeBps: Number(process.env.SWAP_FEE_BPS),
+            swapFeeRecipient: process.env.SWAP_FEE_RECIPIENT
         })) as GetQuoteResponse;
 
         return quote;
@@ -74,6 +94,12 @@ export const get0xSwapQuote = async ({
         throw error;
     }
 };
+
+const isStableCoin = (tokenSymbol: string) => {
+    // Map of stable coins by symbol
+    const stableCoins = (process.env.STABLE_COINS || 'USDC,USDT,DAI,ETH,WETH').split(',').map(coin => coin.trim());
+    return stableCoins.includes(tokenSymbol.toUpperCase());
+}
 
 /**
  * Execute 0x swap with 20% buffer for gas limit
