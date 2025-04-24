@@ -14,12 +14,12 @@ import {
 } from "@moxie-protocol/core";
 import { MoxieUser, moxieUserService } from "@moxie-protocol/moxie-agent-lib";
 import { manageGroupsTemplate, groupDetailsTemplate } from "../templates";
-import { addMembersToGroup, createGroup, deleteGroup, getGroupDetails, removeMembersFromGroup, updateGroup } from "../utils";
+import { addMembersToGroup, createGroup, deleteGroup, getGroupDetails, removeMembersFromGroup, updateGroup, getErrorMessageFromCode } from "../utils";
 import { GetGroupsOutput, GroupOutput } from "../types";
 
 export interface ManageGroupsError {
-    missing_fields: string[];
-    prompt_message: string;
+    missingFields: string[];
+    message: string;
 }
 
 export interface GroupParams {
@@ -86,7 +86,7 @@ export const manageGroupsAction: Action = {
             if (!manageGroupsResponse.success) {
                 elizaLogger.warn(traceId, `[MANAGE_GROUPS] Error: ${JSON.stringify(manageGroupsResponse.error)}`);
                 callback?.({
-                    text: manageGroupsResponse.error.prompt_message,
+                    text: manageGroupsResponse.error.message,
                     action: "MANAGE_GROUPS",
                 });
                 return true;
@@ -127,7 +127,7 @@ export const manageGroupsAction: Action = {
         } catch (error) {
             elizaLogger.error(traceId, `[MANAGE_GROUPS] Unexpected error: ${JSON.stringify(error)}`);
             callback?.({
-                text: `An unexpected error occurred. Please try again later.`,
+                text: getErrorMessageFromCode(error),
                 action: "MANAGE_GROUPS",
             });
         }
@@ -157,7 +157,7 @@ async function handleCreateGroup(traceId: string, moxieUserId: string, state: St
     } catch (error) {
         elizaLogger.error(traceId, `[MANAGE_GROUPS] Error creating group: ${error.message}`);
         await callback?.({
-            text: `❌ Failed to create group. Please try again later.`,
+            text: `❌ Failed to create group | ${getErrorMessageFromCode(error)}`,
             action: "MANAGE_GROUPS",
         });
     }
@@ -187,6 +187,16 @@ async function handleCreateGroupAndAddMember(traceId: string, moxieUserId: strin
 
         const response = await createGroup(state.authorizationHeader as string, groupName) as GroupOutput;
 
+        const isValidUserId = senpiUserIdsToAdd.every(userId => userId.startsWith('M'));
+        if (!isValidUserId) {
+            elizaLogger.warn(traceId, `[MANAGE_GROUPS] [CREATE_GROUP_AND_ADD_GROUP_MEMBER] All Senpi user IDs must start with a capital 'M'`);
+            await callback?.({
+                text: `❌ Invalid Senpi user(s) provided. Please provide valid Senpi user IDs.`,
+                action: "MANAGE_GROUPS",
+            });
+            return;
+        }
+
         const addMembersResponse = await addMembersToGroup(state.authorizationHeader as string, response.group?.id, senpiUserIdsToAdd) as GroupOutput;
 
         if (addMembersResponse.success) {
@@ -203,7 +213,7 @@ async function handleCreateGroupAndAddMember(traceId: string, moxieUserId: strin
     } catch (error) {
         elizaLogger.error(traceId, `[MANAGE_GROUPS] Error creating group and adding member: ${error.message}`);
         await callback?.({
-            text: `❌ An error occurred while creating the group and adding the member. Please try again later.`,
+            text: `❌ Failed to create group and add member(s) | ${getErrorMessageFromCode(error)}`,
             action: "MANAGE_GROUPS",
         });
     }
@@ -216,6 +226,16 @@ async function handleAddGroupMember(traceId: string, moxieUserId: string, state:
             elizaLogger.warn(traceId, `[MANAGE_GROUPS] [ADD_GROUP_MEMBER] Group ID and Senpi user IDs to add are required`);
             await callback?.({
                 text: `❌ Group ID and Senpi user IDs to add are required. Please try again.`,
+                action: "MANAGE_GROUPS",
+            });
+            return;
+        }
+
+        const isValidUserId = senpiUserIdsToAdd.every(userId => userId.startsWith('M'));
+        if (!isValidUserId) {
+            elizaLogger.warn(traceId, `[MANAGE_GROUPS] [ADD_GROUP_MEMBER] All Senpi user IDs must start with a capital 'M'`);
+            await callback?.({
+                text: `❌ Invalid Senpi user(s) provided. Please provide valid Senpi user IDs.`,
                 action: "MANAGE_GROUPS",
             });
             return;
@@ -242,7 +262,7 @@ async function handleAddGroupMember(traceId: string, moxieUserId: string, state:
     } catch (error) {
         elizaLogger.error(traceId, `[MANAGE_GROUPS] Error adding member to group: ${error.message}`);
         await callback?.({
-            text: `❌ An error occurred while adding the member to the group. Please try again later.`,
+            text: `❌ Failed to add member to group | ${getErrorMessageFromCode(error)}`,
             action: "MANAGE_GROUPS",
         });
     }
@@ -276,7 +296,7 @@ async function handleDeleteGroup(traceId: string, moxieUserId: string, state: St
     } catch (error) {
         elizaLogger.error(traceId, `[MANAGE_GROUPS] Error deleting group: ${error.message}`);
         await callback?.({
-            text: `❌ An error occurred while deleting the group. Please try again later.`,
+            text: `❌ Failed to delete group | ${getErrorMessageFromCode(error)}`,
             action: "MANAGE_GROUPS",
         });
     }
@@ -294,6 +314,14 @@ async function handleRemoveGroupMember(traceId: string, moxieUserId: string, sta
             return;
         }
 
+        const isValidUserId = senpiUserIdsToRemove.every(userId => userId.startsWith('M'));
+        if (!isValidUserId) {
+            elizaLogger.warn(traceId, `[MANAGE_GROUPS] [REMOVE_GROUP_MEMBER] All Senpi user IDs must start with a capital 'M'`);
+            await callback?.({
+                text: `❌ Invalid Senpi user(s) provided. Please provide valid Senpi user IDs.`,
+                action: "MANAGE_GROUPS",
+            });
+        }
         const response = await removeMembersFromGroup(state.authorizationHeader as string, groupId, senpiUserIdsToRemove) as GroupOutput;
 
         const moxieUserProfiles = await moxieUserService.getUserByMoxieIdMultipleMinimal(senpiUserIdsToRemove);
@@ -316,7 +344,7 @@ async function handleRemoveGroupMember(traceId: string, moxieUserId: string, sta
     } catch (error) {
         elizaLogger.error(traceId, `[MANAGE_GROUPS] Error removing member from group: ${error.message}`);
         await callback?.({
-            text: `❌ An error occurred while removing the member from the group. Please try again later.`,
+            text: `❌ Failed to remove member from group | ${getErrorMessageFromCode(error)}`,
             action: "MANAGE_GROUPS",
         });
     }
@@ -409,7 +437,7 @@ async function handleGetGroupDetails(traceId: string, runtime: IAgentRuntime, me
     } catch (error) {
         elizaLogger.error(traceId, `[MANAGE_GROUPS] Error retrieving group details: ${error.message}`);
         await callback?.({
-            text: `❌ An error occurred while retrieving the group details. Please try again later.`,
+            text: `❌ Failed to retrieve group details | ${getErrorMessageFromCode(error)}`,
             action: "MANAGE_GROUPS",
         });
     }
@@ -443,7 +471,7 @@ async function handleUpdateGroup(traceId: string, moxieUserId: string, state: St
     } catch (error) {
         elizaLogger.error(traceId, `[MANAGE_GROUPS] Error updating group: ${error.message}`);
         await callback?.({
-            text: `❌ An error occurred while updating the group. Please try again later.`,
+            text: `❌ Failed to update group | ${getErrorMessageFromCode(error)}`,
             action: "MANAGE_GROUPS",
         });
     }

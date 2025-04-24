@@ -359,3 +359,34 @@ export async function removeMembersFromGroup(
         throw new Error(`Error removing members from group: ${error.message}`);
     }
 }
+
+const errorMessages: Record<string, string> = {
+    AERR100: "The user does not have ownership rights for this group.",
+    AERR101: "Please provide a valid group name.",
+    AERR102: "Group names must not begin with special characters such as #, $, or @.",
+    AERR103: "A group with this name already exists. Please choose a different name.",
+    AERR104: "A valid group ID is required to update group details.",
+    AERR105: "The user does not have ownership rights to update the group details.",
+    AERR106: "A valid group ID is required to delete the group.",
+    AERR107: "The user does not have ownership rights to delete the group.",
+    AERR108: "Members must be specified to add them to the group.",
+    AERR109: "A maximum of 50 members can be added to the group.",
+    AERR110: "The provided Senpi user IDs are invalid for adding members to the group.",
+    AERR111: "You cannot add yourself to the group.",
+    AERR112: "The user does not have ownership rights to add members to the group.",
+    AERR113: "Duplicate members cannot be added to the group.",
+    AERR114: "A valid group ID is required to remove members from the group.",
+    AERR115: "The user does not have ownership rights to remove members from the group.",
+    AERR116: "The specified members are not part of the group.",
+    AERR117: "The user is not authorized to perform this action.",
+    AERR118: "The specified user could not be found.",
+};
+  
+export function getErrorMessageFromCode(error: Error | string): string {
+    const errorMsg = typeof error === "string" ? error : error.message;
+    const match = errorMsg.match(/(AERR\d{3})/);
+    const code = match?.[1];
+    return code && errorMessages[code]
+        ? errorMessages[code]
+        : "Something went wrong. Please check your input or try again.";
+}
