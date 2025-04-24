@@ -9,7 +9,7 @@ import {
     type Memory,
     type State
 } from "@moxie-protocol/core";
-import { ftaService, MoxieClientWallet, MoxieHex, MoxieUser, MoxieWalletClient, MoxieWalletSendTransactionResponseType, MoxieWalletSignTypedDataResponseType, Portfolio } from "@moxie-protocol/moxie-agent-lib";
+import { ftaService, getERC20TokenSymbol, MoxieClientWallet, MoxieHex, MoxieUser, MoxieWalletClient, MoxieWalletSendTransactionResponseType, MoxieWalletSignTypedDataResponseType, Portfolio } from "@moxie-protocol/moxie-agent-lib";
 import {
     tokenSwapTemplate,
 } from "../templates/tokenSwapTemplate";
@@ -144,9 +144,37 @@ export const tokenSwapAction = {
                     let buyTokenAddress: string;
                     let buyTokenSymbol: string;
 
-                    // Extract token details
-                    const { tokenSymbol: extractedSellTokenSymbol, tokenAddress: extractedSellTokenAddress } = extractTokenDetails(sellToken);
-                    const { tokenSymbol: extractedBuyTokenSymbol, tokenAddress: extractedBuyTokenAddress } = extractTokenDetails(buyToken);
+                    // Extract token details and check if raw tokens are Ethereum addresses
+                    let extractedSellTokenSymbol, extractedSellTokenAddress;
+                    
+                    if (ethers.isAddress(sellToken)) {
+                        extractedSellTokenAddress = sellToken;
+                        try {
+                            extractedSellTokenSymbol = await getERC20TokenSymbol(sellToken);
+                        } catch (error) {
+                            elizaLogger.warn(traceId,`[tokenSwap] [${moxieUserId}] Failed to fetch sell token symbol from RPC: ${error}`);
+                        }
+                    } else {
+                        const extracted = extractTokenDetails(sellToken);
+                        extractedSellTokenSymbol = extracted.tokenSymbol;
+                        extractedSellTokenAddress = extracted.tokenAddress;
+                    }
+
+                    let extractedBuyTokenSymbol, extractedBuyTokenAddress;
+                    
+                    if (ethers.isAddress(buyToken)) {
+                        extractedBuyTokenAddress = buyToken;
+                        try {
+                            extractedBuyTokenSymbol = await getERC20TokenSymbol(buyToken);
+                        } catch (error) {
+                            elizaLogger.warn(traceId,`[tokenSwap] [${moxieUserId}] Failed to fetch buy token symbol from RPC: ${error}`);
+                        }
+                    } else {
+                        const extracted = extractTokenDetails(buyToken);
+                        extractedBuyTokenSymbol = extracted.tokenSymbol;
+                        extractedBuyTokenAddress = extracted.tokenAddress;
+                    }
+
                     elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] extractedSellTokenSymbol: ${extractedSellTokenSymbol} and extractedSellTokenAddress: ${extractedSellTokenAddress} and extractedBuyTokenSymbol: ${extractedBuyTokenSymbol} and extractedBuyTokenAddress: ${extractedBuyTokenAddress}`);
 
                     // Extract creator details
@@ -1755,8 +1783,10 @@ async function swap(
             moxieUserId: moxieUserId,
             sellAmountBaseUnits: sellAmountInWEI.toString(),
             buyTokenAddress: buyTokenAddress,
+            buyTokenSymbol: buyTokenSymbol,
             walletAddress: agentWalletAddress,
             sellTokenAddress: sellTokenAddress,
+            sellTokenSymbol: sellTokenSymbol,
         });
         elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [swap] get0xSwapQuote: ${JSON.stringify(quote)}`);
 

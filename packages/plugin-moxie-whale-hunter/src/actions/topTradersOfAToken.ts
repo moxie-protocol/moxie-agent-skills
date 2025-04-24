@@ -16,6 +16,7 @@ import * as templates from "../templates";
 import { extractTokenDetails } from "../utils";
 import { MoxieUser, MoxieAgentDBAdapter } from "@moxie-protocol/moxie-agent-lib";
 import { verifyUserBaseEconomyTokenOwnership } from "../utils";
+import { ethers } from "ethers";
 
 export const topTraderOfATokenAction: Action = {
     name: "TOP_TRADER_OF_A_TOKEN",
@@ -60,14 +61,29 @@ export const topTraderOfATokenAction: Action = {
         //     }
         // }
 
-        const tokenDetails = await extractTokenDetails(message.content.text, runtime);
-        if (!tokenDetails || !tokenDetails.tokenAddress) {
-            elizaLogger.error(`Invalid token details - ${message.content.text}`);
-            callback({ text: "Invalid token details" });
-            return false;
+        let tokenAddress: string;
+        // Extract Ethereum address from the message text using regex
+        const addressMatch = message.content.text.match(/0x[a-fA-F0-9]{40}/);
+
+        if (addressMatch) {
+            if (ethers.isAddress(addressMatch[0])) {
+                tokenAddress = addressMatch[0];
+            } else {
+                elizaLogger.error(`Invalid token address - ${addressMatch[0]}`);
+                callback({ text: "Invalid token address" });
+                return false;
+            }
+        } else {
+            const tokenDetails = await extractTokenDetails(message.content.text, runtime);
+            if (!tokenDetails || !tokenDetails.tokenAddress) {
+                elizaLogger.error(`Invalid token details - ${message.content.text}`);
+                callback({ text: "Invalid token details" });
+                return false;
+            }
+            tokenAddress = tokenDetails.tokenAddress;
         }
-        elizaLogger.debug(`Token details: ${JSON.stringify(tokenDetails)}`);
-        const topTradersOfAToken = await getTopBaseTraderOfAToken(tokenDetails.tokenAddress);
+        elizaLogger.debug(`Token address: ${tokenAddress}`);
+        const topTradersOfAToken = await getTopBaseTraderOfAToken(tokenAddress);
         elizaLogger.debug(`Top traders of a token: ${JSON.stringify(topTradersOfAToken)}`);
         const newstate = await runtime.composeState(message, {
             message: message.content.text,
