@@ -467,7 +467,7 @@
         "author": "Senpi",
         "description": "Have Senpi automatically buy and sell tokens for you when specific conditions are met!",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-autonomous-trading",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-autonomous-trading/images/logo.svg",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/feat/trading-automations/packages/plugin-moxie-autonomous-trading/images/logo.svg",
         "settings": {},
         "capabilities": [
             "Copy Trade specific user(s)",
@@ -498,7 +498,7 @@
             }
         ],
         "mediaUrls": [
-            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-autonomous-trading/images/logo.svg"
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/feat/trading-automations/packages/plugin-moxie-autonomous-trading/images/logo.svg"
         ],
         "actions": [
             "AUTONOMOUS_TRADING",
@@ -587,7 +587,7 @@
         "author": "Senpi",
         "description": "Easily add any Base users to a group, which can then be used for copy trading and other features.",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-groups",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-groups/images/logo.png",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/feat/trading-automations/packages/plugin-moxie-groups/images/logo.svg",
         "settings": {},
         "capabilities": ["Create groups", "Add users to groups (This can be done by asking Senpi or on the Groups page.)", "Add all to a group. (Example: (a) ask Senpi for the top holders of a token e.g. $zora, (b) after Senpi returns the results, ask Senpi to add all users to your Zora group.)"],
         "starterQuestions": [
@@ -630,7 +630,7 @@
         "author": "Senpi",
         "description": "Have Senpi create casts for you and post them on Farcaster!",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-senpi-sharing",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-senpi-sharing/images/logo.svg",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/feat/trading-automations/packages/plugin-senpi-sharing/images/logo.svg",
         "settings": {},
         "capabilities": ["Tap the Farcaster icon under any Senpi response to have Senpi create casts for you", "Tap “Cast It!” to post the response on Farcaster! "],
         "starterQuestions": [
