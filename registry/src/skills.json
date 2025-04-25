@@ -50,10 +50,10 @@
         "status": "ACTIVE",
         "isDefault": true,
         "loaders": [
-            "Searching onchain sources",
-            "Analyzing data",
-            "Synthesizing results",
-            "Preparing insights"
+            "Entering stealth mode",
+            "Scanning onchain terrain",
+            "Tracking target movements",
+            "Delivering precision insights"
         ]
     },
     {
@@ -105,7 +105,11 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": true,
-        "loaders": ["Initiating transaction", "Writing to the Base blockchain"]
+        "loaders": [
+            "Target locked",
+            "Calibrating transfer path",
+            "Delivery in motion — no trace left behind"
+        ]
     },
     {
         "pluginId": "5d3b79e2-ac61-0bb6-a3ba-b0e00b943614",
@@ -180,11 +184,10 @@
         "status": "ACTIVE",
         "isDefault": true,
         "loaders": [
-            "Searching Farcaster",
-            "Searching X",
-            "Analyzing data",
-            "Synthesizing results",
-            "Preparing insights"
+            "Tuning into Farcaster frequencies",
+            "Slipping through the noise on X",
+            "Extracting high-signal chatter",
+            "Returning with focused intel"
         ]
     },
     {
@@ -237,7 +240,11 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": true,
-        "loaders": ["Initiating transaction", "Writing to the Base blockchain"]
+        "loaders": [
+            "Sensing your intent",
+            "Preparing the strike",
+            "Executing on Base — clean and silent"
+        ]
     },
     {
         "pluginId": "0ad0731e-698b-04bf-abeb-5d29cc36759f",
@@ -300,10 +307,10 @@
         "status": "ACTIVE",
         "isDefault": true,
         "loaders": [
-            "Searching onchain sources",
-            "Analyzing data",
-            "Synthesizing results",
-            "Preparing insights"
+            "Entering stealth mode",
+            "Scanning onchain terrain",
+            "Tracking target movements",
+            "Delivering precision insights"
         ]
     },
     {
@@ -404,11 +411,10 @@
         "status": "ACTIVE",
         "isDefault": true,
         "loaders": [
-            "Analyzing request",
-            "Doing robot things",
-            "Setting limits",
-            "Initiating transaction",
-            "Writing to the Base blockchain"
+            "Reading the chart’s stance",
+            "Placing your order like a trap",
+            "Trigger primed",
+            "Executed silently to Base"
         ]
     },
     {
@@ -447,12 +453,10 @@
         "status": "ACTIVE",
         "isDefault": true,
         "loaders": [
-            "Searching X",
-            "Searching Farcaster",
-            "Analyzing sentiments",
-            "Feeling the vibes",
-            "Synthesizing results",
-            "Preparing insights"
+            "Listening in the shadows",
+            "Catching the emotional undercurrent",
+            "Feeling the market’s mood",
+            "Delivering insights — crisp and precise"
         ]
     },
     {
@@ -460,32 +464,37 @@
         "name": "@moxie-protocol/plugin-moxie-autonomous-trading",
         "displayName": "Autonomous Trading",
         "version": "0.1.8+build.1",
-        "author": null,
-        "description": "Enables your agent to do autonomous trading by fetching copy trades from top traders or group of traders. You can also set limit orders on Base",
+        "author": "Senpi",
+        "description": "Have Senpi automatically buy and sell tokens for you when specific conditions are met!",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-autonomous-trading",
         "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-autonomous-trading/images/logo.svg",
         "settings": {},
-        "capabilities": ["Copy trades", "Copy group trades", "Copy trades with profit", "Copy group trades with profit"],
+        "capabilities": [
+            "Copy Trade specific user(s)",
+            "Copy Trade a group",
+            "Buy when they buy + Sell when they sell",
+            "Buy when they buy + Sell when price achieved",
+            "Sophisticated combinations",
+            "You can view all your open Auto-Trade rules in the Autonomous Trades section of the dashboard",
+            "The Orders page now also includes a tab for executed Auto-Trades",
+            "“Sell when they sell” will currently sell 100% of your tokens purchased in the auto-trade when they sell 50% of theirs. You’ll be able to adjust these settings in a future release."
+        ],
         "starterQuestions": [
             {
-                "label": "What automations are possible?",
-                "value": "What automations are possible?"
+                "label": "If any 3 people in #copytrade buy >$500 of a token within 30 minutes of each other, buy me $100 of it",
+                "value": "If any 3 people in #copytrade buy >$500 of a token within 30 minutes of each other, buy me $100 of it"
             },
             {
-                "label": "Buy 10$ worth tokens whenever @betashop and @jessepollak buy minimum of $50 of any token in 6 hours",
-                "value": "Buy 10$ worth tokens whenever @[betashop|M4] and @[jessepollak|M1245] buy minimum of $50 of any token in 6 hours"
+                "label": "If any 3 people in #copytrade buy >$500 of a token within 30 minutes of each other, buy me $100 of it, and then sell all of it for 30% profit",
+                "value": "If any 3 people in #copytrade buy >$500 of a token within 30 minutes of each other, buy me $100 of it, and then sell all of it for 30% profit"
             },
             {
-                "label": "buy 10$ worth tokens whenever @betashop and @jessepollak buy minimum of $50 of any token in 6 hours and sell it off when it makes a profit of 40%.",
-                "value": "buy 10$ worth tokens whenever @[betashop|M4] and @[jessepollak|M1245] buy minimum of $50 of any token in 6 hours and sell it off when it makes a profit of 40%."
+                "label": "If any 3 people in #copytrade buy >$500 of a token within 30 minutes of each other, buy me $100 of it, and then sell all of it when any 2 of them sell 50%",
+                "value": "If any 3 people in #copytrade buy >$500 of a token within 30 minutes of each other, buy me $100 of it, and then sell all of it when any 2 of them sell 50%"
             },
             {
-                "label": "Buy 10$ worth tokens whenever any 3 members of #copytrade buys minimum of $50 of any token in 6 hours",
-                "value": "Buy 10$ worth tokens whenever any 3 members of #copytrade buys minimum of $50 of any token in 6 hours"
-            },
-            {
-                "label": "Buy 10$ worth tokens whenever any 3 members of #copytrade buys minimum of $50 of any token in 6 hours and sell it off when it makes a profit of 40%.",
-                "value": "Buy 10$ worth tokens whenever any 3 members of #copytrade buys minimum of $50 of any token in 6 hours and sell it off when it makes a profit of 40%."
+                "label": "If any 3 people in #copytrade buy >$500 of a token within 30 minutes of each other, buy me $100 of it, and then sell all of it when any 2 of them sell 50% OR when it increases by 50%",
+                "value": "If any 3 people in #copytrade buy >$500 of a token within 30 minutes of each other, buy me $100 of it, and then sell all of it when any 2 of them sell 50% OR when it increases by 50%"
             }
         ],
         "mediaUrls": [
@@ -509,10 +518,10 @@
         "status": "ACTIVE",
         "isDefault": true,
         "loaders": [
-            "Analyzing request",
-            "Setting trade parameters",
-            "Creating trading triggers",
-            "Creating trading rules"
+            "Listening to the market’s rhythm",
+            "Detecting synchronized moves",
+            "Locking in your entry",
+            "Executing with quiet precision"
         ]
     }, 
     {
@@ -576,23 +585,19 @@
         "displayName": "Senpi Groups",
         "version": "0.1.8+build.1",
         "author": "Senpi",
-        "description": "Enables your agent to manage groups of Senpi users",
+        "description": "Easily add any Base users to a group, which can then be used for copy trading and other features.",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-groups",
         "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-groups/images/logo.png",
         "settings": {},
-        "capabilities": ["Manage groups of Senpi users"],
+        "capabilities": ["Create groups", "Add users to groups (This can be done by asking Senpi or on the Groups page.)", "Add all to a group. (Example: (a) ask Senpi for the top holders of a token e.g. $zora, (b) after Senpi returns the results, ask Senpi to add all users to your Zora group.)"],
         "starterQuestions": [
             {
-                "label": "Please create a group called 'Social Alpha Group'",
-                "value": "Please create a group called 'Social Alpha Group'"
+                "label": "Create the [replace with group name] group",
+                "value": "Create the [replace with group name] group"
             },
             {
-                "label": "Please add @[betashop|M4] to the 'Social Alpha Group'",
-                "value": "Please add @[betashop|M4] to the 'Social Alpha Group'"
-            },
-            {
-                "label": "Please remove @[betashop|M4] from the 'Social Alpha Group'",
-                "value": "Please remove @[betashop|M4] from the 'Social Alpha Group'"
+                "label": "Add @[replace with name]  to [replace with group name] group",
+                "value": "Add @[replace with name]  to [replace with group name] group"
             }
         ],
         "actions": [
@@ -611,9 +616,10 @@
         "status": "ACTIVE",
         "isDefault": true, 
         "loaders": [
-            "Analyzing request",
-            "Doing some Senpi magic",
-            "Processing request"
+            "Establishing precision",
+            "Opening the circle",
+            "Confirming members",
+            "Aligning group"
         ]
     },
     {
@@ -621,12 +627,12 @@
         "name": "@moxie-protocol/plugin-senpi-sharing",
         "displayName": "Content Sharing",
         "version": "0.1.0",
-        "author": null,
-        "description": "Creates and shares summarized content across social platforms",
+        "author": "Senpi",
+        "description": "Have Senpi create casts for you and post them on Farcaster!",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-senpi-sharing",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/e9ac0912aba19398350aeaa63006211f0ccca403/packages/plugin-moxie-token-social-sentiment/images/logo.svg",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-senpi-sharing/images/logo.svg",
         "settings": {},
-        "capabilities": ["Create and share content"],
+        "capabilities": ["Tap the Farcaster icon under any Senpi response to have Senpi create casts for you", "Tap “Cast It!” to post the response on Farcaster! "],
         "starterQuestions": [
             {
                 "label": "Create a tweet-sized summary of our conversation",
@@ -654,10 +660,7 @@
         "status": "ACTIVE",
         "isDefault": false,
         "loaders": [
-            "Analyzing conversation",
-            "Crafting social content",
-            "Optimizing for platforms",
-            "Preparing shareable summary"
+            "Reticulating splines"
         ]
     }
 ]
