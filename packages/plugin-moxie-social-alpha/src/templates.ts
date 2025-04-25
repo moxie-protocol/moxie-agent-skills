@@ -1,6 +1,6 @@
 const commonPrompt = `
 If displayFreeQueriesHeader = true, then include the following prompt as a header after providing the response headline:
-"Social Alpha is a premium skill that enables you to access comprehensive analysis of onchain portfolios, trades, and social sentiments. You'll need to hold some of the user's creator coins to access it. New to Moxie? You get 10 free questions to try it out!  Happy exploring! 🚀
+"Social Alpha is a premium skill that enables you to access comprehensive analysis of onchain portfolios, trades, and social sentiments. You'll need to hold some of the user's creator coins to access it. New to Senpi? You get 10 free questions to try it out!  Happy exploring! 🚀
 
 Free response {{usedFreeQueries}}/{{totalFreeQueries}}:
 "
@@ -12,7 +12,7 @@ Example:
 This summary is derived from the top creators whose coins you own.
 
 --- <- header
-Social Alpha is a premium skill that enables you to access comprehensive analysis of onchain portfolios, trades, and social sentiments. You'll need to hold some of the user's creator coins to access it. New to Moxie? You get 10 free questions to try it out!  Happy exploring! 🚀
+Social Alpha is a premium skill that enables you to access comprehensive analysis of onchain portfolios, trades, and social sentiments. You'll need to hold some of the user's creator coins to access it. New to Senpi? You get 10 free questions to try it out!  Happy exploring! 🚀
 
 Free response 1/10:
 ---
@@ -52,7 +52,7 @@ If the question is about summarizing recent Twitter (X) activity, follow these i
 ## Tweets JSON data:
 {{tweets}}
 
-## Ineligible Moxie Users:
+## Ineligible Senpi Users:
 {{ineligibleMoxieUsers}}
 
 #### General Guidelines:
@@ -97,7 +97,7 @@ If the question is about summarizing recent posts (also known as casts) on **Far
 ## Cast/Post JSON data:
 {{tweets}}
 
-## Ineligible Moxie Users:
+## Ineligible Senpi Users:
 {{ineligibleMoxieUsers}}
 
 #### General Guidelines:
@@ -147,7 +147,7 @@ If the question is about summarizing recent social media activity by users the u
 ## Farcaster Posts/Casts:
 {{farcasterPosts}}
 
-## Ineligible Moxie Users:
+## Ineligible Senpi Users:
 {{ineligibleMoxieUsers}}
 
 ---
@@ -205,11 +205,11 @@ If the question is about summarizing recent creator coin/token purchase activity
 ## Creator coin swaps data:
 {{swaps}}
 
-## Ineligible Moxie Users:
+## Ineligible Senpi Users:
 {{ineligibleMoxieUsers}}
 
 **Overview**
-- The trending swaps data reflects onchain activity from tens of thousands of Base users' wallets indexed by Moxie.
+- The trending swaps data reflects onchain activity from tens of thousands of Base users' wallets indexed by Senpi.
 - If specific users are mentioned, adjust the context to highlight only those users' trading activity.
 - Rank the trending tokens in the response by: (1) Net volume (buy volume minus sell volume), (2) Highest total volume, (3) Highest percentage gains. Do not prioritize tokens with heavy negative trends.
 
@@ -221,7 +221,7 @@ If the question is about summarizing recent creator coin/token purchase activity
     - Full token_address in the format: [<token_address>](https://basescan.org/token/<token_address>) format e.g. [0x...](https://basescan.org/token/0x...)
 	- Unique buyers & sellers count if available.
 	- Total buy and sell volume (formatted as $[value] in USD).
-	- Notable Moxie users who swapped the token. Mention them by name and link to them using the markdown format:  [username](https://moxie.xyz/profile/user_id) format
+	- Notable Senpi users who swapped the token. Mention them by name and link to them using the markdown format:  [username](https://moxie.xyz/profile/user_id) format
 
 **Action-Specific Conditions**
 - If the user requests trending swaps for specific users, provide only those users' results. Do not rank users vs, each other.
@@ -237,7 +237,7 @@ If the question is about summarizing recent creator coin/token purchase activity
 - If a request falls outside these limitations, explain the specific reason why the agent cannot provide the summary.
 
 **Final Notes**
-- If the user asks for Trending Tokens overall, at the top of each response, always start with: This is analysis is based on tens of thousands of Base users' wallets indexed by Moxie.
+- If the user asks for Trending Tokens overall, at the top of each response, always start with: This is analysis is based on tens of thousands of Base users' wallets indexed by Senpi.
 - If the user asks for Trending Tokens or token swaps from specific users, always start with: Here are the trending tokens or swaps from these users (cite them by name).
 - At the end of each response, ask the user if you can help the buy any of the tokens
 
@@ -259,7 +259,7 @@ If the question is about summarizing recent token purchases (ERC20) activity by 
 ## Token details data:
 {{tokenDetails}}
 
-## Ineligible Moxie Users:
+## Ineligible Senpi Users:
 {{ineligibleMoxieUsers}}
 
 **Overview**
@@ -278,7 +278,7 @@ If the question is about summarizing recent token purchases (ERC20) activity by 
     - **Net buy volume$**
     - **Buy volume$**
     - **Sell volume$**
-    - Notable Moxie users who swapped the token. Mention them by name and link to them using the markdown format:  [username](https://moxie.xyz/profile/user_id) format
+    - Notable Senpi users who swapped the token. Mention them by name and link to them using the markdown format:  [username](https://moxie.xyz/profile/user_id) format
 
 **Action-Specific Conditions**
 - If the user requests trending swaps for specific users, provide only those users' results. Do not rank users vs, each other.
@@ -290,7 +290,7 @@ If the question is about summarizing recent token purchases (ERC20) activity by 
 - If a request falls outside these limitations, explain the specific reason why the agent cannot provide the summary.
 
 **Final Notes**
-- If the user asks for Trending Tokens overall, at the top of each response, always start with: This is analysis is based on tens of thousands of Base users' wallets indexed by Moxie. Tokens are ranked based on Net Buy Volume based on the timeframe in the question (if there is no timeframe, default is 24 hours)
+- If the user asks for Trending Tokens overall, at the top of each response, always start with: This is analysis is based on tens of thousands of Base users' wallets indexed by Senpi. Tokens are ranked based on Net Buy Volume based on the timeframe in the question (if there is no timeframe, default is 24 hours)
 - If the user asks for Trending Tokens or token swaps from specific users, always start with: Here are the trending tokens or swaps from these users (cite them by name).
 - At the end of each response, ask the user if you can help the buy any of the tokens, or check any other timeframe.`
 + footerPrompt;
