@@ -194,10 +194,10 @@ const errorMessages: Record<string, string> = {
     AERR044: "The sell condition value must be a non-negative number",
     AERR045: "Number of users for sell condition is provided bigger than the actual users in the rule. Please provide lower number.",
     AERR046: "Number of users for sell condition is provided bigger than actual users in the group. Please provide lower number.",
-    AGERR001: "Please try again with a valid group. Make sure to use '#' to select from your available groups. You can also ask me to create a new group by typing: create the group [groupname]",
-    AGERR002: "Please add members to the group before setting up auto-trading",
-    AGERR003: "Hi, I'd be happy to help you setup that auto-trade but there are less members in the group than the copy traded users count. You can ask me to add more members by typing: add [user] to [groupname]",
-    AGERR004: "Hi, I'd be happy to help you setup that auto-trade but there are less members in the group than the sell condition value. You can ask me to add more members by typing: add [user] to [groupname]",
+    AERR201: "Please try again with a valid group. Make sure to use '#' to select from your available groups. You can also ask me to create a new group by typing: create the group [groupname]",
+    AERR202: "Please add members to the group before setting up auto-trading",
+    AERR203: "Hi, I'd be happy to help you setup that auto-trade but there are less members in the group than the copy traded users count. You can ask me to add more members by typing: add [user] to [groupname]",
+    AERR204: "Hi, I'd be happy to help you setup that auto-trade but there are less members in the group than the sell condition value. You can ask me to add more members by typing: add [user] to [groupname]",
 };
 
 export function getErrorMessageFromCode(error: Error | string): string {
@@ -264,21 +264,21 @@ export async function createTradingRule(
         const groupDetails = await getGroupDetails(authorizationHeader, groupTradeParams.groupId);
 
         if (groupDetails.groups.length === 0) {
-            throw new Error('AGERR001: Group not found. Please check the group ID.');
+            throw new Error('AERR201: Group not found. Please check the group ID.');
         }
 
         const groupMembersLength = groupDetails.groups[0].members.length;
 
         if (groupMembersLength === 0) {
-            throw new Error('AGERR002: The group has no members. Please add members to the group.');
+            throw new Error('AERR202: The group has no members. Please add members to the group.');
         }
 
         if (groupTradeParams.condition === 'ANY' && groupMembersLength < groupTradeParams.conditionValue) {
-            throw new Error('AGERR003: The number of users in the group is less than the buy condition value. Please provide a lower condition value.');
+            throw new Error('AERR203: The number of users in the group is less than the buy condition value. Please provide a lower condition value.');
         }
 
         if (createRuleInput?.ruleParameters?.baseParams?.sellConfig && groupMembersLength < createRuleInput.ruleParameters.baseParams.sellConfig.conditionValue) {
-            throw new Error('AGERR004: The number of users in the group is less than the sell condition value. Please provide a lower condition value.');
+            throw new Error('AERR204: The number of users in the group is less than the sell condition value. Please provide a lower condition value.');
         }
 
     }
