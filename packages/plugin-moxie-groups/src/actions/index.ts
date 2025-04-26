@@ -116,6 +116,12 @@ export const manageGroupsAction: Action = {
                 case 'UPDATE_GROUP':
                     await handleUpdateGroup(traceId, moxieUserId, state, params, callback);
                     break;
+                case 'GROUP_SETUP_INSTRUCTIONS':
+                    callback?.({
+                        text: `I can help you create groups and add people to groups. \n Try asking: Create the [insert name] group \n Or: Add @[betashop.eth|M4] to the Senpi Founders group`,
+                        action: "MANAGE_GROUPS",
+                    });
+                    break;
                 default:
                     elizaLogger.error(traceId, `[MANAGE_GROUPS] Invalid action type: ${actionType}`);
                     callback?.({

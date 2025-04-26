@@ -286,7 +286,7 @@ export const getAutonomousTradingRuleDetailAction: Action = {
         callback({
             text: response, 
             action: "COPY_TRADE_RULE_DETAILS",
-            cta: ["COPY_TRADE", "GROUP_COPY_TRADE"]
+            cta: ["COPY_TRADE", "GROUP_COPY_TRADE", "AUTO_BUY_AUTO_SELL"]
         });
     },
     examples: [

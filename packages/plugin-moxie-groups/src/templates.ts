@@ -16,6 +16,7 @@ Instructions:
    - DELETE_GROUP
    - GET_GROUP_DETAILS
    - UPDATE_GROUP
+   - GROUP_SETUP_INSTRUCTIONS
 
 2. Parameter Extraction:
    - User mentions: Extract "senpiUserId" from @[username|senpiUserId]
@@ -29,6 +30,7 @@ Instructions:
    - DELETE_GROUP: Requires either groupId or groupName
    - GET_GROUP_DETAILS: No required parameters
    - UPDATE_GROUP: Requires groupId and new groupName
+   - GROUP_SETUP_INSTRUCTIONS: No required parameters
 
 4. Process Steps:
    a. Analyze the user message to determine the action type.

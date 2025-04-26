@@ -70,12 +70,52 @@ export interface CreateRuleInput {
     ruleTrigger: 'GROUP' | 'USER';
 }
 
+export type Group = {
+    id: string;
+    name: string;
+    createdBy: string;
+    createdAt: string;
+    updatedAt: string;
+    members: GroupMember[];
+    status: Status;
+}
+
+export interface GroupMember {
+    moxieUserId: string;
+    createdAt: string;
+    updatedAt: string;
+    status: Status;
+}
+
+export enum Status {
+    ACTIVE = "ACTIVE",
+    INACTIVE = "INACTIVE"
+}
+
+export interface GetGroupsOutput {
+    groups: Group[];
+    pagination: Pagination;
+}
+
+export interface Pagination {
+    total: number;
+    skip: number;
+    take: number;
+}
+
 export interface CreateRuleResponse {
     id: string;
     requestId: string;
     ruleType: string;
     status: string;
     instructions: string;
+}
+
+export interface GetGroupsInput {
+    groupId?: string;
+    groupName?: string;
+    skip?: number;
+    take?: number;
 }
 
 const mutation = gql`
@@ -86,6 +126,21 @@ const mutation = gql`
             ruleType
             status
             instructions
+        }
+    }
+`;
+
+export const GET_GROUP_DETAILS = gql`
+    query GetGroups($input: GetGroupsInput!) {
+        GetGroups(input: $input) {
+            groups {
+                id
+                name
+                createdBy
+                members {
+                    moxieUserId
+                }
+            }
         }
     }
 `;
@@ -139,17 +194,33 @@ const errorMessages: Record<string, string> = {
     AERR044: "The sell condition value must be a non-negative number",
     AERR045: "Number of users for sell condition is provided bigger than the actual users in the rule. Please provide lower number.",
     AERR046: "Number of users for sell condition is provided bigger than actual users in the group. Please provide lower number.",
+    AGERR001: "Please try again with a valid group. Make sure to use '#' to select from your available groups. You can also ask me to create a new group by typing: create the group [groupname]",
+    AGERR002: "Please add members to the group before setting up auto-trading",
+    AGERR003: "Hi, I'd be happy to help you setup that auto-trade but there are less members in the group than the copy traded users count. You can ask me to add more members by typing: add [user] to [groupname]",
+    AGERR004: "Hi, I'd be happy to help you setup that auto-trade but there are less members in the group than the sell condition value. You can ask me to add more members by typing: add [user] to [groupname]",
 };
-  
+
 export function getErrorMessageFromCode(error: Error | string): string {
     const errorMsg = typeof error === "string" ? error : error.message;
     const match = errorMsg.match(/(AERR\d{3})/);
     const code = match?.[1];
-    return code && errorMessages[code]
-        ? errorMessages[code]
-        : "Something went wrong. Please check your input or try again.";
+    if (code && errorMessages[code]) {
+        return errorMessages[code];
+    } else {
+        return `Hi, I'd be happy to help you setup that auto-trade but we just need some more information first. \n&nbsp;\n
+
+1. Make sure to specify who triggers the copy trade. Examples: if @[user] buys a token or if 2 people in #groupname. 
+2. Make sure to specify a trigger amount: e.g. if 2 people in #copytrade buy >$1000 of a token.
+3. Make sure to specify a time period, e.g. "if 2 people in #copytrade buy >$1000 of a token within 30 minutes of each other..."
+4. Make sure to specify an amount to buy for you: "if 2 people in #copytrade buy >$1000 of a token within 30 minutes of each other, buy me $400 of it..."
+5. Optional: Let me know if you have any exit conditions, e.g. "and then sell all when the price increases by 30%, or sell when they sell"
+
+\n&nbsp;\n
+**Here is a fully formed complete auto-trade instruction:**
+If 2 people in #copytrade buy >$1000 of a token within 30 minutes of each other, buy me $400 of it, and then sell when they sell or when the price has increased by 30%`;
+    }
 }
-  
+
 
 export async function createTradingRule(
     authorizationHeader: string,
@@ -161,13 +232,14 @@ export async function createTradingRule(
     userTradeParams?: UserTradeParams,
     limitOrderParams?: LimitOrderParams
 ): Promise<CreateRuleResponse> {
-    
+
     // Ensure either groupTradeParams or userTradeParams is provided, but not both
     if (ruleTrigger === 'GROUP' && !groupTradeParams) {
         throw new Error('Please provide groupTradeParams (e.g. #groupname, condition: ANY|ALL, conditionValue: number, minPurchaseAmount: number) when using a GROUP rule.');
     }
+
     if (ruleTrigger === 'USER' && !userTradeParams) {
-        throw new Error('Please provide userTradeParams (e.g. @username, minPurchaseAmount: number) when using a USER rule.'); 
+        throw new Error('Please provide userTradeParams (e.g. @username, minPurchaseAmount: number) when using a USER rule.');
     }
 
     if (groupTradeParams && userTradeParams) {
@@ -189,6 +261,26 @@ export async function createTradingRule(
 
     if (groupTradeParams) {
         createRuleInput.ruleParameters.groupTradeParams = groupTradeParams;
+        const groupDetails = await getGroupDetails(authorizationHeader, groupTradeParams.groupId);
+
+        if (groupDetails.groups.length === 0) {
+            throw new Error('AGERR001: Group not found. Please check the group ID.');
+        }
+
+        const groupMembersLength = groupDetails.groups[0].members.length;
+
+        if (groupMembersLength === 0) {
+            throw new Error('AGERR002: The group has no members. Please add members to the group.');
+        }
+
+        if (groupTradeParams.condition === 'ANY' && groupMembersLength < groupTradeParams.conditionValue) {
+            throw new Error('AGERR003: The number of users in the group is less than the buy condition value. Please provide a lower condition value.');
+        }
+
+        if (createRuleInput?.ruleParameters?.baseParams?.sellConfig && groupMembersLength < createRuleInput.ruleParameters.baseParams.sellConfig.conditionValue) {
+            throw new Error('AGERR004: The number of users in the group is less than the sell condition value. Please provide a lower condition value.');
+        }
+
     }
 
     if (userTradeParams) {
@@ -222,30 +314,7 @@ export async function createTradingRule(
     }
 }
 
-export const getAutonomousTradingRuleDetails = (currentUser: string) => 
-
-    `Hi There!  
-I can help you easily set up copy trade automations — so you never miss that alpha. Here are some examples of automations I can currently do:
- 
-### **1) Buy when someone else buys**
-- If **@[betashop.eth|M4]** and **@[jessepollak|M1245]** buys a token, then buy me **$100** of it.
-- If **@[betashop.eth|M4]**, **@[jessepollak|M1245]**, and **@[maretus|M7164]** all buy the same token within an hour of each other, then buy me **$100** of it.  
-
-  *(Use @name for anyone whose coins you own on Moxie.)*
-
-### **2) Buy when people in a group buy**
-- If **3 people** in my **#copytrade** group buy the same token within an hour of each other, then buy me **$100** of it.
-
-### **3) Buy then take profits**
-- If **3 people** in my **#copytrade** group buy the same token within an hour of each other, then buy me **$100** of it, and then sell if the price increases by **50%**.
-
----
-
-Go to **Groups** to set up your **#copytrade** group.  
-Then just use **#copytrade** as a reference in your automation.
-\n\n
-Copy and edit the prompts above or start with one of the templates below — just tweak it to fit your strategy!
-`;
+export const getAutonomousTradingRuleDetails = (currentUser: string) => `Hi There!\n&nbsp;\nI can help you easily set up auto-trading — so you never miss that alpha. Here are some examples of auto-trades I can currently do:\n&nbsp;\n\n1. **Buy when someone else buys**\nIf @betashop.eth and @jessepollak buy >500 of a token with 30 minutes of each other, then buy me $100 of it.\n\n2. **Buy when group buys**\nIf 3 people #copytrade buy >$500 of the same token within 20 mins of each other, then buy me $100 of it.\n\n3. **Auto-Buy then Auto-Sell**\nIf 3 people #copytrade buy >$500 of the same token within 20 mins of each other, then buy me $100 of it, and then sell all when 2 of them sell or when it increases by 30%.\n\n&nbsp;\nGo to Groups to set up your #copytrade group and create additional groups.\n&nbsp;\nThen just use #[groupname] to create your auto-trade rules!\n&nbsp;\nCopy and edit the prompts above or start with one of the templates below — just tweak it to fit your strategy!`;
 
 
 export const agentWalletNotFound = {
@@ -290,5 +359,52 @@ export async function checkUserCommunicationPreferences(traceId: string, moxieUs
     } catch (error) {
         elizaLogger.error(traceId, `[AUTONOMOUS_TRADING] [${moxieUserId}] Error checking user preferences: ${error.message}`);
         return null;
+    }
+}
+
+export async function getGroupDetails(
+    authorizationHeader: string,
+    groupId?: string,
+    groupName?: string,
+    skip: number = 0,
+    take: number = 10,
+): Promise<GetGroupsOutput> {
+    elizaLogger.info('getGroupDetails called', { groupId, groupName, skip, take });
+
+    try {
+        const input: GetGroupsInput = {
+            ...(groupId && { groupId }),
+            ...(groupName && { groupName }),
+            ...(skip !== undefined && { skip }),
+            ...(take !== undefined && { take })
+        };
+
+        elizaLogger.debug('getGroupDetails input constructed', { input });
+
+        const data = await fetch(process.env.RULE_API_MOXIE_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': authorizationHeader
+            },
+            body: JSON.stringify({
+                query: GET_GROUP_DETAILS,
+                variables: { input }
+            })
+        });
+
+        elizaLogger.debug('getGroups fetch completed', { status: data.status });
+
+        const result = await data.json();
+        if (result.errors) {
+            elizaLogger.error('getGroups failed', { errors: result.errors });
+            throw new Error(`Failed to get groups: ${result.errors[0].message}`);
+        }
+
+        elizaLogger.info('getGroups successful', { data: result.data.GetGroups });
+        return result.data.GetGroups;
+    } catch (error) {
+        elizaLogger.error('Error in getGroups', { error: error.message });
+        throw new Error(`Error fetching groups: ${error.message}`);
     }
 }
