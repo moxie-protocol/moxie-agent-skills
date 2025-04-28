@@ -172,7 +172,7 @@ const errorMessages: Record<string, string> = {
     AERR022: "To use profit-taking, please define when to sell.",
     AERR023: "At least one sell condition (e.g., price goes up by 10%) is required.",
     AERR024: "Both price change % and sell % must be numbers.",
-    AERR025: "The price change percentage must be more or equal to 1.",
+    AERR025: "The profit percentage must be more or equal to 1.",
     AERR026: "The sell percentage must be more or equal to 1.",
     AERR027: "Set how long the limit order should stay active — it must be a positive number.",
     AERR028: "Limit order settings are only allowed for profit-taking rules.",

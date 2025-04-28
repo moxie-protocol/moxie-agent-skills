@@ -645,22 +645,7 @@
         "settings": {},
         "capabilities": ["Tap the Farcaster icon under any Senpi response to have Senpi create casts for you", "Tap “Cast It!” to post the response on Farcaster! "],
         "starterQuestions": [
-            {
-                "label": "Create a tweet-sized summary of our conversation",
-                "value": "Create a tweet-sized summary of our conversation"
-            },
-            {
-                "label": "Share this discussion as a social media post",
-                "value": "Share this discussion as a social media post"
-            },
-            {
-                "label": "Make this conversation shareable on social media",
-                "value": "Make this conversation shareable on social media"
-            },
-            {
-                "label": "Turn our chat into a concise social post",
-                "value": "Turn our chat into a concise social post"
-            }
+         
         ],
         "mediaUrls": [""],
         "actions": ["POST_CONTENT"],
