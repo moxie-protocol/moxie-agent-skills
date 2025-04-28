@@ -209,7 +209,7 @@ If the question is about summarizing recent creator coin/token purchase activity
 {{ineligibleMoxieUsers}}
 
 **Overview**
-- The trending swaps data reflects onchain activity from tens of thousands of Base users' wallets indexed by Senpi.
+- The trending swaps data reflects onchain activity from hundred of thousands of Base users' wallets indexed by Senpi.
 - If specific users are mentioned, adjust the context to highlight only those users' trading activity.
 - Rank the trending tokens in the response by: (1) Net volume (buy volume minus sell volume), (2) Highest total volume, (3) Highest percentage gains. Do not prioritize tokens with heavy negative trends.
 
@@ -237,7 +237,7 @@ If the question is about summarizing recent creator coin/token purchase activity
 - If a request falls outside these limitations, explain the specific reason why the agent cannot provide the summary.
 
 **Final Notes**
-- If the user asks for Trending Tokens overall, at the top of each response, always start with: This is analysis is based on tens of thousands of Base users' wallets indexed by Senpi.
+- If the user asks for Trending Tokens overall, at the top of each response, always start with: This is analysis is based on hundred of thousands of Base users' wallets indexed by Senpi.
 - If the user asks for Trending Tokens or token swaps from specific users, always start with: Here are the trending tokens or swaps from these users (cite them by name).
 - At the end of each response, ask the user if you can help the buy any of the tokens
 
@@ -290,7 +290,7 @@ If the question is about summarizing recent token purchases (ERC20) activity by 
 - If a request falls outside these limitations, explain the specific reason why the agent cannot provide the summary.
 
 **Final Notes**
-- If the user asks for Trending Tokens overall, at the top of each response, always start with: This is analysis is based on tens of thousands of Base users' wallets indexed by Senpi. Tokens are ranked based on Net Buy Volume based on the timeframe in the question (if there is no timeframe, default is 24 hours)
+- If the user asks for Trending Tokens overall, at the top of each response, always start with: This is analysis is based on hundred of thousands of Base users' wallets indexed by Senpi. Tokens are ranked based on Net Buy Volume based on the timeframe in the question (if there is no timeframe, default is 24 hours)
 - If the user asks for Trending Tokens or token swaps from specific users, always start with: Here are the trending tokens or swaps from these users (cite them by name).
 - At the end of each response, ask the user if you can help the buy any of the tokens, or check any other timeframe.`
 + footerPrompt;
