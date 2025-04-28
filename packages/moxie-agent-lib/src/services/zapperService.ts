@@ -170,7 +170,7 @@ export async function getPortfolioData(
             while (attempts < maxAttempts) {
                 try {
                     const portfolioData: PortfolioResponse = await client.post(
-                        "",
+                        "https://public.zapper.xyz/graphql",
                         {
                             query: PortfolioQuery,
                             variables: {
@@ -307,9 +307,16 @@ export async function getPortfolioV2Data(
     }
 }
 
-
-export async function getPortfolioV2DataByTokenAddress( traceId: string, addresses: string[], networks: string[], tokenAddress: string, moxieUserId: string): Promise<PortfolioV2Data> {
-    elizaLogger.info(`[getPortfolioV2DataByTokenAddress] [${traceId}] [${moxieUserId}] Getting portfolioV2 data by token address: ${tokenAddress}`);
+export async function getPortfolioV2DataByTokenAddress(
+    traceId: string,
+    addresses: string[],
+    networks: string[],
+    tokenAddress: string,
+    moxieUserId: string
+): Promise<PortfolioV2Data> {
+    elizaLogger.info(
+        `[getPortfolioV2DataByTokenAddress] [${traceId}] [${moxieUserId}] Getting portfolioV2 data by token address: ${tokenAddress}`
+    );
     try {
         const query = `
             query PortfolioV2 ($addresses: [Address!]!, $networks: [Network!]!, $tokenAddress: String!) {
@@ -343,13 +350,15 @@ export async function getPortfolioV2DataByTokenAddress( traceId: string, address
 
         while (attempts < maxAttempts) {
             try {
-                const response = await client.post('', {
+                const response = await client.post("", {
                     query: query,
                     variables: {
                         addresses,
                         networks,
-                        tokenAddress: tokenAddress ? tokenAddress.toLowerCase() : ""
-                    }
+                        tokenAddress: tokenAddress
+                            ? tokenAddress.toLowerCase()
+                            : "",
+                    },
                 });
 
                 if (response.status !== 200) {
@@ -358,23 +367,27 @@ export async function getPortfolioV2DataByTokenAddress( traceId: string, address
 
                 const portfolioData = response.data.data.portfolioV2;
                 return portfolioData;
-
             } catch (error) {
                 attempts++;
                 if (attempts === maxAttempts) {
                     throw error;
                 }
-                elizaLogger.warn(` [getPortfolioV2DataByTokenAddress] [${traceId}] [${moxieUserId}] Zapper getPortfolioV2DataByTokenAddress failed, attempt ${attempts}/${maxAttempts}. Retrying...`);
-                await new Promise(resolve => setTimeout(resolve, backoffMs * attempts));
+                elizaLogger.warn(
+                    ` [getPortfolioV2DataByTokenAddress] [${traceId}] [${moxieUserId}] Zapper getPortfolioV2DataByTokenAddress failed, attempt ${attempts}/${maxAttempts}. Retrying...`
+                );
+                await new Promise((resolve) =>
+                    setTimeout(resolve, backoffMs * attempts)
+                );
             }
         }
     } catch (error) {
-        elizaLogger.error(` [getPortfolioV2DataByTokenAddress] [${traceId}] [${moxieUserId}] Error fetching Zapper getPortfolioV2DataByTokenAddress data:`, error);
+        elizaLogger.error(
+            ` [getPortfolioV2DataByTokenAddress] [${traceId}] [${moxieUserId}] Error fetching Zapper getPortfolioV2DataByTokenAddress data:`,
+            error
+        );
         throw error;
     }
 }
-
-
 
 export interface ZapperTokenDetails {
     name: string;
