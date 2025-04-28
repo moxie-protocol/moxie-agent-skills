@@ -69,8 +69,9 @@ Before providing the final JSON output, show your reasoning process inside <rule
 9. Validate the presence of all required parameters for the chosen rule type.
 10. For GROUP rules, explicitly check if the number of users from the group is specified.
 11. Check if the profitPercentage (if applicable) is negative. If it is, prepare an error message stating that negative profit percentages (stop losses) are not supported currently.
-12. If 'timeDurationInSec' is not provided and there is more than one user or group member involved, throw an error "Please specify the duration between which copied traders make trades to be counted for the rule"
-13. Important: Copy trading rules must replicate the same trade action as the source. Only buy trades can be copied — initiating a sell trade in response to a buy, or copying a sell trade with a buy, is not supported. However, it's valid to specify exit conditions (like selling at a target profit or when users sell) for the copied buy trade.
+12. If 'timeDurationInSec' is not provided and there is more than one user or group member involved, throw an error "Please specify the duration between which copied traders make trades to be counted for the rule".
+13. Do not add sell conditions unless specifically asked by the user.
+14. Important: Copy trading rules must replicate the same trade action as the source. Only buy trades can be copied — initiating a sell trade in response to a buy, or copying a sell trade with a buy, is not supported. However, it's valid to specify exit conditions (like selling at a target profit or when users sell) for the copied buy trade.
 
 After completing the rule analysis, provide the JSON output based on your analysis.
 

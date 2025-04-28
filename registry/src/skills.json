@@ -489,19 +489,19 @@
         ],
         "starterQuestions": [
             {
-                "label": "If any 3 people in #[copytrade|COPYTRADE_ID] buy >$500 of a token within 30 minutes of each other, buy me $100 of it",
+                "label": "If any 3 people in #copytrade buy >$500 of a token within 30 minutes of each other, buy me $100 of it",
                 "value": "If any 3 people in #[copytrade|COPYTRADE_ID] buy >$500 of a token within 30 minutes of each other, buy me $100 of it"
             },
             {
-                "label": "If any 3 people in #[copytrade|COPYTRADE_ID] buy >$500 of a token within 30 minutes of each other, buy me $100 of it, and then sell all of it for 30% profit",
+                "label": "If any 3 people in #copytrade buy >$500 of a token within 30 minutes of each other, buy me $100 of it, and then sell all of it for 30% profit",
                 "value": "If any 3 people in #[copytrade|COPYTRADE_ID] buy >$500 of a token within 30 minutes of each other, buy me $100 of it, and then sell all of it for 30% profit"
             },
             {
-                "label": "If any 3 people in #[copytrade|COPYTRADE_ID] buy >$500 of a token within 30 minutes of each other, buy me $100 of it, and then sell all of it when any 2 of them sell 50%",
+                "label": "If any 3 people in #copytrade buy >$500 of a token within 30 minutes of each other, buy me $100 of it, and then sell all of it when any 2 of them sell 50%",
                 "value": "If any 3 people in #[copytrade|COPYTRADE_ID] buy >$500 of a token within 30 minutes of each other, buy me $100 of it, and then sell all of it when any 2 of them sell 50%"
             },
             {
-                "label": "If any 3 people in #[copytrade|COPYTRADE_ID] buy >$500 of a token within 30 minutes of each other, buy me $100 of it, and then sell all of it when any 2 of them sell 50% OR when it increases by 50%",
+                "label": "If any 3 people in #copytrade buy >$500 of a token within 30 minutes of each other, buy me $100 of it, and then sell all of it when any 2 of them sell 50% OR when it increases by 50%",
                 "value": "If any 3 people in #[copytrade|COPYTRADE_ID] buy >$500 of a token within 30 minutes of each other, buy me $100 of it, and then sell all of it when any 2 of them sell 50% OR when it increases by 50%"
             }
         ],
@@ -636,7 +636,7 @@
     {
         "pluginId": "b30be45e-ff5a-4ef9-9674-7e27bdc8d1d8",
         "name": "@moxie-protocol/plugin-senpi-sharing",
-        "displayName": "Content Sharing",
+        "displayName": "Cast on Farcaster",
         "version": "0.1.0",
         "author": "Senpi",
         "description": "Have Senpi create casts for you and post them on Farcaster!",
