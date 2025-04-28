@@ -55,7 +55,7 @@
             "Tracking target movements",
             "Delivering precision insights"
         ],
-        "orderIndex": 1
+        "orderIndex": 12
     },
     {
         "pluginId": "927fb66c-2ebc-48e1-82a8-907c6e54e379",
@@ -111,7 +111,7 @@
             "Calibrating transfer path",
             "Delivery in motion — no trace left behind"
         ],
-        "orderIndex": 2
+        "orderIndex": 11
     },
     {
         "pluginId": "5d3b79e2-ac61-0bb6-a3ba-b0e00b943614",
@@ -191,7 +191,7 @@
             "Extracting high-signal chatter",
             "Returning with focused intel"
         ],
-        "orderIndex": 3
+        "orderIndex": 10
     },
     {
         "pluginId": "b5622f90-987e-51d1-bea9-5b1471bb9379",
@@ -248,7 +248,7 @@
             "Preparing the strike",
             "Executing on Base — clean and silent"
         ],
-        "orderIndex": 4
+        "orderIndex": 9
     },
     {
         "pluginId": "0ad0731e-698b-04bf-abeb-5d29cc36759f",
@@ -316,7 +316,7 @@
             "Tracking target movements",
             "Delivering precision insights"
         ],
-        "orderIndex": 5
+        "orderIndex": 8
     },
     {
         "pluginId": "a8c0c53a-e4e5-0848-b69b-a17af97d64dd",
@@ -375,7 +375,7 @@
             "Synthesizing results",
             "Preparing insights"
         ],
-        "orderIndex": 9
+        "orderIndex": 4
     },
     {
         "pluginId": "36c9a919-5a55-4645-9008-cfd32ec4b5a2",
@@ -422,7 +422,7 @@
             "Trigger primed",
             "Executed silently to Base"
         ],
-        "orderIndex": 10
+        "orderIndex": 2
     },
     {
         "pluginId": "0ad0731e-698b-04bf-abeb-5d29cc36759d",
@@ -465,7 +465,7 @@
             "Feeling the market’s mood",
             "Delivering insights — crisp and precise"
         ],
-        "orderIndex": 8
+        "orderIndex": 5
     },
     {
         "pluginId": "f65a02f3-4bf2-436d-be50-34e7d33fd293",
@@ -531,7 +531,7 @@
             "Locking in your entry",
             "Executing with quiet precision"
         ],
-        "orderIndex": 12
+        "orderIndex": 0
     }, 
     {
         "pluginId": "79449cd9-0590-4ccc-9d9f-12f99438c17b",
@@ -587,7 +587,7 @@
             "Waiting for response",
             "Doing some DegenFans magic"
         ],
-        "orderIndex": 6
+        "orderIndex": 7
     },
     {
         "pluginId": "3d5e16f1-40e0-5df0-89c0-b2216bfa8850",
@@ -631,7 +631,7 @@
             "Confirming members",
             "Aligning group"
         ],
-        "orderIndex": 11
+        "orderIndex": 1
     },
     {
         "pluginId": "b30be45e-ff5a-4ef9-9674-7e27bdc8d1d8",
@@ -673,6 +673,6 @@
         "loaders": [
             "Reticulating splines"
         ],
-        "orderIndex": 7
+        "orderIndex": 6
     }
 ]
