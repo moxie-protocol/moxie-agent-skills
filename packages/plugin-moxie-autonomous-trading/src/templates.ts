@@ -29,7 +29,7 @@ Please follow these steps to process the user input and generate the appropriate
    - moxieIds: Find all matches of @[username|id] and extract the 'id' part.
    - timeDurationInSec: Look for time-related phrases and convert to seconds. Note: This is not required if there's only one user whose trades are copied.
    - amountInUSD: Find the dollar amount mentioned to "buy" (not sell).
-   - profitPercentage (for PROFIT rules only): Find the profit percentage mentioned for selling. Use the exact percentage mentioned by the user (e.g., 110% should be 110, not 10).
+   - profitPercentage (for PROFIT rules only): Find the profit percentage mentioned for selling. Ensure to capture the exact percentage as stated by the user (e.g., if the user mentions 110%, record it as 110; if 10% is mentioned, record it as 10).
    - minPurchaseAmount: Look for any mention of a minimum purchase amount in USD.
    - sellTriggerType: Determine if it's a "LIMIT_ORDER" (based on profit percentage), "COPY_SELL" (based on users' selling actions), or a combination of both (BOTH).
    - sellTriggerCount: For COPY_SELL, how many users need to sell to trigger a sell.
@@ -40,7 +40,7 @@ Please follow these steps to process the user input and generate the appropriate
    - groupId: Find the match of #[groupname|id] and extract the 'id' part.
    - timeDurationInSec: Look for time-related phrases and convert them to seconds. Note: This is not required if there's only one user from the group whose trades are copied.
    - amountInUSD: Find the dollar amount mentioned to "buy" (not sell).
-   - profitPercentage (for PROFIT rules only): Find the profit percentage mentioned for selling. Use the exact percentage mentioned by the user (e.g., 110% should be 110, not 10).
+   - profitPercentage (for PROFIT rules only): Find the profit percentage mentioned for selling. Ensure to capture the exact percentage as stated by the user (e.g., if the user mentions 110%, record it as 110; if 10% is mentioned, record it as 10).
    - condition: Determine if it's "ANY" or "ALL" based on the input for buying.
    - conditionValue: For "ANY" condition, extract the number of people mentioned for buying (default to 1 if not specified).
    - minPurchaseAmount: Look for any mention of a minimum purchase amount in USD.
