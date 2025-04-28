@@ -654,7 +654,7 @@
         "skillCoinAddress": "",
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
-        "isDefault": false,
+        "isDefault": true,
         "loaders": [
             "Reticulating splines"
         ],
