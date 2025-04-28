@@ -2,7 +2,7 @@
 
 To ensure that your Skills is registered successfully to the Skills Marketplace, make sure to provide detailed descriptions on your Creator Agent Skills based on the [pre-written template](./.github/pull_request_template.md) and fulfill all the following requirements:
 
-## 🔹 Quick Start & Onboarding
+## 🔹 **Quick Start & Onboarding**
 
 - [ ] **Immediate Usability**
 
@@ -37,8 +37,6 @@ To ensure that your Skills is registered successfully to the Skills Marketplace,
 | ✅ Clearly articulate transaction details and fees.                       | ❌ Leave users unsure about transaction details or outcomes. |
 
 ### 🔹 **Clear Responses**
-
-### 🔹 Clear Responses
 
 - [ ] **Use Plain Language**
 
