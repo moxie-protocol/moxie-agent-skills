@@ -55,6 +55,91 @@
             "Synthesizing results",
             "Preparing insights"
         ]
+    },{
+        "pluginId": "ba2e0746-d089-4539-a23b-84882bc8eafd",
+        "name": "@moxie-protocol/plugin-betswirl",
+        "version": "0.0.1",
+        "displayName": "BetSwirl",
+        "author": "Romuald Hog <romuald@betswirl.com>",
+        "description": "Enable your agent to place bets and retrieve results from BetSwirl’s onchain games of luck on Base. Play Coin Toss, Dice, and Roulette — all provably fair using Chainlink VRF. Supports ETH, BETS, PEPE, and DEGEN with instant payouts to your agent wallet.",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-betswirl",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-betswirl/images/logo.png",
+        "settings": {},
+        "capabilities": [
+            "Flip a Coin",
+            "Roll a Dice",
+            "Spin a Roulette",
+            "Get your bets"
+        ],
+        "starterQuestions": [
+            {
+                "label": "What is the BetSwirl skills?",
+                "value": "What is the BetSwirl skills?"
+            },
+            {
+                "label": "Bet 0.01 ETH on heads",
+                "value": "Bet 0.01 ETH on heads"
+            },
+            {
+                "label": "Bet 0.01 ETH above 44 on dice",
+                "value": "Bet 0.01 ETH above 44 on dice"
+            },
+            {
+                "label": "Bet 0.01 ETH on 3,6,8 and 10",
+                "value": "Bet 0.01 ETH on 3,6,8 and 10"
+            },
+            {
+                "label": "Show my bets",
+                "value": "Show my bets"
+            }
+        ],
+        "mediaUrls": [
+            "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-betswirl/images/logo.png"
+        ],
+        "actions": [
+            "COIN_TOSS",
+            "COIN_FLIP",
+            "DOUBLE_OR_NOTHING",
+            "TOSS_A_COIN",
+            "BETSWIRL_COIN_TOSS",
+            "BET_ON_HEADS",
+            "BET_ON_TAILS",
+            "BET_ON_COIN_FLIP",
+            "BET_ON_COIN_TOSS",
+            "BET_ON_HEADS_BETSWIRL",
+            "BET_ON_TAILS_BETSWIRL",
+            "BET_ON_CON_FLIP_BETSWIRL",
+            "BET_ON_COIN_TOSS_BETSWIRL",
+            "DICE",
+            "ROLL_A_DICE",
+            "DICE_ROLL",
+            "BETSWIRL_DICE",
+            "BET_ON_DICE",
+            "BET_ON_DICE_BETSWIRL",
+            "ROULETTE",
+            "SPIN_A_ROULETTE",
+            "BETSWIRL_ROULETTE",
+            "BET_ON_ROULETTE",
+            "BET_ON_ROULETTE_BETSWIRL",
+            "GET_BETS",
+            "RETRIEVE_BETS",
+            "SHOW_BETS",
+            "LAST_BETS",
+            "GET_BETSWIRL_BETS",
+            "BETSWIRL_INFO",
+            "WHAT_IS_BETSWIRL",
+            "HOW_DOES_BETSWIRL_WORK",
+            "HOW_TO_PLAY_BETSWIRL",
+            "WHAT_IS_PLAY_GAMES_OF_LUCK",
+            "HOW_DOES_PLAY_GAMES_OF_LUCK_WORK",
+            "HOW_TO_PLAY_GAMES_OF_LUCK"
+        ],
+        "isPremium": false,
+        "freeQueries": 0,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
+        "status": "ACTIVE",
+        "isDefault": false
     },
     {
         "pluginId": "927fb66c-2ebc-48e1-82a8-907c6e54e379",
