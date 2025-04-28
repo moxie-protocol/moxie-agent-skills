@@ -17,15 +17,11 @@ import type { Content } from "@moxie-protocol/core";
 import type { UserAgentInfo, UserAgentInteraction } from "./types/types.ts";
 import {
     COMMON_AGENT_ID,
-    MINIMUM_CREATOR_AGENT_COINS,
     mockMoxieUser,
     mockWallet,
     mockPortfolio,
 } from "./constants/constants";
-import {
-    validateInputAgentInteractions,
-    validateMoxieAIAgentBalance,
-} from "./helpers";
+import { validateInputAgentInteractions } from "./helpers";
 import express from "express";
 import { ResponseHelper } from "./responseHelper.ts";
 import { traceIdMiddleware } from "./middleware/traceId.ts";
