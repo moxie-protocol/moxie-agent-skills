@@ -29,7 +29,7 @@ Please follow these steps to process the user input and generate the appropriate
    - moxieIds: Find all matches of @[username|id] and extract the 'id' part.
    - timeDurationInSec: Look for time-related phrases and convert to seconds. Note: This is not required if there's only one user whose trades are copied.
    - amountInUSD: Find the dollar amount mentioned to "buy" (not sell).
-   - profitPercentage (for PROFIT rules only): Find the profit percentage mentioned for selling.
+   - profitPercentage (for PROFIT rules only): Find the profit percentage mentioned for selling. Use the exact percentage mentioned by the user (e.g., 110% should be 110, not 10).
    - minPurchaseAmount: Look for any mention of a minimum purchase amount in USD.
    - sellTriggerType: Determine if it's a "LIMIT_ORDER" (based on profit percentage), "COPY_SELL" (based on users' selling actions), or a combination of both (BOTH).
    - sellTriggerCount: For COPY_SELL, how many users need to sell to trigger a sell.
@@ -40,7 +40,7 @@ Please follow these steps to process the user input and generate the appropriate
    - groupId: Find the match of #[groupname|id] and extract the 'id' part.
    - timeDurationInSec: Look for time-related phrases and convert them to seconds. Note: This is not required if there's only one user from the group whose trades are copied.
    - amountInUSD: Find the dollar amount mentioned to "buy" (not sell).
-   - profitPercentage (for PROFIT rules only): Find the profit percentage mentioned for selling.
+   - profitPercentage (for PROFIT rules only): Find the profit percentage mentioned for selling. Use the exact percentage mentioned by the user (e.g., 110% should be 110, not 10).
    - condition: Determine if it's "ANY" or "ALL" based on the input for buying.
    - conditionValue: For "ANY" condition, extract the number of people mentioned for buying (default to 1 if not specified).
    - minPurchaseAmount: Look for any mention of a minimum purchase amount in USD.
@@ -69,13 +69,14 @@ Before providing the final JSON output, show your reasoning process inside <rule
 9. Validate the presence of all required parameters for the chosen rule type.
 10. For GROUP rules, explicitly check if the number of users from the group is specified.
 11. Check if the profitPercentage (if applicable) is negative. If it is, prepare an error message stating that negative profit percentages (stop losses) are not supported currently.
-12. If 'timeDurationInSec' is not provided and there is more than one user or group member involved, throw an error "Please specify the duration between which copied traders make trades to be counted for the rule".
+12. If 'timeDurationInSec' is not provided and there is more than one user or group member involved, throw an error "Please specify the duration between which copied traders make trades to be counted for the rule"
 13. Do not add sell conditions unless specifically asked by the user.
 14. Important: Copy trading rules must replicate the same trade action as the source. Only buy trades can be copied — initiating a sell trade in response to a buy, or copying a sell trade with a buy, is not supported. However, it's valid to specify exit conditions (like selling at a target profit or when users sell) for the copied buy trade.
 
 After completing the rule analysis, provide the JSON output based on your analysis.
 
 If all required parameters are present, use this format for the JSON output:
+
 
 \`\`\`json
 {
