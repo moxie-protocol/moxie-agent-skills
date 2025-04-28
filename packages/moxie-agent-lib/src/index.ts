@@ -20,6 +20,8 @@ export { MoxieAgentDBAdapter } from "./services/MoxieAgentDBAdapter";
 
 export { getTokenDetails, getTrendingTokenDetails } from "./services/tokenDetails";
 
+export { getERC20TokenSymbol } from "./services/tokenSymbol";
+
 export type {
     TwitterMetadata,
     FarcasterMetadata,
@@ -75,3 +77,5 @@ export {
 } from "./services/balanceValidator";
 
 export { deleteLimitOrders } from "./services/cowService";
+
+export { formatUserMention, formatGroupMention, formatTokenMention } from "./utils";

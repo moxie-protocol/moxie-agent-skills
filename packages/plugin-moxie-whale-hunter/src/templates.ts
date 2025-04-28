@@ -8,8 +8,8 @@ If the question is about top base traders/whales, follow these instructions:
 {{topTraders}}
 
 #### General Guidelines:
-- The summary is derived from the trading volume of moxie users on base in last 24 hours.
-- Add the header of the summary saying "Moxie indexes tens of thousands of Base users. Here's a detailed overview of the top traders from the last 24 hours:"
+- The summary is derived from the trading volume of senpi users on base in last 24 hours.
+- Add the header of the summary saying "Senpi indexes hundred of thousands of Base users. Here's a detailed overview of the top traders from the last 24 hours:"
 - **Include as many traders as possible**, ensuring a diverse range of insights. The output can be long so try to include as many traders as possible.
 - **Be as detailed and specific in the summary as possible. The more details the better vs. broad generalities. Also include links to posts that have high engagement.**
 - **Avoid using platitudes. Don’t over exaggerate or make claims about the overall social media landscape. Just report the facts.**
@@ -35,8 +35,8 @@ If the question is about top traders of a token, follow these instructions:
 
 
 #### General Guidelines:
-- The summary is derived from the trading volume of moxie users of a token on base in last 24 hours.
-- Add the header of the summary saying "Moxie indexes tens of thousands of Base users. Here's a detailed overview of the top traders of the token from the last 24 hours:"
+- The summary is derived from the trading volume of senpi users of a token on base in last 24 hours.
+- Add the header of the summary saying "Senpi indexes hundred of thousands of Base users. Here's a detailed overview of the top traders of the token from the last 24 hours:"
 - **Include as many traders as possible**, ensuring a diverse range of insights. The output can be long so try to include as many traders as possible.
 - **Be as detailed and specific in the summary as possible. The more details the better vs. broad generalities. Also include links to posts that have high engagement.**
 - **Avoid using platitudes. Don’t over exaggerate or make claims about the overall social media landscape. Just report the facts.**
@@ -91,9 +91,9 @@ Instructions for generating the summary:
    - Only include other metrics (Market Cap, Volume, Liquidity) if they are present in the data
 
 2. Create a formatted table of top holders only if holder data exists:
-   | Moxie User | Holdings | Holdings (USD) |
+   | Senpi User | Holdings | Holdings (USD) |
    Where:
-   - Moxie User is the holder's profile link from the data
+   - Senpi User is the holder's profile link from the data
    - Holdings shows the raw token amount from the data
    - Holdings (USD) shows the value in USD (only if price data is available)
 
@@ -128,14 +128,15 @@ Example Output Format (only using available data):
 [Other metrics only if explicitly provided]
 
 # Top Holders:
-Here are the top holders of tokenName ($[tokenSymbol]) amongst tens of thousands of Base users Moxie indexes.
+Here are the top holders of tokenName ($[tokenSymbol]) amongst hundred of thousands of Base users Senpi indexes.
 
 [Only show table if holder data exists]
-| Moxie User | Holdings | Holdings (USD) |
+| Senpi User | Holdings | Holdings (USD) |
 |------------|----------|----------------|
 | profile_link | total_balance | total_balance_in_usd|
 
 [Actual data from topTokenHolders]
+Do not make any changes to the profile_link. It should start with '@' and be in the format of @[username|user_id].
 
 [Only include observations based on actual data]
 

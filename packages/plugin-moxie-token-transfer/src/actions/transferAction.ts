@@ -11,6 +11,7 @@ import { handleTransactionStatus } from "../utils/common";
 import { BASE_NETWORK_ID, ERC20_ABI, ETH_ADDRESS, MOXIE_TOKEN_ADDRESS, MOXIE_TOKEN_DECIMALS, USDC_ADDRESS, USDC_TOKEN_DECIMALS, WETH_ADDRESS } from "../constants";
 import { get0xPrice } from "../utils/0xApis";
 import Decimal from "decimal.js";
+import { getERC20TokenSymbol } from "@moxie-protocol/moxie-agent-lib";
 
 // Consider adding JSDoc for the tokenTransferAction object
 export const tokenTransferAction = {
@@ -898,13 +899,34 @@ async function resolveTokenAddress(context: Context, token: string): Promise<Fun
             };
         }
 
-        // Try to extract token details from token:address format
-        const { tokenAddress, tokenSymbol } = extractTokenDetails(token);
-        if (!tokenAddress || !ethers.isAddress(tokenAddress)) {
-            elizaLogger.error(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [resolveTokenAddress] Invalid token format: ${token}`);
-            return {
-                callBackTemplate: callBackTemplate.APPLICATION_ERROR("Invalid token format")
-            };
+        let tokenSymbol: string;
+        let tokenAddress: string;
+        // Check if token is a valid Ethereum address
+        if (ethers.isAddress(token)) {
+            try {
+                // Token is a valid address, fetch symbol from JSON RPC
+                tokenSymbol = await getERC20TokenSymbol(token);
+                tokenAddress = token;
+                elizaLogger.debug(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [resolveTokenAddress] Token details: ${JSON.stringify({
+                    tokenAddress: tokenAddress,
+                    tokenSymbol: tokenSymbol,
+                    tokenType: "ERC20"
+                })}`);
+            } catch (error) {
+                elizaLogger.error(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [resolveTokenAddress] Error fetching token symbol: ${error}`);
+                return {
+                    callBackTemplate: callBackTemplate.APPLICATION_ERROR("Error fetching token symbol")
+                };
+            }
+        } else {
+            // Not a valid address, try to extract from token:address format
+            ({ tokenAddress, tokenSymbol } = extractTokenDetails(token));
+            if (!tokenAddress || !ethers.isAddress(tokenAddress)) {
+                elizaLogger.error(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [resolveTokenAddress] Invalid token format: ${token}`);
+                return {
+                    callBackTemplate: callBackTemplate.APPLICATION_ERROR("Invalid token format") 
+                };
+            }
         }
 
         elizaLogger.debug(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [resolveTokenAddress] Extracted ERC20 address: ${tokenAddress}`);
