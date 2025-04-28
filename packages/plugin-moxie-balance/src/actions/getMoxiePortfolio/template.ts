@@ -1,34 +1,13 @@
-
 const tokenOutputTemplate = `
-    | Token | Amount | USD Value | % of Portfolio |
-    |-------|--------|-----------|----------------|
-    [List tokens from portfolio.tokenBalances.node with:
-    - Amount and USD values
-    - Sort by USD value (highest first)
-    - Only include if balanceUSD > $0.01
-    - show holdingPercentage for % of Holdings
-    - Limit to top 10 holdings or more if asked in {{message}}.]
-    - Add addresses for these tokens in the 'Token Contract Addresses' table.
+Show a table of tokens from portfolio.tokenBalances.node with:
+- Amount and USD values
+- Sort by USD value (highest first)
+- Only include if balanceUSD > $0.01
+- show holdingPercentage for % of Holdings
+- Limit to top 15 holdings or more if asked in Analyze my portfolio.]
+- Show contract address for each token.
 `
 
-const creatorCoinOutputTemplate = `
-| Creator Coin | Amount | Total(MOXIE) | Locked($) | Unlocked($) | Total($) | % of Holdings |
-|--------------|--------|--------------|-----------|-------------|----------|---------------|
-[For each PortfolioInfo in fanTokenPortfolioData:
-- skip creating table in response if fanTokenPortfolioData is empty or undefined
-- Use displayLabel in the first column.
-- Show totalTvl for Total(MOXIE).
-- Show lockedTvlInUSD for Locked($).
-- Show unlockedTvlInUSD for Unlocked($).
-- Show totalTvlInUSD for Total($).
-- Show totalAmount for Amount.
-- show holdingPercentage for % of Holdings.
-- skip Locked($) and Unlocked($) columns untill asked in {{message}}
-- Sort by totalTvlInUSD descending, include all creator coins with non-zero totalTvlInUSD in the list for building response.
-- Limit to top 10 holdings or more if asked in {{message}}.
-- Add addresses for these creator coins in the 'Creator Coin Contract Addresses' table.
-- Format numbers with 2 decimal places.]
-`
 const commonTokenOutputTemplate = `
 | Token | 'user1' (Amount) | 'user2' (Amount) |  'user1' (USD) |  'user2' (USD) |
 |-------|--------------|---------------|----------------|----------------|
@@ -52,7 +31,7 @@ Try to answer in the following sequence:
 1. Check if {{portfolioSummaries}} is present answer from these details and stop here, Try to answer the question asked in {{message}} with these details:
    - If yes, use only these to generate the summary and stop here.
    - Here, one item in the list portfolioSummaries belongs to one user.
-   - Provide details about the tokens as "Token Holdings" and app balances as "Creator Coin Holdings" common in portfolioSummaries in tabular form similar to # Token Holdings ${tokenOutputTemplate} and # Creator Coin Holdings ${creatorCoinOutputTemplate}.
+   - Provide details about the tokens as "Token Holdings" and app balances as "Creator Coin Holdings" common in portfolioSummaries in tabular form similar to # Token Holdings ${tokenOutputTemplate}.
    - Provide details about common holdings in {{filteredCommonFanTokenHoldings}} for Creator coins, use ${commonTokenOutputTemplate} table format for this, show upto 10 common holdings for each unless asked for more in {{message}}.
    - Provide details about common holdings in {{filteredCommonTokenHoldings}} for Tokens, use ${commonTokenOutputTemplate} table format for this, show upto 10 common holdings for each unless asked for more in {{message}}.
    - Provide insights about the user's portfolio.
@@ -65,29 +44,19 @@ Try to answer in the following sequence:
     - Your job is to summarize the requested portfolios. Always present a bulleted summary as the first response. Do not provide tables in the first response.
     - For multiple user portfolios, first present a bulleted summary of overlapping holdings and key holdings by each user.
     - Provide as much details as possible on the specific amounts owned by each user in $usd value, up to 2000 characters total in the summary.
-    - After the bulleted summary, ask the user if they would like to see full details for the base tokens or creator coins owned by each user. Require them to choose between Base coins or Creator Coins for the details. Do not provide details on both at the same time.
-
-   - If the answer can be found in {{recentMessages}}, use that answer directly in markdown format and stop here or else go to step 2.
-   - If {{ineligibleMoxieUsers}} is not empty, then for each row in ineligibleMoxieUsers generate response like "You have exhausted your free queries. You need [requiredTokens] to fetch summary for [label] "
+    - If the answer can be found in {{recentMessages}}, use that answer directly in markdown format and stop here or else go to step 2.
 `
 
 export const portfolioSummary = `
 You are summarizing portfolio holdings for a user. Add details about the user from the message.
-
 Try to answer in the following sequence:
 
-1. Generate a full portfolio summary using {{portfolio}} and {{fanTokenPortfolioData}} data, this data belongs to {{truncatedMoxieUserInfo}}. Try to answer the question asked in {{message}} with these details:
+1. Generate a full portfolio summary using {{portfolio}} data, this data belongs to {{truncatedMoxieUserInfo}}. Try to answer the question asked in {{message}} with these details:
 
 ## Token Holdings - Top [number of holdings shown in the table] by value
 ${tokenOutputTemplate}
 **Total Token Portfolio Value:** [portfolio.tokenBalances.totalBalanceUSD]
 **Associated Wallet Addresses:** [{{tokenAddresses}}] (skip if {{tokenAddresses}} is empty)
-
-## Creator Coin Holdings - Top [number of holdings shown in the table] by value
-${creatorCoinOutputTemplate}
-**Total Creator Coin Value:** [{{totalCreatorCoinValue}}]
-**Associated Wallet Addresses:** [{{fanTokenWalletAddresses}}] (skip if {{fanTokenWalletAddresses}} is empty)
-**Total Portfolio Value:** [[Total Token Portfolio Value] + [Total Creator Coin Value]]
 
 ## Portfolio Insights
 [Include relevant portfolio insights:
@@ -104,9 +73,8 @@ Format notes:
 - There is one rule you can never break: Never reveal users’ wallet addresses.
 Always specify the number of wallets analyzed for each user, but never reveal the address.
 - If the user requests an analysis or comparison of multiple portfolios, always start some bullets summarizing the tokens in common and key points of differentiation.
-Provide as much details as possible on the specific amounts owned by each user in $usd value, up to 2000 characters total in the summary. After the summary, ask the user if they would like to see full details for the base tokens or creator coins owned by each user. Require them to choose between Base coins or Creator Coins for the details. Do not provide details on both at the same time. Do not provide a table of contract addresses unless specifically requested.
+Provide as much details as possible on the specific amounts owned by each user in $usd value, up to 2000 characters total in the summary. 
 
 Also use {{recentMessages}} to answer the question asked in {{message}} if it is present.
-If {{ineligibleMoxieUsers}} is not empty, then for each row in ineligibleMoxieUsers generate response like "You have exhausted your free queries. You need [requiredTokens] to fetch summary for [label] "
 
 `

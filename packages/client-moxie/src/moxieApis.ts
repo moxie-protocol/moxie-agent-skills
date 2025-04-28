@@ -205,47 +205,6 @@ export function createMoxieApiRouter(
                     elizaLogger.info(traceId, `currentWalletBalance`, {
                         currentWalletBalance,
                     });
-
-                    // validate if user has min. creator agent coins
-                    let creatorAgentBalance, hasSufficientBalance;
-                    try {
-                        ({ creatorAgentBalance, hasSufficientBalance } =
-                            await validateMoxieAIAgentBalance({
-                                moxieUserId,
-                                runtime,
-                            }));
-                    } catch (error) {
-                        elizaLogger.error(
-                            "Error validating Moxie AI Agent balance:",
-                            error
-                        );
-                        res.status(500).json(
-                            ResponseHelper.error<null>(
-                                "VALIDATION_ERROR",
-                                "An error occurred while validating the Moxie AI Agent balance. Please try again later.",
-                                req.path,
-                                req.traceId
-                            )
-                        );
-                        return;
-                    }
-                    if (!hasSufficientBalance) {
-                        res.status(403).json(
-                            ResponseHelper.error<null>(
-                                "USER_NOT_ELIGIBILE",
-                                `user need to hold ${MINIMUM_CREATOR_AGENT_COINS} creator agent tokens to interact with agent. current balance is ${creatorAgentBalance}`,
-                                req.path,
-                                req.traceId,
-                                {
-                                    minimumCreatorAgentCoins:
-                                        MINIMUM_CREATOR_AGENT_COINS,
-                                    currentCreatorAgentCoinsBalance:
-                                        creatorAgentBalance,
-                                }
-                            )
-                        );
-                        return;
-                    }
                 }
 
                 const userId = stringToUuid(moxieUserId);

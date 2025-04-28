@@ -224,7 +224,7 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
         const skillsTableName = process.env.SKILLS_TABLE_NAME || "skills";
         const userSkillsTableName = process.env.USER_SKILLS_TABLE_NAME || "user_skills";
         let selectFields = [
-            "s.id",
+            "DISTINCT ON (s.order_index) s.id",
             "s.name",
             "s.display_name",
             "s.version",
@@ -258,6 +258,8 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
         if (installed_status !== "") {
             query += ` WHERE COALESCE(us.status, 'UNINSTALLED') = '${installed_status}' ${installed_status == "INSTALLED" ? "OR s.is_default = true" : "AND s.is_default = false"}`;
         }
+        query += ` ORDER BY s.order_index, s.updated_at DESC`;
+        elizaLogger.debug(`[getSkills] [${userId}] Query: ${query}`);
         return this.pgAdapter.query(query, []).then((result) => {
             return result.rows.map((row) => ({
                 id: row.id,

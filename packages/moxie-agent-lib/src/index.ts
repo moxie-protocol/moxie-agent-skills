@@ -77,3 +77,5 @@ export {
 } from "./services/balanceValidator";
 
 export { deleteLimitOrders } from "./services/cowService";
+
+export { formatUserMention, formatGroupMention, formatTokenMention } from "./utils";
