@@ -16,7 +16,7 @@
                 "value": "Show token details for  $ [replace with token name]"
             },
             {
-                "label": "Compare $clanker and $bnkr",
+                "label": "Compare $CLANKER and $BNKR",
                 "value": "Compare $[CLANKER|0x1bc0c42215582d5a085795f4badbac3ff36d1bcb] and $[BNKR|0x22af33fe49fd1fa80c7149773dde5890d3c76f3b]"
             }
         ],
@@ -213,11 +213,11 @@
                 "value": "Buy me $25 worth of  $ [replace with token name]"
             },
             {
-                "label": "Swap 100 $degen for  $ [replace with token name]",
+                "label": "Swap 100 $DEGEN for  $ [replace with token name]",
                 "value": "Swap 100 $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed] for  $ [replace with token name]"
             },
             {
-                "label": "Use 40% of my $eth to buy  $ [replace with token name] and 20% to buy $degen",
+                "label": "Use 40% of my $eth to buy  $ [replace with token name] and 20% to buy $DEGEN",
                 "value": "Use 40% of my $eth to buy  $ [replace with token name] and 20% to buy $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed]"
             }
         ],
@@ -342,11 +342,11 @@
                 "value": "Show today's trending tokens on Base along with the top traders"
             },
             {
-                "label": "Who are the biggest $bnkr whales?",
+                "label": "Who are the biggest $BNKR whales?",
                 "value": "Who are the biggest $[BNKR|0x22af33fe49fd1fa80c7149773dde5890d3c76f3b] whales?"
             },
             {
-                "label": "Who are the top traders recently of $clanker?",
+                "label": "Who are the top traders recently of $CLANKER?",
                 "value": "Who are the top traders recently of $[CLANKER|0x1bc0c42215582d5a085795f4badbac3ff36d1bcb]?"
             }
         ],
@@ -401,7 +401,7 @@
                 "value": "Buy $25 worth of $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] if the price increases by 10%"
             },
             {
-                "label": "Sell 10% of my $bnkr if the price increases by 10%",
+                "label": "Sell 10% of my $BNKR if the price increases by 10%",
                 "value": "Sell 10% of my $[BNKR|0x22af33fe49fd1fa80c7149773dde5890d3c76f3b] if the price increases by 10%"
             }
         ],
@@ -534,21 +534,21 @@
     }, 
     {
         "pluginId": "79449cd9-0590-4ccc-9d9f-12f99438c17b",
-        "name": "@moxie-protocol/plugin-degenfans-alfafrens",
-        "displayName": "DegenFans AlfaFrens",
+        "name": "@moxie-protocol/plugin-DEGENfans-alfafrens",
+        "displayName": "DEGENFans AlfaFrens",
         "version": "0.0.2",
-        "author": "DegenFans",
+        "author": "DEGENFans",
         "description": "Enables your agent to recommend staking options for AlfaFrens channels",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-degenfans-alfafrens",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-degenfans-alfafrens/images/logo.png",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-DEGENfans-alfafrens",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-DEGENfans-alfafrens/images/logo.png",
         "settings": {},
         "capabilities": [
             "show the best staking options for a given staking amount"
         ],
         "starterQuestions": [
             {
-                "label": "What is the Degenfans Alfafrens Skills?",
-                "value": "What is the Degenfans Alfafrens Skills?"
+                "label": "What is the DEGENfans Alfafrens Skills?",
+                "value": "What is the DEGENfans Alfafrens Skills?"
             },
             {
                 "label": "What are some staking recommendations you have for Alfafrens?",
@@ -584,7 +584,7 @@
         "loaders": [
             "Querying AlfaFrens",
             "Waiting for response",
-            "Doing some DegenFans magic"
+            "Doing some DEGENFans magic"
         ],
         "orderIndex": 7
     },
