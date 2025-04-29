@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { apiClient } from "@/lib/api";
 import { NavLink } from "react-router";
-import type { UUID } from "@moxie-protocol/core";
+import type { UUID } from "@senpi-ai/core";
 import { formatAgentName } from "@/lib/utils";
 
 export default function Home() {

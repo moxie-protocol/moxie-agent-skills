@@ -11,7 +11,7 @@ import { useTransition, animated } from "@react-spring/web";
 import { Paperclip, Send, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-import type { Content, UUID } from "@moxie-protocol/core";
+import type { Content, UUID } from "@senpi-ai/core";
 import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api";
 import { cn, moment } from "@/lib/utils";
@@ -23,7 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import { IAttachment } from "@/types";
 import { AudioRecorder } from "./audio-recorder";
 import { Badge } from "./ui/badge";
-import Message from './message';
+import Message from "./message";
 
 interface ExtraContentFields {
     user: string;
@@ -36,13 +36,15 @@ type ContentWithUser = Content & ExtraContentFields;
 
 interface StreamResponse {
     stream: true;
-    [Symbol.asyncIterator](): AsyncIterator<{ text: string, id: number }>;
+    [Symbol.asyncIterator](): AsyncIterator<{ text: string; id: number }>;
 }
 
 type MessageResponse = StreamResponse | Content[];
 
-const isStreamResponse = (response: MessageResponse): response is StreamResponse => {
-    return 'stream' in response;
+const isStreamResponse = (
+    response: MessageResponse
+): response is StreamResponse => {
+    return "stream" in response;
 };
 
 export default function Page({ agentId }: { agentId: UUID }) {
@@ -109,7 +111,7 @@ export default function Page({ agentId }: { agentId: UUID }) {
             },
         ];
 
-        setMessages(prev => [...prev, ...newMessages]);
+        setMessages((prev) => [...prev, ...newMessages]);
 
         sendMessageMutation.mutate({
             message: input,
@@ -143,38 +145,40 @@ export default function Page({ agentId }: { agentId: UUID }) {
                 const currentTime = Date.now();
                 for await (const data of response) {
                     fullText += data.text;
-                    setMessages(prevMessages => {
+                    setMessages((prevMessages) => {
                         let tempMessages = [...prevMessages];
                         if (!streamingMessageId) {
                             streamingMessageId = data.id;
                             tempMessages = [
-                                ...messages.filter(msg => !msg.isLoading),
+                                ...messages.filter((msg) => !msg.isLoading),
                                 {
                                     id: streamingMessageId,
                                     text: fullText,
                                     user: "system",
                                     isLoading: false,
                                     createdAt: currentTime,
-                                }
+                                },
                             ];
                         }
                         tempMessages[tempMessages.length - 1] = {
                             ...tempMessages[tempMessages.length - 1],
                             text: fullText,
                             isLoading: false,
-                        }
+                        };
                         return tempMessages;
                     });
                 }
             } else {
-                setMessages(prevMessages => [
-                    ...prevMessages.filter(msg => !msg.isLoading),
-                    ...(Array.isArray(response) ? response : [response]).map(msg => ({
-                        ...msg,
-                        user: "system",
-                        createdAt: Date.now(),
-                        attachments: undefined,
-                    }))
+                setMessages((prevMessages) => [
+                    ...prevMessages.filter((msg) => !msg.isLoading),
+                    ...(Array.isArray(response) ? response : [response]).map(
+                        (msg) => ({
+                            ...msg,
+                            user: "system",
+                            createdAt: Date.now(),
+                            attachments: undefined,
+                        })
+                    ),
                 ]);
             }
         },
@@ -184,7 +188,7 @@ export default function Page({ agentId }: { agentId: UUID }) {
                 title: "Unable to send message",
                 description: e.message,
             });
-        }
+        },
     });
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -195,8 +199,7 @@ export default function Page({ agentId }: { agentId: UUID }) {
     };
 
     const transitions = useTransition(messages, {
-        keys: (message) =>
-            `${message.createdAt}-${message.user}`,
+        keys: (message) => `${message.createdAt}-${message.user}`,
         from: { opacity: 0, transform: "translateY(50px)" },
         enter: { opacity: 1, transform: "translateY(0px)" },
         leave: { opacity: 0, transform: "translateY(10px)" },
@@ -227,7 +230,10 @@ export default function Page({ agentId }: { agentId: UUID }) {
                                         <ChatBubbleMessage
                                             isLoading={message?.isLoading}
                                         >
-                                            <Message text={message?.text} user={message?.user} />
+                                            <Message
+                                                text={message?.text}
+                                                user={message?.user}
+                                            />
                                             {/* Attachments */}
                                             <div>
                                                 {message?.attachments?.map(

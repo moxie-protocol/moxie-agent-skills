@@ -6,7 +6,7 @@ import {
     type State,
     type ActionExample,
     elizaLogger,
-} from "@moxie-protocol/core";
+} from "@senpi-ai/core";
 import { getCasinoTokens } from "../providers/casinoTokens";
 
 export const infoAction: Action = {

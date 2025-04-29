@@ -1,6 +1,6 @@
 import { type Hex } from "viem";
 import { ethers } from "ethers";
-import { MoxieWalletClient } from "@moxie-protocol/moxie-agent-lib/src/wallet";
+import { MoxieWalletClient } from "@senpi-ai/senpi-agent-lib/src/wallet";
 import {
     casinoChainIds,
     casinoChainById,

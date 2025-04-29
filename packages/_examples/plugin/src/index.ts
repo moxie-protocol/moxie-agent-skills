@@ -1,4 +1,4 @@
-import type { Plugin } from "@moxie-protocol/core";
+import type { Plugin } from "@senpi-ai/core";
 import { transferAction } from "./actions/transferAction";
 import { balanceAction } from "./actions/balanceAction";
 

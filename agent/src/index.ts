@@ -18,15 +18,15 @@ import {
     settings,
     stringToUuid,
     validateCharacterConfig,
-} from "@moxie-protocol/core";
-import { MoxieClient } from "@moxie-protocol/client-moxie";
+} from "@senpi-ai/core";
+import { MoxieClient } from "@senpi-ai/client-senpi";
 import fs from "node:fs";
 import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import yargs from "yargs";
-import samplePlugin from "@moxie-protocol/plugin-sample";
-import degenfansAlfaFrensPlugin from  "@moxie-protocol/plugin-degenfans-alfafrens";
+import samplePlugin from "@senpi-ai/plugin-sample";
+import degenfansAlfaFrensPlugin from "@senpi-ai/plugin-degenfans-alfafrens";
 import bootstrapPlugin from "@elizaos/plugin-bootstrap";
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -244,7 +244,7 @@ async function handlePluginImporting(plugins: string[]) {
                     const importedPlugin = await import(plugin);
                     const functionName =
                         plugin
-                            .replace("@moxie-protocol/plugin-", "")
+                            .replace("@senpi-ai/plugin-", "")
                             .replace(/-./g, (x) => x[1].toUpperCase()) +
                         "Plugin"; // Assumes plugin function is camelCased with Plugin suffix
                     return (

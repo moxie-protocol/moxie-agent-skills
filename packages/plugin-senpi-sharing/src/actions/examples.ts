@@ -1,4 +1,4 @@
-import { ActionExample } from "@moxie-protocol/core";
+import { ActionExample } from "@senpi-ai/core";
 
 export const sharingExamples: ActionExample[][] = [
     [
@@ -69,4 +69,4 @@ All recipients can now view and display these NFTs in their collections.`,
             },
         },
     ],
-]; 
+];

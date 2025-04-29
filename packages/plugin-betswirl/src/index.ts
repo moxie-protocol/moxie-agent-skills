@@ -1,4 +1,4 @@
-import type { Plugin } from "@moxie-protocol/core";
+import type { Plugin } from "@senpi-ai/core";
 import { infoAction } from "./actions/info";
 import { coinTossAction } from "./actions/coinToss";
 import { rouletteAction } from "./actions/roulette";

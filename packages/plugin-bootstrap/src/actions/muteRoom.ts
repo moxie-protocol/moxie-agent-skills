@@ -1,6 +1,6 @@
-import { composeContext } from "@moxie-protocol/core";
-import { generateTrueOrFalse } from "@moxie-protocol/core";
-import { booleanFooter } from "@moxie-protocol/core";
+import { composeContext } from "@senpi-ai/core";
+import { generateTrueOrFalse } from "@senpi-ai/core";
+import { booleanFooter } from "@senpi-ai/core";
 import {
     Action,
     ActionExample,
@@ -8,7 +8,7 @@ import {
     Memory,
     ModelClass,
     State,
-} from "@moxie-protocol/core";
+} from "@senpi-ai/core";
 
 export const shouldMuteTemplate =
     `Based on the conversation so far:

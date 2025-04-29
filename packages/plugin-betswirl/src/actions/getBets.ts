@@ -11,9 +11,9 @@ import {
     composeContext,
     generateObject,
     ModelClass,
-} from "@moxie-protocol/core";
-import { MoxieUser } from "@moxie-protocol/moxie-agent-lib/src";
-import { MoxieWalletClient } from "@moxie-protocol/moxie-agent-lib/src/wallet";
+} from "@senpi-ai/core";
+import { MoxieUser } from "@senpi-ai/senpi-agent-lib/src";
+import { MoxieWalletClient } from "@senpi-ai/senpi-agent-lib/src/wallet";
 import {
     CASINO_GAME_TYPE,
     slugById,

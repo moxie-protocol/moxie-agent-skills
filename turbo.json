@@ -4,61 +4,52 @@
         "check-types": {
             "dependsOn": ["build"]
         },
-        "@moxie-protocol/agent#check-types": {
+        "@senpi-ai/agent#check-types": {
             "dependsOn": [
-                "@moxie-protocol/plugin-solana#build",
-                "@moxie-protocol/plugin-direct#build"
-            ]
-        },
-        "@moxie-protocol/moxie-agent#check-types": {
-            "dependsOn": [
-                "@moxie-protocol/plugin-solana#build",
-                "@moxie-protocol/plugin-direct#build"
+                "@senpi-ai/plugin-solana#build",
+                "@senpi-ai/plugin-direct#build"
             ]
         },
         "build": {
             "outputs": ["dist/**"],
-            "dependsOn": ["^@moxie-protocol/core#build"]
+            "dependsOn": ["^@senpi-ai/core#build"]
         },
         "@elizaos/client-direct#build": {
             "outputs": ["dist/**"],
             "dependsOn": [
-                "@moxie-protocol/plugin-image-generation#build",
-                "@moxie-protocol/plugin-tee-log#build"
+                "@senpi-ai/plugin-image-generation#build",
+                "@senpi-ai/plugin-tee-log#build"
             ]
         },
-        "@moxie-protocol/plugin-solana#build": {
+        "@senpi-ai/plugin-solana#build": {
             "outputs": ["dist/**"],
             "dependsOn": [
-                "@moxie-protocol/plugin-trustdb#build",
-                "@moxie-protocol/plugin-tee#build"
+                "@senpi-ai/plugin-trustdb#build",
+                "@senpi-ai/plugin-tee#build"
             ]
         },
-        "@moxie-protocol/plugin-nft-generation#build": {
+        "@senpi-ai/plugin-nft-generation#build": {
             "outputs": ["dist/**"],
-            "dependsOn": ["@moxie-protocol/plugin-node#build"]
+            "dependsOn": ["@senpi-ai/plugin-node#build"]
         },
-        "@moxie-protocol/plugin-tee-verifiable-log#build": {
+        "@senpi-ai/plugin-tee-verifiable-log#build": {
+            "outputs": ["dist/**"],
+            "dependsOn": ["@senpi-ai/core#build", "@senpi-ai/plugin-tee#build"]
+        },
+        "@senpi-ai/plugin-evm#build": {
+            "outputs": ["dist/**"],
+            "dependsOn": ["@senpi-ai/plugin-tee#build"]
+        },
+        "@senpi-ai/plugin-tee-log#build": {
             "outputs": ["dist/**"],
             "dependsOn": [
-                "@moxie-protocol/core#build",
-                "@moxie-protocol/plugin-tee#build"
+                "@senpi-ai/plugin-tee#build",
+                "@senpi-ai/plugin-sgx#build"
             ]
         },
-        "@moxie-protocol/plugin-evm#build": {
+        "@senpi-ai/plugin-quai#build": {
             "outputs": ["dist/**"],
-            "dependsOn": ["@moxie-protocol/plugin-tee#build"]
-        },
-        "@moxie-protocol/plugin-tee-log#build": {
-            "outputs": ["dist/**"],
-            "dependsOn": [
-                "@moxie-protocol/plugin-tee#build",
-                "@moxie-protocol/plugin-sgx#build"
-            ]
-        },
-        "@moxie-protocol/plugin-quai#build": {
-            "outputs": ["dist/**"],
-            "dependsOn": ["@moxie-protocol/plugin-trustdb#build"]
+            "dependsOn": ["@senpi-ai/plugin-trustdb#build"]
         },
         "eliza-docs#build": {
             "outputs": ["build/**"]

@@ -3,8 +3,8 @@ import {
     MemoryManager,
     formatMessages,
     AgentRuntime as IAgentRuntime,
-} from "@moxie-protocol/core";
-import type { Memory, Provider, State } from "@moxie-protocol/core";
+} from "@senpi-ai/core";
+import type { Memory, Provider, State } from "@senpi-ai/core";
 import { formatFacts } from "../evaluators/fact.ts";
 
 const factsProvider: Provider = {

@@ -9,8 +9,8 @@ import {
     composeContext,
     generateObject,
     ModelClass,
-} from "@moxie-protocol/core";
-import { MoxieWalletClient } from "@moxie-protocol/moxie-agent-lib/src/wallet";
+} from "@senpi-ai/core";
+import { MoxieWalletClient } from "@senpi-ai/senpi-agent-lib/src/wallet";
 import { transferEthTemplate } from "../templates";
 import { TransferEthSchema } from "../types";
 

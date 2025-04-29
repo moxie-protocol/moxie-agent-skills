@@ -1,4 +1,4 @@
-import { Plugin } from "@moxie-protocol/core";
+import { Plugin } from "@senpi-ai/core";
 import { continueAction } from "./actions/continue.ts";
 import { followRoomAction } from "./actions/followRoom.ts";
 import { ignoreAction } from "./actions/ignore.ts";

@@ -9,8 +9,8 @@ import {
     composeContext,
     generateObject,
     ModelClass,
-} from "@moxie-protocol/core";
-import { MoxieWalletClient } from "@moxie-protocol/moxie-agent-lib/src/wallet";
+} from "@senpi-ai/core";
+import { MoxieWalletClient } from "@senpi-ai/senpi-agent-lib/src/wallet";
 import { formatEther, http, createPublicClient } from "viem";
 import { base } from "viem/chains";
 import { getTokenBalance } from "../utils/balance";

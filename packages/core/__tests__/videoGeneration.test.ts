@@ -1,4 +1,4 @@
-import { IAgentRuntime, Memory, State } from "@moxie-protocol/core";
+import { IAgentRuntime, Memory, State } from "@senpi-ai/core";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
 // Mock the fetch function

@@ -11,8 +11,8 @@ import {
     composeContext,
     generateObject,
     ModelClass,
-} from "@moxie-protocol/core";
-import { MoxieWalletClient } from "@moxie-protocol/moxie-agent-lib/src/wallet";
+} from "@senpi-ai/core";
+import { MoxieWalletClient } from "@senpi-ai/senpi-agent-lib/src/wallet";
 import {
     CASINO_GAME_TYPE,
     Dice,
@@ -322,12 +322,13 @@ export const diceAction: Action = {
                 modelClass: ModelClass.SMALL,
                 schema: DiceBetParameters,
             });
-            const { number, betAmount, token, isConfirmed } = diceDetails.object as {
-                number: DiceNumber;
-                betAmount: string;
-                token: string;
-                isConfirmed: boolean;
-            };
+            const { number, betAmount, token, isConfirmed } =
+                diceDetails.object as {
+                    number: DiceNumber;
+                    betAmount: string;
+                    token: string;
+                    isConfirmed: boolean;
+                };
 
             // Validate face is heads or tails
             if (!number) {
@@ -345,8 +346,8 @@ export const diceAction: Action = {
                 chainId,
                 selectedToken
             );
-            
-             // if confirmation is not given yet
+
+            // if confirmation is not given yet
             if (isConfirmed === null) {
                 await callback({
                     text: `You are trying to bet on ${number} with ${betAmount} ${token}. Would you like to confirm this bet?`,

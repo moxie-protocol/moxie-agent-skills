@@ -1,12 +1,12 @@
 {
-    "name": "@moxie-protocol/plugin-sample",
+    "name": "@senpi-ai/plugin-sample",
     "version": "0.0.1",
     "main": "dist/index.js",
     "type": "module",
     "types": "dist/index.d.ts",
     "dependencies": {
-        "@moxie-protocol/core": "workspace:*",
-        "@moxie-protocol/moxie-agent-lib": "workspace:*",
+        "@senpi-ai/core": "workspace:*",
+        "@senpi-ai/senpi-agent-lib": "workspace:*",
         "ethers": "^6.0.0",
         "graphql-request": "^7.1.2"
     },

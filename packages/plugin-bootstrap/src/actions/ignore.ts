@@ -3,7 +3,7 @@ import {
     IAgentRuntime,
     Memory,
     type Action,
-} from "@moxie-protocol/core";
+} from "@senpi-ai/core";
 
 export const ignoreAction: Action = {
     name: "IGNORE",

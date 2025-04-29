@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api";
 import Overview from "@/components/overview";
 import { useParams } from "react-router";
-import type { UUID } from "@moxie-protocol/core";
+import type { UUID } from "@senpi-ai/core";
 
 export default function AgentRoute() {
     const { agentId } = useParams<{ agentId: UUID }>();

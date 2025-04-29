@@ -1,4 +1,4 @@
-import { type UUID } from "@moxie-protocol/core";
+import { type UUID } from "@senpi-ai/core";
 
 export const SERVER_URL = "http://localhost:7998";
 export const SUPABASE_URL = "https://pronvzrzfwsptkojvudd.supabase.co";

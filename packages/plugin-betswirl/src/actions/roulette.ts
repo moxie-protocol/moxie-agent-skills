@@ -11,8 +11,8 @@ import {
     composeContext,
     generateObject,
     ModelClass,
-} from "@moxie-protocol/core";
-import { MoxieWalletClient } from "@moxie-protocol/moxie-agent-lib/src/wallet";
+} from "@senpi-ai/core";
+import { MoxieWalletClient } from "@senpi-ai/senpi-agent-lib/src/wallet";
 import {
     CASINO_GAME_TYPE,
     Roulette,
@@ -324,12 +324,13 @@ export const rouletteAction: Action = {
                 modelClass: ModelClass.SMALL,
                 schema: RouletteBetParameters,
             });
-            const { numbers, betAmount, token, isConfirmed } = rouletteDetails.object as {
-                numbers: Array<RouletteNumber>;
-                betAmount: string;
-                token: string;
-                isConfirmed: boolean;
-            };
+            const { numbers, betAmount, token, isConfirmed } =
+                rouletteDetails.object as {
+                    numbers: Array<RouletteNumber>;
+                    betAmount: string;
+                    token: string;
+                    isConfirmed: boolean;
+                };
 
             // Validate face is heads or tails
             if (!numbers || !numbers.length) {
