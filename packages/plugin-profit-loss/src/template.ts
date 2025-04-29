@@ -40,7 +40,7 @@ Given the conversation history and latest message, extract:
 2. Moxie User IDs (if any) in the format: @[username|userId] or userId extract userId from it
 3. Token addresses (if any) in the format: $[token_symbol|token_address] or valid ethereum address
 4. Analysis type: “USER_PNL” | “WALLET_PNL” | “PROFITABLE_TRADERS” | “LOSS_MAKING_TRADERS” | “TOKEN_TRADERS”
-5. Analysis for my agent wallet or my user: "agent" | "user"
+5. Analysis for my agent wallet or my user: "agent" | "user" | "none"
 Response format:
 {
   “walletAddresses”: [],
