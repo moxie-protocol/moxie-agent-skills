@@ -78,7 +78,7 @@
                 "value": "Send 50% of my  $ [replace with token name] to @[betashop.eth|M4]"
             },
             {
-                "label": "Send 25% of my  $ [replace with token name] to @betashop.eth ",
+                "label": "Send 25% of my  $ [replace with token name] to @betashop.eth",
                 "value": "Send 25% of my  $ [replace with token name] to @[betashop.eth|M4]"
             }
         ],
@@ -214,11 +214,11 @@
             },
             {
                 "label": "Swap 100 $degen for  $ [replace with token name]",
-                "value": "Swap 100 $degen for  $ [replace with token name]"
+                "value": "Swap 100 $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed] for  $ [replace with token name]"
             },
             {
                 "label": "Use 40% of my $eth to buy  $ [replace with token name] and 20% to buy $degen",
-                "value": "Use 40% of my $eth to buy  $ [replace with token name] and 20% to buy $degen"
+                "value": "Use 40% of my $eth to buy  $ [replace with token name] and 20% to buy $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed]"
             }
         ],
         "mediaUrls": [
