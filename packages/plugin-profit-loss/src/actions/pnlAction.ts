@@ -3,6 +3,8 @@ import { extractWalletTemplate, pnLTemplate } from "../template";
 import { fetchPnlData, preparePnlQuery } from "../service/pnlService";
 import { getERC20TokenSymbol, MoxieUser } from "@moxie-protocol/moxie-agent-lib";
 import { ethers } from "ethers";
+import * as agentLib from "@moxie-protocol/moxie-agent-lib";
+
 export const PnLAction = {
     name: "PROFIT_LOSS",
     description: "This action can summarize Profit & Loss for a user, wallet address, or token address. It shows the money earned or lost by the specified entity.",
@@ -26,7 +28,8 @@ export const PnLAction = {
         const traceId = message.id;
         const moxieUserInfo = state.moxieUserInfo as MoxieUser;
         const moxieUserId = moxieUserInfo.id;
-
+        const agentWallet = state.agentWallet as agentLib.MoxieClientWallet;
+        const agentWalletAddress = agentWallet.address.toLowerCase();
         try {
             elizaLogger.debug(traceId, `[PnLAction] [${moxieUserId}] Starting PnL calculation`);
 
@@ -61,15 +64,36 @@ export const PnLAction = {
 
             elizaLogger.debug(traceId, `[PnLAction] Segregated token addresses: ${JSON.stringify(tokenAddresses)}`);
             elizaLogger.debug(traceId, `[PnLAction] Segregated wallet addresses: ${JSON.stringify(walletAddresses)}`);
+            elizaLogger.debug(traceId, `[PnLAction] Agent wallet address: ${agentWalletAddress}`);
+            if (walletPnlResponse.analysisFor === "agent") {
+                if (!state.agentWallet) {
+                    throw new Error("Agent wallet not found in state");
+                }
+
+                if (!(state.agentWallet as agentLib.MoxieClientWallet).delegated) {
+                    throw new Error("Delegate access not found for agent wallet");
+                }
+                walletPnlResponse.walletAddresses = [agentWalletAddress];
+                walletPnlResponse.analysisType = "WALLET_PNL";
+            } else if (walletPnlResponse.analysisFor === "user") {
+                walletPnlResponse.moxieUserIds = [moxieUserId];
+                walletPnlResponse.analysisType = "USER_PNL";
+            }
 
             // use dune table called result_wallet_pnl to get the PnL data
             const pnlQuery = await preparePnlQuery(walletPnlResponse);
 
             const pnlData = await fetchPnlData(pnlQuery);
 
-            elizaLogger.debug(traceId, `[PnLAction] pnlData: ${pnlData}`);
+            // calculate the total PnL
+            const totalPnl = pnlData.reduce((acc, curr) => acc + curr.profit_loss, 0);
 
-            const pnlDataTemplate = pnLTemplate.replace("{{pnlData}}", JSON.stringify(pnlData));
+            elizaLogger.debug(traceId, `[PnLAction] pnlData: ${pnlData}`);
+            elizaLogger.debug(traceId, `[PnLAction] totalPnl: ${totalPnl}`);
+
+            const pnlDataTemplate = pnLTemplate
+                .replace("{{pnlData}}", JSON.stringify(pnlData))
+                .replace("{{totalPnl}}", totalPnl.toString());
 
             const currentContext = composeContext({
                 state,
