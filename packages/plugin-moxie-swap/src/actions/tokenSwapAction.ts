@@ -2031,7 +2031,14 @@ async function getTargetQuantityForBalanceBasedSwaps(
     }
 
     // calculate the percentage to be used for the swap
-    const percentage = balance.type === 'FULL' ? 100 : balance.percentage;
+    let percentage = balance.type === 'FULL' ? 100 : balance.percentage;
+    
+    // If ETH and 100%, use 99% instead
+    if (sellTokenSymbol === "ETH" && percentage === 100) {
+        percentage = 99;
+        elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [tokenSwapAction] [balance] Using 99% instead of 100% for ETH`);
+    }
+    
     // Scale up by a larger factor (e.g., 1e7)
     quantityInWEI = (BigInt(currentWalletBalance) * BigInt(percentage * 1e7)) / BigInt(1e9)
     elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [tokenSwapAction] [balance] quantityInWEI: ${quantityInWEI}`);

@@ -1138,7 +1138,15 @@ async function getTargetQuantityForBalanceBasedTokenTransfer(
         // Calculate transfer amount based on percentage
         // Using 1e9 as base to maintain precision while avoiding overflow
         const percentageBase = 1e9;
-        const scaledPercentage = balance.percentage * 1e7; // Scale up by 1e7 to maintain precision
+        // If ETH and 100%, use 99% instead to leave gas for transaction
+        const adjustedPercentage = (tokenSymbol.toUpperCase() === "ETH" && balance.percentage === 100)
+            ? 99
+            : balance.percentage;
+        elizaLogger.debug(
+            context.traceId,
+            `[tokenTransfer] [${context.moxieUserId}] [getTargetQuantityForBalanceBasedTokenTransfer] Original percentage: ${balance.percentage}, Adjusted percentage: ${adjustedPercentage}`
+        );
+        const scaledPercentage = adjustedPercentage * 1e7; // Scale up by 1e7 to maintain precision
         const quantityInWEI = (walletBalance * BigInt(scaledPercentage)) / BigInt(percentageBase);
 
         elizaLogger.debug(
