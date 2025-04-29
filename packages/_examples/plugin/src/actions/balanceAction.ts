@@ -10,7 +10,7 @@ import {
     generateObject,
     ModelClass,
 } from "@senpi-ai/core";
-import { MoxieWalletClient } from "@senpi-ai/senpi-agent-lib/src/wallet";
+import { SenpiWalletClient } from "@senpi-ai/senpi-agent-lib/src/wallet";
 import { formatEther, http, createPublicClient } from "viem";
 import { base } from "viem/chains";
 import { getTokenBalance } from "../utils/balance";
@@ -40,7 +40,7 @@ export const balanceAction: Action = {
             chain: base,
             transport: http(),
         });
-        const { address } = state.agentWallet as MoxieWalletClient;
+        const { address } = state.agentWallet as SenpiWalletClient;
 
         const balance = await publicClient.getBalance({
             address: address as `0x${string}`,

@@ -1,6 +1,6 @@
 import { elizaLogger, IAgentConfig } from "@senpi-ai/core";
 
-export interface MoxiePortfolio {
+export interface SenpiPortfolio {
     currentPrice: number;
     fanTokenName: string;
     fanTokenSymbol: string;
@@ -14,25 +14,25 @@ export interface MoxiePortfolio {
     unlockedTvl: number;
     fanTokenAddress: string;
     totalTvl: number;
-    fanTokenMoxieUserId: string;
+    fanTokenSenpiUserId: string;
 }
 
-interface MoxiePortfolioResponse {
+interface SenpiPortfolioResponse {
     data: {
         MoxieUserPortfolios: {
-            MoxieUserPortfolio: MoxiePortfolio[];
+            MoxieUserPortfolio: SenpiPortfolio[];
         };
     };
 }
 
 const AIRSTACK_GRAPHQL_ENDPOINT = process.env.AIRSTACK_GRAPHQL_ENDPOINT;
 
-export async function fetchPortfolioByMoxieIdOrderByTVL(
-    moxieId: string,
+export async function fetchPortfolioBySenpiIdOrderByTVL(
+    senpiId: string,
     limit: number = 10
-): Promise<MoxiePortfolio[]> {
+): Promise<SenpiPortfolio[]> {
     try {
-        elizaLogger.info(`Fetching portfolio for moxieId: ${moxieId}`);
+        elizaLogger.info(`Fetching portfolio for senpiId: ${senpiId}`);
         const response = await fetch(AIRSTACK_GRAPHQL_ENDPOINT, {
             method: "POST",
             headers: {
@@ -41,8 +41,8 @@ export async function fetchPortfolioByMoxieIdOrderByTVL(
             },
             body: JSON.stringify({
                 query: `
-          query GetPortfolio($moxieUserId: String!) {
-            MoxieUserPortfolios(input: {filter: {moxieUserId: { _eq: $moxieUserId }}, order: {totalTvl: DESC}, limit: ${limit}}) {
+          query GetPortfolio($usdcUserId: String!) {
+            MoxieUserPortfolios(input: {filter: {senpiUserId: { _eq: $usdcUserId }}, order: {totalTvl: DESC}, limit: ${limit}}) {
               MoxieUserPortfolio {
                 currentPrice
                 fanTokenName
@@ -57,13 +57,13 @@ export async function fetchPortfolioByMoxieIdOrderByTVL(
                 unlockedTvl
                 fanTokenAddress
                 totalTvl
-                fanTokenMoxieUserId
+                fanTokenSenpiUserId
               }
             }
           }
         `,
                 variables: {
-                    moxieUserId: moxieId,
+                    senpiUserId: senpiId,
                 },
             }),
         });
@@ -72,7 +72,7 @@ export async function fetchPortfolioByMoxieIdOrderByTVL(
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = (await response.json()) as MoxiePortfolioResponse;
+        const data = (await response.json()) as SenpiPortfolioResponse;
         return data.data.MoxieUserPortfolios.MoxieUserPortfolio;
     } catch (error) {
         console.error("Error fetching portfolio:", error);

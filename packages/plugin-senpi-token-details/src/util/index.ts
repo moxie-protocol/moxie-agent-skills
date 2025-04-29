@@ -2,7 +2,7 @@ import { IAgentRuntime } from "@senpi-ai/core";
 
 const CACHE_EXPIRATION = 60000; // 1 minute in milliseconds
 
-export async function setMoxieUserIdCache(
+export async function setSenpiUserIdCache(
     data: string,
     cacheKey: string,
     runtime: IAgentRuntime
@@ -12,7 +12,7 @@ export async function setMoxieUserIdCache(
     });
 }
 
-export async function getMoxieCache(
+export async function getSenpiCache(
     cacheKey: string,
     runtime: IAgentRuntime
 ): Promise<string | null> {

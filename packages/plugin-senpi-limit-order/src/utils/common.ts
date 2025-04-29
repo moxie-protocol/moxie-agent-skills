@@ -16,7 +16,7 @@ export async function handleTransactionStatus(
     txHash: string
 ): Promise<FunctionResponse<string>> {
     elizaLogger.debug(
-        `[${context.moxieUserId}] [handleTransactionStatus] called with input details: [${txHash}]`
+        `[${context.senpiUserId}] [handleTransactionStatus] called with input details: [${txHash}]`
     );
     let txnReceipt: ethers.providers.TransactionReceipt | null = null;
 
@@ -28,7 +28,7 @@ export async function handleTransactionStatus(
         );
         if (!txnReceipt) {
             elizaLogger.error(
-                `[${context.moxieUserId}] [handleTransactionStatus] Transaction receipt timeout`
+                `[${context.senpiUserId}] [handleTransactionStatus] Transaction receipt timeout`
             );
             return {
                 data: null,
@@ -40,14 +40,14 @@ export async function handleTransactionStatus(
 
         if (txnReceipt.status === 1) {
             elizaLogger.debug(
-                `[${context.moxieUserId}] [handleTransactionStatus] transaction successful: ${txHash}`
+                `[${context.senpiUserId}] [handleTransactionStatus] transaction successful: ${txHash}`
             );
             return {
                 data: txHash,
             };
         } else {
             elizaLogger.error(
-                `[${context.moxieUserId}] [handleTransactionStatus] transaction failed: ${txHash} with status: ${txnReceipt.status}`
+                `[${context.senpiUserId}] [handleTransactionStatus] transaction failed: ${txHash} with status: ${txnReceipt.status}`
             );
             return {
                 data: null,
@@ -58,7 +58,7 @@ export async function handleTransactionStatus(
         const errorMessage =
             error instanceof Error ? error.message : "Unknown error";
         elizaLogger.error(
-            `[${context.moxieUserId}] [handleTransactionStatus] Error waiting for transaction receipt: ${errorMessage}`
+            `[${context.senpiUserId}] [handleTransactionStatus] Error waiting for transaction receipt: ${errorMessage}`
         );
         return {
             callBackTemplate: APPLICATION_ERROR(
@@ -70,7 +70,7 @@ export async function handleTransactionStatus(
 
 /**
  * Handles the status of a blockchain transaction by waiting for confirmation and checking the receipt
- * @param moxieUserId The ID of the Moxie user initiating the transaction
+ * @param senpiUserId The ID of the Senpi user initiating the transaction
  * @param provider The Ethereum JSON RPC provider used to interact with the blockchain
  * @param txHash The transaction hash to monitor
  * @returns Promise that resolves to the transaction receipt if successful, or null if failed
@@ -78,13 +78,13 @@ export async function handleTransactionStatus(
  */
 export async function handleTransactionStatusSwap(
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     provider: ethers.providers.JsonRpcProvider,
     txHash: string
 ): Promise<ethers.providers.TransactionReceipt | null> {
     elizaLogger.debug(
         traceId,
-        `[${moxieUserId}] [handleTransactionStatus] called with input details: [${txHash}]`
+        `[${senpiUserId}] [handleTransactionStatus] called with input details: [${txHash}]`
     );
     let txnReceipt: ethers.providers.TransactionReceipt | null = null;
 
@@ -97,7 +97,7 @@ export async function handleTransactionStatusSwap(
         if (!txnReceipt) {
             elizaLogger.error(
                 traceId,
-                `[${moxieUserId}] [handleTransactionStatus] Transaction receipt timeout`
+                `[${senpiUserId}] [handleTransactionStatus] Transaction receipt timeout`
             );
             return null;
         }
@@ -105,13 +105,13 @@ export async function handleTransactionStatusSwap(
         if (txnReceipt.status === 1) {
             elizaLogger.debug(
                 traceId,
-                `[${moxieUserId}] [handleTransactionStatus] transaction successful: ${txHash}`
+                `[${senpiUserId}] [handleTransactionStatus] transaction successful: ${txHash}`
             );
             return txnReceipt;
         } else {
             elizaLogger.error(
                 traceId,
-                `[${moxieUserId}] [handleTransactionStatus] transaction failed: ${txHash} with status: ${txnReceipt.status}`
+                `[${senpiUserId}] [handleTransactionStatus] transaction failed: ${txHash} with status: ${txnReceipt.status}`
             );
             return null;
         }
@@ -120,7 +120,7 @@ export async function handleTransactionStatusSwap(
             error instanceof Error ? error.message : "Unknown error";
         elizaLogger.error(
             traceId,
-            `[${moxieUserId}] [handleTransactionStatus] Error waiting for transaction receipt: ${errorMessage}`
+            `[${senpiUserId}] [handleTransactionStatus] Error waiting for transaction receipt: ${errorMessage}`
         );
         return null;
     }

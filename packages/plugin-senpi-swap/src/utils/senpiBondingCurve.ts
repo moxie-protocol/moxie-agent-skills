@@ -7,10 +7,10 @@ import {
     subjectShareSoldTopic0,
 } from "./constants";
 import {
-    MoxieWalletClient,
-    MoxieWalletSendTransactionInputType,
-    MoxieWalletSendTransactionResponseType,
-} from "@elizaos/moxie-lib";
+    SenpiWalletClient,
+    SenpiWalletSendTransactionInputType,
+    SenpiWalletSendTransactionResponseType,
+} from "@elizaos/senpi-lib";
 
 type SubjectSharePurchasedEvent = {
     args: {
@@ -40,28 +40,28 @@ type SubjectShareSoldEvent = {
  * Buys shares of a creator's tokens using the bonding curve contract
  * @param embeddedWallet The wallet address of the buyer
  * @param creatorSubjectAddress The subject address of the creator whose tokens are being purchased
- * @param amountInWEI The amount of Moxie tokens to spend in WEI
+ * @param amountInWEI The amount of Senpi tokens to spend in WEI
  * @returns Promise that resolves to the transaction response from Privy
  * @throws Error if the transaction fails or if wallet has insufficient funds
  */
 export async function buyShares(
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     embeddedWallet: string,
     creatorSubjectAddress: string,
     amountInWEI: bigint,
-    walletClient: MoxieWalletClient
-): Promise<MoxieWalletSendTransactionResponseType> {
+    walletClient: SenpiWalletClient
+): Promise<SenpiWalletSendTransactionResponseType> {
     elizaLogger.debug(
         traceId,
-        `[creatorCoinSwap] [buyShares] [${moxieUserId}] called with input details: [${embeddedWallet}] [${creatorSubjectAddress}] [${amountInWEI}]`
+        `[creatorCoinSwap] [buyShares] [${senpiUserId}] called with input details: [${embeddedWallet}] [${creatorSubjectAddress}] [${amountInWEI}]`
     );
     try {
         const provider = new ethers.JsonRpcProvider(process.env.BASE_RPC_URL);
         const feeData = await provider.getFeeData();
         elizaLogger.debug(
             traceId,
-            `[creatorCoinSwap] [buyShares] [${moxieUserId}] feeData: ${JSON.stringify(feeData)}`
+            `[creatorCoinSwap] [buyShares] [${senpiUserId}] feeData: ${JSON.stringify(feeData)}`
         );
         const maxPriorityFeePerGas =
             (feeData.maxPriorityFeePerGas! * BigInt(120)) / BigInt(100);
@@ -69,9 +69,9 @@ export async function buyShares(
             (feeData.maxFeePerGas! * BigInt(120)) / BigInt(100);
         elizaLogger.debug(
             traceId,
-            `[creatorCoinSwap] [buyShares] [${moxieUserId}] maxPriorityFeePerGas: ${maxPriorityFeePerGas} maxFeePerGas: ${maxFeePerGas}`
+            `[creatorCoinSwap] [buyShares] [${senpiUserId}] maxPriorityFeePerGas: ${maxPriorityFeePerGas} maxFeePerGas: ${maxFeePerGas}`
         );
-        const swapRequestInput: MoxieWalletSendTransactionInputType = {
+        const swapRequestInput: SenpiWalletSendTransactionInputType = {
             address: embeddedWallet,
             chainType: "ethereum",
             caip2: "eip155:" + (process.env.CHAIN_ID || "8453"),
@@ -95,7 +95,7 @@ export async function buyShares(
         };
         elizaLogger.debug(
             traceId,
-            `[creatorCoinSwap] [buyShares] [${moxieUserId}] swap request: ${JSON.stringify(
+            `[creatorCoinSwap] [buyShares] [${senpiUserId}] swap request: ${JSON.stringify(
                 swapRequestInput,
                 (key, value) =>
                     typeof value === "bigint" ? value.toString() : value
@@ -113,7 +113,7 @@ export async function buyShares(
         );
         elizaLogger.debug(
             traceId,
-            `[creatorCoinSwap] [buyShares] [${moxieUserId}] swap response: ${JSON.stringify(swapResponse)}`
+            `[creatorCoinSwap] [buyShares] [${senpiUserId}] swap response: ${JSON.stringify(swapResponse)}`
         );
         return swapResponse;
     } catch (error) {
@@ -143,7 +143,7 @@ export async function buyShares(
         }
         elizaLogger.error(
             traceId,
-            `[creatorCoinSwap] [buyShares] [${moxieUserId}] [ERROR] Error executing buyShares: ${JSON.stringify(error)}`
+            `[creatorCoinSwap] [buyShares] [${senpiUserId}] [ERROR] Error executing buyShares: ${JSON.stringify(error)}`
         );
         throw new Error(
             "Failed to execute buy shares transaction. Please try again."
@@ -155,14 +155,14 @@ export async function buyShares(
  * Creates input parameters for a buy shares transaction
  * @param embeddedWallet The wallet address of the buyer
  * @param creatorSubjectAddress The subject address of the creator whose tokens are being purchased
- * @param amountInWEI The amount of Moxie tokens to spend in WEI
+ * @param amountInWEI The amount of Senpi tokens to spend in WEI
  * @returns EthereumSendTransactionInputType object with transaction parameters
  */
 export function createBuyRequestInput(
     embeddedWallet: string,
     creatorSubjectAddress: string,
     amountInWEI: bigint
-): MoxieWalletSendTransactionInputType {
+): SenpiWalletSendTransactionInputType {
     return {
         address: embeddedWallet,
         chainType: "ethereum",
@@ -195,7 +195,7 @@ export function createSwapRequestInput(
     embeddedWallet: string,
     creatorSubjectAddress: string,
     amountInWEI: bigint
-): MoxieWalletSendTransactionInputType {
+): SenpiWalletSendTransactionInputType {
     return createBuyRequestInput(
         embeddedWallet,
         creatorSubjectAddress,
@@ -206,26 +206,26 @@ export function createSwapRequestInput(
 /**
  * Extracts and decodes share transfer details from a transaction receipt
  * @param receipt The transaction receipt containing the transfer logs
- * @param moxieUserId The user ID of the Moxie user
- * @returns Object containing the amount of creator coins bought and Moxie tokens sold
+ * @param senpiUserId The user ID of the Senpi user
+ * @returns Object containing the amount of creator coins bought and Senpi tokens sold
  */
 export function decodeBuySharesEvent(
     traceId: string,
     receipt: ethers.TransactionReceipt,
-    moxieUserId: string
-): { creatorCoinsBought: string; moxieSold: string } {
+    senpiUserId: string
+): { creatorCoinsBought: string; senpiSold: string } {
     // Find the share purchase event log
     const shareTransferLog = receipt.logs.find(
         (log) => log.topics[0] === subjectSharePurchasedTopic0
     );
     elizaLogger.debug(
         traceId,
-        `[creatorCoinSwap] [decodeBuySharesEvent] [${moxieUserId}] shareTransferLog: ${JSON.stringify(shareTransferLog)}`
+        `[creatorCoinSwap] [decodeBuySharesEvent] [${senpiUserId}] shareTransferLog: ${JSON.stringify(shareTransferLog)}`
     );
 
     if (!shareTransferLog) {
         throw new Error(
-            `[creatorCoinSwap] [decodeBuySharesEvent] [${moxieUserId}] Share transfer event log not found`
+            `[creatorCoinSwap] [decodeBuySharesEvent] [${senpiUserId}] Share transfer event log not found`
         );
     }
 
@@ -238,7 +238,7 @@ export function decodeBuySharesEvent(
 
     elizaLogger.debug(
         traceId,
-        `[creatorCoinSwap] [decodeBuySharesEvent] [${moxieUserId}] decodedData: ${JSON.stringify(
+        `[creatorCoinSwap] [decodeBuySharesEvent] [${senpiUserId}] decodedData: ${JSON.stringify(
             decodedData,
             (key, value) =>
                 typeof value === "bigint" ? value.toString() : value
@@ -248,41 +248,41 @@ export function decodeBuySharesEvent(
     // Add null check for args to prevent potential undefined access
     if (!decodedData.args) {
         throw new Error(
-            `[creatorCoinSwap] [decodeBuySharesEvent] [${moxieUserId}] Event args not found in decoded data`
+            `[creatorCoinSwap] [decodeBuySharesEvent] [${senpiUserId}] Event args not found in decoded data`
         );
     }
 
     // Extract and format the transfer amounts
     const creatorCoinsBought = ethers.formatEther(decodedData.args._buyAmount);
-    const moxieSold = ethers.formatEther(decodedData.args._sellAmount);
+    const senpiSold = ethers.formatEther(decodedData.args._sellAmount);
 
     elizaLogger.debug(
         traceId,
-        `[creatorCoinSwap] [decodeBuySharesEvent] [${moxieUserId}] creatorCoinsBought: ${creatorCoinsBought} moxieSold: ${moxieSold}`
+        `[creatorCoinSwap] [decodeBuySharesEvent] [${senpiUserId}] creatorCoinsBought: ${creatorCoinsBought} senpiSold: ${senpiSold}`
     );
 
     return {
         creatorCoinsBought,
-        moxieSold,
+        senpiSold,
     };
 }
 
 /**
  * Calculates the amount of tokens that will be received for a given buy amount
- * @param moxieUserId The ID of the Moxie user making the purchase
+ * @param senpiUserId The ID of the Senpi user making the purchase
  * @param subjectAddress The address of the subject token being purchased
  * @param amount The amount of tokens to buy
  * @returns The amount of tokens that will be received
  */
 export async function calculateTokensBuy(
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     subjectAddress: string,
     amount: bigint
 ): Promise<bigint> {
     elizaLogger.debug(
         traceId,
-        `[calculateTokensBuy] [${moxieUserId}] Starting calculation`,
+        `[calculateTokensBuy] [${senpiUserId}] Starting calculation`,
         {
             subjectAddress,
             amount: amount.toString(),
@@ -326,7 +326,7 @@ export async function calculateTokensBuy(
 
         elizaLogger.debug(
             traceId,
-            `[calculateTokensBuy] [${moxieUserId}] Calculation successful`,
+            `[calculateTokensBuy] [${senpiUserId}] Calculation successful`,
             {
                 tokensToReceive: tokens[0].toString(),
             }
@@ -336,7 +336,7 @@ export async function calculateTokensBuy(
     } catch (error) {
         elizaLogger.error(
             traceId,
-            `[calculateTokensBuy] [${moxieUserId}] Calculation failed`,
+            `[calculateTokensBuy] [${senpiUserId}] Calculation failed`,
             {
                 error: error instanceof Error ? error.message : String(error),
                 subjectAddress,
@@ -357,20 +357,20 @@ export async function calculateTokensBuy(
 
 /**
  * Calculates the amount of tokens that will be received for a given sell amount
- * @param moxieUserId The ID of the Moxie user making the purchase
+ * @param senpiUserId The ID of the Senpi user making the purchase
  * @param subjectAddress The address of the subject token being purchased
  * @param amountInWEI The amount of tokens to sell in WEI
  * @returns The amount of tokens that will be received
  */
 export async function calculateTokensSell(
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     subjectAddress: string,
     amountInWEI: bigint
 ): Promise<bigint> {
     elizaLogger.debug(
         traceId,
-        `[calculateTokensSell] [${moxieUserId}] Starting calculation`,
+        `[calculateTokensSell] [${senpiUserId}] Starting calculation`,
         {
             subjectAddress,
             amount: amountInWEI.toString(),
@@ -414,7 +414,7 @@ export async function calculateTokensSell(
 
         elizaLogger.debug(
             traceId,
-            `[calculateTokensSell] [${moxieUserId}] Calculation successful`,
+            `[calculateTokensSell] [${senpiUserId}] Calculation successful`,
             {
                 tokensToReceive: tokens[0].toString(),
             }
@@ -424,7 +424,7 @@ export async function calculateTokensSell(
     } catch (error) {
         elizaLogger.error(
             traceId,
-            `[calculateTokensSell] [${moxieUserId}] Calculation failed`,
+            `[calculateTokensSell] [${senpiUserId}] Calculation failed`,
             {
                 error: error instanceof Error ? error.message : String(error),
                 subjectAddress,
@@ -445,7 +445,7 @@ export async function calculateTokensSell(
 
 /**
  * Sells shares of a creator's tokens using the bonding curve contract
- * @param moxieUserId The ID of the Moxie user selling the shares
+ * @param senpiUserId The ID of the Senpi user selling the shares
  * @param embeddedWallet The wallet address of the seller
  * @param creatorSubjectAddress The subject address of the creator whose tokens are being sold
  * @param amountInWEI The amount of creator tokens to sell in WEI
@@ -454,22 +454,22 @@ export async function calculateTokensSell(
  */
 export async function sellShares(
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     embeddedWallet: string,
     creatorSubjectAddress: string,
     amountInWEI: bigint,
-    walletClient: MoxieWalletClient
-): Promise<MoxieWalletSendTransactionInputType> {
+    walletClient: SenpiWalletClient
+): Promise<SenpiWalletSendTransactionInputType> {
     elizaLogger.debug(
         traceId,
-        `[creatorCoinSwap] [sellShares] [${moxieUserId}] called with input details: [${embeddedWallet}] [${creatorSubjectAddress}] [${amountInWEI}]`
+        `[creatorCoinSwap] [sellShares] [${senpiUserId}] called with input details: [${embeddedWallet}] [${creatorSubjectAddress}] [${amountInWEI}]`
     );
     try {
         const provider = new ethers.JsonRpcProvider(process.env.BASE_RPC_URL);
         const feeData = await provider.getFeeData();
         elizaLogger.debug(
             traceId,
-            `[creatorCoinSwap] [sellShares] [${moxieUserId}] feeData: ${JSON.stringify(feeData)}`
+            `[creatorCoinSwap] [sellShares] [${senpiUserId}] feeData: ${JSON.stringify(feeData)}`
         );
         const maxPriorityFeePerGas =
             (feeData.maxPriorityFeePerGas! * BigInt(120)) / BigInt(100);
@@ -477,9 +477,9 @@ export async function sellShares(
             (feeData.maxFeePerGas! * BigInt(120)) / BigInt(100);
         elizaLogger.debug(
             traceId,
-            `[creatorCoinSwap] [sellShares] [${moxieUserId}] maxPriorityFeePerGas: ${maxPriorityFeePerGas} maxFeePerGas: ${maxFeePerGas}`
+            `[creatorCoinSwap] [sellShares] [${senpiUserId}] maxPriorityFeePerGas: ${maxPriorityFeePerGas} maxFeePerGas: ${maxFeePerGas}`
         );
-        const swapRequestInput: MoxieWalletSendTransactionInputType = {
+        const swapRequestInput: SenpiWalletSendTransactionInputType = {
             address: embeddedWallet,
             chainType: "ethereum",
             caip2: "eip155:" + (process.env.CHAIN_ID || "8453"),
@@ -490,7 +490,7 @@ export async function sellShares(
                     abi: BONDING_CURVE_ABI,
                     args: [
                         creatorSubjectAddress,
-                        amountInWEI, // tokens in wei and not moxie
+                        amountInWEI, // tokens in wei and not senpi
                         0,
                         "0x0000000000000000000000000000000000000000",
                     ],
@@ -503,7 +503,7 @@ export async function sellShares(
         };
         elizaLogger.debug(
             traceId,
-            `[creatorCoinSwap] [sellShares] [${moxieUserId}] swap request: ${JSON.stringify(
+            `[creatorCoinSwap] [sellShares] [${senpiUserId}] swap request: ${JSON.stringify(
                 swapRequestInput,
                 (key, value) =>
                     typeof value === "bigint" ? value.toString() : value
@@ -521,13 +521,13 @@ export async function sellShares(
         );
         elizaLogger.debug(
             traceId,
-            `[creatorCoinSwap] [sellShares] [${moxieUserId}] swap response: ${JSON.stringify(swapResponse)}`
+            `[creatorCoinSwap] [sellShares] [${senpiUserId}] swap response: ${JSON.stringify(swapResponse)}`
         );
         return swapResponse;
     } catch (error) {
         elizaLogger.error(
             traceId,
-            `[creatorCoinSwap] [sellShares] [${moxieUserId}] Error executing sellShares: ${JSON.stringify(error)}`
+            `[creatorCoinSwap] [sellShares] [${senpiUserId}] Error executing sellShares: ${JSON.stringify(error)}`
         );
         if (error instanceof Error) {
             if (
@@ -562,26 +562,26 @@ export async function sellShares(
 /**
  * Extracts and decodes share transfer details from a transaction receipt
  * @param receipt The transaction receipt containing the transfer logs
- * @param moxieUserId The user ID of the Moxie user
- * @returns Object containing the amount of creator coins bought and Moxie tokens sold
+ * @param senpiUserId The user ID of the Senpi user
+ * @returns Object containing the amount of creator coins bought and Senpi tokens sold
  */
 export function decodeSellSharesEvent(
     traceId: string,
     receipt: ethers.TransactionReceipt,
-    moxieUserId: string
-): { creatorCoinsSold: string; moxieReceived: string } {
+    senpiUserId: string
+): { creatorCoinsSold: string; senpiReceived: string } {
     // Find the share sale event log
     const shareTransferLog = receipt.logs.find(
         (log) => log.topics[0] === subjectShareSoldTopic0
     );
     elizaLogger.debug(
         traceId,
-        `[creatorCoinSwap] [decodeSellSharesEvent] [${moxieUserId}] shareTransferLog: ${JSON.stringify(shareTransferLog)}`
+        `[creatorCoinSwap] [decodeSellSharesEvent] [${senpiUserId}] shareTransferLog: ${JSON.stringify(shareTransferLog)}`
     );
 
     if (!shareTransferLog) {
         throw new Error(
-            `[creatorCoinSwap] [decodeSellSharesEvent] [${moxieUserId}] Share sale event log not found`
+            `[creatorCoinSwap] [decodeSellSharesEvent] [${senpiUserId}] Share sale event log not found`
         );
     }
 
@@ -595,13 +595,13 @@ export function decodeSellSharesEvent(
     // Add null check for args to prevent potential undefined access
     if (!decodedData.args) {
         throw new Error(
-            `[creatorCoinSwap] [decodeSellSharesEvent] [${moxieUserId}] Event args not found in decoded data`
+            `[creatorCoinSwap] [decodeSellSharesEvent] [${senpiUserId}] Event args not found in decoded data`
         );
     }
 
     elizaLogger.debug(
         traceId,
-        `[creatorCoinSwap] [decodeSellSharesEvent] [${moxieUserId}] decodedData: ${JSON.stringify(
+        `[creatorCoinSwap] [decodeSellSharesEvent] [${senpiUserId}] decodedData: ${JSON.stringify(
             decodedData,
             (key, value) =>
                 typeof value === "bigint" ? value.toString() : value
@@ -610,15 +610,15 @@ export function decodeSellSharesEvent(
 
     // Extract and format the transfer amounts
     const creatorCoinsSold = ethers.formatEther(decodedData.args._sellAmount);
-    const moxieReceived = ethers.formatEther(decodedData.args._buyAmount);
+    const senpiReceived = ethers.formatEther(decodedData.args._buyAmount);
 
     elizaLogger.debug(
         traceId,
-        `[creatorCoinSwap] [decodeSellSharesEvent] [${moxieUserId}] creatorCoinsSold: ${creatorCoinsSold} moxieReceived: ${moxieReceived}`
+        `[creatorCoinSwap] [decodeSellSharesEvent] [${senpiUserId}] creatorCoinsSold: ${creatorCoinsSold} senpiReceived: ${senpiReceived}`
     );
 
     return {
         creatorCoinsSold,
-        moxieReceived,
+        senpiReceived,
     };
 }

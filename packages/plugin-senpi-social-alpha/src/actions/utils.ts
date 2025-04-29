@@ -9,13 +9,13 @@ import {
 } from "@senpi-ai/core";
 import {
     portfolioService,
-    MoxieUser,
+    SenpiUser,
     fetchPluginTokenGate,
 } from "@senpi-ai/senpi-agent-lib";
 
 import {
     FIVE_MINS,
-    getCurrentMoxieUserContextCacheKey,
+    getCurrentSenpiUserContextCacheKey,
     getTopCreatorsCacheKey,
     ONE_DAY,
 } from "../cache";
@@ -28,55 +28,55 @@ const FREEMIUM_TRENDING_CREATORS_LIST = FREEMIUM_TRENDING_CREATORS
     ? FREEMIUM_TRENDING_CREATORS.split(",")
     : [];
 
-export async function fetchTopCreatorsByMoxieId(
-    moxieId: string,
+export async function fetchTopCreatorsBySenpiId(
+    senpiId: string,
     noOfUsers: number,
     runtime: IAgentRuntime
 ): Promise<string[]> {
     try {
-        elizaLogger.debug(`-- fetching top creators for ${moxieId}`);
+        elizaLogger.debug(`-- fetching top creators for ${senpiId}`);
         const cachedCreators = await runtime.cacheManager.get(
-            getTopCreatorsCacheKey(moxieId)
+            getTopCreatorsCacheKey(senpiId)
         );
 
         if (cachedCreators) {
-            elizaLogger.debug(`using cached creators list for ${moxieId}`);
+            elizaLogger.debug(`using cached creators list for ${senpiId}`);
             return JSON.parse(cachedCreators as string);
         }
         const portfolio =
-            await portfolioService.fetchPortfolioByMoxieIdOrderByTVL(
-                moxieId,
+            await portfolioService.fetchPortfolioBySenpiIdOrderByTVL(
+                senpiId,
                 noOfUsers
             );
 
-        const moxieUserIds = portfolio
+        const senpiUserIds = portfolio
             .filter(
                 (p) =>
-                    p?.fanTokenMoxieUserId && p?.fanTokenMoxieUserId !== moxieId
+                    p?.fanTokenSenpiUserId && p?.fanTokenSenpiUserId !== senpiId
             )
-            .map((p) => p.fanTokenMoxieUserId);
+            .map((p) => p.fanTokenSenpiUserId);
 
-        elizaLogger.debug(`top creators moxieUserIds: ${moxieUserIds}`);
-        elizaLogger.debug(`caching creators list for ${moxieId}`);
+        elizaLogger.debug(`top creators senpiUserIds: ${senpiUserIds}`);
+        elizaLogger.debug(`caching creators list for ${senpiId}`);
 
-        if (moxieUserIds.length > 0) {
+        if (senpiUserIds.length > 0) {
             await runtime.cacheManager.set(
-                getTopCreatorsCacheKey(moxieId),
-                JSON.stringify(moxieUserIds),
+                getTopCreatorsCacheKey(senpiId),
+                JSON.stringify(senpiUserIds),
                 {
                     expires: Date.now() + FIVE_MINS,
                 }
             );
         }
 
-        return moxieUserIds;
+        return senpiUserIds;
     } catch (error) {
-        elizaLogger.error(`Error fetching portfolio for ${moxieId}:`, error);
+        elizaLogger.error(`Error fetching portfolio for ${senpiId}:`, error);
     }
     return [];
 }
 
-export async function getMoxieIdsFromMessage(
+export async function getSenpiIdsFromMessage(
     message: Memory,
     contextExampleTemplate: string,
     state?: State,
@@ -86,19 +86,19 @@ export async function getMoxieIdsFromMessage(
 ): Promise<string[]> {
     try {
         if (isTopTokenOwnersQuery) {
-            const moxieUserInfo: MoxieUser = state.moxieUserInfo as MoxieUser;
-            const topCreatorMoxieIds = await fetchTopCreatorsByMoxieId(
-                moxieUserInfo.id,
+            const senpiUserInfo: SenpiUser = state.senpiUserInfo as SenpiUser;
+            const topCreatorSenpiIds = await fetchTopCreatorsBySenpiId(
+                senpiUserInfo.id,
                 noOfTopUsers || 10,
                 runtime
             );
-            return topCreatorMoxieIds;
+            return topCreatorSenpiIds;
         }
 
-        const key = getCurrentMoxieUserContextCacheKey(message.roomId);
+        const key = getCurrentSenpiUserContextCacheKey(message.roomId);
         const messageText = message.content.text || "";
-        // const moxieIdPattern = /\bM\d+\b/g;
-        let moxieIds: string[] = [];
+        // const senpiIdPattern = /\bM\d+\b/g;
+        let senpiIds: string[] = [];
 
         //check for any text with @ which is failed attempt to mention in the messageText
         const atPattern = /@\[([^|\]]+)\|M\d+\]/g;
@@ -107,14 +107,14 @@ export async function getMoxieIdsFromMessage(
             elizaLogger.debug(
                 `Found @ mentions in message: ${atMatches.join(", ")}`
             );
-            // Extract Moxie IDs from mentions in format @[name|MID]
-            const moxieIdsFromMentions = atMatches
+            // Extract Senpi IDs from mentions in format @[name|MID]
+            const senpiIdsFromMentions = atMatches
                 .map((match) => {
                     const parts = match.match(/@\[(.*?)\|(M\d+)\]/);
                     return parts ? parts[2] : null;
                 })
                 .filter((id) => id !== null);
-            moxieIds = moxieIdsFromMentions;
+            senpiIds = senpiIdsFromMentions;
         } else {
             // Check for invalid @ mentions
             const invalidAtPattern = /@\w+/g;
@@ -129,18 +129,18 @@ export async function getMoxieIdsFromMessage(
             }
         }
 
-        elizaLogger.debug(`moxieIds at this point: ${moxieIds}`);
-        if (moxieIds.length === 0) {
-            const cachedMoxieUserContext = await runtime.cacheManager.get(key);
+        elizaLogger.debug(`senpiIds at this point: ${senpiIds}`);
+        if (senpiIds.length === 0) {
+            const cachedSenpiUserContext = await runtime.cacheManager.get(key);
 
-            if (cachedMoxieUserContext) {
-                moxieIds = JSON.parse(cachedMoxieUserContext as string);
+            if (cachedSenpiUserContext) {
+                senpiIds = JSON.parse(cachedSenpiUserContext as string);
             }
 
-            const moxieUserInfo: MoxieUser = state.moxieUserInfo as MoxieUser;
-            elizaLogger.debug(`fetching top creators for ${moxieUserInfo.id}`);
-            const topCreatorMoxieIds = await fetchTopCreatorsByMoxieId(
-                moxieUserInfo.id,
+            const senpiUserInfo: SenpiUser = state.senpiUserInfo as SenpiUser;
+            elizaLogger.debug(`fetching top creators for ${senpiUserInfo.id}`);
+            const topCreatorSenpiIds = await fetchTopCreatorsBySenpiId(
+                senpiUserInfo.id,
                 noOfTopUsers || 10,
                 runtime
             );
@@ -148,8 +148,8 @@ export async function getMoxieIdsFromMessage(
             // prompt checking in current question is followup question of previous one
             const newstate = await runtime.composeState(message, {
                 message: message.content.text,
-                moxieIds: moxieIds,
-                topCreatorMoxieIds: topCreatorMoxieIds,
+                senpiIds: senpiIds,
+                topCreatorSenpiIds: topCreatorSenpiIds,
                 examples: contextExampleTemplate,
             });
             // Create a summary context for the model
@@ -159,23 +159,23 @@ export async function getMoxieIdsFromMessage(
             });
 
             // Generate summary using the model
-            const generatedMoxieIds = await generateText({
+            const generatedSenpiIds = await generateText({
                 runtime,
                 context,
                 modelClass: ModelClass.SMALL,
             });
 
-            moxieIds = JSON.parse(generatedMoxieIds as string);
+            senpiIds = JSON.parse(generatedSenpiIds as string);
         }
 
-        await runtime.cacheManager.set(key, JSON.stringify(moxieIds), {
+        await runtime.cacheManager.set(key, JSON.stringify(senpiIds), {
             expires: Date.now() + ONE_DAY,
         });
-        elizaLogger.debug(`Moxie IDs from message: ${moxieIds}`);
-        return moxieIds;
+        elizaLogger.debug(`Senpi IDs from message: ${senpiIds}`);
+        return senpiIds;
     } catch (error) {
-        elizaLogger.error("Error getting Moxie IDs from message:", error);
-        console.error("Error getting Moxie IDs from message:", error);
+        elizaLogger.error("Error getting Senpi IDs from message:", error);
+        console.error("Error getting Senpi IDs from message:", error);
         return [];
     }
 }
@@ -205,8 +205,8 @@ export async function streamTextByLines(
     }
 }
 
-export async function handleIneligibleMoxieUsers(
-    ineligibleMoxieUsers,
+export async function handleIneligibleSenpiUsers(
+    ineligibleSenpiUsers,
     callback,
     breakLine = false
 ) {
@@ -217,18 +217,18 @@ export async function handleIneligibleMoxieUsers(
         messageParts.push("\n");
     }
 
-    if (ineligibleMoxieUsers.length == 1) {
-        const userprofileLinkText = `[@${ineligibleMoxieUsers[0].requestedUserName}](https://senpi.ai/profile/${ineligibleMoxieUsers[0].requestedId})`;
+    if (ineligibleSenpiUsers.length == 1) {
+        const userprofileLinkText = `[@${ineligibleSenpiUsers[0].requestedUserName}](https://senpi.ai/profile/${ineligibleSenpiUsers[0].requestedId})`;
 
         let remainingNoOfTokensToBuy =
-            ineligibleMoxieUsers[0].expectedCreatorCoinBalance -
-            ineligibleMoxieUsers[0].actualCreatorCoinBalance;
+            ineligibleSenpiUsers[0].expectedCreatorCoinBalance -
+            ineligibleSenpiUsers[0].actualCreatorCoinBalance;
         if (remainingNoOfTokensToBuy < 0) {
             remainingNoOfTokensToBuy = 0;
         }
 
         if (breakLine === true) {
-            if (ineligibleMoxieUsers[0].actualCreatorCoinBalance > 0) {
+            if (ineligibleSenpiUsers[0].actualCreatorCoinBalance > 0) {
                 messageParts.push(
                     `I can also get you that social alpha on ${userprofileLinkText}, but you’ll need some ${userprofileLinkText} coins to unlock it.\n\n`
                 );
@@ -242,21 +242,21 @@ export async function handleIneligibleMoxieUsers(
                 `I can get you that social alpha on ${userprofileLinkText}, but first you’ll need to buy ${remainingNoOfTokensToBuy} of their coins to unlock it.\n\n`
             );
         }
-        if (ineligibleMoxieUsers[0].actualCreatorCoinBalance > 0) {
+        if (ineligibleSenpiUsers[0].actualCreatorCoinBalance > 0) {
             messageParts.push(
-                `It costs ${remainingNoOfTokensToBuy} (~$${roundToDecimalPlaces(ineligibleMoxieUsers[0].requiredMoxieAmountInUSD, 2)}) ${userprofileLinkText} to access, and right now, you have only ${ineligibleMoxieUsers[0].actualCreatorCoinBalance} ${userprofileLinkText} in your wallet. Want me to grab them for you now? Just say the word, and I’ll handle it! 🚀`
+                `It costs ${remainingNoOfTokensToBuy} (~$${roundToDecimalPlaces(ineligibleSenpiUsers[0].requiredSenpiAmountInUSD, 2)}) ${userprofileLinkText} to access, and right now, you have only ${ineligibleSenpiUsers[0].actualCreatorCoinBalance} ${userprofileLinkText} in your wallet. Want me to grab them for you now? Just say the word, and I’ll handle it! 🚀`
             );
         } else {
             messageParts.push(
-                `It costs ~$${roundToDecimalPlaces(ineligibleMoxieUsers[0].requiredMoxieAmountInUSD, 2)} for lifetime access. Do you want me to buy it for you?`
+                `It costs ~$${roundToDecimalPlaces(ineligibleSenpiUsers[0].requiredSenpiAmountInUSD, 2)} for lifetime access. Do you want me to buy it for you?`
             );
         }
 
         for (const part of messageParts) {
             callback({ text: part });
         }
-    } else if (ineligibleMoxieUsers.length > 1) {
-        const userLinks = ineligibleMoxieUsers
+    } else if (ineligibleSenpiUsers.length > 1) {
+        const userLinks = ineligibleSenpiUsers
             .map(
                 (user) =>
                     `[@${user.requestedUserName}](https://senpi.ai/profile/${user.requestedId})`

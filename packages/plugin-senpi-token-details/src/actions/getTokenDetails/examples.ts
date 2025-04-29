@@ -71,7 +71,7 @@ export const tokenDetailsExamples: ActionExample[][] = [
   - **Bullish Signs**: Double bottom formations on 4-hour and 12-hour charts.
   - **Bearish Risks**: Short-term double top formations on 5-minute and 1-minute charts.
 - **Market Sentiment**: Neutral, with ETF approvals bringing some positivity.
-- **Social Media Buzz**: Increased mentions of Moxie in trading communities.
+- **Social Media Buzz**: Increased mentions of Senpi in trading communities.
 - **Risks**:
   - **High volatility** in the last 24 hours.
   - **Potential liquidity risks** for large trades.

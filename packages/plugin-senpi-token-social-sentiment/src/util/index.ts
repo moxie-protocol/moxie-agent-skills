@@ -10,7 +10,7 @@ const CACHE_EXPIRATION = 120000; // 2 minutes in milliseconds
 
 import { UUID } from "@senpi-ai/core";
 
-export async function setMoxieCache(
+export async function setSenpiCache(
     data: string,
     cacheKey: string,
     runtime: IAgentRuntime
@@ -20,7 +20,7 @@ export async function setMoxieCache(
     });
 }
 
-export async function getMoxieCache(
+export async function getSenpiCache(
     cacheKey: string,
     runtime: IAgentRuntime
 ): Promise<string | null> {

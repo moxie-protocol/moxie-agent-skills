@@ -9,7 +9,7 @@ const commonTokenOutputTemplate = `
 - Show row[user2].dollarValue in the fifth column.
 - similar to this build column for all users in filteredCommonFanTokenHoldings
 ]
-`
+`;
 const creatorCoinAddressesTemplate = `
 <!-- ## Creator Coin Contract Addresses -->
 
@@ -28,7 +28,7 @@ sample output for '## Creator Coin Contract Addresses'
 |--------------|--------------------------------------------|
 | FANCOIN      | 0x1a2b3c4d5e6f7890abcdef1234567890abcdef12 |
 -->
-`
+`;
 export const fanTokenPortfolioSummary = `
 You are summarizing portfolio holdings for a user. Add details about user from message.
 
@@ -45,7 +45,7 @@ Try to answer in the following sequence:
    - Format the entire response in markdown.
    - show ${creatorCoinAddressesTemplate} in markdown comments.
    - If the answer can be found here, stop here, or else go to step 2.
-2. Generate Creator Coin Holdings summary from {{fanTokenPortfolio}} (if present), this data belongs to {{truncatedMoxieUserInfo}}. Try to answer the question asked in {{message}} with these details:
+2. Generate Creator Coin Holdings summary from {{fanTokenPortfolio}} (if present), this data belongs to {{truncatedSenpiUserInfo}}. Try to answer the question asked in {{message}} with these details:
 
 ## Creator Coin Holdings - Top [number of holdings shown in the table] by value
 
@@ -84,4 +84,4 @@ If the answer can be found here, stop here, or else go to step 3.
 3. Check if the answer can be found in {{recentMessages}}:
    - If yes, use that answer directly in markdown format and stop here.
 
-`
+`;

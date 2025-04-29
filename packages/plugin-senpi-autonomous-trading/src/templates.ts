@@ -26,7 +26,7 @@ Please follow these steps to process the user input and generate the appropriate
 3. Extract the required parameters based on the rule type:
 
    For COPY_TRADE and COPY_TRADE_AND_PROFIT:
-   - moxieIds: Find all matches of @[username|id] and extract the 'id' part.
+   - senpiIds: Find all matches of @[username|id] and extract the 'id' part.
    - timeDurationInSec: Look for time-related phrases and convert to seconds. Note: This is not required if there's only one user whose trades are copied.
    - amountInUSD: Find the dollar amount mentioned to "buy" (not sell).
    - profitPercentage (for PROFIT rules only): Find the profit percentage mentioned for selling. Ensure to capture the exact percentage as stated by the user (e.g., if the user mentions 110%, record it as 110; if 10% is mentioned, record it as 10).

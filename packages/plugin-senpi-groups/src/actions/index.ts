@@ -12,7 +12,7 @@ import {
     generateObjectDeprecated,
     streamText,
 } from "@senpi-ai/core";
-import { MoxieUser, moxieUserService } from "@senpi-ai/senpi-agent-lib";
+import { SenpiUser, senpiUserService } from "@senpi-ai/senpi-agent-lib";
 import { manageGroupsTemplate, groupDetailsTemplate } from "../templates";
 import {
     addMembersToGroup,
@@ -68,13 +68,13 @@ export const manageGroupsAction: Action = {
         callback: HandlerCallback
     ) => {
         const traceId = message.id;
-        const moxieUserInfo = state.moxieUserInfo as MoxieUser;
-        const moxieUserId = moxieUserInfo.id;
+        const senpiUserInfo = state.senpiUserInfo as SenpiUser;
+        const senpiUserId = senpiUserInfo.id;
 
         try {
             elizaLogger.debug(
                 traceId,
-                `[MANAGE_GROUPS] [${moxieUserId}] Starting handler with user message: ${JSON.stringify(message)}`
+                `[MANAGE_GROUPS] [${senpiUserId}] Starting handler with user message: ${JSON.stringify(message)}`
             );
 
             const manageGroupsContext = composeContext({
@@ -113,7 +113,7 @@ export const manageGroupsAction: Action = {
                 case "CREATE_GROUP":
                     await handleCreateGroup(
                         traceId,
-                        moxieUserId,
+                        senpiUserId,
                         state,
                         params,
                         callback
@@ -122,7 +122,7 @@ export const manageGroupsAction: Action = {
                 case "CREATE_GROUP_AND_ADD_GROUP_MEMBER":
                     await handleCreateGroupAndAddMember(
                         traceId,
-                        moxieUserId,
+                        senpiUserId,
                         state,
                         params,
                         callback
@@ -131,7 +131,7 @@ export const manageGroupsAction: Action = {
                 case "ADD_GROUP_MEMBER":
                     await handleAddGroupMember(
                         traceId,
-                        moxieUserId,
+                        senpiUserId,
                         state,
                         params,
                         callback
@@ -140,7 +140,7 @@ export const manageGroupsAction: Action = {
                 case "DELETE_GROUP":
                     await handleDeleteGroup(
                         traceId,
-                        moxieUserId,
+                        senpiUserId,
                         state,
                         params,
                         callback
@@ -149,7 +149,7 @@ export const manageGroupsAction: Action = {
                 case "REMOVE_GROUP_MEMBER":
                     await handleRemoveGroupMember(
                         traceId,
-                        moxieUserId,
+                        senpiUserId,
                         state,
                         params,
                         callback
@@ -168,7 +168,7 @@ export const manageGroupsAction: Action = {
                 case "UPDATE_GROUP":
                     await handleUpdateGroup(
                         traceId,
-                        moxieUserId,
+                        senpiUserId,
                         state,
                         params,
                         callback
@@ -209,7 +209,7 @@ export const manageGroupsAction: Action = {
 
 async function handleCreateGroup(
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     state: State,
     params: GroupParams,
     callback: HandlerCallback
@@ -250,7 +250,7 @@ async function handleCreateGroup(
 
 async function handleCreateGroupAndAddMember(
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     state: State,
     params: GroupParams,
     callback: HandlerCallback
@@ -333,7 +333,7 @@ async function handleCreateGroupAndAddMember(
 
 async function handleAddGroupMember(
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     state: State,
     params: GroupParams,
     callback: HandlerCallback
@@ -372,12 +372,12 @@ async function handleAddGroupMember(
             groupId,
             senpiUserIdsToAdd
         )) as GroupOutput;
-        const moxieUserProfiles =
-            await moxieUserService.getUserByMoxieIdMultipleMinimal(
+        const senpiUserProfiles =
+            await senpiUserService.getUserBySenpiIdMultipleMinimal(
                 senpiUserIdsToAdd
             );
         const idToUsernameMap = new Map();
-        moxieUserProfiles.forEach((user, id) => {
+        senpiUserProfiles.forEach((user, id) => {
             idToUsernameMap.set(id, user.userName || id);
         });
 
@@ -410,7 +410,7 @@ async function handleAddGroupMember(
 
 async function handleDeleteGroup(
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     state: State,
     params: GroupParams,
     callback: HandlerCallback
@@ -459,7 +459,7 @@ async function handleDeleteGroup(
 
 async function handleRemoveGroupMember(
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     state: State,
     params: GroupParams,
     callback: HandlerCallback
@@ -497,12 +497,12 @@ async function handleRemoveGroupMember(
             senpiUserIdsToRemove
         )) as GroupOutput;
 
-        const moxieUserProfiles =
-            await moxieUserService.getUserByMoxieIdMultipleMinimal(
+        const senpiUserProfiles =
+            await senpiUserService.getUserBySenpiIdMultipleMinimal(
                 senpiUserIdsToRemove
             );
         const idToUsernameMap = new Map();
-        moxieUserProfiles.forEach((user, id) => {
+        senpiUserProfiles.forEach((user, id) => {
             idToUsernameMap.set(id, user.userName || id);
         });
 
@@ -574,8 +574,8 @@ async function handleGetGroupDetails(
         const memberIds: Set<string> = new Set();
         groupDetails.forEach((group) => {
             (group.members || []).forEach((member) => {
-                if (member?.moxieUserId) {
-                    memberIds.add(member.moxieUserId);
+                if (member?.senpiUserId) {
+                    memberIds.add(member.senpiUserId);
                 }
             });
         });
@@ -585,15 +585,15 @@ async function handleGetGroupDetails(
             `[MANAGE_GROUPS] [GET_GROUP_DETAILS] Member IDs: ${Array.from(memberIds).join(", ")}`
         );
 
-        const moxieUserProfiles =
-            await moxieUserService.getUserByMoxieIdMultipleMinimal(
+        const senpiUserProfiles =
+            await senpiUserService.getUserBySenpiIdMultipleMinimal(
                 Array.from(memberIds)
             );
 
         const userDetails: Record<string, string> = {};
 
         // Step 1: Fill from user profiles
-        for (const [id, user] of moxieUserProfiles.entries()) {
+        for (const [id, user] of senpiUserProfiles.entries()) {
             userDetails[id] = user.userName ?? id;
         }
 
@@ -662,7 +662,7 @@ async function handleGetGroupDetails(
 
 async function handleUpdateGroup(
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     state: State,
     params: GroupParams,
     callback: HandlerCallback

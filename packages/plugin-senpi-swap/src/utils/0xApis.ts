@@ -1,6 +1,6 @@
 import {
-    MoxieWalletClient,
-    MoxieWalletSendTransactionInputType,
+    SenpiWalletClient,
+    SenpiWalletSendTransactionInputType,
 } from "@senpi-ai/senpi-agent-lib";
 import { GetQuoteResponse } from "../types";
 import { createClientV2 } from "@0x/swap-ts-sdk";
@@ -49,7 +49,7 @@ if (!process.env.SWAP_FEE_RECIPIENT) {
 
 /**
  * Get 0x swap quote
- * @param moxieUserId - The moxie user id
+ * @param senpiUserId - The senpi user id
  * @param sellAmountBaseUnits - The sell amount
  * @param buyTokenAddress - The buy token address
  * @param walletAddress - The wallet address
@@ -58,7 +58,7 @@ if (!process.env.SWAP_FEE_RECIPIENT) {
  */
 export const get0xSwapQuote = async ({
     traceId,
-    moxieUserId,
+    senpiUserId,
     sellAmountBaseUnits,
     buyTokenAddress,
     buyTokenSymbol,
@@ -67,7 +67,7 @@ export const get0xSwapQuote = async ({
     sellTokenSymbol,
 }: {
     traceId: string;
-    moxieUserId: string;
+    senpiUserId: string;
     sellAmountBaseUnits: string;
     buyTokenAddress: string;
     buyTokenSymbol: string;
@@ -88,7 +88,7 @@ export const get0xSwapQuote = async ({
 
             elizaLogger.debug(
                 traceId,
-                `[get0xSwapQuote] [${moxieUserId}] input details: [${walletAddress}] [${sellTokenAddress}] [${buyTokenAddress}] [${sellAmountBaseUnits}] [${buyTokenSymbol}] [${sellTokenSymbol}]`
+                `[get0xSwapQuote] [${senpiUserId}] input details: [${walletAddress}] [${sellTokenAddress}] [${buyTokenAddress}] [${sellAmountBaseUnits}] [${buyTokenSymbol}] [${sellTokenSymbol}]`
             );
 
             const quote = (await zxClient.swap.permit2.getQuote.query({
@@ -114,14 +114,14 @@ export const get0xSwapQuote = async ({
             if (retryCount >= MAX_RETRIES) {
                 elizaLogger.error(
                     traceId,
-                    `[get0xSwapQuote] [${moxieUserId}] [ERROR] Failed to get 0x swap quote after ${MAX_RETRIES} attempts: ${JSON.stringify(error)}`
+                    `[get0xSwapQuote] [${senpiUserId}] [ERROR] Failed to get 0x swap quote after ${MAX_RETRIES} attempts: ${JSON.stringify(error)}`
                 );
                 throw error;
             }
 
             elizaLogger.warn(
                 traceId,
-                `[get0xSwapQuote] [${moxieUserId}] [RETRY ${retryCount}/${MAX_RETRIES}] Failed to get 0x swap quote: ${JSON.stringify(error)}`
+                `[get0xSwapQuote] [${senpiUserId}] [RETRY ${retryCount}/${MAX_RETRIES}] Failed to get 0x swap quote: ${JSON.stringify(error)}`
             );
 
             // Wait before retrying
@@ -140,27 +140,27 @@ const isStableCoin = (tokenSymbol: string) => {
 
 /**
  * Execute 0x swap with 20% buffer for gas limit
- * @param moxieUserId - The moxie user id
+ * @param senpiUserId - The senpi user id
  * @param walletAddress - The wallet address
  * @param quote - The quote
  * @returns The transaction response
  */
 export const execute0xSwap = async ({
     traceId,
-    moxieUserId,
+    senpiUserId,
     walletAddress,
     quote,
     walletClient,
 }: {
     traceId: string;
-    moxieUserId: string;
+    senpiUserId: string;
     walletAddress: string;
     quote: GetQuoteResponse;
-    walletClient: MoxieWalletClient;
+    walletClient: SenpiWalletClient;
 }) => {
     elizaLogger.debug(
         traceId,
-        `[execute0xSwap] [${moxieUserId}] input details: [${walletAddress}] [${quote.transaction.to}] [${quote.transaction.value}] [${quote.transaction.data}] [${quote.transaction.gas}] [${quote.transaction.gasPrice}]`
+        `[execute0xSwap] [${senpiUserId}] input details: [${walletAddress}] [${quote.transaction.to}] [${quote.transaction.value}] [${quote.transaction.data}] [${quote.transaction.gas}] [${quote.transaction.gasPrice}]`
     );
 
     const MAX_RETRIES = 3;
@@ -176,13 +176,13 @@ export const execute0xSwap = async ({
             const feeData = await provider.getFeeData();
             elizaLogger.debug(
                 traceId,
-                `[execute0xSwap] [${moxieUserId}] feeData: ${JSON.stringify(feeData)}`
+                `[execute0xSwap] [${senpiUserId}] feeData: ${JSON.stringify(feeData)}`
             );
             const maxPriorityFeePerGas =
                 (feeData.maxPriorityFeePerGas! * BigInt(120)) / BigInt(100);
             const maxFeePerGas =
                 (feeData.maxFeePerGas! * BigInt(120)) / BigInt(100);
-            const transactionInput: MoxieWalletSendTransactionInputType = {
+            const transactionInput: SenpiWalletSendTransactionInputType = {
                 address: walletAddress,
                 chainType: "ethereum",
                 caip2: `eip155:${process.env.CHAIN_ID || "8453"}`,
@@ -197,7 +197,7 @@ export const execute0xSwap = async ({
             };
             elizaLogger.debug(
                 traceId,
-                `[execute0xSwap] [${moxieUserId}] transactionInput: ${JSON.stringify(transactionInput)}`
+                `[execute0xSwap] [${senpiUserId}] transactionInput: ${JSON.stringify(transactionInput)}`
             );
             const tx = await walletClient.sendTransaction(
                 process.env.CHAIN_ID || "8453",
@@ -214,7 +214,7 @@ export const execute0xSwap = async ({
             );
             elizaLogger.debug(
                 traceId,
-                `[execute0xSwap] [${moxieUserId}] tx hash: ${tx.hash}`
+                `[execute0xSwap] [${senpiUserId}] tx hash: ${tx.hash}`
             );
             return tx;
         } catch (error) {
@@ -223,7 +223,7 @@ export const execute0xSwap = async ({
             if (retryCount >= MAX_RETRIES) {
                 elizaLogger.error(
                     traceId,
-                    `[execute0xSwap] [${moxieUserId}] [ERROR] Failed to execute 0x swap after ${MAX_RETRIES} attempts: ${JSON.stringify(error)}`
+                    `[execute0xSwap] [${senpiUserId}] [ERROR] Failed to execute 0x swap after ${MAX_RETRIES} attempts: ${JSON.stringify(error)}`
                 );
                 throw new Error(
                     "Failed to execute 0x swap. Please try again later."
@@ -232,7 +232,7 @@ export const execute0xSwap = async ({
 
             elizaLogger.warn(
                 traceId,
-                `[execute0xSwap] [${moxieUserId}] [RETRY ${retryCount}/${MAX_RETRIES}] Failed to execute 0x swap: ${JSON.stringify(error)}`
+                `[execute0xSwap] [${senpiUserId}] [RETRY ${retryCount}/${MAX_RETRIES}] Failed to execute 0x swap: ${JSON.stringify(error)}`
             );
 
             // Wait before retrying
@@ -243,7 +243,7 @@ export const execute0xSwap = async ({
 
 // /**
 //  * Get 0x price
-//  * @param moxieUserId - The moxie user id
+//  * @param senpiUserId - The senpi user id
 //  * @param sellAmountBaseUnits - The sell amount
 //  * @param buyTokenAddress - The buy token address
 //  * @param walletAddress - The wallet address
@@ -251,20 +251,20 @@ export const execute0xSwap = async ({
 //  * @returns The price
 //  */
 // export const get0xPrice = async ({
-//     moxieUserId,
+//     senpiUserId,
 //     sellAmountBaseUnits,
 //     buyTokenAddress,
 //     walletAddress,
 //     sellTokenAddress,
 // }: {
-//     moxieUserId: string;
+//     senpiUserId: string;
 //     sellAmountBaseUnits: string;
 //     buyTokenAddress: string;
 //     walletAddress: string;
 //     sellTokenAddress: string;
 // }) => {
 //     try {
-//         elizaLogger.debug(`[get0xPrice] [${moxieUserId}] input details: [${walletAddress}] [${sellTokenAddress}] [${buyTokenAddress}] [${sellAmountBaseUnits}]`)
+//         elizaLogger.debug(`[get0xPrice] [${senpiUserId}] input details: [${walletAddress}] [${sellTokenAddress}] [${buyTokenAddress}] [${sellAmountBaseUnits}]`)
 //         const price = (await zxClient.swap.permit2.getPrice.query({
 //             sellAmount: sellAmountBaseUnits,
 //             sellToken: sellTokenAddress,
@@ -272,10 +272,10 @@ export const execute0xSwap = async ({
 //             chainId: Number(process.env.CHAIN_ID),
 //             slippageBps: ERC20_TXN_SLIPPAGE_BPS
 //         })) as GetIndicativePriceResponse;
-//         elizaLogger.debug(`[get0xPrice] [${moxieUserId}] price: ${JSON.stringify(price)}`)
+//         elizaLogger.debug(`[get0xPrice] [${senpiUserId}] price: ${JSON.stringify(price)}`)
 //         return price;
 //     } catch (error) {
-//         elizaLogger.error(`[get0xPrice] [${moxieUserId}] [ERROR] Failed to get 0x price: ${JSON.stringify(error)}`);
+//         elizaLogger.error(`[get0xPrice] [${senpiUserId}] [ERROR] Failed to get 0x price: ${JSON.stringify(error)}`);
 //         throw new Error('Failed to get price quote. Please try again later.');
 //     }
 // };

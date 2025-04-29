@@ -18,16 +18,16 @@ import * as templates from "../templates";
 import { fetchSwapData } from "../utils";
 import { TOP_CREATORS_COUNT } from "../config";
 import {
-    getMoxieIdsFromMessage,
+    getSenpiIdsFromMessage,
     streamTextByLines,
-    handleIneligibleMoxieUsers,
+    handleIneligibleSenpiUsers,
 } from "./utils";
 import {
     getTokenDetails,
     getTrendingTokenDetails,
-    MoxieAgentDBAdapter,
-    MoxieUser,
-    moxieUserService,
+    SenpiAgentDBAdapter,
+    SenpiUser,
+    senpiUserService,
 } from "@senpi-ai/senpi-agent-lib";
 export const tokenSwapSummary: Action = {
     name: "TRENDING_TOKENS",
@@ -263,23 +263,23 @@ async function swapSummaryHandler(
     const {
         isGeneralQuery,
         selfQuery,
-        onlyIncludeSpecifiedMoxieIds,
+        onlyIncludeSpecifiedSenpiIds,
         isTopTokenOwnersQuery,
         timeFilter,
     } = responseJson;
 
     elizaLogger.debug(
-        `--- >> isGeneralQuery: ${isGeneralQuery}, selfQuery: ${selfQuery}, onlyIncludeSpecifiedMoxieIds: ${onlyIncludeSpecifiedMoxieIds}, isTopTokenOwnersQuery: ${isTopTokenOwnersQuery}, timeFilter: ${timeFilter}`
+        `--- >> isGeneralQuery: ${isGeneralQuery}, selfQuery: ${selfQuery}, onlyIncludeSpecifiedSenpiIds: ${onlyIncludeSpecifiedSenpiIds}, isTopTokenOwnersQuery: ${isTopTokenOwnersQuery}, timeFilter: ${timeFilter}`
     );
 
-    let moxieIds: string[] = [];
+    let senpiIds: string[] = [];
     if (!isGeneralQuery) {
         try {
             if (selfQuery === true) {
-                const moxieUserId = (state.moxieUserInfo as MoxieUser)?.id;
-                moxieIds = [moxieUserId];
+                const senpiUserId = (state.senpiUserInfo as SenpiUser)?.id;
+                senpiIds = [senpiUserId];
             } else {
-                moxieIds = await getMoxieIdsFromMessage(
+                senpiIds = await getSenpiIdsFromMessage(
                     message,
                     templates.topCreatorsSwapExamples,
                     state,
@@ -289,7 +289,7 @@ async function swapSummaryHandler(
                 );
             }
 
-            if (moxieIds.length === 0) {
+            if (senpiIds.length === 0) {
                 callback({
                     text: "I couldn't find the specific creators you mentioned. Please make sure to mention their names or usernames (using '@').",
                 });
@@ -313,8 +313,8 @@ async function swapSummaryHandler(
                         },
                         metadata: {
                             timestamp: new Date().toISOString(),
-                            source: "moxie-big-fan-plugin",
-                            action: "getMoxieIdsFromMessage",
+                            source: "senpi-big-fan-plugin",
+                            action: "getSenpiIdsFromMessage",
                             version: "1.0.0",
                         },
                     },
@@ -327,20 +327,20 @@ async function swapSummaryHandler(
         }
     }
     elizaLogger.debug(
-        `searching for swaps for moxieIds: ${moxieIds} - ${isGeneralQuery}`
+        `searching for swaps for senpiIds: ${senpiIds} - ${isGeneralQuery}`
     );
     let newstate;
     let totalFreeQueries;
     let usedFreeQueries;
-    let eligibleMoxieIds: string[] = [],
-        ineligibleMoxieUsers = [];
+    let eligibleSenpiIds: string[] = [],
+        ineligibleSenpiUsers = [];
 
     if (!isGeneralQuery) {
         let userInfoBatchOutput;
         try {
             userInfoBatchOutput =
-                await moxieUserService.getUserByMoxieIdMultipleTokenGate(
-                    moxieIds,
+                await senpiUserService.getUserBySenpiIdMultipleTokenGate(
+                    senpiIds,
                     state.authorizationHeader as string,
                     stringToUuid("SOCIAL_ALPHA")
                 );
@@ -361,39 +361,39 @@ async function swapSummaryHandler(
             userInfoBatchOutput.remainingFreeTrialCount;
         for (const userInfo of userInfoBatchOutput.users) {
             if (userInfo.errorDetails) {
-                ineligibleMoxieUsers.push(userInfo.errorDetails);
+                ineligibleSenpiUsers.push(userInfo.errorDetails);
             } else {
-                eligibleMoxieIds.push(userInfo.user.id);
+                eligibleSenpiIds.push(userInfo.user.id);
             }
         }
 
         elizaLogger.debug(
-            `eligibleMoxieIds: ${eligibleMoxieIds}, ineligibleMoxieUsers: ${ineligibleMoxieUsers}`
+            `eligibleSenpiIds: ${eligibleSenpiIds}, ineligibleSenpiUsers: ${ineligibleSenpiUsers}`
         );
 
-        if (ineligibleMoxieUsers.length >= 0 && eligibleMoxieIds.length == 0) {
-            await handleIneligibleMoxieUsers(ineligibleMoxieUsers, callback);
+        if (ineligibleSenpiUsers.length >= 0 && eligibleSenpiIds.length == 0) {
+            await handleIneligibleSenpiUsers(ineligibleSenpiUsers, callback);
             return false;
         }
     } else {
-        eligibleMoxieIds = moxieIds;
+        eligibleSenpiIds = senpiIds;
     }
 
     const allSwaps = await fetchSwapData(
-        eligibleMoxieIds,
+        eligibleSenpiIds,
         tokenType,
-        onlyIncludeSpecifiedMoxieIds,
+        onlyIncludeSpecifiedSenpiIds,
         timeFilter
     );
 
     if (allSwaps.length === 0) {
-        if (eligibleMoxieIds.length <= 3) {
+        if (eligibleSenpiIds.length <= 3) {
             const userProfiles = [];
             let userProfilesOutput;
             try {
                 userProfilesOutput =
-                    await moxieUserService.getUserByMoxieIdMultipleTokenGate(
-                        eligibleMoxieIds,
+                    await senpiUserService.getUserBySenpiIdMultipleTokenGate(
+                        eligibleSenpiIds,
                         state.authorizationHeader as string,
                         stringToUuid("SOCIAL_ALPHA")
                     );
@@ -429,7 +429,7 @@ async function swapSummaryHandler(
             return false;
         } else {
             callback({
-                text: `I scanned various wallets for ${eligibleMoxieIds.length} users or the creators and I was not able to find any recent trades. Do you want to analyze their portfolio?`,
+                text: `I scanned various wallets for ${eligibleSenpiIds.length} users or the creators and I was not able to find any recent trades. Do you want to analyze their portfolio?`,
             });
             return false;
         }
@@ -464,7 +464,7 @@ async function swapSummaryHandler(
         tokenDetails: JSON.stringify(tokenDetails),
         totalFreeQueries: totalFreeQueries,
         usedFreeQueries: usedFreeQueries,
-        ineligibleMoxieUsers: JSON.stringify(ineligibleMoxieUsers),
+        ineligibleSenpiUsers: JSON.stringify(ineligibleSenpiUsers),
         message: message.content.text,
         previousConversations: memoryContents.length > 1 ? memoryContents : "",
     });
@@ -509,8 +509,8 @@ async function swapSummaryHandler(
         callback({ text: textPart });
     }
 
-    if (ineligibleMoxieUsers.length > 0) {
-        handleIneligibleMoxieUsers(ineligibleMoxieUsers, callback);
+    if (ineligibleSenpiUsers.length > 0) {
+        handleIneligibleSenpiUsers(ineligibleSenpiUsers, callback);
     }
     // const summary = await generateText({
     //     runtime,

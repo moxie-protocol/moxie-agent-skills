@@ -1,12 +1,12 @@
 import { elizaLogger } from "@senpi-ai/core";
 import { ethers } from "ethers";
 import { TRANSACTION_RECEIPT_TIMEOUT } from "./constants";
-import { insufficientMoxieBalanceTemplate } from "./callbackTemplates";
+import { insufficientSenpiBalanceTemplate } from "./callbackTemplates";
 import { getERC20Balance } from "./erc20";
 
 /**
  * Handles the status of a blockchain transaction by waiting for confirmation and checking the receipt
- * @param moxieUserId The ID of the Moxie user initiating the transaction
+ * @param senpiUserId The ID of the Senpi user initiating the transaction
  * @param provider The Ethereum JSON RPC provider used to interact with the blockchain
  * @param txHash The transaction hash to monitor
  * @returns Promise that resolves to the transaction receipt if successful, or null if failed
@@ -14,13 +14,13 @@ import { getERC20Balance } from "./erc20";
  */
 export async function handleTransactionStatus(
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     provider: ethers.JsonRpcProvider,
     txHash: string
 ): Promise<ethers.TransactionReceipt | null> {
     elizaLogger.debug(
         traceId,
-        `[${moxieUserId}] [handleTransactionStatus] called with input details: [${txHash}]`
+        `[${senpiUserId}] [handleTransactionStatus] called with input details: [${txHash}]`
     );
     let txnReceipt: ethers.TransactionReceipt | null = null;
 
@@ -33,7 +33,7 @@ export async function handleTransactionStatus(
         if (!txnReceipt) {
             elizaLogger.error(
                 traceId,
-                `[${moxieUserId}] [handleTransactionStatus] Transaction receipt timeout`
+                `[${senpiUserId}] [handleTransactionStatus] Transaction receipt timeout`
             );
             return null;
         }
@@ -41,13 +41,13 @@ export async function handleTransactionStatus(
         if (txnReceipt.status === 1) {
             elizaLogger.debug(
                 traceId,
-                `[${moxieUserId}] [handleTransactionStatus] transaction successful: ${txHash}`
+                `[${senpiUserId}] [handleTransactionStatus] transaction successful: ${txHash}`
             );
             return txnReceipt;
         } else {
             elizaLogger.error(
                 traceId,
-                `[${moxieUserId}] [handleTransactionStatus] transaction failed: ${txHash} with status: ${txnReceipt.status}`
+                `[${senpiUserId}] [handleTransactionStatus] transaction failed: ${txHash} with status: ${txnReceipt.status}`
             );
             return null;
         }
@@ -56,7 +56,7 @@ export async function handleTransactionStatus(
             error instanceof Error ? error.message : "Unknown error";
         elizaLogger.error(
             traceId,
-            `[${moxieUserId}] [handleTransactionStatus] Error waiting for transaction receipt: ${errorMessage}`
+            `[${senpiUserId}] [handleTransactionStatus] Error waiting for transaction receipt: ${errorMessage}`
         );
         return null;
     }
@@ -118,25 +118,25 @@ export function extractTokenDetails(
 }
 
 // /**
-//  * Checks if the Moxie balance is sufficient for the required amount
+//  * Checks if the Senpi balance is sufficient for the required amount
 //  * @param requiredAmount The amount required to check the balance against
 //  * @param walletAddress The address of the wallet to check the balance of
 //  * @param callback The callback to call if the balance is insufficient
 //  * @returns Promise that resolves to true if the balance is insufficient, false otherwise
 //  */
-// export async function checkMoxieBalance(
+// export async function checkSenpiBalance(
 //     requiredAmount: bigint,
 //     walletAddress: string,
 //     callback?: Function
 // ): Promise<boolean> {
-//     if (!process.env.MOXIE_TOKEN_ADDRESS) {
-//         throw new Error('MOXIE_TOKEN_ADDRESS environment variable is not set');
+//     if (!process.env.SENPI_TOKEN_ADDRESS) {
+//         throw new Error('SENPI_TOKEN_ADDRESS environment variable is not set');
 //     }
-//     const balance = await getERC20Balance(traceId, process.env.MOXIE_TOKEN_ADDRESS, walletAddress);
+//     const balance = await getERC20Balance(traceId, process.env.SENPI_TOKEN_ADDRESS, walletAddress);
 //     const currentBalance = balance !== "" ? BigInt(balance) : 0n;
 
 //     if (currentBalance < requiredAmount) {
-//         await callback?.(insufficientMoxieBalanceTemplate(currentBalance, requiredAmount));
+//         await callback?.(insufficientSenpiBalanceTemplate(currentBalance, requiredAmount));
 //         return true;
 //     }
 //     return false;

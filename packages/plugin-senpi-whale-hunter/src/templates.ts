@@ -61,7 +61,7 @@ Also consider the possibility that the token address might have appeared in earl
 **Important details and constraints**:
 1. **User Intent**: Confirm that the user is asking for top token holders before extracting any addresses. If the user does not request top holders, do not extract addresses.
 2. **Multiple Tokens**: The user may mention multiple tokens. If they ask for the top holders of each mentioned token, extract all relevant addresses.
-3. **Notation**: If a token is specified via a ticker or symbol (e.g., $MYTOKEN) followed by an address in brackets, only extract the address if the user asks for its top holders. e.g. $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] then extract 0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527
+3. **Notation**: If a token is specified via a ticker or symbol (e.g., $MYTOKEN) followed by an address in brackets, only extract the address if the user asks for its top holders. e.g. $[USDC|0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913] then extract 0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527
 4. **Creator Coins**: We do not support creator coins. If the user mentions a creator coin (or indicates it is a creator coin) and requests holders, do not extract that address.
 5. **Top n holders**: The user may request the top n holders of a token. If they do, you should extract the top n holders of the token. Default is 10.
 5. **Output Format**: Return a JSON object with a single key, tokenAddresses, pointing to an array of all extracted addresses. For example:

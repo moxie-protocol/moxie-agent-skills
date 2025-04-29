@@ -17,8 +17,8 @@ import {
 } from "./constants/constants";
 import { elizaLogger, validateUuid, IAgentRuntime } from "@senpi-ai/core";
 import {
-    MoxieWallet,
-    getMoxiePortfolioInfoByCreatorTokenDetails,
+    SenpiWallet,
+    getSenpiPortfolioInfoByCreatorTokenDetails,
 } from "@senpi-ai/senpi-agent-lib";
 
 /**
@@ -81,9 +81,9 @@ export async function validateSenpiAIAgentBalance({
     };
 
     // bypass this check for internal dev team
-    const devTeamMoxieUserIds =
-        process.env.DEV_TEAM_MOXIE_USER_IDS?.split(",") || [];
-    if (devTeamMoxieUserIds.includes(senpiUserId)) {
+    const devTeamSenpiUserIds =
+        process.env.DEV_TEAM_SENPI_USER_IDS?.split(",") || [];
+    if (devTeamSenpiUserIds.includes(senpiUserId)) {
         return {
             creatorAgentBalance: 0,
             hasSufficientBalance: true,
@@ -101,7 +101,7 @@ export async function validateSenpiAIAgentBalance({
     }
 
     // Get portfolio info
-    const portfolioInfo = await getMoxiePortfolioInfoByCreatorTokenDetails(
+    const portfolioInfo = await getSenpiPortfolioInfoByCreatorTokenDetails(
         senpiUserId,
         {
             address: CREATOR_AGENT_TOKEN_ADDRESS,
@@ -169,9 +169,9 @@ export async function validateBaseEconomyTokenBalance({
     };
 
     // bypass this check for internal dev team
-    const devTeamMoxieUserIds =
-        process.env.DEV_TEAM_MOXIE_USER_IDS?.split(",") || [];
-    if (devTeamMoxieUserIds.includes(senpiUserId)) {
+    const devTeamSenpiUserIds =
+        process.env.DEV_TEAM_SENPI_USER_IDS?.split(",") || [];
+    if (devTeamSenpiUserIds.includes(senpiUserId)) {
         return {
             baseEconomyTokenBalance: 0,
             hasSufficientBalance: true,
@@ -189,7 +189,7 @@ export async function validateBaseEconomyTokenBalance({
     }
 
     // Get portfolio info
-    const portfolioInfo = await getMoxiePortfolioInfoByCreatorTokenDetails(
+    const portfolioInfo = await getSenpiPortfolioInfoByCreatorTokenDetails(
         senpiUserId,
         {
             address: BASE_ECONOMY_TOKEN_ADDRESS,
@@ -232,7 +232,7 @@ export async function validateBaseEconomyTokenBalance({
 }
 
 export async function validateCreatorAgentCoinBalance(
-    wallets: MoxieWallet[]
+    wallets: SenpiWallet[]
 ): Promise<{ creatorAgentBalance: number; hasSufficientBalance: boolean }> {
     // validate if the user holds xx amount of creator agent coins
     let creatorAgentCoinsBalance: number = 0;

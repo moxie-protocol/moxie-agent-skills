@@ -1,14 +1,14 @@
 import { Fta } from "./fta";
-import { MoxieUser } from "./types";
-import { MoxieClientWallet } from "../wallet";
+import { SenpiUser } from "./types";
+import { SenpiClientWalet } from "../wallet";
 import { Portfolio, PortfolioV2Data } from "./zapperService";
 
 /**
  * REUSABLE MOCK DATA STARTS BELOW
  */
 
-// Mock Moxie User Data
-export const mockMoxieUser: MoxieUser = {
+// Mock Senpi User Data
+export const mockSenpiUser: SenpiUser = {
     id: "M1",
     userName: "vitalik.eth",
     name: "vitalik.eth",
@@ -18,8 +18,8 @@ export const mockMoxieUser: MoxieUser = {
     referrerId: "M12",
     communicationPreference: "WARPCAST",
     primaryWalletId: "03463334-3c5c-4d08-9551-188f62b2586a",
-    moxieScore: 1000,
-    moxieRank: 0,
+    senpiScore: 1000,
+    senpiRank: 0,
     createdAt: "2024-12-20T14:37:34.348Z",
     identities: [
         {
@@ -91,8 +91,8 @@ export const mockMoxieUser: MoxieUser = {
     vestingContracts: [],
 };
 
-// Mock Moxie Wallet Data
-export const mockWallet: MoxieClientWallet = {
+// Mock Senpi Wallet Data
+export const mockWallet: SenpiClientWalet = {
     address: "0xa5cc845ef113c4c0908d4c1f4616a000b9a67b80",
     chainType: "ethereum",
     chainId: "8453",
@@ -126,7 +126,7 @@ export const mockFta: Fta = {
     entityDisplayName: "Vitalik Buterin",
     allTimeEarningRank: 1,
     userFansSharePercentage: 90,
-    moxieUserId: "M1",
+    senpiUserId: "M1",
     imageURL: null,
     priceCurve: 0,
     launchCastUrl: null,
@@ -182,7 +182,7 @@ export const mockPortfolioV2: PortfolioV2Data = {
     },
 };
 
-export const MOXIE_USER_PORTFOLIOS_QUERY = (filterConditions: string[]) => `
+export const SENPI_USER_PORTFOLIOS_QUERY = (filterConditions: string[]) => `
       query GetPortfolioInfo {
         MoxieUserPortfolios(
           input: {filter: {${filterConditions.join(", ")}}}

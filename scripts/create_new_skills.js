@@ -54,19 +54,19 @@ try {
     console.log(`Updated package.json name in ${packageJsonFilePath}`);
 
     // add the skill to senpi.character.json
-    const moxieCharacterFilePath = path.join(
+    const senpiCharacterFilePath = path.join(
         __dirname,
         "../characters/senpi.character.json"
     );
-    const moxieCharacter = JSON.parse(fs.readFileSync(moxieCharacterFilePath), "utf8");
+    const senpiCharacter = JSON.parse(fs.readFileSync(senpiCharacterFilePath), "utf8");
     // check if the skill already exists in senpi.character.json
-    if (moxieCharacter.plugins.includes(`@senpi-ai/${pluginName}`)) {
+    if (senpiCharacter.plugins.includes(`@senpi-ai/${pluginName}`)) {
         throw new Error(`Skill ${pluginName} already exists in senpi.character.json`);
     }
-    moxieCharacter.plugins.push(`@senpi-ai/${pluginName}`);
+    senpiCharacter.plugins.push(`@senpi-ai/${pluginName}`);
 
-    fs.writeFileSync(moxieCharacterFilePath, JSON.stringify(moxieCharacter, null, 4));
-    console.log(`Updated senpi.character.json in ${moxieCharacterFilePath}`);
+    fs.writeFileSync(senpiCharacterFilePath, JSON.stringify(senpiCharacter, null, 4));
+    console.log(`Updated senpi.character.json in ${senpiCharacterFilePath}`);
 
     // add the skill to agent/package.json
     const agentPackageJsonFilePath = path.join(

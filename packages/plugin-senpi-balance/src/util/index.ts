@@ -6,7 +6,7 @@ import {
     formatTimestamp,
     elizaLogger,
 } from "@senpi-ai/core";
-import { MoxieUser } from "@senpi-ai/senpi-agent-lib";
+import { SenpiUser } from "@senpi-ai/senpi-agent-lib";
 import { ErrorDetails } from "@senpi-ai/senpi-agent-lib/src/services/types";
 const CACHE_EXPIRATION = 120000; // 2 minutes in milliseconds
 
@@ -18,7 +18,7 @@ const FREEMIUM_TRENDING_CREATORS_LIST = FREEMIUM_TRENDING_CREATORS
     ? FREEMIUM_TRENDING_CREATORS.split(",")
     : [];
 
-export async function setMoxieCache(
+export async function setSenpiCache(
     data: string,
     cacheKey: string,
     runtime: IAgentRuntime
@@ -28,7 +28,7 @@ export async function setMoxieCache(
     });
 }
 
-export async function getMoxieCache(
+export async function getSenpiCache(
     cacheKey: string,
     runtime: IAgentRuntime
 ): Promise<string | null> {
@@ -38,7 +38,7 @@ export async function getMoxieCache(
 /**
  * Gets all wallet addresses associated with a user, including vesting contracts
  */
-export async function getWalletAddresses(userInfo: MoxieUser) {
+export async function getWalletAddresses(userInfo: SenpiUser) {
     const addresses =
         userInfo.wallets.map((wallet) => wallet?.walletAddress) || [];
     const vestingAddresses =
@@ -48,13 +48,13 @@ export async function getWalletAddresses(userInfo: MoxieUser) {
     return [...addresses, ...vestingAddresses];
 }
 
-export async function getMoxieToUSD() {
+export async function getSenpiToUSD() {
     try {
         const response = await fetch(
-            "https://api.coingecko.com/api/v3/simple/price?ids=moxie&vs_currencies=usd"
+            "https://api.coingecko.com/api/v3/simple/price?ids=senpi&vs_currencies=usd"
         );
         const data = await response.json();
-        return data.moxie.usd;
+        return data.senpi.usd;
     } catch (error) {
         // Fallback value if API call fails
         return 0.00415299;
@@ -62,13 +62,13 @@ export async function getMoxieToUSD() {
 }
 
 export function getCommonHoldings(
-    moxieUserInfoMultiple: MoxieUser[],
+    senpiUserInfoMultiple: SenpiUser[],
     portfolioSummaries: any
 ) {
     const commonFanTokenHoldings = {};
     const commonTokenHoldings = {};
 
-    for (const user of moxieUserInfoMultiple) {
+    for (const user of senpiUserInfoMultiple) {
         if (portfolioSummaries[user.userName]) {
             for (const portfolio of portfolioSummaries[user.userName]
                 .fanTokenHoldings) {
@@ -151,8 +151,8 @@ export function roundToDecimalPlaces(
     return num;
 }
 
-export async function handleIneligibleMoxieUsers(
-    ineligibleMoxieUsers: ErrorDetails[],
+export async function handleIneligibleSenpiUsers(
+    ineligibleSenpiUsers: ErrorDetails[],
     callback,
     breakLine = false
 ) {
@@ -163,18 +163,18 @@ export async function handleIneligibleMoxieUsers(
         messageParts.push("\n");
     }
 
-    if (ineligibleMoxieUsers.length == 1) {
-        const userprofileLinkText = `[@${ineligibleMoxieUsers[0].requestedUserName}](https://senpi.ai/profile/${ineligibleMoxieUsers[0].requestedId})`;
+    if (ineligibleSenpiUsers.length == 1) {
+        const userprofileLinkText = `[@${ineligibleSenpiUsers[0].requestedUserName}](https://senpi.ai/profile/${ineligibleSenpiUsers[0].requestedId})`;
 
         let remainingNoOfTokensToBuy =
-            ineligibleMoxieUsers[0].expectedCreatorCoinBalance -
-            ineligibleMoxieUsers[0].actualCreatorCoinBalance;
+            ineligibleSenpiUsers[0].expectedCreatorCoinBalance -
+            ineligibleSenpiUsers[0].actualCreatorCoinBalance;
         if (remainingNoOfTokensToBuy < 0) {
             remainingNoOfTokensToBuy = 0;
         }
 
         if (breakLine === true) {
-            if (ineligibleMoxieUsers[0].actualCreatorCoinBalance > 0) {
+            if (ineligibleSenpiUsers[0].actualCreatorCoinBalance > 0) {
                 messageParts.push(
                     `I can also get you that portfolio on ${userprofileLinkText}, but you’ll need some ${userprofileLinkText} coins to unlock it.\n\n`
                 );
@@ -188,21 +188,21 @@ export async function handleIneligibleMoxieUsers(
                 `I can get you that portfolio analysis on ${userprofileLinkText}, but first you’ll need to buy ${remainingNoOfTokensToBuy} of their coins to unlock it.\n\n`
             );
         }
-        if (ineligibleMoxieUsers[0].actualCreatorCoinBalance > 0) {
+        if (ineligibleSenpiUsers[0].actualCreatorCoinBalance > 0) {
             messageParts.push(
-                `It costs ${remainingNoOfTokensToBuy} (~$${roundToDecimalPlaces(ineligibleMoxieUsers[0].requiredMoxieAmountInUSD, 2)}) ${userprofileLinkText} to access, and right now, you have only ${ineligibleMoxieUsers[0].actualCreatorCoinBalance} ${userprofileLinkText} in your wallet. Want me to grab them for you now? Just say the word, and I’ll handle it! 🚀`
+                `It costs ${remainingNoOfTokensToBuy} (~$${roundToDecimalPlaces(ineligibleSenpiUsers[0].requiredSenpiAmountInUSD, 2)}) ${userprofileLinkText} to access, and right now, you have only ${ineligibleSenpiUsers[0].actualCreatorCoinBalance} ${userprofileLinkText} in your wallet. Want me to grab them for you now? Just say the word, and I’ll handle it! 🚀`
             );
         } else {
             messageParts.push(
-                `It costs ~$${roundToDecimalPlaces(ineligibleMoxieUsers[0].requiredMoxieAmountInUSD, 2)} for lifetime access. Do you want me to buy it for you?`
+                `It costs ~$${roundToDecimalPlaces(ineligibleSenpiUsers[0].requiredSenpiAmountInUSD, 2)} for lifetime access. Do you want me to buy it for you?`
             );
         }
 
         for (const part of messageParts) {
             callback({ text: part });
         }
-    } else if (ineligibleMoxieUsers.length > 1) {
-        const userLinks = ineligibleMoxieUsers
+    } else if (ineligibleSenpiUsers.length > 1) {
+        const userLinks = ineligibleSenpiUsers
             .map(
                 (user) =>
                     `[@${user.requestedUserName}](https://senpi.ai/profile/${user})`

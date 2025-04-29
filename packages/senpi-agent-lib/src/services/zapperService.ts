@@ -312,10 +312,10 @@ export async function getPortfolioV2DataByTokenAddress(
     addresses: string[],
     networks: string[],
     tokenAddress: string,
-    moxieUserId: string
+    senpiUserId: string
 ): Promise<PortfolioV2Data> {
     elizaLogger.info(
-        `[getPortfolioV2DataByTokenAddress] [${traceId}] [${moxieUserId}] Getting portfolioV2 data by token address: ${tokenAddress}`
+        `[getPortfolioV2DataByTokenAddress] [${traceId}] [${senpiUserId}] Getting portfolioV2 data by token address: ${tokenAddress}`
     );
     try {
         const query = `
@@ -373,7 +373,7 @@ export async function getPortfolioV2DataByTokenAddress(
                     throw error;
                 }
                 elizaLogger.warn(
-                    ` [getPortfolioV2DataByTokenAddress] [${traceId}] [${moxieUserId}] Zapper getPortfolioV2DataByTokenAddress failed, attempt ${attempts}/${maxAttempts}. Retrying...`
+                    ` [getPortfolioV2DataByTokenAddress] [${traceId}] [${senpiUserId}] Zapper getPortfolioV2DataByTokenAddress failed, attempt ${attempts}/${maxAttempts}. Retrying...`
                 );
                 await new Promise((resolve) =>
                     setTimeout(resolve, backoffMs * attempts)
@@ -382,7 +382,7 @@ export async function getPortfolioV2DataByTokenAddress(
         }
     } catch (error) {
         elizaLogger.error(
-            ` [getPortfolioV2DataByTokenAddress] [${traceId}] [${moxieUserId}] Error fetching Zapper getPortfolioV2DataByTokenAddress data:`,
+            ` [getPortfolioV2DataByTokenAddress] [${traceId}] [${senpiUserId}] Error fetching Zapper getPortfolioV2DataByTokenAddress data:`,
             error
         );
         throw error;

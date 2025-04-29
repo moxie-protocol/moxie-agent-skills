@@ -1,6 +1,6 @@
 import {
     FarcasterMetadata,
-    MoxieUser,
+    SenpiUser,
     TwitterMetadata,
 } from "@senpi-ai/senpi-agent-lib";
 import { Staking } from "../types";
@@ -109,7 +109,7 @@ export function getHelpText(user: AfUser): string {
     if (user && user.matchType) {
         if (user.matchType === "BY_CREATOR_COIN") {
             tbl +=
-                "\n* I matched your AlfaFrens user by your moxie creator coin FID";
+                "\n* I matched your AlfaFrens user by your senpi creator coin FID";
         } else if (user.matchType === "BY_GIVEN_ADDRESS") {
             tbl +=
                 "\n* I matched your AlfaFrens user by your given AlfaFrens user address";
@@ -118,10 +118,10 @@ export function getHelpText(user: AfUser): string {
                 "\n* I matched your AlfaFrens user by your given AlfaFrens user name";
         } else if (user.matchType === "BY_FID") {
             tbl +=
-                "\n* I matched your AlfaFrens user by your moxie account FID";
+                "\n* I matched your AlfaFrens user by your senpi account FID";
         } else if (user.matchType === "BY_TWITTER") {
             tbl +=
-                "\n* I matched your AlfaFrens user by your moxie account X handle";
+                "\n* I matched your AlfaFrens user by your senpi account X handle";
         }
     }
     return tbl;
@@ -131,8 +131,8 @@ export function getHelpTextUserNotFound(): string {
     tbl +=
         "I was not able to find your AlfaFrens profile. To get a personalized staking recommendations, make sure that you have:";
     tbl += "\n  * AlfaFrens profile connected to your Farcaster and X account";
-    tbl += "\n  * Conected Farcaster Account from your Moxie profile";
-    tbl += "\n  * Conected X Account from your Moxie profile";
+    tbl += "\n  * Conected Farcaster Account from your Senpi profile";
+    tbl += "\n  * Conected X Account from your Senpi profile";
     tbl += "\n";
     tbl +=
         "\nIf you don't have an account on AlfaFrens, you can create one on:";
@@ -147,15 +147,15 @@ export interface UserData {
     xhandle: string;
 }
 
-export function getUserData(moxieUserInfo: MoxieUser): UserData {
+export function getUserData(senpiUserInfo: SenpiUser): UserData {
     let fid: string = null;
     let xhandle: string = null;
-    const fcId = moxieUserInfo.identities.find((o) => o.type === "FARCASTER");
+    const fcId = senpiUserInfo.identities.find((o) => o.type === "FARCASTER");
     if (fcId) {
         fid = (fcId.metadata as FarcasterMetadata)?.fid?.toString();
     }
 
-    const xId = moxieUserInfo.identities.find((o) => o.type === "TWITTER");
+    const xId = senpiUserInfo.identities.find((o) => o.type === "TWITTER");
     if (xId) {
         xhandle = (fcId.metadata as TwitterMetadata).username;
     }

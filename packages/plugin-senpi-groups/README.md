@@ -1,6 +1,6 @@
 # @elizaos/plugin-senpi-groups
 
-A plugin for Eliza that enables group management for Moxie users.
+A plugin for Eliza that enables group management for Senpi users.
 
 ## Features
 

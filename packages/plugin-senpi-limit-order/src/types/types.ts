@@ -1,6 +1,6 @@
 import { HandlerCallback, IAgentRuntime, State } from "@senpi-ai/core";
 import { Portfolio } from "@senpi-ai/senpi-agent-lib";
-import { MoxieWalletClient } from "@senpi-ai/senpi-agent-lib";
+import { SenpiWalletClient } from "@senpi-ai/senpi-agent-lib";
 import { ethers } from "ethers";
 
 export interface Balance {
@@ -34,7 +34,7 @@ export interface FunctionResponse<T> {
 
 export interface Context {
     traceId: string;
-    moxieUserId?: string;
+    senpiUserId?: string;
     runtime: IAgentRuntime;
     state: State;
     provider?: ethers.providers.JsonRpcProvider;

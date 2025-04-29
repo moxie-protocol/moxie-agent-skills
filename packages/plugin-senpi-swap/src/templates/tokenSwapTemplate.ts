@@ -105,7 +105,7 @@ Please follow these steps to process the transaction intent:
      If the user hasn't specified a buyToken and the sellToken matches the default buyToken, prompt the user to specify a different token
    - buyToken: The token to be purchased/received, which MUST be one of the following:
      * A creator coin in the format @[username|userId]
-     * An ERC20 token in the format $[token_symbol|token_address] or valid ethereum token address 
+     * An ERC20 token in the format $[token_symbol|token_address] or valid ethereum token address
    - value_type: Required for USD amounts (only when $ symbol is present in the amount).
    - buyToken and sellToken should not be same. Prompt user to specify a different token if they are the same.
    IMPORTANT TOKEN VALIDATION RULES:
@@ -136,7 +136,7 @@ Please follow these steps to process the transaction intent:
             - Both username AND userId must be present
             - Exact matches only - no partial matching (e.g., "yeti" ≠ "yeti0x")
     - ERC20 tokens MUST:
-        * Be explicitly provided in complete $[token_symbol|token_address]format or valid ethereum token address 
+        * Be explicitly provided in complete $[token_symbol|token_address]format or valid ethereum token address
         * Have both symbol AND address present if token format is $[token_symbol|token_address]
         * Never have assumed or guessed addresses and symbols
         * Return error if incomplete format is provided

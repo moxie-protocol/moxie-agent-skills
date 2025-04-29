@@ -1,6 +1,6 @@
 # @elizaos/plugin-senpi-balance
 
-A skill for moxie AI agnent that enables fetching token sentiment.
+A skill for senpi AI agnent that enables fetching token sentiment.
 
 ## Description
 
@@ -19,7 +19,6 @@ pnpm i @elizaos/plugin-token-social-sentiment
 The `getTokenSocialSentiment` action provides the ability for the agent to fetch Base ERC20 token sentiments.
 
 The analysis includes the data from Farcaster and Twitter(X), latest trends, tweets and casts.
-
 
 ## Development
 
@@ -54,4 +53,4 @@ Contributions are welcome! Please see the [CONTRIBUTING.md](../../CONTRIBUTING.m
 
 ## License
 
-This AI Agent Skills is part of the Moxie AI Agent project. See the main project repository for license information.
+This AI Agent Skills is part of the Senpi AI Agent project. See the main project repository for license information.

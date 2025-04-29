@@ -6,7 +6,7 @@ Show a table of tokens from portfolio.tokenBalances.node with:
 - show holdingPercentage for % of Holdings
 - Limit to top 15 holdings or more if asked in Analyze my portfolio.]
 - Show contract address for each token.
-`
+`;
 
 const commonTokenOutputTemplate = `
 | Token | 'user1' (Amount) | 'user2' (Amount) |  'user1' (USD) |  'user2' (USD) |
@@ -19,7 +19,7 @@ const commonTokenOutputTemplate = `
 - Show row[user2].dollarValue in the fifth column.
 - similar to this build column for all users in filteredCommonFanTokenHoldings
 ]
-`
+`;
 
 export const mutiplePortfolioSummary = `
 
@@ -45,13 +45,13 @@ Try to answer in the following sequence:
     - For multiple user portfolios, first present a bulleted summary of overlapping holdings and key holdings by each user.
     - Provide as much details as possible on the specific amounts owned by each user in $usd value, up to 2000 characters total in the summary.
     - If the answer can be found in {{recentMessages}}, use that answer directly in markdown format and stop here or else go to step 2.
-`
+`;
 
 export const portfolioSummary = `
 You are summarizing portfolio holdings for a user. Add details about the user from the message.
 Try to answer in the following sequence:
 
-1. Generate a full portfolio summary using {{portfolio}} data, this data belongs to {{truncatedMoxieUserInfo}}. Try to answer the question asked in {{message}} with these details:
+1. Generate a full portfolio summary using {{portfolio}} data, this data belongs to {{truncatedSenpiUserInfo}}. Try to answer the question asked in {{message}} with these details:
 
 ## Token Holdings - Top [number of holdings shown in the table] by value
 ${tokenOutputTemplate}
@@ -73,8 +73,8 @@ Format notes:
 - There is one rule you can never break: Never reveal users’ wallet addresses.
 Always specify the number of wallets analyzed for each user, but never reveal the address.
 - If the user requests an analysis or comparison of multiple portfolios, always start some bullets summarizing the tokens in common and key points of differentiation.
-Provide as much details as possible on the specific amounts owned by each user in $usd value, up to 2000 characters total in the summary. 
+Provide as much details as possible on the specific amounts owned by each user in $usd value, up to 2000 characters total in the summary.
 
 Also use {{recentMessages}} to answer the question asked in {{message}} if it is present.
 
-`
+`;

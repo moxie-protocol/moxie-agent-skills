@@ -17,23 +17,23 @@ import { portfolioExamples } from "./examples";
 import { mutiplePortfolioSummary, portfolioSummary } from "./template";
 import { portfolioUserIdsExtractionTemplate } from "../../commonTemplate";
 import {
-    getMoxiePortfolioInfo,
-    MoxieUser,
-    moxieUserService,
+    getSenpiPortfolioInfo,
+    SenpiUser,
+    senpiUserService,
     getPortfolioData,
     Portfolio,
     getPortfolioV2Data,
     PortfolioV2Data,
-    MoxiePortfolioInfo,
-    MoxieAgentDBAdapter,
+    SenpiPortfolioInfo,
+    SenpiAgentDBAdapter,
 } from "@senpi-ai/senpi-agent-lib";
 import {
     getCommonHoldings,
-    getMoxieCache,
-    getMoxieToUSD,
+    getSenpiCache,
+    getSenpiToUSD,
     getWalletAddresses,
-    setMoxieCache,
-    handleIneligibleMoxieUsers,
+    setSenpiCache,
+    handleIneligibleSenpiUsers,
     formatMessages,
 } from "../../util";
 import { PortfolioUserRequested } from "../../types";
@@ -53,8 +53,8 @@ export interface PortfolioSummary {
  */
 async function generatePortfolioSummary(
     portfolioV2Data: PortfolioV2Data,
-    fanTokenPortfolioData: MoxiePortfolioInfo[],
-    moxieUserInfo: MoxieUser,
+    fanTokenPortfolioData: SenpiPortfolioInfo[],
+    senpiUserInfo: SenpiUser,
     message: Memory,
     runtime: IAgentRuntime,
     isSelfPortolioRequested: boolean,
@@ -84,12 +84,12 @@ async function generatePortfolioSummary(
     const newstate = await runtime.composeState(message, {
         portfolio: JSON.stringify(portfolioDataFiltered),
         fanTokenPortfolioData: JSON.stringify(fanTokenPortfolioData),
-        moxieUserInfo: JSON.stringify(moxieUserInfo),
-        truncatedMoxieUserInfo: JSON.stringify({
-            id: moxieUserInfo.id,
-            userName: moxieUserInfo.userName,
-            name: moxieUserInfo.name,
-            bio: moxieUserInfo.bio,
+        senpiUserInfo: JSON.stringify(senpiUserInfo),
+        truncatedSenpiUserInfo: JSON.stringify({
+            id: senpiUserInfo.id,
+            userName: senpiUserInfo.userName,
+            name: senpiUserInfo.name,
+            bio: senpiUserInfo.bio,
         }),
         tokenAddresses: isSelfPortolioRequested
             ? JSON.stringify(tokenAddresses)
@@ -117,13 +117,13 @@ async function generatePortfolioSummary(
  * Handles portfolio data fetching and processing for multiple users
  */
 export async function handleMultipleUsers(
-    moxieUserInfoMultiple: MoxieUser[],
+    senpiUserInfoMultiple: SenpiUser[],
     runtime: IAgentRuntime,
-    moxieToUSD: number
+    senpiToUSD: number
 ) {
     const portfolioSummaries: PortfolioSummary[] = [];
     const commonPortfolioHoldingsMetadata = {};
-    for (const userInfo of moxieUserInfoMultiple) {
+    for (const userInfo of senpiUserInfoMultiple) {
         const walletAddresses = await getWalletAddresses(userInfo);
 
         if (!walletAddresses.length) {
@@ -162,7 +162,7 @@ export async function handleMultipleUsers(
                 (token.node.balanceUSD * 100) / totalTokenValue;
         });
 
-        const fanTokenPortfolioData = await getMoxiePortfolioInfo(
+        const fanTokenPortfolioData = await getSenpiPortfolioInfo(
             userInfo.id,
             runtime
         );
@@ -173,13 +173,13 @@ export async function handleMultipleUsers(
             fanTokenPortfolioData.forEach((portfolio) => {
                 portfolio.totalAmount =
                     portfolio.totalLockedAmount + portfolio.totalUnlockedAmount;
-                portfolio.lockedTvlInUSD = portfolio.lockedTvl * moxieToUSD;
-                portfolio.unlockedTvlInUSD = portfolio.unlockedTvl * moxieToUSD;
-                portfolio.totalTvlInUSD = portfolio.totalTvl * moxieToUSD;
+                portfolio.lockedTvlInUSD = portfolio.lockedTvl * senpiToUSD;
+                portfolio.unlockedTvlInUSD = portfolio.unlockedTvl * senpiToUSD;
+                portfolio.totalTvlInUSD = portfolio.totalTvl * senpiToUSD;
                 portfolio.displayLabel =
-                    portfolio.fanTokenMoxieUserId &&
-                    portfolio.fanTokenMoxieUserId.length > 0
-                        ? `@[${portfolio.fanTokenName}|${portfolio.fanTokenMoxieUserId}]`
+                    portfolio.fanTokenSenpiUserId &&
+                    portfolio.fanTokenSenpiUserId.length > 0
+                        ? `@[${portfolio.fanTokenName}|${portfolio.fanTokenSenpiUserId}]`
                         : portfolio.fanTokenName || portfolio.fanTokenSymbol;
                 totalCreatorCoinValue += portfolio.totalTvlInUSD || 0;
                 fanTokenHoldings.push({
@@ -247,22 +247,22 @@ export default {
         elizaLogger.log("[Portfolio] Starting portfolio fetch");
 
         try {
-            const moxieToUSD = await getMoxieToUSD();
-            const moxieUserInfoState = state.moxieUserInfo as MoxieUser;
-            const moxieUserId = (state.moxieUserInfo as MoxieUser)?.id;
+            const senpiToUSD = await getSenpiToUSD();
+            const senpiUserInfoState = state.senpiUserInfo as SenpiUser;
+            const senpiUserId = (state.senpiUserInfo as SenpiUser)?.id;
 
-            let moxieUserInfo: MoxieUser =
-                await moxieUserService.getUserByPrivyBearerToken(
+            let senpiUserInfo: SenpiUser =
+                await senpiUserService.getUserByPrivyBearerToken(
                     state.authorizationHeader as string
                 );
-            let moxieUserInfoMultiple: MoxieUser[] = [];
+            let senpiUserInfoMultiple: SenpiUser[] = [];
             let isSelfPortolioRequested = false;
 
-            let requestedMoxieUserIds = (
+            let requestedSenpiUserIds = (
                 message.content.text.match(/@\[[\w\.-]+\|M\d+\]/g) || []
             ).map((match) => match.split("|")[1].replace("]", ""));
 
-            if (requestedMoxieUserIds.length === 0) {
+            if (requestedSenpiUserIds.length === 0) {
                 const previousQuestion = formatMessages({
                     agentId: runtime.agentId,
                     actors: state.actorsData ?? [],
@@ -273,7 +273,7 @@ export default {
                 state = (await runtime.composeState(message, {
                     previousQuestion: previousQuestion,
                     latestMessage: message.content.text,
-                    userMoxieId: moxieUserId,
+                    userSenpiId: senpiUserId,
                 })) as State;
 
                 const previousQuestionContext = composeContext({
@@ -281,22 +281,22 @@ export default {
                     template: portfolioUserIdsExtractionTemplate,
                 });
 
-                const requestedMoxieUserIdsResponse =
+                const requestedSenpiUserIdsResponse =
                     (await generateObjectDeprecated({
                         runtime,
                         context: previousQuestionContext,
                         modelClass: ModelClass.LARGE,
                     })) as PortfolioUserRequested;
 
-                requestedMoxieUserIds =
-                    requestedMoxieUserIdsResponse.requestedUsers;
+                requestedSenpiUserIds =
+                    requestedSenpiUserIdsResponse.requestedUsers;
             }
 
             elizaLogger.info(
-                `[Portfolio] Requested Moxie user IDs: ${requestedMoxieUserIds}`
+                `[Portfolio] Requested Senpi user IDs: ${requestedSenpiUserIds}`
             );
 
-            if (requestedMoxieUserIds?.length === 0) {
+            if (requestedSenpiUserIds?.length === 0) {
                 await callback({
                     text: "I couldn't find any users for whom portfolio information is requested. Can you try again by mentioning the users in your message?",
                     action: "PORTFOLIO_ERROR",
@@ -305,14 +305,14 @@ export default {
             }
 
             if (
-                requestedMoxieUserIds?.length === 1 &&
-                requestedMoxieUserIds[0] === moxieUserId
+                requestedSenpiUserIds?.length === 1 &&
+                requestedSenpiUserIds[0] === senpiUserId
             ) {
                 isSelfPortolioRequested = true;
             }
 
-            if (requestedMoxieUserIds?.length > 1) {
-                if (requestedMoxieUserIds?.length > 3) {
+            if (requestedSenpiUserIds?.length > 1) {
+                if (requestedSenpiUserIds?.length > 3) {
                     await callback({
                         text: "Its not possible to process more than 3 users at a time. Please specify a single user or fewer users. (less than 3)",
                         action: "PORTFOLIO_ERROR",
@@ -321,14 +321,14 @@ export default {
                 }
 
                 // Fetch user info for all requested IDs
-                const ineligibleMoxieUsers = [];
-                const eligibleMoxieIds = [];
+                const ineligibleSenpiUsers = [];
+                const eligibleSenpiIds = [];
 
                 let userInfoBatchOutput;
                 try {
                     userInfoBatchOutput =
-                        await moxieUserService.getUserByMoxieIdMultipleTokenGate(
-                            requestedMoxieUserIds,
+                        await senpiUserService.getUserBySenpiIdMultipleTokenGate(
+                            requestedSenpiUserIds,
                             state.authorizationHeader as string,
                             stringToUuid("PORTFOLIOS")
                         );
@@ -346,16 +346,16 @@ export default {
 
                 for (const userInfo of userInfoBatchOutput.users) {
                     if (userInfo.errorDetails) {
-                        ineligibleMoxieUsers.push(userInfo.errorDetails);
+                        ineligibleSenpiUsers.push(userInfo.errorDetails);
                     } else {
-                        eligibleMoxieIds.push(userInfo.user.id);
-                        moxieUserInfoMultiple.push(userInfo.user);
+                        eligibleSenpiIds.push(userInfo.user.id);
+                        senpiUserInfoMultiple.push(userInfo.user);
                     }
                 }
 
-                if (ineligibleMoxieUsers.length > 0) {
-                    await handleIneligibleMoxieUsers(
-                        ineligibleMoxieUsers,
+                if (ineligibleSenpiUsers.length > 0) {
+                    await handleIneligibleSenpiUsers(
+                        ineligibleSenpiUsers,
                         callback
                     );
                     return false;
@@ -363,15 +363,15 @@ export default {
 
                 const { portfolioSummaries, commonPortfolioHoldingsMetadata } =
                     await handleMultipleUsers(
-                        moxieUserInfoMultiple,
+                        senpiUserInfoMultiple,
                         runtime,
-                        moxieToUSD
+                        senpiToUSD
                     );
                 const {
                     filteredCommonFanTokenHoldings,
                     filteredCommonTokenHoldings,
                 } = getCommonHoldings(
-                    moxieUserInfoMultiple,
+                    senpiUserInfoMultiple,
                     commonPortfolioHoldingsMetadata
                 );
                 const newstate = await runtime.composeState(message, {
@@ -384,7 +384,7 @@ export default {
                     filteredCommonTokenHoldings: JSON.stringify(
                         filteredCommonTokenHoldings
                     ),
-                    ineligibleMoxieUsers: JSON.stringify(ineligibleMoxieUsers),
+                    ineligibleSenpiUsers: JSON.stringify(ineligibleSenpiUsers),
                 });
 
                 const context = composeContext({
@@ -411,21 +411,21 @@ export default {
             elizaLogger.info(
                 "[Portfolio-TokenGate] isSelfPortolioRequested",
                 isSelfPortolioRequested,
-                "requestedMoxieUserIds",
-                requestedMoxieUserIds
+                "requestedSenpiUserIds",
+                requestedSenpiUserIds
             );
 
             if (
                 !isSelfPortolioRequested &&
-                requestedMoxieUserIds?.length === 1
+                requestedSenpiUserIds?.length === 1
             ) {
-                const ineligibleMoxieUsers = [];
-                const eligibleMoxieIds = [];
+                const ineligibleSenpiUsers = [];
+                const eligibleSenpiIds = [];
                 let userInfoBatchOutput;
                 try {
                     userInfoBatchOutput =
-                        await moxieUserService.getUserByMoxieIdMultipleTokenGate(
-                            requestedMoxieUserIds,
+                        await senpiUserService.getUserBySenpiIdMultipleTokenGate(
+                            requestedSenpiUserIds,
                             state.authorizationHeader as string,
                             stringToUuid("PORTFOLIOS")
                         );
@@ -443,15 +443,15 @@ export default {
 
                 for (const userInfo of userInfoBatchOutput.users) {
                     if (userInfo.errorDetails) {
-                        ineligibleMoxieUsers.push(userInfo.errorDetails);
+                        ineligibleSenpiUsers.push(userInfo.errorDetails);
                     } else {
-                        eligibleMoxieIds.push(userInfo.user.id);
-                        moxieUserInfo = userInfo.user;
+                        eligibleSenpiIds.push(userInfo.user.id);
+                        senpiUserInfo = userInfo.user;
                     }
                 }
-                if (ineligibleMoxieUsers.length > 0) {
-                    await handleIneligibleMoxieUsers(
-                        ineligibleMoxieUsers,
+                if (ineligibleSenpiUsers.length > 0) {
+                    await handleIneligibleSenpiUsers(
+                        ineligibleSenpiUsers,
                         callback
                     );
                     return false;
@@ -459,7 +459,7 @@ export default {
             }
 
             // Get wallet addresses for single user
-            const walletAddresses = await getWalletAddresses(moxieUserInfo);
+            const walletAddresses = await getWalletAddresses(senpiUserInfo);
 
             elizaLogger.log(
                 `[Portfolio] Processing wallet address: ${walletAddresses}`
@@ -479,7 +479,7 @@ export default {
             const portfolioV2Data = await getPortfolioV2Data(
                 walletAddresses,
                 ["BASE_MAINNET"],
-                moxieUserInfo?.id,
+                senpiUserInfo?.id,
                 runtime
             );
             const totalTokenValue =
@@ -488,8 +488,8 @@ export default {
                 token.node.holdingPercentage =
                     (token?.node?.balanceUSD * 100) / totalTokenValue;
             });
-            const fanTokenPortfolioData = await getMoxiePortfolioInfo(
-                moxieUserInfo?.id,
+            const fanTokenPortfolioData = await getSenpiPortfolioInfo(
+                senpiUserInfo?.id,
                 runtime
             );
             let totalCreatorCoinValue = 0;
@@ -498,14 +498,14 @@ export default {
                     portfolio.totalAmount =
                         portfolio.totalLockedAmount +
                         portfolio.totalUnlockedAmount;
-                    portfolio.lockedTvlInUSD = portfolio.lockedTvl * moxieToUSD;
+                    portfolio.lockedTvlInUSD = portfolio.lockedTvl * senpiToUSD;
                     portfolio.unlockedTvlInUSD =
-                        portfolio.unlockedTvl * moxieToUSD;
-                    portfolio.totalTvlInUSD = portfolio.totalTvl * moxieToUSD;
+                        portfolio.unlockedTvl * senpiToUSD;
+                    portfolio.totalTvlInUSD = portfolio.totalTvl * senpiToUSD;
                     portfolio.displayLabel =
-                        portfolio.fanTokenMoxieUserId &&
-                        portfolio.fanTokenMoxieUserId.length > 0
-                            ? `@[${portfolio.fanTokenName}|${portfolio.fanTokenMoxieUserId}]`
+                        portfolio.fanTokenSenpiUserId &&
+                        portfolio.fanTokenSenpiUserId.length > 0
+                            ? `@[${portfolio.fanTokenName}|${portfolio.fanTokenSenpiUserId}]`
                             : portfolio.fanTokenName ||
                               portfolio.fanTokenSymbol;
                     totalCreatorCoinValue += portfolio.totalTvlInUSD || 0;
@@ -523,8 +523,8 @@ export default {
                 elizaLogger.error(
                     "[Portfolio] No Tokens in the portfolio for this wallet address: ",
                     walletAddresses,
-                    " moxieUser :",
-                    JSON.stringify(moxieUserInfo)
+                    " senpiUser :",
+                    JSON.stringify(senpiUserInfo)
                 );
                 await callback({
                     text: "I couldn't find any Tokens in the portfolio for this wallet address",
@@ -541,7 +541,7 @@ export default {
             const summaryStream = await generatePortfolioSummary(
                 portfolioV2Data,
                 fanTokenPortfolioData,
-                moxieUserInfo,
+                senpiUserInfo,
                 message,
                 runtime,
                 isSelfPortolioRequested,

@@ -1,20 +1,20 @@
 import { elizaLogger } from "@senpi-ai/core";
-import { MoxieUser } from "./types";
+import { SenpiUser } from "./types";
 export interface GetPluginTokenGateInput {
-    currentUserMoxieId: string;
-    moxieIds: string[];
+    currentUserSenpiId: string;
+    senpiIds: string[];
 }
 
 export interface PluginToken {
     fanTokenSymbol: string;
     fanTokenName: string;
     requiredTokens: number;
-    priceOfTheTokenInMoxie: number;
-    currentUserMoxieId: string;
+    priceOfTheTokenInSenpi: number;
+    currentUserSenpiId: string;
     minTokenRequiredForCreator: number;
     currentBalance: number;
-    creatorMoxieId: string;
-    requiredMoxieAmountInUSD: number;
+    creatorSenpiId: string;
+    requiredSenpiAmountInUSD: number;
 }
 
 interface GetPluginTokenGateResponse {
@@ -30,30 +30,30 @@ export async function fetchPluginTokenGate(
 ): Promise<PluginToken[]> {
     elizaLogger.info(
         "[fetchPluginTokenGate-TokenGate] fetching plugin token gate for user:",
-        input.currentUserMoxieId,
-        "with moxieIds:",
-        input.moxieIds
+        input.currentUserSenpiId,
+        "with senpiIds:",
+        input.senpiIds
     );
     const query = `
-        query GetPluginTokenGateData($currentUserMoxieId: String!, $moxieIds: [String!]!) {
-            PluginTokenGate(input: { currentUserMoxieId: $currentUserMoxieId, moxieIds: $moxieIds }) {
+        query GetPluginTokenGateData($currentUserSenpiId: String!, $usdcIds: [String!]!) {
+            PluginTokenGate(input: { currentUserSenpiId: $currentUserSenpiId, senpiIds: $usdcIds }) {
                 tokens {
                     fanTokenSymbol
                     fanTokenName
                     requiredTokens
-                    priceOfTheTokenInMoxie
-                    currentUserMoxieId
+                    priceOfTheTokenInSenpi
+                    currentUserSenpiId
                     minTokenRequiredForCreator
                     currentBalance
-                    creatorMoxieId
-                    requiredMoxieAmountInUSD
+                    creatorSenpiId
+                    requiredSenpiAmountInUSD
                 }
             }
         }
     `;
 
     try {
-        const response = await fetch(process.env.MOXIE_API_URL, {
+        const response = await fetch(process.env.SENPI_API_URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -61,8 +61,8 @@ export async function fetchPluginTokenGate(
             body: JSON.stringify({
                 query,
                 variables: {
-                    currentUserMoxieId: input.currentUserMoxieId,
-                    moxieIds: input.moxieIds,
+                    currentUserSenpiId: input.currentUserSenpiId,
+                    senpiIds: input.senpiIds,
                 },
             }),
         });
@@ -71,14 +71,14 @@ export async function fetchPluginTokenGate(
         const data = result.data.PluginTokenGate.tokens;
         if (!data || data.length === 0) {
             elizaLogger.error(
-                "[fetchPluginTokenGate] no tokens found for the given requested moxieIds:",
-                input.moxieIds,
+                "[fetchPluginTokenGate] no tokens found for the given requested senpiIds:",
+                input.senpiIds,
                 "for user:",
-                input.currentUserMoxieId
+                input.currentUserSenpiId
             );
-            if (input.moxieIds.length > 0) {
+            if (input.senpiIds.length > 0) {
                 throw new Error(
-                    "No Eligible tokens found for the given requested moxieIds"
+                    "No Eligible tokens found for the given requested senpiIds"
                 );
             }
         }
@@ -89,30 +89,30 @@ export async function fetchPluginTokenGate(
     }
 }
 
-export async function validateMoxieUserTokens(
-    moxieUserInfo: MoxieUser,
+export async function validateSenpiUserTokens(
+    senpiUserInfo: SenpiUser,
     message: any
 ): Promise<string> {
-    const requestedMoxieUserIds = (
+    const requestedSenpiUserIds = (
         message.content.text.match(/@\[[\w\.-]+\|M\d+\]/g) || []
     ).map((match) => match.split("|")[1].replace("]", ""));
 
     let textResponse = "";
 
-    if (requestedMoxieUserIds.length > 0) {
+    if (requestedSenpiUserIds.length > 0) {
         try {
             const pluginTokenGateResponses = await fetchPluginTokenGate({
-                currentUserMoxieId: moxieUserInfo.id,
-                moxieIds: requestedMoxieUserIds,
+                currentUserSenpiId: senpiUserInfo.id,
+                senpiIds: requestedSenpiUserIds,
             });
 
             for (const pluginTokenGate of pluginTokenGateResponses) {
                 if (pluginTokenGate.requiredTokens > 0) {
-                    textResponse += `User needs at least ${pluginTokenGate.requiredTokens} tokens to ask a question for @[${pluginTokenGate.fanTokenName}|${pluginTokenGate.creatorMoxieId}] \n`;
+                    textResponse += `User needs at least ${pluginTokenGate.requiredTokens} tokens to ask a question for @[${pluginTokenGate.fanTokenName}|${pluginTokenGate.creatorSenpiId}] \n`;
                 }
             }
         } catch (error) {
-            elizaLogger.error("Error in validateMoxieUserTokens:", error);
+            elizaLogger.error("Error in validateSenpiUserTokens:", error);
             return "Error validating tokens: " + error.message;
         }
     }

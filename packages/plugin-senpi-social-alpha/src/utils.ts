@@ -1,5 +1,5 @@
 import { elizaLogger, IAgentRuntime } from "@senpi-ai/core";
-import { MOXIE_BACKEND_INTERNAL_URL } from "./config";
+import { SENPI_BACKEND_INTERNAL_URL } from "./config";
 
 interface TopTrader {
     user_id: string;
@@ -33,7 +33,7 @@ interface GetUserSwapsSummaryResponse {
 export async function fetchSwapData(
     userIds: string[],
     tokenType: "ALL" | "CREATOR_COIN" | "NON_CREATOR_COIN",
-    fetchOnlyResultsFromGivenMoxieIds: boolean,
+    fetchOnlyResultsFromGivenSenpiIds: boolean,
     timeFilter: {
         startTimestamp: string;
         endTimestamp: string;
@@ -62,15 +62,15 @@ export async function fetchSwapData(
         const variables = {
             input: {
                 filter: {
-                    moxie_ids: userIds,
+                    senpi_ids: userIds,
                     // Get timestamp from 24 hours ago by subtracting milliseconds (24 * 60 * 60 * 1000)
                     // Convert to ISO string, replace T with space, and take first 19 chars (YYYY-MM-DD HH:mm:ss)
                     start_time: startTimestamp,
                     // Get current timestamp in same format
                     end_time: endTimestamp,
                     token_type: tokenType,
-                    only_results_from_given_moxie_ids:
-                        fetchOnlyResultsFromGivenMoxieIds,
+                    only_results_from_given_senpi_ids:
+                        fetchOnlyResultsFromGivenSenpiIds,
                 },
                 sort: {
                     sort_order: "DESC",
@@ -84,11 +84,11 @@ export async function fetchSwapData(
 
         elizaLogger.debug(`variables: ${JSON.stringify(variables)}`);
 
-        if (!MOXIE_BACKEND_INTERNAL_URL) {
-            throw new Error("MOXIE_BACKEND_INTERNAL_URL is not set");
+        if (!SENPI_BACKEND_INTERNAL_URL) {
+            throw new Error("SENPI_BACKEND_INTERNAL_URL is not set");
         }
 
-        const response = await fetch(`${MOXIE_BACKEND_INTERNAL_URL}`, {
+        const response = await fetch(`${SENPI_BACKEND_INTERNAL_URL}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

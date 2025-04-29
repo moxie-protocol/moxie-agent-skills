@@ -20,7 +20,7 @@ export const GET_GROUP_DETAILS = gql`
                 name
                 createdBy
                 members {
-                    moxieUserId
+                    senpiUserId
                 }
             }
         }
@@ -37,7 +37,7 @@ export const CREATE_GROUP = gql`
                 name
                 createdBy
                 members {
-                    moxieUserId
+                    senpiUserId
                 }
             }
         }
@@ -56,7 +56,7 @@ export const UPDATE_GROUP = gql`
                 createdAt
                 updatedAt
                 members {
-                    moxieUserId
+                    senpiUserId
                     createdAt
                     updatedAt
                     status
@@ -88,7 +88,7 @@ export const ADD_MEMBERS_TO_GROUP = gql`
                 createdAt
                 updatedAt
                 members {
-                    moxieUserId
+                    senpiUserId
                     createdAt
                     updatedAt
                     status
@@ -112,7 +112,7 @@ export const REMOVE_MEMBERS_FROM_GROUP = gql`
                 createdAt
                 updatedAt
                 members {
-                    moxieUserId
+                    senpiUserId
                     createdAt
                     updatedAt
                     status
@@ -148,7 +148,7 @@ export async function getGroupDetails(
 
         elizaLogger.debug("getGroupDetails input constructed", { input });
 
-        const data = await fetch(process.env.RULE_API_MOXIE_API_URL, {
+        const data = await fetch(process.env.RULE_API_SENPI_API_URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -190,7 +190,7 @@ export async function createGroup(
         const input: CreateGroupInput = { name };
         elizaLogger.debug("createGroup input constructed", { input });
 
-        const data = await fetch(process.env.RULE_API_MOXIE_API_URL, {
+        const data = await fetch(process.env.RULE_API_SENPI_API_URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -240,7 +240,7 @@ export async function updateGroup(
         };
         elizaLogger.debug("updateGroup input constructed", { input });
 
-        const data = await fetch(process.env.RULE_API_MOXIE_API_URL, {
+        const data = await fetch(process.env.RULE_API_SENPI_API_URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -288,7 +288,7 @@ export async function deleteGroup(
         };
         elizaLogger.debug("deleteGroup input constructed", { input });
 
-        const data = await fetch(process.env.RULE_API_MOXIE_API_URL, {
+        const data = await fetch(process.env.RULE_API_SENPI_API_URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -333,7 +333,7 @@ export async function addMembersToGroup(
         const input: ModifyGroupMembersInput = { groupId, members };
         elizaLogger.debug("addMembersToGroup input constructed", { input });
 
-        const data = await fetch(process.env.RULE_API_MOXIE_API_URL, {
+        const data = await fetch(process.env.RULE_API_SENPI_API_URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -384,7 +384,7 @@ export async function removeMembersFromGroup(
             input,
         });
 
-        const data = await fetch(process.env.RULE_API_MOXIE_API_URL, {
+        const data = await fetch(process.env.RULE_API_SENPI_API_URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

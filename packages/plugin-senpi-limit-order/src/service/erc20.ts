@@ -59,27 +59,27 @@ export async function getNativeTokenBalance(walletAddress: string) {
 }
 /**
  * Decodes a token transfer event from a transaction receipt
- * @param moxieUserId - The ID of the Moxie user
+ * @param senpiUserId - The ID of the Senpi user
  * @param txReceipt - The transaction receipt containing the token transfer event
  * @returns An object containing the amount, from address, and to address of the token transfer, or null if no transfer event is found
  */
 export async function decodeTokenTransfer(
-    moxieUserId: string,
+    senpiUserId: string,
     txReceipt: ethers.providers.TransactionReceipt,
     buyTokenAddress: string,
     agentWalletAddress: string
 ): Promise<{ amount: string; from: string; to: string } | null> {
     try {
         elizaLogger.debug(
-            `[decodeTokenTransfer] [${moxieUserId}] called with input details: [${JSON.stringify(txReceipt)}]`
+            `[decodeTokenTransfer] [${senpiUserId}] called with input details: [${JSON.stringify(txReceipt)}]`
         );
-        // Find the log event for Moxie token transfer
+        // Find the log event for Senpi token transfer
         if (
             buyTokenAddress !== ETH_ADDRESS &&
             buyTokenAddress !== WETH_ADDRESS
         ) {
             elizaLogger.debug(
-                `[decodeTokenTransfer] [${moxieUserId}] fetching token log for transaction for ERC20: ${txReceipt.transactionHash}`
+                `[decodeTokenTransfer] [${senpiUserId}] fetching token log for transaction for ERC20: ${txReceipt.transactionHash}`
             );
             const tokenLog = txReceipt.logs.find(
                 (log) =>
@@ -91,7 +91,7 @@ export async function decodeTokenTransfer(
             );
             if (!tokenLog) {
                 elizaLogger.error(
-                    `[decodeTokenTransfer] [${moxieUserId}] No token transfer event found in transaction receipt`
+                    `[decodeTokenTransfer] [${senpiUserId}] No token transfer event found in transaction receipt`
                 );
                 return null;
             }
@@ -105,7 +105,7 @@ export async function decodeTokenTransfer(
         }
     } catch (error) {
         elizaLogger.error(
-            `[decodeTokenTransfer] [${moxieUserId}] Error decoding token transfer: ${JSON.stringify(error)}`
+            `[decodeTokenTransfer] [${senpiUserId}] Error decoding token transfer: ${JSON.stringify(error)}`
         );
         return null;
     }
@@ -139,7 +139,7 @@ export async function getERC20Decimals(context: Context, tokenAddress: string) {
         if (cachedDecimals !== null && cachedDecimals !== undefined) {
             elizaLogger.debug(
                 context.traceId,
-                `[${context.moxieUserId}] [getERC20Decimals] Found decimals in cache for token ${tokenAddress}: ${cachedDecimals}`
+                `[${context.senpiUserId}] [getERC20Decimals] Found decimals in cache for token ${tokenAddress}: ${cachedDecimals}`
             );
             return cachedDecimals;
         }
@@ -159,7 +159,7 @@ export async function getERC20Decimals(context: Context, tokenAddress: string) {
     } catch (error) {
         elizaLogger.error(
             context.traceId,
-            `[${context.moxieUserId}] [getERC20Decimals] Error fetching token decimals: ${JSON.stringify(error)}`
+            `[${context.senpiUserId}] [getERC20Decimals] Error fetching token decimals: ${JSON.stringify(error)}`
         );
         throw error;
     }

@@ -1,13 +1,13 @@
 import { SubjectToken } from "../utils/subgraph";
-import { GetQuoteResponse } from "../types"
+import { GetQuoteResponse } from "../types";
 
 export const mockSubjectTokenDetail: SubjectToken = {
     id: "0x123",
     name: "Test Subject Token",
     symbol: "TEST",
     decimals: 18,
-    currentPriceInMoxie: "100",
-    currentPriceInWeiInMoxie: "100",
+    currentPriceInSenpi: "100",
+    currentPriceInWeiInSenpi: "100",
     reserve: "100",
     reserveRatio: "100",
     totalSupply: "100",
@@ -34,8 +34,8 @@ export const mockSubjectTokenDetails: Record<string, SubjectToken> = {
         name: "Test Subject Token 2",
         symbol: "TEST2",
         decimals: 18,
-        currentPriceInMoxie: "100",
-        currentPriceInWeiInMoxie: "100",
+        currentPriceInSenpi: "100",
+        currentPriceInWeiInSenpi: "100",
         reserve: "100",
         reserveRatio: "100",
         totalSupply: "100",
@@ -55,7 +55,6 @@ export const mockSubjectTokenDetails: Record<string, SubjectToken> = {
         isGraduated: true,
     },
 };
-
 
 export const mockGetQuoteResponse: GetQuoteResponse = {
     blockNumber: "1",

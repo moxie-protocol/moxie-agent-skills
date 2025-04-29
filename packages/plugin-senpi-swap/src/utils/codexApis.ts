@@ -15,7 +15,7 @@ import { Decimal } from "decimal.js";
  */
 export async function getPrice(
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     amount: string,
     sourceTokenAddress: string,
     sourceTokenDecimals: number,
@@ -27,7 +27,7 @@ export async function getPrice(
     try {
         elizaLogger.debug(
             traceId,
-            `[getPrice] started with [${moxieUserId}] ` +
+            `[getPrice] started with [${senpiUserId}] ` +
                 `[amount]: ${amount}, ` +
                 `[sourceTokenAddress]: ${sourceTokenAddress}, ` +
                 `[sourceTokenDecimals]: ${sourceTokenDecimals}, ` +
@@ -52,13 +52,13 @@ export async function getPrice(
         ]);
         elizaLogger.debug(
             traceId,
-            `[getPrice] [${moxieUserId}] [TOKEN_DETAILS] ${JSON.stringify(tokenDetails)}`
+            `[getPrice] [${senpiUserId}] [TOKEN_DETAILS] ${JSON.stringify(tokenDetails)}`
         );
 
         if (!tokenDetails || tokenDetails.length === 0) {
             elizaLogger.error(
                 traceId,
-                `[getPrice] [${moxieUserId}] [ERROR] Error getting token details: ${tokenDetails}`
+                `[getPrice] [${senpiUserId}] [ERROR] Error getting token details: ${tokenDetails}`
             );
             throw new Error(
                 `Failed to get token details from codex with error`
@@ -80,7 +80,7 @@ export async function getPrice(
         if (!sourceTokenDetail || !targetTokenDetail) {
             elizaLogger.error(
                 traceId,
-                `[getPrice] [${moxieUserId}] [ERROR] source / target token details not found`
+                `[getPrice] [${senpiUserId}] [ERROR] source / target token details not found`
             );
             throw new Error(
                 `Failed to get token details from codex with error`
@@ -89,7 +89,7 @@ export async function getPrice(
         if (!sourceTokenDetail?.priceUSD) {
             elizaLogger.error(
                 traceId,
-                `[getPrice] [${moxieUserId}] [ERROR] priceUSD not found for source token: ${sourceTokenDetail}`
+                `[getPrice] [${senpiUserId}] [ERROR] priceUSD not found for source token: ${sourceTokenDetail}`
             );
             throw new Error(
                 `Failed to get token price in USD for token: ${sourceTokenAddress}`
@@ -99,14 +99,14 @@ export async function getPrice(
         const sourceTokenPriceInUSD = new Decimal(sourceTokenDetail.priceUSD);
         elizaLogger.debug(
             traceId,
-            `[getPrice] [${moxieUserId}] [${sourceTokenSymbol}] Price USD: ${sourceTokenPriceInUSD}`
+            `[getPrice] [${senpiUserId}] [${sourceTokenSymbol}] Price USD: ${sourceTokenPriceInUSD}`
         );
 
         // check for the target token price in USD
         if (!targetTokenDetail?.priceUSD) {
             elizaLogger.error(
                 traceId,
-                `[getPrice] [${moxieUserId}] [ERROR] priceUSD not found for target token: ${targetTokenDetail}`
+                `[getPrice] [${senpiUserId}] [ERROR] priceUSD not found for target token: ${targetTokenDetail}`
             );
             throw new Error(
                 `Failed to get token price in USD for token: ${targetTokenAddress}`
@@ -116,7 +116,7 @@ export async function getPrice(
         const targetTokenPriceInUSD = new Decimal(targetTokenDetail.priceUSD);
         elizaLogger.debug(
             traceId,
-            `[getPrice] [${moxieUserId}] [${targetTokenSymbol}] Price USD: ${targetTokenPriceInUSD}`
+            `[getPrice] [${senpiUserId}] [${targetTokenSymbol}] Price USD: ${targetTokenPriceInUSD}`
         );
 
         // convert the amount to ether
@@ -124,7 +124,7 @@ export async function getPrice(
 
         elizaLogger.debug(
             traceId,
-            `[getPrice] [${moxieUserId}] [${sourceTokenSymbol}] amount in ether: ${amountinEther}`
+            `[getPrice] [${senpiUserId}] [${sourceTokenSymbol}] amount in ether: ${amountinEther}`
         );
 
         // calculate the amount of target token that can be bought with the amount using the source token price in USD
@@ -139,7 +139,7 @@ export async function getPrice(
 
         elizaLogger.debug(
             traceId,
-            `[getPrice] [${moxieUserId}] [${targetTokenSymbol}] amount: ${amountInTargetTokenFixed}`
+            `[getPrice] [${senpiUserId}] [${targetTokenSymbol}] amount: ${amountInTargetTokenFixed}`
         );
 
         // convert to wei
@@ -149,7 +149,7 @@ export async function getPrice(
     } catch (error) {
         elizaLogger.error(
             traceId,
-            `[getPrice] [${moxieUserId}] [ERROR] Unhandled error: ${error.message}`
+            `[getPrice] [${senpiUserId}] [ERROR] Unhandled error: ${error.message}`
         );
         throw error;
     }

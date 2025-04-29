@@ -109,13 +109,13 @@ export const limitOrderAction = {
             return true;
         }
 
-        // pick moxie user info from state
-        const moxieUserInfo = state.moxieUserInfo as agentLib.MoxieUser;
-        const moxieUserId = moxieUserInfo.id;
-        const agentWallet = state.agentWallet as agentLib.MoxieClientWallet;
+        // pick senpi user info from state
+        const senpiUserInfo = state.senpiUserInfo as agentLib.SenpiUser;
+        const senpiUserId = senpiUserInfo.id;
+        const agentWallet = state.agentWallet as agentLib.SenpiClientWalet;
 
-        // add moxie user id to context
-        context.moxieUserId = moxieUserId;
+        // add senpi user id to context
+        context.senpiUserId = senpiUserId;
 
         try {
             // process the message and extract the limit order details
@@ -128,7 +128,7 @@ export const limitOrderAction = {
             if (limitOrderOptions.callBackTemplate) {
                 elizaLogger.debug(
                     traceId,
-                    `[limitOrderAction] [${moxieUserId}] [processMessage] limitOrderOptions: ${JSON.stringify(limitOrderOptions)}`
+                    `[limitOrderAction] [${senpiUserId}] [processMessage] limitOrderOptions: ${JSON.stringify(limitOrderOptions)}`
                 );
                 await callback?.({
                     text: limitOrderOptions.callBackTemplate.text,
@@ -144,7 +144,7 @@ export const limitOrderAction = {
             if (!validationResult) {
                 elizaLogger.debug(
                     traceId,
-                    `[limitOrderAction] [${moxieUserId}] [isValidLimitOrderContent] validationResult: ${JSON.stringify(validationResult)}`
+                    `[limitOrderAction] [${senpiUserId}] [isValidLimitOrderContent] validationResult: ${JSON.stringify(validationResult)}`
                 );
                 await callback?.({
                     content: validationResult.callBackTemplate.content,
@@ -169,7 +169,7 @@ export const limitOrderAction = {
         } catch (error) {
             elizaLogger.error(
                 traceId,
-                `[limitOrderAction] [${moxieUserId}] [ERROR] error: ${error}`
+                `[limitOrderAction] [${senpiUserId}] [ERROR] error: ${error}`
             );
             const errorTemplate = callBackTemplate.APPLICATION_ERROR(
                 `Error processing limit order: ${error.message}`
@@ -213,20 +213,20 @@ async function preValidateRequiredData(context: Context): Promise<boolean> {
     }
 
     // Validate required state objects
-    if (!state.moxieUserInfo) {
-        throw new Error("Moxie user info not found in state");
+    if (!state.senpiUserInfo) {
+        throw new Error("Senpi user info not found in state");
     }
 
     if (!state.agentWallet) {
         throw new Error("Agent wallet not found in state");
     }
 
-    if (!(state.agentWallet as agentLib.MoxieClientWallet).delegated) {
+    if (!(state.agentWallet as agentLib.SenpiClientWalet).delegated) {
         throw new Error("Delegate access not found for agent wallet");
     }
 
-    if (!state.moxieWalletClient) {
-        throw new Error("Moxie wallet client not found in state");
+    if (!state.SenpiWalletClient) {
+        throw new Error("Senpi wallet client not found in state");
     }
 
     if (!process.env.COW_LIMIT_ORDER_APP_DATA_HASH) {
@@ -301,14 +301,14 @@ async function processMessage(
 
         elizaLogger.debug(
             context.traceId,
-            `[limitOrder] [${context.moxieUserId}] limitOrderOptions: ${JSON.stringify(limitOrderOptions)}`
+            `[limitOrder] [${context.senpiUserId}] limitOrderOptions: ${JSON.stringify(limitOrderOptions)}`
         );
 
         // Return early if confirmation required
         if (limitOrderOptions.confirmation_required) {
             elizaLogger.debug(
                 context.traceId,
-                `[limitOrder] [${context.moxieUserId}] confirmation_required: ${JSON.stringify(limitOrderOptions.confirmation_required)}`
+                `[limitOrder] [${context.senpiUserId}] confirmation_required: ${JSON.stringify(limitOrderOptions.confirmation_required)}`
             );
             return {
                 callBackTemplate: {
@@ -326,7 +326,7 @@ async function processMessage(
         if (limitOrderOptions.error) {
             elizaLogger.debug(
                 context.traceId,
-                `[limitOrder] [${context.moxieUserId}] error: ${JSON.stringify(limitOrderOptions.error)}`
+                `[limitOrder] [${context.senpiUserId}] error: ${JSON.stringify(limitOrderOptions.error)}`
             );
             return {
                 callBackTemplate: {
@@ -541,7 +541,7 @@ function isValidLimitOrderContent(
 async function processLimitOrder(context: Context, data: LimitOrderResponse) {
     elizaLogger.debug(
         context.traceId,
-        `[limitOrder] [${context.moxieUserId}] [processLimitOrder] started`
+        `[limitOrder] [${context.senpiUserId}] [processLimitOrder] started`
     );
 
     // Map to cache wallet balances for balance-based transfers to avoid duplicate queries
@@ -554,7 +554,7 @@ async function processLimitOrder(context: Context, data: LimitOrderResponse) {
     for (const limitOrder of data.limit_orders) {
         elizaLogger.debug(
             context.traceId,
-            `[limitOrder] [${context.moxieUserId}] [processLimitOrder] Processing limit order: ${JSON.stringify(limitOrder)}`
+            `[limitOrder] [${context.senpiUserId}] [processLimitOrder] Processing limit order: ${JSON.stringify(limitOrder)}`
         );
 
         try {
@@ -563,7 +563,7 @@ async function processLimitOrder(context: Context, data: LimitOrderResponse) {
             if (limitOrder.execution_type === "FUTURE") {
                 elizaLogger.debug(
                     context.traceId,
-                    `[limitOrder] [${context.moxieUserId}] [processLimitOrder] Execution type is future, processing limit order then executing`
+                    `[limitOrder] [${context.senpiUserId}] [processLimitOrder] Execution type is future, processing limit order then executing`
                 );
                 result = await processSingleLimitOrder(
                     context,
@@ -575,7 +575,7 @@ async function processLimitOrder(context: Context, data: LimitOrderResponse) {
             if (result.callBackTemplate) {
                 elizaLogger.error(
                     context.traceId,
-                    `[limitOrder] [${context.moxieUserId}] [processLimitOrder] Limit order failed: ${JSON.stringify(result.callBackTemplate)}`
+                    `[limitOrder] [${context.senpiUserId}] [processLimitOrder] Limit order failed: ${JSON.stringify(result.callBackTemplate)}`
                 );
                 return {
                     callBackTemplate: result.callBackTemplate,
@@ -586,7 +586,7 @@ async function processLimitOrder(context: Context, data: LimitOrderResponse) {
             if (result.data) {
                 elizaLogger.debug(
                     context.traceId,
-                    `[limitOrder] [${context.moxieUserId}] [processLimitOrder] Limit order successful: ${JSON.stringify(result.data)}`
+                    `[limitOrder] [${context.senpiUserId}] [processLimitOrder] Limit order successful: ${JSON.stringify(result.data)}`
                 );
                 await context.callback({
                     content: result.data.content,
@@ -597,7 +597,7 @@ async function processLimitOrder(context: Context, data: LimitOrderResponse) {
         } catch (error) {
             elizaLogger.error(
                 context.traceId,
-                `[limitOrder] [${context.moxieUserId}] [processLimitOrder] Unexpected error: ${error}`
+                `[limitOrder] [${context.senpiUserId}] [processLimitOrder] Unexpected error: ${error}`
             );
             return {
                 callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -622,7 +622,7 @@ async function processSingleLimitOrder(
 ): Promise<FunctionResponse<CallbackTemplate>> {
     elizaLogger.debug(
         context.traceId,
-        `[limitOrder] [${context.moxieUserId}] [processSingleLimitOrder] limitOrder: ${JSON.stringify(limitOrder)}`
+        `[limitOrder] [${context.senpiUserId}] [processSingleLimitOrder] limitOrder: ${JSON.stringify(limitOrder)}`
     );
     const {
         sellToken,
@@ -636,7 +636,7 @@ async function processSingleLimitOrder(
         value_type,
         balance,
     } = limitOrder;
-    const agentWallet = context.state.agentWallet as agentLib.MoxieClientWallet;
+    const agentWallet = context.state.agentWallet as agentLib.SenpiClientWalet;
     // extract the sell token address and symbol
     let sellTokenAddress: string;
     let sellTokenSymbol: string;
@@ -651,7 +651,7 @@ async function processSingleLimitOrder(
         } catch (error) {
             elizaLogger.warn(
                 context.traceId,
-                `[limitOrder] [${context.moxieUserId}] Failed to fetch sell token symbol from RPC: ${error}`
+                `[limitOrder] [${context.senpiUserId}] Failed to fetch sell token symbol from RPC: ${error}`
             );
         }
     } else {
@@ -667,7 +667,7 @@ async function processSingleLimitOrder(
         } catch (error) {
             elizaLogger.warn(
                 context.traceId,
-                `[limitOrder] [${context.moxieUserId}] Failed to fetch buy token symbol from RPC: ${error}`
+                `[limitOrder] [${context.senpiUserId}] Failed to fetch buy token symbol from RPC: ${error}`
             );
         }
     } else {
@@ -678,7 +678,7 @@ async function processSingleLimitOrder(
 
     try {
         const traceId = context.traceId;
-        const moxieUserId = context.moxieUserId;
+        const senpiUserId = context.senpiUserId;
         // Validate required transfer parameters
         if (!limitOrder || !limitOrder.sellToken || !limitOrder.buyToken) {
             throw new Error("Missing required transfer parameters");
@@ -701,7 +701,7 @@ async function processSingleLimitOrder(
 
         elizaLogger.debug(
             context.traceId,
-            `[limitOrder] [${context.moxieUserId}] [processSingleLimitOrder] sellTokenBalance: ${sellTokenBalance}`
+            `[limitOrder] [${context.senpiUserId}] [processSingleLimitOrder] sellTokenBalance: ${sellTokenBalance}`
         );
 
         let buyTokenAmountInWEI: bigint;
@@ -713,18 +713,18 @@ async function processSingleLimitOrder(
                 sellTokenAddress,
                 sellTokenSymbol,
                 traceId,
-                moxieUserId
+                senpiUserId
             ),
             fetchPriceWithRetry(
                 buyTokenAddress,
                 buyTokenSymbol,
                 traceId,
-                moxieUserId
+                senpiUserId
             ),
         ]);
         elizaLogger.debug(
             traceId,
-            `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [USD_VALUE_TYPE] sellTokenPriceInUSD: ${sellTokenPriceInUSD} and buyTokenPriceInUSD: ${buyTokenPriceInUSD}`
+            `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [USD_VALUE_TYPE] sellTokenPriceInUSD: ${sellTokenPriceInUSD} and buyTokenPriceInUSD: ${buyTokenPriceInUSD}`
         );
 
         // Calculate target price based on limit price type
@@ -743,14 +743,14 @@ async function processSingleLimitOrder(
             }
             elizaLogger.debug(
                 traceId,
-                `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [PERCENTAGE] targetPriceInUSD: ${targetTokenPriceInUSD}`
+                `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [PERCENTAGE] targetPriceInUSD: ${targetTokenPriceInUSD}`
             );
         } else if (limitPrice.type === "TOKEN_PRICE") {
             // For token price, use the specified price directly
             targetTokenPriceInUSD = limitPrice.value;
             elizaLogger.debug(
                 traceId,
-                `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [TOKEN_PRICE] targetPriceInUSD: ${targetTokenPriceInUSD}`
+                `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [TOKEN_PRICE] targetPriceInUSD: ${targetTokenPriceInUSD}`
             );
         }
 
@@ -764,7 +764,7 @@ async function processSingleLimitOrder(
                     buyTokenDecimals,
                     sellTokenDecimals,
                     traceId,
-                    moxieUserId,
+                    senpiUserId,
                     buyTokenPriceInUSD,
                     type
                 );
@@ -773,7 +773,7 @@ async function processSingleLimitOrder(
             } catch (error) {
                 elizaLogger.error(
                     traceId,
-                    `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BUY_QUANTITY] Error calculating amounts: ${error}`
+                    `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [BUY_QUANTITY] Error calculating amounts: ${error}`
                 );
                 throw error;
             }
@@ -788,7 +788,7 @@ async function processSingleLimitOrder(
                     buyTokenDecimals,
                     sellTokenDecimals,
                     traceId,
-                    moxieUserId,
+                    senpiUserId,
                     type
                 );
                 buyTokenAmountInWEI = amounts.buyTokenAmountInWEI;
@@ -796,7 +796,7 @@ async function processSingleLimitOrder(
             } catch (error) {
                 elizaLogger.error(
                     traceId,
-                    `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [SELL_QUANTITY] Error calculating amounts: ${error}`
+                    `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [SELL_QUANTITY] Error calculating amounts: ${error}`
                 );
                 throw error;
             }
@@ -804,7 +804,7 @@ async function processSingleLimitOrder(
             try {
                 const amounts = await calculateBalanceBasedAmounts(
                     traceId,
-                    moxieUserId,
+                    senpiUserId,
                     currentWalletBalanceForBalanceBasedSwaps[sellTokenAddress],
                     sellTokenAddress,
                     sellTokenSymbol,
@@ -824,7 +824,7 @@ async function processSingleLimitOrder(
             } catch (error) {
                 elizaLogger.error(
                     traceId,
-                    `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BALANCE_BASED] Error getting balance based quantity: ${error}`
+                    `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [BALANCE_BASED] Error getting balance based quantity: ${error}`
                 );
                 throw error;
             }
@@ -845,14 +845,14 @@ async function processSingleLimitOrder(
                 );
                 elizaLogger.debug(
                     traceId,
-                    `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [ETH_TO_WETH_SWAP] buyAmountInWEI: ${buyAmountInWEI.data}`
+                    `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [ETH_TO_WETH_SWAP] buyAmountInWEI: ${buyAmountInWEI.data}`
                 );
                 sellTokenSymbol = WETH;
                 sellTokenAddress = WETH_ADDRESS;
             } catch (error) {
                 elizaLogger.error(
                     traceId,
-                    `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [ETH_TO_WETH_SWAP] Error swapping ETH to WETH: ${error}`
+                    `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [ETH_TO_WETH_SWAP] Error swapping ETH to WETH: ${error}`
                 );
                 throw error;
             }
@@ -878,7 +878,7 @@ async function processSingleLimitOrder(
         };
         elizaLogger.debug(
             traceId,
-            `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [orderCreation] orderCreation: ${JSON.stringify(orderCreation)}`
+            `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [orderCreation] orderCreation: ${JSON.stringify(orderCreation)}`
         );
 
         const cowLimitOrderId = await createCowLimitOrder(
@@ -887,26 +887,26 @@ async function processSingleLimitOrder(
         );
         elizaLogger.debug(
             traceId,
-            `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [cowLimitOrder] cowLimitOrderId: ${cowLimitOrderId}`
+            `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [cowLimitOrder] cowLimitOrderId: ${cowLimitOrderId}`
         );
 
         // then insert into the database
         await (
-            context.runtime.databaseAdapter as agentLib.MoxieAgentDBAdapter
+            context.runtime.databaseAdapter as agentLib.SenpiAgentDBAdapter
         ).saveLimitOrder(cowLimitOrderId, agentWallet.address);
         elizaLogger.debug(
             traceId,
-            `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [saveLimitOrder]cowLimitOrderId: ${cowLimitOrderId}`
+            `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [saveLimitOrder]cowLimitOrderId: ${cowLimitOrderId}`
         );
 
         // check if the user has alerts enabled
         const communicationPreference = await checkUserCommunicationPreferences(
             traceId,
-            moxieUserId
+            senpiUserId
         );
         elizaLogger.debug(
             traceId,
-            `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [checkUserCommunicationPreferences] communicationPreference: ${communicationPreference}`
+            `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [checkUserCommunicationPreferences] communicationPreference: ${communicationPreference}`
         );
 
         return {
@@ -918,7 +918,7 @@ async function processSingleLimitOrder(
     } catch (error) {
         elizaLogger.error(
             context.traceId,
-            `[limitOrder] [${context.moxieUserId}] [processSingleLimitOrder] Error: ${error}`
+            `[limitOrder] [${context.senpiUserId}] [processSingleLimitOrder] Error: ${error}`
         );
         if (error.message.toLowerCase().includes("insufficient")) {
             return {
@@ -947,15 +947,15 @@ async function processSingleLimitOrder(
  * Check the user communication preferences
  * @param userId The user ID of the person performing the swap
  * @param traceId The trace ID of the request
- * @param moxieUserId The Moxie user ID of the person performing the swap
+ * @param senpiUserId The Senpi user ID of the person performing the swap
  * @returns Promise that resolves to the user communication preferences
  */
 async function checkUserCommunicationPreferences(
     traceId: string,
-    moxieUserId: string
+    senpiUserId: string
 ): Promise<string | null> {
     try {
-        const response = await fetch(process.env.MOXIE_API_URL_INTERNAL, {
+        const response = await fetch(process.env.SENPI_API_URL_INTERNAL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -963,7 +963,7 @@ async function checkUserCommunicationPreferences(
             body: JSON.stringify({
                 query: `
                     query GetUser {
-                        GetUser(input: { userId: "${moxieUserId}" }) {
+                        GetUser(input: { userId: "${senpiUserId}" }) {
                             communicationPreference
                         }
                     }
@@ -974,7 +974,7 @@ async function checkUserCommunicationPreferences(
         if (!response.ok) {
             elizaLogger.error(
                 traceId,
-                `[limitOrder] [${moxieUserId}] Failed to fetch user preferences: ${response.statusText}`
+                `[limitOrder] [${senpiUserId}] Failed to fetch user preferences: ${response.statusText}`
             );
             return null;
         }
@@ -982,14 +982,14 @@ async function checkUserCommunicationPreferences(
         const data = await response.json();
         elizaLogger.debug(
             traceId,
-            `[limitOrder] [${moxieUserId}] User communication preferences:`,
+            `[limitOrder] [${senpiUserId}] User communication preferences:`,
             data?.data?.GetUser?.communicationPreference
         );
         return data?.data?.GetUser?.communicationPreference;
     } catch (error) {
         elizaLogger.error(
             traceId,
-            `[limitOrder] [${moxieUserId}] Error checking user preferences: ${error.message}`
+            `[limitOrder] [${senpiUserId}] Error checking user preferences: ${error.message}`
         );
         return null;
     }
@@ -997,7 +997,7 @@ async function checkUserCommunicationPreferences(
 
 /**
  * Get the current wallet balance
- * @param moxieUserId The user ID of the person performing the swap
+ * @param senpiUserId The user ID of the person performing the swap
  * @param sellToken The token to sell
  * @param agentWallet The wallet address to receive the tokens
  * @param balance The balance object
@@ -1006,7 +1006,7 @@ async function checkUserCommunicationPreferences(
 async function getTargetQuantityForBalanceBasedSwaps(
     traceId: string,
     currentWalletBalance: bigint | undefined,
-    moxieUserId: string,
+    senpiUserId: string,
     sellTokenAddress: string,
     sellTokenSymbol: string,
     agentWallet: any,
@@ -1022,12 +1022,12 @@ async function getTargetQuantityForBalanceBasedSwaps(
     }
     elizaLogger.debug(
         traceId,
-        `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [getTargetQuantityForBalanceBasedSwaps] currentWalletBalance: ${currentWalletBalance} ${sellTokenAddress}`
+        `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [getTargetQuantityForBalanceBasedSwaps] currentWalletBalance: ${currentWalletBalance} ${sellTokenAddress}`
     );
     if (!currentWalletBalance || currentWalletBalance === 0n) {
         elizaLogger.error(
             traceId,
-            `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [balance] currentWalletBalance is ${currentWalletBalance}`
+            `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [balance] currentWalletBalance is ${currentWalletBalance}`
         );
         throw new Error(
             `Insufficient ${sellTokenSymbol} balance ${currentWalletBalance} to complete this operation`
@@ -1041,7 +1041,7 @@ async function getTargetQuantityForBalanceBasedSwaps(
         (BigInt(currentWalletBalance) * BigInt(percentage * 1e7)) / BigInt(1e9);
     elizaLogger.debug(
         traceId,
-        `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [balance] quantityInWEI: ${quantityInWEI}`
+        `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [balance] quantityInWEI: ${quantityInWEI}`
     );
     return { quantityInWEI, currentWalletBalance };
 }
@@ -1071,10 +1071,10 @@ async function swap(
     buyTokenDecimals: number
 ): Promise<FunctionResponse<bigint>> {
     const traceId = context.traceId;
-    const moxieUserId = context.moxieUserId;
+    const senpiUserId = context.senpiUserId;
     const provider = context.provider;
     const walletClient = context.state
-        .moxieWalletClient as agentLib.MoxieWalletClient;
+        .SenpiWalletClient as agentLib.SenpiWalletClient;
 
     elizaLogger.debug(
         traceId,
@@ -1091,19 +1091,19 @@ async function swap(
                 : await getERC20Balance(sellTokenAddress, agentWalletAddress);
         elizaLogger.debug(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [swap] balance: ${balance}`
+            `[tokenSwap] [${senpiUserId}] [swap] balance: ${balance}`
         );
         tokenBalance = balance ? BigInt(balance.toString()) : BigInt(0);
 
         if (tokenBalance < sellAmountInWEI) {
             elizaLogger.error(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [swap] Insufficient balance for ${sellTokenSymbol} to ${buyTokenSymbol} swap. Token balance: ${tokenBalance}, required: ${sellAmountInWEI}`
+                `[tokenSwap] [${senpiUserId}] [swap] Insufficient balance for ${sellTokenSymbol} to ${buyTokenSymbol} swap. Token balance: ${tokenBalance}, required: ${sellAmountInWEI}`
             );
             const callbackTemplate = await handleInsufficientBalance(
                 traceId,
                 context.state.agentWalletBalance as agentLib.Portfolio,
-                moxieUserId,
+                senpiUserId,
                 sellTokenAddress,
                 sellTokenSymbol,
                 sellAmountInWEI,
@@ -1119,7 +1119,7 @@ async function swap(
         // call 0x api to get quote
         quote = await get0xSwapQuote({
             traceId: traceId,
-            moxieUserId: moxieUserId,
+            senpiUserId: senpiUserId,
             sellAmountBaseUnits: sellAmountInWEI.toString(),
             buyTokenAddress: buyTokenAddress,
             walletAddress: agentWalletAddress,
@@ -1127,14 +1127,14 @@ async function swap(
         });
         elizaLogger.debug(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [swap] get0xSwapQuote: ${JSON.stringify(quote)}`
+            `[tokenSwap] [${senpiUserId}] [swap] get0xSwapQuote: ${JSON.stringify(quote)}`
         );
 
         // check is liquidity is available
         if (!quote.liquidityAvailable) {
             elizaLogger.error(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [swap] liquidity not available for ${sellTokenSymbol} to ${buyTokenSymbol} swap`
+                `[tokenSwap] [${senpiUserId}] [swap] liquidity not available for ${sellTokenSymbol} to ${buyTokenSymbol} swap`
             );
             throw new Error(
                 `Liquidity not available for ${sellTokenSymbol} to ${buyTokenSymbol} swap`
@@ -1145,13 +1145,13 @@ async function swap(
         const issues = quote.issues;
         elizaLogger.debug(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [swap] issues from get0xSwapQuote: ${JSON.stringify(issues)}`
+            `[tokenSwap] [${senpiUserId}] [swap] issues from get0xSwapQuote: ${JSON.stringify(issues)}`
         );
         // check allowance and approve spending
         if (issues.allowance && issues.allowance != null) {
             await checkAllowanceAndApproveSpendRequest(
                 traceId,
-                moxieUserId,
+                senpiUserId,
                 agentWalletAddress,
                 sellTokenAddress,
                 // @ts-ignore
@@ -1163,7 +1163,7 @@ async function swap(
             );
             elizaLogger.debug(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [swap] checkAllowanceAndApproveSpendRequest completed`
+                `[tokenSwap] [${senpiUserId}] [swap] checkAllowanceAndApproveSpendRequest completed`
             );
         }
         // check balance and approve spending
@@ -1177,7 +1177,7 @@ async function swap(
                       );
             elizaLogger.debug(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [swap] tokenBalance: ${balance}`
+                `[tokenSwap] [${senpiUserId}] [swap] tokenBalance: ${balance}`
             );
             if (balance) {
                 tokenBalance = BigInt(balance.toString());
@@ -1185,7 +1185,7 @@ async function swap(
             if (tokenBalance < sellAmountInWEI) {
                 elizaLogger.error(
                     traceId,
-                    `[tokenSwap] [${moxieUserId}] [swap] Insufficient balance for ${sellTokenSymbol} to ${buyTokenSymbol} swap. Token balance: ${tokenBalance}, required: ${sellAmountInWEI}`
+                    `[tokenSwap] [${senpiUserId}] [swap] Insufficient balance for ${sellTokenSymbol} to ${buyTokenSymbol} swap. Token balance: ${tokenBalance}, required: ${sellAmountInWEI}`
                 );
                 return {
                     callBackTemplate: callBackTemplate.INSUFFICIENT_BALANCE(
@@ -1199,18 +1199,18 @@ async function swap(
     } catch (error) {
         elizaLogger.error(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [swap] Error getting 0x quote: ${error.message}`
+            `[tokenSwap] [${senpiUserId}] [swap] Error getting 0x quote: ${error.message}`
         );
         throw error;
     }
 
     // if (sellTokenSymbol != "ETH") { // skip for ETH
     // signature related
-    let signResponse: agentLib.MoxieWalletSignTypedDataResponseType | undefined;
+    let signResponse: agentLib.SenpiWalletSignTypedDataResponseType | undefined;
     try {
         elizaLogger.debug(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [swap] quote.permit2.eip712: ${JSON.stringify(quote.permit2?.eip712)}`
+            `[tokenSwap] [${senpiUserId}] [swap] quote.permit2.eip712: ${JSON.stringify(quote.permit2?.eip712)}`
         );
         if (quote.permit2?.eip712) {
             signResponse = await walletClient.signTypedData(
@@ -1221,13 +1221,13 @@ async function swap(
             );
             elizaLogger.debug(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [swap] signResponse: ${JSON.stringify(signResponse)}`
+                `[tokenSwap] [${senpiUserId}] [swap] signResponse: ${JSON.stringify(signResponse)}`
             );
         }
 
         if (signResponse && signResponse.signature && quote.transaction?.data) {
             const signatureLengthInHex = numberToHex(
-                size(signResponse.signature as agentLib.MoxieHex),
+                size(signResponse.signature as agentLib.SenpiHex),
                 {
                     signed: false,
                     size: 32,
@@ -1243,20 +1243,20 @@ async function swap(
             );
             elizaLogger.debug(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [swap] quote.transaction.data: ${JSON.stringify(quote.transaction.data)}`
+                `[tokenSwap] [${senpiUserId}] [swap] quote.transaction.data: ${JSON.stringify(quote.transaction.data)}`
             );
         }
     } catch (error) {
         elizaLogger.error(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [swap] Error signing typed data: ${error}`
+            `[tokenSwap] [${senpiUserId}] [swap] Error signing typed data: ${error}`
         );
         throw error;
     }
     // }
 
     // execute 0x swap
-    let tx: agentLib.MoxieWalletSendTransactionResponseType | null = null;
+    let tx: agentLib.SenpiWalletSendTransactionResponseType | null = null;
     try {
         tx = await execute0xSwap({
             context: context,
@@ -1266,12 +1266,12 @@ async function swap(
         });
         elizaLogger.debug(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [swap] 0x tx: ${JSON.stringify(tx)}`
+            `[tokenSwap] [${senpiUserId}] [swap] 0x tx: ${JSON.stringify(tx)}`
         );
     } catch (error) {
         elizaLogger.error(
             traceId,
-            "[tokenSwap] [${moxieUserId}] [swap] Error executing 0x swap:",
+            "[tokenSwap] [${senpiUserId}] [swap] Error executing 0x swap:",
             { error }
         );
         throw error;
@@ -1286,55 +1286,55 @@ async function swap(
     try {
         txnReceipt = await handleTransactionStatusSwap(
             traceId,
-            moxieUserId,
+            senpiUserId,
             provider,
             tx.hash
         );
         if (!txnReceipt) {
             elizaLogger.error(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [swap] txnReceipt is null`
+                `[tokenSwap] [${senpiUserId}] [swap] txnReceipt is null`
             );
             throw new Error(`Transaction receipt is null for ${tx.hash}.`);
         }
     } catch (error) {
         elizaLogger.error(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [swap] Error handling transaction status: ${JSON.stringify(error)}`
+            `[tokenSwap] [${senpiUserId}] [swap] Error handling transaction status: ${JSON.stringify(error)}`
         );
         throw error;
     }
 
     elizaLogger.debug(
         traceId,
-        `[tokenSwap] [${moxieUserId}] [swap] 0x swap txnReceipt: ${JSON.stringify(txnReceipt)}`
+        `[tokenSwap] [${senpiUserId}] [swap] 0x swap txnReceipt: ${JSON.stringify(txnReceipt)}`
     );
     if (txnReceipt.status == 1) {
         if (
             buyTokenAddress !== ETH_ADDRESS &&
             buyTokenAddress !== WETH_ADDRESS
         ) {
-            // decode the txn receipt to get the moxie purchased
+            // decode the txn receipt to get the senpi purchased
             const transferDetails = await decodeTokenTransfer(
-                moxieUserId,
+                senpiUserId,
                 txnReceipt,
                 buyTokenAddress,
                 agentWalletAddress
             );
             elizaLogger.debug(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [swap] 0x swap decodeTokenTransfer: ${JSON.stringify(transferDetails)}`
+                `[tokenSwap] [${senpiUserId}] [swap] 0x swap decodeTokenTransfer: ${JSON.stringify(transferDetails)}`
             );
             if (transferDetails) {
                 buyAmountInWEI = BigInt(transferDetails.amount);
                 elizaLogger.debug(
                     traceId,
-                    `[tokenSwap] [${moxieUserId}] [swap] buyAmountInWEI: ${buyAmountInWEI}`
+                    `[tokenSwap] [${senpiUserId}] [swap] buyAmountInWEI: ${buyAmountInWEI}`
                 );
             } else {
                 elizaLogger.error(
                     traceId,
-                    `[tokenSwap] [${moxieUserId}] [swap] Error decoding token transfer`
+                    `[tokenSwap] [${senpiUserId}] [swap] Error decoding token transfer`
                 );
                 throw new Error(`Error decoding token transfer`);
             }
@@ -1354,7 +1354,7 @@ async function swap(
     } else {
         elizaLogger.error(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [swap] 0x swap failed: ${tx.hash} `
+            `[tokenSwap] [${senpiUserId}] [swap] 0x swap failed: ${tx.hash} `
         );
         throw new Error(`0x swap failed: ${tx.hash}`);
     }
@@ -1363,7 +1363,7 @@ async function swap(
 /**
  * Handle insufficient balance
  * @param currentWalletBalance - The current wallet balance
- * @param moxieUserId - The user ID of the person performing the swap
+ * @param senpiUserId - The user ID of the person performing the swap
  * @param sellTokenAddress - The address of the sell token
  * @param sellTokenSymbol - The symbol of the sell token
  * @param sellAmountInWEI - The amount of the sell token in WEI
@@ -1375,7 +1375,7 @@ async function swap(
 async function handleInsufficientBalance(
     traceId: string,
     currentWalletBalance: agentLib.Portfolio,
-    moxieUserId: string,
+    senpiUserId: string,
     sellTokenAddress: string,
     sellTokenSymbol: string,
     sellAmountInWEI: bigint,
@@ -1387,7 +1387,7 @@ async function handleInsufficientBalance(
 ): Promise<CallbackTemplate> {
     elizaLogger.debug(
         traceId,
-        `[tokenSwap] [${moxieUserId}] [handleInsufficientBalance] [currentWalletBalance]: ${JSON.stringify(currentWalletBalance)}`
+        `[tokenSwap] [${senpiUserId}] [handleInsufficientBalance] [currentWalletBalance]: ${JSON.stringify(currentWalletBalance)}`
     );
     // Get indicative price of buy token in USD
     let indicativePriceOfBuyTokenInUSD: string;
@@ -1395,7 +1395,7 @@ async function handleInsufficientBalance(
         // use codex to get the price
         const price = await getPrice(
             traceId,
-            moxieUserId,
+            senpiUserId,
             sellAmountInWEI.toString(),
             sellTokenAddress,
             sellTokenDecimals,
@@ -1426,7 +1426,7 @@ async function handleInsufficientBalance(
         );
     elizaLogger.debug(
         traceId,
-        `[tokenSwap] [${moxieUserId}] [handleInsufficientBalance] [otherTokensWithSufficientBalance]: ${JSON.stringify(otherTokensWithSufficientBalance)}`
+        `[tokenSwap] [${senpiUserId}] [handleInsufficientBalance] [otherTokensWithSufficientBalance]: ${JSON.stringify(otherTokensWithSufficientBalance)}`
     );
 
     // extract the symbols from otherTokensWithSufficientBalance
@@ -1438,7 +1438,7 @@ async function handleInsufficientBalance(
         .map((token) => token.token.baseToken.symbol);
     elizaLogger.debug(
         traceId,
-        `[tokenSwap] [${moxieUserId}] [handleInsufficientBalance] [otherTokenSymbols]: ${JSON.stringify(otherTokenSymbols)}`
+        `[tokenSwap] [${senpiUserId}] [handleInsufficientBalance] [otherTokenSymbols]: ${JSON.stringify(otherTokenSymbols)}`
     );
 
     // extract a map with symbol as key and token as value
@@ -1451,7 +1451,7 @@ async function handleInsufficientBalance(
     );
     elizaLogger.debug(
         traceId,
-        `[tokenSwap] [${moxieUserId}] [handleInsufficientBalance] [otherTokenSymbolsMap]: ${JSON.stringify(otherTokenSymbolsMap)}`
+        `[tokenSwap] [${senpiUserId}] [handleInsufficientBalance] [otherTokenSymbolsMap]: ${JSON.stringify(otherTokenSymbolsMap)}`
     );
 
     return {
@@ -1488,25 +1488,25 @@ const calculateBuyQuantityAmounts = async (
     buyTokenDecimals: number,
     sellTokenDecimals: number,
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     buyTokenPriceInUSD: number,
     type: string
 ): Promise<{ buyTokenAmountInWEI: bigint; sellTokenAmountInWEI: bigint }> => {
     elizaLogger.debug(
         traceId,
-        `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [type]: ${type}`
+        `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [type]: ${type}`
     );
     if (value_type && value_type == "USD") {
         elizaLogger.debug(
             traceId,
-            `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [VALUE_TYPE]: ${value_type}`
+            `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [VALUE_TYPE]: ${value_type}`
         );
         try {
             let buyAmount: string;
             let sellAmount: string;
             if (type === "SELL") {
                 // this is for usd based direct sell case where user is selling in terms of buy quantity
-                // sell $KTA when price increase by 10% and get me $10 worth of moxie
+                // sell $KTA when price increase by 10% and get me $10 worth of senpi
                 buyAmount = new Decimal(buyQuantity)
                     .div(buyTokenPriceInUSD)
                     .toFixed(buyTokenDecimals);
@@ -1537,18 +1537,18 @@ const calculateBuyQuantityAmounts = async (
             // Log results
             elizaLogger.debug(
                 traceId,
-                `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [USD_VALUE_TYPE] buyAmount: ${buyAmount}, buyAmountInWEI: ${buyTokenAmountInWEI}`
+                `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [USD_VALUE_TYPE] buyAmount: ${buyAmount}, buyAmountInWEI: ${buyTokenAmountInWEI}`
             );
             elizaLogger.debug(
                 traceId,
-                `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [USD_VALUE_TYPE] sellAmount: ${sellAmount}, sellAmountInWEI: ${sellTokenAmountInWEI}`
+                `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [USD_VALUE_TYPE] sellAmount: ${sellAmount}, sellAmountInWEI: ${sellTokenAmountInWEI}`
             );
 
             return { buyTokenAmountInWEI, sellTokenAmountInWEI };
         } catch (error) {
             elizaLogger.error(
                 traceId,
-                `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [USD_VALUE_TYPE] Error getting price: ${error}`
+                `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [USD_VALUE_TYPE] Error getting price: ${error}`
             );
             throw error;
         }
@@ -1558,7 +1558,7 @@ const calculateBuyQuantityAmounts = async (
             let buyAmount: string;
             let sellAmount: string;
             if (type === "SELL") {
-                // sell $[KTA|0x12323423] when price increase by 10% and get me 1000 moxie
+                // sell $[KTA|0x12323423] when price increase by 10% and get me 1000 senpi
                 buyAmount = new Decimal(buyQuantity).toFixed(buyTokenDecimals);
                 sellAmount = new Decimal(buyQuantity)
                     .mul(buyTokenPriceInUSD)
@@ -1588,18 +1588,18 @@ const calculateBuyQuantityAmounts = async (
             // Log results
             elizaLogger.debug(
                 traceId,
-                `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [DIRECT_VALUE_TYPE] buyAmount: ${buyAmount}, buyAmountInWEI: ${buyTokenAmountInWEI}`
+                `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [DIRECT_VALUE_TYPE] buyAmount: ${buyAmount}, buyAmountInWEI: ${buyTokenAmountInWEI}`
             );
             elizaLogger.debug(
                 traceId,
-                `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [DIRECT_VALUE_TYPE] sellAmount: ${sellAmount}, sellAmountInWEI: ${sellTokenAmountInWEI}`
+                `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [DIRECT_VALUE_TYPE] sellAmount: ${sellAmount}, sellAmountInWEI: ${sellTokenAmountInWEI}`
             );
 
             return { buyTokenAmountInWEI, sellTokenAmountInWEI };
         } catch (error) {
             elizaLogger.error(
                 traceId,
-                `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [DIRECT_VALUE_TYPE] Error getting price: ${error}`
+                `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [DIRECT_VALUE_TYPE] Error getting price: ${error}`
             );
             throw error;
         }
@@ -1615,17 +1615,17 @@ const calculateSellQuantityAmounts = async (
     buyTokenDecimals: number,
     sellTokenDecimals: number,
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     type: string
 ): Promise<{ buyTokenAmountInWEI: bigint; sellTokenAmountInWEI: bigint }> => {
     elizaLogger.debug(
         traceId,
-        `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] started with type: ${type}`
+        `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] started with type: ${type}`
     );
     if (value_type && value_type == "USD") {
         elizaLogger.debug(
             traceId,
-            `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [SELL_QUANTITY] [VALUE_TYPE]: ${value_type}`
+            `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [SELL_QUANTITY] [VALUE_TYPE]: ${value_type}`
         );
         try {
             // Calculate token amounts based on USD values
@@ -1642,7 +1642,7 @@ const calculateSellQuantityAmounts = async (
                     .toFixed(sellTokenDecimals);
             } else if (type === "BUY") {
                 // this is for usd based direct buy case where user is buying in terms of sell quantity
-                // example: buy $KTA when price drops by 20% using 100$ $moxie
+                // example: buy $KTA when price drops by 20% using 100$ $usdc
                 sellAmount = new Decimal(sellQuantity)
                     .div(sellTokenPriceInUSD)
                     .toFixed(sellTokenDecimals);
@@ -1665,18 +1665,18 @@ const calculateSellQuantityAmounts = async (
             // Log results
             elizaLogger.debug(
                 traceId,
-                `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [SELL_QUANTITY] [USD_VALUE_TYPE] buyAmount: ${buyAmount}, buyAmountInWEI: ${buyTokenAmountInWEI}`
+                `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [SELL_QUANTITY] [USD_VALUE_TYPE] buyAmount: ${buyAmount}, buyAmountInWEI: ${buyTokenAmountInWEI}`
             );
             elizaLogger.debug(
                 traceId,
-                `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [SELL_QUANTITY] [USD_VALUE_TYPE] sellAmount: ${sellAmount}, sellAmountInWEI: ${sellTokenAmountInWEI}`
+                `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [SELL_QUANTITY] [USD_VALUE_TYPE] sellAmount: ${sellAmount}, sellAmountInWEI: ${sellTokenAmountInWEI}`
             );
 
             return { buyTokenAmountInWEI, sellTokenAmountInWEI };
         } catch (error) {
             elizaLogger.error(
                 traceId,
-                `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [SELL_QUANTITY] [USD_VALUE_TYPE] Error getting price: ${error}`
+                `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [SELL_QUANTITY] [USD_VALUE_TYPE] Error getting price: ${error}`
             );
             throw error;
         }
@@ -1697,7 +1697,7 @@ const calculateSellQuantityAmounts = async (
                     .toFixed(buyTokenDecimals);
             } else if (type === "BUY") {
                 // this is for direct buy case where user is buying in terms of sell quantity
-                // example: buy $KTA when price drops by 20% using 100 $moxie
+                // example: buy $KTA when price drops by 20% using 100 $usdc
                 sellAmount = new Decimal(sellQuantity).toFixed(
                     sellTokenDecimals
                 );
@@ -1722,18 +1722,18 @@ const calculateSellQuantityAmounts = async (
             // Log results
             elizaLogger.debug(
                 traceId,
-                `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [SELL_QUANTITY] [DIRECT_VALUE_TYPE] buyAmount: ${buyAmount}, buyAmountInWEI: ${buyTokenAmountInWEI}`
+                `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [SELL_QUANTITY] [DIRECT_VALUE_TYPE] buyAmount: ${buyAmount}, buyAmountInWEI: ${buyTokenAmountInWEI}`
             );
             elizaLogger.debug(
                 traceId,
-                `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [SELL_QUANTITY] [DIRECT_VALUE_TYPE] sellAmount: ${sellAmount}, sellAmountInWEI: ${sellTokenAmountInWEI}`
+                `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [SELL_QUANTITY] [DIRECT_VALUE_TYPE] sellAmount: ${sellAmount}, sellAmountInWEI: ${sellTokenAmountInWEI}`
             );
 
             return { buyTokenAmountInWEI, sellTokenAmountInWEI };
         } catch (error) {
             elizaLogger.error(
                 traceId,
-                `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [SELL_QUANTITY] [DIRECT_VALUE_TYPE] Error getting price: ${error}`
+                `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [SELL_QUANTITY] [DIRECT_VALUE_TYPE] Error getting price: ${error}`
             );
             throw error;
         }
@@ -1742,7 +1742,7 @@ const calculateSellQuantityAmounts = async (
 
 const calculateBalanceBasedAmounts = async (
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     currentBalance: bigint,
     sellTokenAddress: string,
     sellTokenSymbol: string,
@@ -1761,12 +1761,12 @@ const calculateBalanceBasedAmounts = async (
 }> => {
     elizaLogger.debug(
         traceId,
-        `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BALANCE_BASED] [type]: ${type}`
+        `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [BALANCE_BASED] [type]: ${type}`
     );
     const result = await getTargetQuantityForBalanceBasedSwaps(
         traceId,
         currentBalance,
-        moxieUserId,
+        senpiUserId,
         sellTokenAddress,
         sellTokenSymbol,
         agentWallet,
@@ -1779,7 +1779,7 @@ const calculateBalanceBasedAmounts = async (
     );
     elizaLogger.debug(
         traceId,
-        `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BALANCE_BASED] sellQuantity: ${sellQuantity}`
+        `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [BALANCE_BASED] sellQuantity: ${sellQuantity}`
     );
 
     let sellAmount: string;
@@ -1815,11 +1815,11 @@ const calculateBalanceBasedAmounts = async (
     // Log results
     elizaLogger.debug(
         traceId,
-        `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BALANCE_BASED] buyAmount: ${buyAmount}, buyAmountInWEI: ${buyTokenAmountInWEI}`
+        `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [BALANCE_BASED] buyAmount: ${buyAmount}, buyAmountInWEI: ${buyTokenAmountInWEI}`
     );
     elizaLogger.debug(
         traceId,
-        `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BALANCE_BASED] sellAmount: ${sellAmount}, sellAmountInWEI: ${sellTokenAmountInWEI}`
+        `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [BALANCE_BASED] sellAmount: ${sellAmount}, sellAmountInWEI: ${sellTokenAmountInWEI}`
     );
 
     return {

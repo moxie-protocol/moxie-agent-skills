@@ -12,12 +12,12 @@ import {
 import {
     ftaService,
     getERC20TokenSymbol,
-    MoxieClientWallet,
-    MoxieHex,
-    MoxieUser,
-    MoxieWalletClient,
-    MoxieWalletSendTransactionResponseType,
-    MoxieWalletSignTypedDataResponseType,
+    SenpiClientWalet,
+    SenpiHex,
+    SenpiUser,
+    SenpiWalletClient,
+    SenpiWalletSendTransactionResponseType,
+    SenpiWalletSignTypedDataResponseType,
     Portfolio,
 } from "@senpi-ai/senpi-agent-lib";
 import { tokenSwapTemplate } from "../templates/tokenSwapTemplate";
@@ -47,7 +47,7 @@ import {
     USDC_ADDRESS,
     USDC_TOKEN_DECIMALS,
 } from "../utils/constants";
-import { calculateTokensBuy } from "../utils/moxieBondingCurve";
+import { calculateTokensBuy } from "../utils/senpiBondingCurve";
 import {
     initiatePurchaseTemplate,
     insufficientEthBalanceTemplate,
@@ -57,7 +57,7 @@ import {
     swapFailedTemplate,
     agentWalletNotFound,
     delegateAccessNotFound,
-    moxieWalletClientNotFound,
+    SenpiWalletClientNotFound,
 } from "../utils/callbackTemplates";
 import {
     getSubjectTokenDetailsBySubjectAddress,
@@ -80,14 +80,14 @@ export const tokenSwapAction = {
         _options: any,
         callback?: any
     ) => {
-        // pick moxie user info from state
-        const moxieUserInfo = state.moxieUserInfo as MoxieUser;
-        const moxieUserId = moxieUserInfo.id;
+        // pick senpi user info from state
+        const senpiUserInfo = state.senpiUserInfo as SenpiUser;
+        const senpiUserId = senpiUserInfo.id;
         const traceId = _message.id;
         try {
             elizaLogger.debug(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] Starting creatorCoinSwap handler with user message: ${JSON.stringify(_message, (key, value) => (key === "embedding" ? undefined : value))}`
+                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] Starting creatorCoinSwap handler with user message: ${JSON.stringify(_message, (key, value) => (key === "embedding" ? undefined : value))}`
             );
 
             // Compose swap context
@@ -112,14 +112,14 @@ export const tokenSwapAction = {
 
             elizaLogger.debug(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] swapOptions: ${JSON.stringify(swapOptions)}`
+                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] swapOptions: ${JSON.stringify(swapOptions)}`
             );
 
             // check if confirmation is required
             if (swapOptions.confirmation_required) {
                 elizaLogger.error(
                     traceId,
-                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] confirmation required: ${swapOptions.confirmation_required}`
+                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] confirmation required: ${swapOptions.confirmation_required}`
                 );
                 await callback?.({
                     text: swapOptions.confirmation_message,
@@ -136,7 +136,7 @@ export const tokenSwapAction = {
             if (swapOptions.error) {
                 elizaLogger.error(
                     traceId,
-                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] swapOptions has error: ${JSON.stringify(swapOptions)}`
+                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] swapOptions has error: ${JSON.stringify(swapOptions)}`
                 );
                 await callback?.({
                     text: swapOptions.error.prompt_message,
@@ -150,22 +150,22 @@ export const tokenSwapAction = {
 
             // Validate swap content
             if (
-                !isValidSwapContent(traceId, moxieUserId, swapOptions, callback)
+                !isValidSwapContent(traceId, senpiUserId, swapOptions, callback)
             ) {
                 elizaLogger.error(
                     traceId,
-                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] swapOptions is not valid: ${JSON.stringify(swapOptions)}`
+                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] swapOptions is not valid: ${JSON.stringify(swapOptions)}`
                 );
                 return true;
             }
 
-            // read moxieUserInfo from state
-            const agentWallet = state.agentWallet as MoxieClientWallet;
+            // read senpiUserInfo from state
+            const agentWallet = state.agentWallet as SenpiClientWalet;
 
             if (!agentWallet) {
                 elizaLogger.error(
                     traceId,
-                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] agentWallet not found`
+                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] agentWallet not found`
                 );
                 await callback?.(agentWalletNotFound);
                 return true;
@@ -174,19 +174,19 @@ export const tokenSwapAction = {
             if (!agentWallet.delegated) {
                 elizaLogger.error(
                     traceId,
-                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] agentWallet is not delegated`
+                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] agentWallet is not delegated`
                 );
                 await callback?.(delegateAccessNotFound);
                 return true;
             }
 
-            const walletClient = state.moxieWalletClient as MoxieWalletClient;
+            const walletClient = state.SenpiWalletClient as SenpiWalletClient;
             if (!walletClient) {
                 elizaLogger.error(
                     traceId,
-                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] walletClient not found`
+                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] walletClient not found`
                 );
-                await callback?.(moxieWalletClientNotFound);
+                await callback?.(SenpiWalletClientNotFound);
                 return true;
             }
 
@@ -210,7 +210,7 @@ export const tokenSwapAction = {
                 } = transaction;
                 elizaLogger.debug(
                     traceId,
-                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] transaction elements - ${JSON.stringify(transaction)}`
+                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] transaction elements - ${JSON.stringify(transaction)}`
                 );
 
                 if (
@@ -220,7 +220,7 @@ export const tokenSwapAction = {
                 ) {
                     elizaLogger.debug(
                         traceId,
-                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] starting swap action with sellToken: ${sellToken} and buyToken: ${buyToken} and sellQuantity: ${sellQuantity} and buyQuantity: ${buyQuantity}`
+                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] starting swap action with sellToken: ${sellToken} and buyToken: ${buyToken} and sellQuantity: ${sellQuantity} and buyQuantity: ${buyQuantity}`
                     );
 
                     let sellTokenAddress: string;
@@ -239,7 +239,7 @@ export const tokenSwapAction = {
                         } catch (error) {
                             elizaLogger.warn(
                                 traceId,
-                                `[tokenSwap] [${moxieUserId}] Failed to fetch sell token symbol from RPC: ${error}`
+                                `[tokenSwap] [${senpiUserId}] Failed to fetch sell token symbol from RPC: ${error}`
                             );
                         }
                     } else {
@@ -258,7 +258,7 @@ export const tokenSwapAction = {
                         } catch (error) {
                             elizaLogger.warn(
                                 traceId,
-                                `[tokenSwap] [${moxieUserId}] Failed to fetch buy token symbol from RPC: ${error}`
+                                `[tokenSwap] [${senpiUserId}] Failed to fetch buy token symbol from RPC: ${error}`
                             );
                         }
                     } else {
@@ -269,7 +269,7 @@ export const tokenSwapAction = {
 
                     elizaLogger.debug(
                         traceId,
-                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] extractedSellTokenSymbol: ${extractedSellTokenSymbol} and extractedSellTokenAddress: ${extractedSellTokenAddress} and extractedBuyTokenSymbol: ${extractedBuyTokenSymbol} and extractedBuyTokenAddress: ${extractedBuyTokenAddress}`
+                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] extractedSellTokenSymbol: ${extractedSellTokenSymbol} and extractedSellTokenAddress: ${extractedSellTokenAddress} and extractedBuyTokenSymbol: ${extractedBuyTokenSymbol} and extractedBuyTokenAddress: ${extractedBuyTokenAddress}`
                     );
 
                     // Extract creator details
@@ -283,12 +283,12 @@ export const tokenSwapAction = {
                     } = extractCreatorDetails(buyToken);
                     elizaLogger.debug(
                         traceId,
-                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] extractedSellTokenCreatorId: ${extractedSellTokenCreatorId} and extractedSellTokenCreatorUsername: ${extractedSellTokenCreatorUsername} and extractedBuyTokenCreatorId: ${extractedBuyTokenCreatorId} and extractedBuyTokenCreatorUsername: ${extractedBuyTokenCreatorUsername}`
+                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] extractedSellTokenCreatorId: ${extractedSellTokenCreatorId} and extractedSellTokenCreatorUsername: ${extractedSellTokenCreatorUsername} and extractedBuyTokenCreatorId: ${extractedBuyTokenCreatorId} and extractedBuyTokenCreatorUsername: ${extractedBuyTokenCreatorUsername}`
                     );
 
                     // check if the buy or sell token is a subject token by fetching the subject token details from the subgraph
                     // this check is required if the buy or sell request is coming from other plugins
-                    // where users doesn't have moxie user info. they just have  the subject token address
+                    // where users doesn't have senpi user info. they just have  the subject token address
                     const subjectTokenDetails =
                         await getSubjectTokenDetailsBySubjectTokenAddresses(
                             traceId,
@@ -299,7 +299,7 @@ export const tokenSwapAction = {
                         );
                     elizaLogger.debug(
                         traceId,
-                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [SUBJECT_TOKEN_CHECK] subjectTokenDetails: ${JSON.stringify(subjectTokenDetails)}`
+                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [SUBJECT_TOKEN_CHECK] subjectTokenDetails: ${JSON.stringify(subjectTokenDetails)}`
                     );
 
                     // Check if sell token is a creator coin
@@ -309,7 +309,7 @@ export const tokenSwapAction = {
                             .isGraduated;
                     elizaLogger.debug(
                         traceId,
-                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [SUBJECT_TOKEN_CHECK] isSellTokenCreatorCoin: ${isSellTokenCreatorCoin}`
+                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [SUBJECT_TOKEN_CHECK] isSellTokenCreatorCoin: ${isSellTokenCreatorCoin}`
                     );
 
                     // Check if buy token is a creator coin
@@ -319,7 +319,7 @@ export const tokenSwapAction = {
                             .isGraduated;
                     elizaLogger.debug(
                         traceId,
-                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [SUBJECT_TOKEN_CHECK] isBuyTokenCreatorCoin: ${isBuyTokenCreatorCoin}`
+                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [SUBJECT_TOKEN_CHECK] isBuyTokenCreatorCoin: ${isBuyTokenCreatorCoin}`
                     );
 
                     // get the creator coin details
@@ -335,7 +335,7 @@ export const tokenSwapAction = {
                         extractedSellTokenCreatorId,
                         extractedBuyTokenCreatorId,
                         subjectTokenDetails,
-                        moxieUserId,
+                        senpiUserId,
                         runtime,
                         callback
                     );
@@ -392,13 +392,13 @@ export const tokenSwapAction = {
                                 : "TOKEN_TO_TOKEN";
                     elizaLogger.debug(
                         traceId,
-                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [SWAP_TYPE] swapType: ${swapType}`
+                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [SWAP_TYPE] swapType: ${swapType}`
                     );
 
                     if (swapType == "CREATOR_TO_CREATOR") {
                         elizaLogger.debug(
                             traceId,
-                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [${swapType}] starting creator to creator swap`
+                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [${swapType}] starting creator to creator swap`
                         );
 
                         // get the subject token address
@@ -409,7 +409,7 @@ export const tokenSwapAction = {
 
                         elizaLogger.debug(
                             traceId,
-                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [${swapType}] sellTokenSubjectTokenAddress: ${sellTokenSubjectTokenAddress} and buyTokenSubjectTokenAddress: ${buyTokenSubjectTokenAddress}`
+                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [${swapType}] sellTokenSubjectTokenAddress: ${sellTokenSubjectTokenAddress} and buyTokenSubjectTokenAddress: ${buyTokenSubjectTokenAddress}`
                         );
 
                         // fetch decimals for the sell Tokens.
@@ -422,7 +422,7 @@ export const tokenSwapAction = {
 
                         elizaLogger.debug(
                             traceId,
-                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [${swapType}] buyTokenDecimals: ${buyTokenDecimals} and sellTokenDecimals: ${sellTokenDecimals}`
+                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [${swapType}] buyTokenDecimals: ${buyTokenDecimals} and sellTokenDecimals: ${sellTokenDecimals}`
                         );
 
                         // get the subject address
@@ -432,21 +432,21 @@ export const tokenSwapAction = {
                             buyTokenSubjectTokenDetails?.subject?.id;
                         elizaLogger.debug(
                             traceId,
-                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [${swapType}] sellTokenSubjectAddress: ${sellTokenSubjectAddress} and buyTokenSubjectAddress: ${buyTokenSubjectAddress}`
+                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [${swapType}] sellTokenSubjectAddress: ${sellTokenSubjectAddress} and buyTokenSubjectAddress: ${buyTokenSubjectAddress}`
                         );
 
-                        let moxieInWEI: bigint;
+                        let senpiInWEI: bigint;
                         let quantityInWEI: bigint;
 
                         if (buyQuantity) {
                             let updatedBuyQuantity = buyQuantity;
                             elizaLogger.debug(
                                 traceId,
-                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [${swapType}] [BUY_QUANTITY] updatedBuyQuantity: ${updatedBuyQuantity}`
+                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [${swapType}] [BUY_QUANTITY] updatedBuyQuantity: ${updatedBuyQuantity}`
                             );
-                            // Calculate moxie required for buy quantity
+                            // Calculate senpi required for buy quantity
                             const buyTokenCurrentPriceInWEI = Decimal(
-                                buyTokenSubjectTokenDetails.currentPriceInWeiInMoxie
+                                buyTokenSubjectTokenDetails.currentPriceInWeiInSenpi
                             );
                             if (value_type && value_type == "USD") {
                                 // usd based operations
@@ -456,11 +456,11 @@ export const tokenSwapAction = {
                                 );
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [BUY_QUANTITY] [VALUE_TYPE]: ${usdQuantityInWEI}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [BUY_QUANTITY] [VALUE_TYPE]: ${usdQuantityInWEI}`
                                 );
                                 try {
                                     // const price = await get0xPrice({
-                                    //     moxieUserId,
+                                    //     senpiUserId,
                                     //     sellAmountBaseUnits: usdQuantityInWEI.toString(),
                                     //     buyTokenAddress: MOXIE_TOKEN_ADDRESS,
                                     //     walletAddress: agentWallet.address,
@@ -470,7 +470,7 @@ export const tokenSwapAction = {
                                     // use codex to get the price
                                     const price = await getPrice(
                                         traceId,
-                                        moxieUserId,
+                                        senpiUserId,
                                         usdQuantityInWEI.toString(),
                                         USDC_ADDRESS,
                                         USDC_TOKEN_DECIMALS,
@@ -482,25 +482,25 @@ export const tokenSwapAction = {
 
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] [BUY_QUANTITY] price: ${price}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] [BUY_QUANTITY] price: ${price}`
                                     );
                                     const buyAmountInWEI = BigInt(price);
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] [BUY_QUANTITY] buyAmountInWEI: ${buyAmountInWEI}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] [BUY_QUANTITY] buyAmountInWEI: ${buyAmountInWEI}`
                                     );
 
-                                    // check how many tokens can be bought with the moxie
+                                    // check how many tokens can be bought with the senpi
                                     const requiredBuyQuantityInWEI =
                                         await calculateTokensBuy(
                                             traceId,
-                                            moxieUserId,
+                                            senpiUserId,
                                             buyTokenSubjectAddress,
                                             buyAmountInWEI
                                         );
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] [BUY_QUANTITY] requiredBuyQuantityInWEI: ${requiredBuyQuantityInWEI}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] [BUY_QUANTITY] requiredBuyQuantityInWEI: ${requiredBuyQuantityInWEI}`
                                     );
 
                                     // convert wei into format units
@@ -511,7 +511,7 @@ export const tokenSwapAction = {
                                         );
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] [BUY_QUANTITY] requiredBuyQuantity: ${requiredBuyQuantity}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] [BUY_QUANTITY] requiredBuyQuantity: ${requiredBuyQuantity}`
                                     );
 
                                     updatedBuyQuantity =
@@ -519,12 +519,12 @@ export const tokenSwapAction = {
                                 } catch (error) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] [BUY_QUANTITY] [ERROR] Error: ${error}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] [BUY_QUANTITY] [ERROR] Error: ${error}`
                                     );
                                     return true;
                                 }
                             }
-                            const moxieRequiredInWEI = Decimal(
+                            const senpiRequiredInWEI = Decimal(
                                 updatedBuyQuantity.toString()
                             )
                                 .mul(buyTokenCurrentPriceInWEI)
@@ -532,22 +532,22 @@ export const tokenSwapAction = {
                                 .replace(/\.?0+$/, ""); // Remove trailing zeros and decimal point if whole number
                             elizaLogger.debug(
                                 traceId,
-                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [${swapType}] [BUY_QUANTITY] moxieRequiredInWEI: ${moxieRequiredInWEI}`
+                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [${swapType}] [BUY_QUANTITY] senpiRequiredInWEI: ${senpiRequiredInWEI}`
                             );
 
                             // now check the selling token
                             const sellTokenCurrentPriceInWEI = Decimal(
-                                sellTokenSubjectTokenDetails.currentPriceInWeiInMoxie
+                                sellTokenSubjectTokenDetails.currentPriceInWeiInSenpi
                             );
                             const requiredSellQuantity = Decimal(
-                                moxieRequiredInWEI
+                                senpiRequiredInWEI
                             )
                                 .div(sellTokenCurrentPriceInWEI)
                                 .toFixed(sellTokenDecimals) // Force exactly 18 decimal places
                                 .replace(/\.?0+$/, ""); // Remove trailing zeros and decimal point if whole number
                             elizaLogger.debug(
                                 traceId,
-                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [${swapType}] [REQUIRED_SELL_QUANTITY] requiredSellQuantity: ${requiredSellQuantity}`
+                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [${swapType}] [REQUIRED_SELL_QUANTITY] requiredSellQuantity: ${requiredSellQuantity}`
                             );
 
                             const requiredSellQuantityInWEI = ethers.parseUnits(
@@ -567,7 +567,7 @@ export const tokenSwapAction = {
                             ) {
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [${swapType}] [BUY_QUANTITY] insufficient balance: ${currentSellTokenBalanceInWEI} < ${requiredSellQuantityInWEI}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [${swapType}] [BUY_QUANTITY] insufficient balance: ${currentSellTokenBalanceInWEI} < ${requiredSellQuantityInWEI}`
                                 );
                                 await callback({
                                     text: `\nYou do not have enough ${sellTokenSubjectTokenDetails.name} creator coins to complete the operation.
@@ -581,7 +581,7 @@ export const tokenSwapAction = {
                             // proceed to sell the required sell quantity
                             const sellResponse = await executeSellAction(
                                 traceId,
-                                moxieUserId,
+                                senpiUserId,
                                 provider,
                                 agentWallet.address,
                                 sellTokenSubjectAddress,
@@ -592,14 +592,14 @@ export const tokenSwapAction = {
                             );
                             elizaLogger.debug(
                                 traceId,
-                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [${swapType}] [BUY_QUANTITY] sellAction response: ${JSON.stringify(sellResponse)}`
+                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [${swapType}] [BUY_QUANTITY] sellAction response: ${JSON.stringify(sellResponse)}`
                             );
 
                             // process sell response
                             if (sellResponse.success == false) {
                                 elizaLogger.error(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [${swapType}] [BUY_QUANTITY] sellAction failed: ${JSON.stringify(sellResponse)}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [${swapType}] [BUY_QUANTITY] sellAction failed: ${JSON.stringify(sellResponse)}`
                                 );
                                 await callback?.({
                                     text: `\nAn error occurred while performing the swap operation. Please try again.`,
@@ -610,36 +610,36 @@ export const tokenSwapAction = {
                                 return true;
                             }
 
-                            // get the moxie received in the sell action
-                            const moxieReceivedInWEI =
-                                "moxieReceived" in sellResponse
+                            // get the senpi received in the sell action
+                            const senpiReceivedInWEI =
+                                "senpiReceived" in sellResponse
                                     ? ethers.parseUnits(
-                                          sellResponse.moxieReceived,
+                                          sellResponse.senpiReceived,
                                           MOXIE_TOKEN_DECIMALS
                                       )
                                     : 0n;
 
-                            // now buy the buytoken with the received moxie
+                            // now buy the buytoken with the received senpi
                             const buyResponse = await executeBuyAction(
                                 traceId,
-                                moxieUserId,
+                                senpiUserId,
                                 provider,
                                 agentWallet.address,
                                 buyTokenSubjectAddress,
-                                moxieReceivedInWEI,
+                                senpiReceivedInWEI,
                                 callback,
                                 walletClient,
                                 buyTokenSubjectTokenDetails.name
                             );
                             elizaLogger.debug(
                                 traceId,
-                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [${swapType}] [BUY_QUANTITY] buyAction response: ${JSON.stringify(buyResponse)}`
+                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [${swapType}] [BUY_QUANTITY] buyAction response: ${JSON.stringify(buyResponse)}`
                             );
 
                             if (buyResponse.success == false) {
                                 elizaLogger.error(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [${swapType}] [BUY_QUANTITY] buyAction failed: ${JSON.stringify(buyResponse)}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [${swapType}] [BUY_QUANTITY] buyAction failed: ${JSON.stringify(buyResponse)}`
                                 );
                                 await callback?.({
                                     text: `\nAn error occurred while performing the swap operation. Please try again.`,
@@ -651,7 +651,7 @@ export const tokenSwapAction = {
                             }
                             elizaLogger.debug(
                                 traceId,
-                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [BUY_QUANTITY] buyAction response: ${JSON.stringify(buyResponse)}`
+                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [BUY_QUANTITY] buyAction response: ${JSON.stringify(buyResponse)}`
                             );
                         } else if (sellQuantity) {
                             let sellQuantityInWEI = ethers.parseUnits(
@@ -666,11 +666,11 @@ export const tokenSwapAction = {
                                 );
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [VALUE_TYPE]: ${value_type}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [VALUE_TYPE]: ${value_type}`
                                 );
                                 try {
                                     // const price = await get0xPrice({
-                                    //     moxieUserId,
+                                    //     senpiUserId,
                                     //     sellAmountBaseUnits: sellQuantityInWEI.toString(),
                                     //     buyTokenAddress: MOXIE_TOKEN_ADDRESS,
                                     //     walletAddress: agentWallet.address,
@@ -680,7 +680,7 @@ export const tokenSwapAction = {
                                     // use codex to get the price
                                     const price = await getPrice(
                                         traceId,
-                                        moxieUserId,
+                                        senpiUserId,
                                         sellQuantityInWEI.toString(),
                                         USDC_ADDRESS,
                                         USDC_TOKEN_DECIMALS,
@@ -691,39 +691,39 @@ export const tokenSwapAction = {
                                     );
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] price: ${price}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] price: ${price}`
                                     );
-                                    moxieInWEI = BigInt(price);
+                                    senpiInWEI = BigInt(price);
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] moxieInWEI: ${moxieInWEI}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] senpiInWEI: ${senpiInWEI}`
                                     );
 
-                                    // use the moxie to get the sell quantity in WEI
-                                    const currentPriceInWEIMoxie = Decimal(
-                                        sellTokenSubjectTokenDetails.currentPriceInWeiInMoxie
+                                    // use the senpi to get the sell quantity in WEI
+                                    const currentPriceInWEISenpi = Decimal(
+                                        sellTokenSubjectTokenDetails.currentPriceInWeiInSenpi
                                     );
 
                                     const result = Decimal(price)
-                                        .div(currentPriceInWEIMoxie)
+                                        .div(currentPriceInWEISenpi)
                                         .toFixed(18) // Force exactly 18 decimal places
                                         .replace(/\.?0+$/, ""); // Remove trailing zeros and decimal point if whole number
 
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] result: ${result}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] result: ${result}`
                                     );
 
                                     quantityInWEI = ethers.parseEther(result);
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] quantityInWEI: ${quantityInWEI}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] quantityInWEI: ${quantityInWEI}`
                                     );
 
                                     // execute sell action
                                     const swapResp = await executeSellAction(
                                         traceId,
-                                        moxieUserId,
+                                        senpiUserId,
                                         provider,
                                         agentWallet.address,
                                         sellTokenSubjectAddress,
@@ -734,21 +734,21 @@ export const tokenSwapAction = {
                                     );
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] swap response: ${JSON.stringify(swapResp)}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] swap response: ${JSON.stringify(swapResp)}`
                                     );
 
                                     if (swapResp.success == false) {
                                         elizaLogger.error(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] executeSellAction failed: ${JSON.stringify(swapResp)}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] executeSellAction failed: ${JSON.stringify(swapResp)}`
                                         );
                                         return true;
                                     }
 
-                                    moxieInWEI =
-                                        "moxieReceived" in swapResp
+                                    senpiInWEI =
+                                        "senpiReceived" in swapResp
                                             ? ethers.parseUnits(
-                                                  swapResp.moxieReceived,
+                                                  swapResp.senpiReceived,
                                                   MOXIE_TOKEN_DECIMALS
                                               )
                                             : 0n;
@@ -756,23 +756,23 @@ export const tokenSwapAction = {
                                     // execute buy action
                                     const buyResp = await executeBuyAction(
                                         traceId,
-                                        moxieUserId,
+                                        senpiUserId,
                                         provider,
                                         agentWallet.address,
                                         buyTokenSubjectAddress,
-                                        moxieInWEI,
+                                        senpiInWEI,
                                         callback,
                                         walletClient,
                                         buyTokenSubjectTokenDetails.name
                                     );
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] buyResp: ${JSON.stringify(buyResp)}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] buyResp: ${JSON.stringify(buyResp)}`
                                     );
                                 } catch (error) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] [ERROR] Error: ${error}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [USD_VALUE_TYPE] [ERROR] Error: ${error}`
                                     );
                                     return true;
                                 }
@@ -780,14 +780,14 @@ export const tokenSwapAction = {
                                 // this is for non USD value type
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] sellQuantityInWEI: ${sellQuantityInWEI}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] sellQuantityInWEI: ${sellQuantityInWEI}`
                                 );
 
                                 quantityInWEI = sellQuantityInWEI;
                                 // execute sell action
                                 const swapResp = await executeSellAction(
                                     traceId,
-                                    moxieUserId,
+                                    senpiUserId,
                                     provider,
                                     agentWallet.address,
                                     sellTokenSubjectAddress,
@@ -798,20 +798,20 @@ export const tokenSwapAction = {
                                 );
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] [MOXIE] executeSellAction  response: ${JSON.stringify(swapResp)}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] [MOXIE] executeSellAction  response: ${JSON.stringify(swapResp)}`
                                 );
 
                                 if (swapResp.success == false) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] [MOXIE] executeSellAction failed: ${JSON.stringify(swapResp)}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] [MOXIE] executeSellAction failed: ${JSON.stringify(swapResp)}`
                                     );
                                     return true;
                                 }
-                                moxieInWEI =
-                                    "moxieReceived" in swapResp
+                                senpiInWEI =
+                                    "senpiReceived" in swapResp
                                         ? ethers.parseUnits(
-                                              swapResp.moxieReceived,
+                                              swapResp.senpiReceived,
                                               MOXIE_TOKEN_DECIMALS
                                           )
                                         : 0n;
@@ -819,25 +819,25 @@ export const tokenSwapAction = {
                                 // execute buy action
                                 const buyResp = await executeBuyAction(
                                     traceId,
-                                    moxieUserId,
+                                    senpiUserId,
                                     provider,
                                     agentWallet.address,
                                     buyTokenSubjectAddress,
-                                    moxieInWEI,
+                                    senpiInWEI,
                                     callback,
                                     walletClient,
                                     buyTokenSubjectTokenDetails.name
                                 );
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [DEFAULT] [MOXIE] buyResp: ${JSON.stringify(buyResp)}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [DEFAULT] [MOXIE] buyResp: ${JSON.stringify(buyResp)}`
                                 );
                             }
                         } else if (balance && balance.type) {
                             // balance based swap
                             elizaLogger.debug(
                                 traceId,
-                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [BALANCE_BASED] balance type: ${JSON.stringify(balance)}`
+                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [BALANCE_BASED] balance type: ${JSON.stringify(balance)}`
                             );
                             try {
                                 const result =
@@ -846,7 +846,7 @@ export const tokenSwapAction = {
                                         currentWalletBalanceForBalanceBasedSwaps[
                                             sellTokenSubjectTokenAddress
                                         ],
-                                        moxieUserId,
+                                        senpiUserId,
                                         sellTokenSubjectTokenAddress,
                                         sellTokenSubjectTokenDetails.name,
                                         agentWallet,
@@ -859,12 +859,12 @@ export const tokenSwapAction = {
                                 ] = result.currentWalletBalance;
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [BALANCE_BASED] quantityInWEI: ${quantityInWEI}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [BALANCE_BASED] quantityInWEI: ${quantityInWEI}`
                                 );
                                 // execute sell action
                                 const swapResp = await executeSellAction(
                                     traceId,
-                                    moxieUserId,
+                                    senpiUserId,
                                     provider,
                                     agentWallet.address,
                                     sellTokenSubjectAddress,
@@ -875,20 +875,20 @@ export const tokenSwapAction = {
                                 );
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [BALANCE_BASED] [MOXIE] executeSellAction  response: ${JSON.stringify(swapResp)}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [BALANCE_BASED] [MOXIE] executeSellAction  response: ${JSON.stringify(swapResp)}`
                                 );
 
                                 if (swapResp.success == false) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [BALANCE_BASED] [MOXIE] executeSellAction failed: ${JSON.stringify(swapResp)}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [BALANCE_BASED] [MOXIE] executeSellAction failed: ${JSON.stringify(swapResp)}`
                                     );
                                     return true;
                                 }
-                                moxieInWEI =
-                                    "moxieReceived" in swapResp
+                                senpiInWEI =
+                                    "senpiReceived" in swapResp
                                         ? ethers.parseUnits(
-                                              swapResp.moxieReceived,
+                                              swapResp.senpiReceived,
                                               MOXIE_TOKEN_DECIMALS
                                           )
                                         : 0n;
@@ -896,31 +896,31 @@ export const tokenSwapAction = {
                                 // execute buy action
                                 const buyResp = await executeBuyAction(
                                     traceId,
-                                    moxieUserId,
+                                    senpiUserId,
                                     provider,
                                     agentWallet.address,
                                     buyTokenSubjectAddress,
-                                    moxieInWEI,
+                                    senpiInWEI,
                                     callback,
                                     walletClient,
                                     buyTokenSubjectTokenDetails.name
                                 );
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [BALANCE_BASED] [MOXIE] buyResp: ${JSON.stringify(buyResp)}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [BALANCE_BASED] [MOXIE] buyResp: ${JSON.stringify(buyResp)}`
                                 );
 
                                 if (buyResp.success == false) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [BALANCE_BASED] [MOXIE] buyAction failed: ${JSON.stringify(buyResp)}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [BALANCE_BASED] [MOXIE] buyAction failed: ${JSON.stringify(buyResp)}`
                                     );
                                     return true;
                                 }
                             } catch (error) {
                                 elizaLogger.error(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [BALANCE_BASED] Error getting balance based quantity: ${error}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_CREATOR] [BALANCE_BASED] Error getting balance based quantity: ${error}`
                                 );
                                 return true;
                             }
@@ -928,7 +928,7 @@ export const tokenSwapAction = {
                     } else if (swapType == "CREATOR_TO_TOKEN") {
                         elizaLogger.debug(
                             traceId,
-                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] swap type: ${swapType}`
+                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] swap type: ${swapType}`
                         );
 
                         // get the subject token address
@@ -952,12 +952,12 @@ export const tokenSwapAction = {
                             sellTokenSubjectTokenDetails?.subject?.id;
 
                         let sellQuantityInWEI: bigint;
-                        let moxieInWEI: bigint;
+                        let senpiInWEI: bigint;
                         let quantityInWEI: bigint;
                         if (buyQuantity) {
                             elizaLogger.debug(
                                 traceId,
-                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BUY_QUANTITY] quantityInWEI: ${quantityInWEI}`
+                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BUY_QUANTITY] quantityInWEI: ${quantityInWEI}`
                             );
                             if (value_type && value_type == "USD") {
                                 let requiredBuyAmountInWEI: bigint;
@@ -967,11 +967,11 @@ export const tokenSwapAction = {
                                 );
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE]: ${value_type}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE]: ${value_type}`
                                 );
                                 try {
                                     // const price = await get0xPrice({
-                                    //     moxieUserId,
+                                    //     senpiUserId,
                                     //     sellAmountBaseUnits: usdcQuantityInWEI.toString(),
                                     //     buyTokenAddress: MOXIE_TOKEN_ADDRESS,
                                     //     walletAddress: agentWallet.address,
@@ -981,7 +981,7 @@ export const tokenSwapAction = {
                                     // use codex to get the price
                                     const price = await getPrice(
                                         traceId,
-                                        moxieUserId,
+                                        senpiUserId,
                                         usdcQuantityInWEI.toString(),
                                         USDC_ADDRESS,
                                         USDC_TOKEN_DECIMALS,
@@ -992,17 +992,17 @@ export const tokenSwapAction = {
                                     );
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] price: ${price}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] price: ${price}`
                                     );
                                     quantityInWEI = BigInt(price);
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] quantityInWEI from getUSDEquivalentPrice: ${quantityInWEI}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] quantityInWEI from getUSDEquivalentPrice: ${quantityInWEI}`
                                     );
                                 } catch (error) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE]: ${value_type} Error getting price: ${error}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE]: ${value_type} Error getting price: ${error}`
                                     );
                                     return true;
                                 }
@@ -1013,7 +1013,7 @@ export const tokenSwapAction = {
                                         MOXIE_TOKEN_DECIMALS
                                     );
                                 } else {
-                                    // if the buy token is not MOXIE then we need to get moxie required
+                                    // if the buy token is not MOXIE then we need to get senpi required
                                     const erc20QuantityInWEI =
                                         ethers.parseUnits(
                                             buyQuantity.toString(),
@@ -1021,7 +1021,7 @@ export const tokenSwapAction = {
                                         );
                                     try {
                                         // const price = await get0xPrice({
-                                        //     moxieUserId,
+                                        //     senpiUserId,
                                         //     sellAmountBaseUnits: erc20QuantityInWEI.toString(),
                                         //     buyTokenAddress: MOXIE_TOKEN_ADDRESS,
                                         //     walletAddress: agentWallet.address,
@@ -1031,7 +1031,7 @@ export const tokenSwapAction = {
                                         // use codex to get the price
                                         const price = await getPrice(
                                             traceId,
-                                            moxieUserId,
+                                            senpiUserId,
                                             erc20QuantityInWEI.toString(),
                                             buyTokenAddress,
                                             buyTokenDecimals,
@@ -1043,31 +1043,31 @@ export const tokenSwapAction = {
                                         quantityInWEI = BigInt(price);
                                         elizaLogger.debug(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] quantityInWEI from getPrice: ${quantityInWEI}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] quantityInWEI from getPrice: ${quantityInWEI}`
                                         );
                                     } catch (error) {
                                         elizaLogger.error(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] Error getting price: ${error}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] Error getting price: ${error}`
                                         );
                                         return true;
                                     }
                                 }
                             }
                             // now check the creator coins to sell equivalent to the required buy amount
-                            const currentPriceInWEIMoxie = Decimal(
-                                sellTokenSubjectTokenDetails.currentPriceInWeiInMoxie
+                            const currentPriceInWEISenpi = Decimal(
+                                sellTokenSubjectTokenDetails.currentPriceInWeiInSenpi
                             );
                             const requiredSellQuantity = Decimal(
                                 quantityInWEI.toString()
                             )
-                                .div(currentPriceInWEIMoxie)
+                                .div(currentPriceInWEISenpi)
                                 .toFixed(sellTokenDecimals)
                                 .replace(/\.?0+$/, ""); // Remove trailing zeros and decimal point if whole number
 
                             elizaLogger.debug(
                                 traceId,
-                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] requiredSellQuantity: ${requiredSellQuantity}`
+                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] requiredSellQuantity: ${requiredSellQuantity}`
                             );
                             const requiredSellQuantityInWEI = ethers.parseUnits(
                                 requiredSellQuantity,
@@ -1075,7 +1075,7 @@ export const tokenSwapAction = {
                             );
                             elizaLogger.debug(
                                 traceId,
-                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] requiredSellQuantityInWEI: ${requiredSellQuantityInWEI}`
+                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] requiredSellQuantityInWEI: ${requiredSellQuantityInWEI}`
                             );
 
                             // now check the balance of the creator coins to sell
@@ -1087,7 +1087,7 @@ export const tokenSwapAction = {
                                 );
                             elizaLogger.debug(
                                 traceId,
-                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] availableTokenBalanceInWEI: ${availableTokenBalanceInWEI}`
+                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] availableTokenBalanceInWEI: ${availableTokenBalanceInWEI}`
                             );
 
                             if (
@@ -1096,7 +1096,7 @@ export const tokenSwapAction = {
                             ) {
                                 elizaLogger.error(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] insufficient balance: ${availableTokenBalanceInWEI} < ${requiredSellQuantityInWEI}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] insufficient balance: ${availableTokenBalanceInWEI} < ${requiredSellQuantityInWEI}`
                                 );
                                 await callback({
                                     text: `\nInsufficient balance to complete this transaction.
@@ -1111,7 +1111,7 @@ export const tokenSwapAction = {
                             // now we can execute the sell action
                             const swapResp = await executeSellAction(
                                 traceId,
-                                moxieUserId,
+                                senpiUserId,
                                 provider,
                                 agentWallet.address,
                                 sellTokenSubjectAddress,
@@ -1122,28 +1122,28 @@ export const tokenSwapAction = {
                             );
                             elizaLogger.debug(
                                 traceId,
-                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] swap response: ${JSON.stringify(swapResp)}`
+                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] swap response: ${JSON.stringify(swapResp)}`
                             );
 
                             if (swapResp.success == false) {
                                 elizaLogger.error(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] executeSellAction failed: ${JSON.stringify(swapResp)}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] executeSellAction failed: ${JSON.stringify(swapResp)}`
                                 );
                                 return true;
                             }
 
-                            moxieInWEI =
-                                "moxieReceived" in swapResp
+                            senpiInWEI =
+                                "senpiReceived" in swapResp
                                     ? ethers.parseUnits(
-                                          swapResp.moxieReceived,
+                                          swapResp.senpiReceived,
                                           MOXIE_TOKEN_DECIMALS
                                       )
                                     : 0n;
 
                             elizaLogger.debug(
                                 traceId,
-                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] moxieInWEI from executeSellAction: ${moxieInWEI}`
+                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] senpiInWEI from executeSellAction: ${senpiInWEI}`
                             );
 
                             if (buyTokenSymbol !== "MOXIE") {
@@ -1155,9 +1155,9 @@ export const tokenSwapAction = {
                                         buyTokenSymbol,
                                         MOXIE_TOKEN_ADDRESS,
                                         MOXIE,
-                                        moxieUserId,
+                                        senpiUserId,
                                         agentWallet.address,
-                                        moxieInWEI,
+                                        senpiInWEI,
                                         provider,
                                         MOXIE_TOKEN_DECIMALS,
                                         buyTokenDecimals,
@@ -1167,12 +1167,12 @@ export const tokenSwapAction = {
                                     );
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] buyAmountInWEI: ${buyAmountInWEI}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] buyAmountInWEI: ${buyAmountInWEI}`
                                     );
                                 } catch (error) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] Error swapping to MOXIE: ${error}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] Error swapping to MOXIE: ${error}`
                                     );
                                     return true;
                                 }
@@ -1190,11 +1190,11 @@ export const tokenSwapAction = {
                                 );
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE]: ${value_type}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE]: ${value_type}`
                                 );
                                 try {
                                     // const price = await get0xPrice({
-                                    //     moxieUserId,
+                                    //     senpiUserId,
                                     //     sellAmountBaseUnits: sellQuantityInWEI.toString(),
                                     //     buyTokenAddress: MOXIE_TOKEN_ADDRESS,
                                     //     walletAddress: agentWallet.address,
@@ -1204,7 +1204,7 @@ export const tokenSwapAction = {
                                     // use codex to get the price
                                     const price = await getPrice(
                                         traceId,
-                                        moxieUserId,
+                                        senpiUserId,
                                         sellQuantityInWEI.toString(),
                                         USDC_ADDRESS,
                                         USDC_TOKEN_DECIMALS,
@@ -1215,25 +1215,25 @@ export const tokenSwapAction = {
                                     );
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] price: ${price}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] price: ${price}`
                                     );
-                                    moxieInWEI = BigInt(price);
+                                    senpiInWEI = BigInt(price);
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] moxieInWEI from getPrice: ${moxieInWEI}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] senpiInWEI from getPrice: ${senpiInWEI}`
                                     );
 
-                                    // use the moxie to get the sell quantity in WEI
-                                    const currentPriceInWEIMoxie = Decimal(
-                                        sellTokenSubjectTokenDetails.currentPriceInWeiInMoxie
+                                    // use the senpi to get the sell quantity in WEI
+                                    const currentPriceInWEISenpi = Decimal(
+                                        sellTokenSubjectTokenDetails.currentPriceInWeiInSenpi
                                     );
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] currentPriceInWEIMoxie: ${currentPriceInWEIMoxie}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] currentPriceInWEISenpi: ${currentPriceInWEISenpi}`
                                     );
 
                                     const result = Decimal(price)
-                                        .div(currentPriceInWEIMoxie)
+                                        .div(currentPriceInWEISenpi)
                                         .toFixed(18) // Force exactly 18 decimal places
                                         .replace(/\.?0+$/, ""); // Remove trailing zeros and decimal point if whole number
 
@@ -1243,19 +1243,19 @@ export const tokenSwapAction = {
 
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] result: ${result}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] result: ${result}`
                                     );
 
                                     quantityInWEI = ethers.parseEther(result);
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] quantityInWEI: ${quantityInWEI}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] quantityInWEI: ${quantityInWEI}`
                                     );
 
                                     // execute sell action
                                     const swapResp = await executeSellAction(
                                         traceId,
-                                        moxieUserId,
+                                        senpiUserId,
                                         provider,
                                         agentWallet.address,
                                         sellTokenSubjectAddress,
@@ -1266,26 +1266,26 @@ export const tokenSwapAction = {
                                     );
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] swap response: ${JSON.stringify(swapResp)}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] swap response: ${JSON.stringify(swapResp)}`
                                     );
 
                                     if (swapResp.success == false) {
                                         elizaLogger.error(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] executeSellAction failed: ${JSON.stringify(swapResp)}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] executeSellAction failed: ${JSON.stringify(swapResp)}`
                                         );
                                         return true;
                                     }
-                                    moxieInWEI =
-                                        "moxieReceived" in swapResp
+                                    senpiInWEI =
+                                        "senpiReceived" in swapResp
                                             ? ethers.parseUnits(
-                                                  swapResp.moxieReceived,
+                                                  swapResp.senpiReceived,
                                                   MOXIE_TOKEN_DECIMALS
                                               )
                                             : 0n;
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] moxieInWEI from executeSellAction: ${moxieInWEI}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] senpiInWEI from executeSellAction: ${senpiInWEI}`
                                     );
                                     if (buyTokenSymbol !== "MOXIE") {
                                         // swap to the requested buy token
@@ -1296,9 +1296,9 @@ export const tokenSwapAction = {
                                                 buyTokenSymbol,
                                                 MOXIE_TOKEN_ADDRESS,
                                                 MOXIE,
-                                                moxieUserId,
+                                                senpiUserId,
                                                 agentWallet.address,
-                                                moxieInWEI,
+                                                senpiInWEI,
                                                 provider,
                                                 MOXIE_TOKEN_DECIMALS,
                                                 buyTokenDecimals,
@@ -1308,12 +1308,12 @@ export const tokenSwapAction = {
                                             );
                                             elizaLogger.debug(
                                                 traceId,
-                                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] buyAmountInWEI: ${buyAmountInWEI}`
+                                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] buyAmountInWEI: ${buyAmountInWEI}`
                                             );
                                         } catch (error) {
                                             elizaLogger.error(
                                                 traceId,
-                                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] Error swapping to MOXIE: ${error}`
+                                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] Error swapping to MOXIE: ${error}`
                                             );
                                             return true;
                                         }
@@ -1321,14 +1321,14 @@ export const tokenSwapAction = {
                                 } catch (error) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] Error getting USD value quantity: ${error}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] Error getting USD value quantity: ${error}`
                                     );
                                     return true;
                                 }
                             } else {
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] sellQuantityInWEI: ${sellQuantityInWEI}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] sellQuantityInWEI: ${sellQuantityInWEI}`
                                 );
 
                                 if (buyTokenSymbol === "MOXIE") {
@@ -1336,7 +1336,7 @@ export const tokenSwapAction = {
                                     // execute sell action
                                     const swapResp = await executeSellAction(
                                         traceId,
-                                        moxieUserId,
+                                        senpiUserId,
                                         provider,
                                         agentWallet.address,
                                         sellTokenSubjectAddress,
@@ -1347,13 +1347,13 @@ export const tokenSwapAction = {
                                     );
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] [MOXIE] executeSellAction  response: ${JSON.stringify(swapResp)}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] [MOXIE] executeSellAction  response: ${JSON.stringify(swapResp)}`
                                     );
 
                                     if (swapResp.success == false) {
                                         elizaLogger.error(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] [MOXIE] executeSellAction failed: ${JSON.stringify(swapResp)}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] [MOXIE] executeSellAction failed: ${JSON.stringify(swapResp)}`
                                         );
                                         return true;
                                     }
@@ -1362,7 +1362,7 @@ export const tokenSwapAction = {
                                     // execute sell action
                                     const swapResp = await executeSellAction(
                                         traceId,
-                                        moxieUserId,
+                                        senpiUserId,
                                         provider,
                                         agentWallet.address,
                                         sellTokenSubjectAddress,
@@ -1373,21 +1373,21 @@ export const tokenSwapAction = {
                                     );
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] executeSellAction response: ${JSON.stringify(swapResp)}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] executeSellAction response: ${JSON.stringify(swapResp)}`
                                     );
 
                                     if (swapResp.success == false) {
                                         elizaLogger.error(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] executeSellAction failed: ${JSON.stringify(swapResp)}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] executeSellAction failed: ${JSON.stringify(swapResp)}`
                                         );
                                         return true;
                                     }
 
-                                    moxieInWEI =
-                                        "moxieReceived" in swapResp
+                                    senpiInWEI =
+                                        "senpiReceived" in swapResp
                                             ? ethers.parseUnits(
-                                                  swapResp.moxieReceived,
+                                                  swapResp.senpiReceived,
                                                   MOXIE_TOKEN_DECIMALS
                                               )
                                             : 0n;
@@ -1400,9 +1400,9 @@ export const tokenSwapAction = {
                                             buyTokenSymbol,
                                             MOXIE_TOKEN_ADDRESS,
                                             MOXIE,
-                                            moxieUserId,
+                                            senpiUserId,
                                             agentWallet.address,
-                                            moxieInWEI,
+                                            senpiInWEI,
                                             provider,
                                             MOXIE_TOKEN_DECIMALS,
                                             buyTokenDecimals,
@@ -1412,12 +1412,12 @@ export const tokenSwapAction = {
                                         );
                                         elizaLogger.debug(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] swap response - buyAmountInWEI: ${buyAmountInWEI}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] swap response - buyAmountInWEI: ${buyAmountInWEI}`
                                         );
                                     } catch (error) {
                                         elizaLogger.error(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] Error swapping to MOXIE: ${error}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] Error swapping to MOXIE: ${error}`
                                         );
                                         return true;
                                     }
@@ -1427,7 +1427,7 @@ export const tokenSwapAction = {
                             // balance based swap
                             elizaLogger.debug(
                                 traceId,
-                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] balance type: ${JSON.stringify(balance)}`
+                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] balance type: ${JSON.stringify(balance)}`
                             );
                             try {
                                 const result =
@@ -1436,7 +1436,7 @@ export const tokenSwapAction = {
                                         currentWalletBalanceForBalanceBasedSwaps[
                                             sellTokenSubjectTokenAddress
                                         ],
-                                        moxieUserId,
+                                        senpiUserId,
                                         sellTokenSubjectTokenAddress,
                                         sellTokenSubjectTokenDetails.name,
                                         agentWallet,
@@ -1449,13 +1449,13 @@ export const tokenSwapAction = {
                                 ] = result.currentWalletBalance;
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] quantityInWEI: ${quantityInWEI}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] quantityInWEI: ${quantityInWEI}`
                                 );
 
                                 // execute sell action
                                 const swapResp = await executeSellAction(
                                     traceId,
-                                    moxieUserId,
+                                    senpiUserId,
                                     provider,
                                     agentWallet.address,
                                     sellTokenSubjectAddress,
@@ -1466,26 +1466,26 @@ export const tokenSwapAction = {
                                 );
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] [MOXIE] executeSellAction  response: ${JSON.stringify(swapResp)}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] [MOXIE] executeSellAction  response: ${JSON.stringify(swapResp)}`
                                 );
 
                                 if (swapResp.success == false) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] [MOXIE] executeSellAction failed: ${JSON.stringify(swapResp)}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] [MOXIE] executeSellAction failed: ${JSON.stringify(swapResp)}`
                                     );
                                     return true;
                                 }
-                                moxieInWEI =
-                                    "moxieReceived" in swapResp
+                                senpiInWEI =
+                                    "senpiReceived" in swapResp
                                         ? ethers.parseUnits(
-                                              swapResp.moxieReceived,
+                                              swapResp.senpiReceived,
                                               MOXIE_TOKEN_DECIMALS
                                           )
                                         : 0n;
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] [MOXIE] moxieInWEI: ${moxieInWEI}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] [MOXIE] senpiInWEI: ${senpiInWEI}`
                                 );
 
                                 if (buyTokenSymbol !== "MOXIE") {
@@ -1497,9 +1497,9 @@ export const tokenSwapAction = {
                                             buyTokenSymbol,
                                             MOXIE_TOKEN_ADDRESS,
                                             MOXIE,
-                                            moxieUserId,
+                                            senpiUserId,
                                             agentWallet.address,
-                                            moxieInWEI,
+                                            senpiInWEI,
                                             provider,
                                             MOXIE_TOKEN_DECIMALS,
                                             buyTokenDecimals,
@@ -1509,12 +1509,12 @@ export const tokenSwapAction = {
                                         );
                                         elizaLogger.debug(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] [MOXIE] buyAmountInWEI: ${buyAmountInWEI}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] [MOXIE] buyAmountInWEI: ${buyAmountInWEI}`
                                         );
                                     } catch (error) {
                                         elizaLogger.error(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] [MOXIE] Error swapping to MOXIE: ${error}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] [MOXIE] Error swapping to MOXIE: ${error}`
                                         );
                                         return true;
                                     }
@@ -1522,7 +1522,7 @@ export const tokenSwapAction = {
                             } catch (error) {
                                 elizaLogger.error(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] Error getting balance based quantity: ${error}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] Error getting balance based quantity: ${error}`
                                 );
                                 return true;
                             }
@@ -1530,7 +1530,7 @@ export const tokenSwapAction = {
                     } else if (swapType == "TOKEN_TO_CREATOR") {
                         elizaLogger.debug(
                             traceId,
-                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] swap type: ${swapType}`
+                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] swap type: ${swapType}`
                         );
 
                         const buyTokenSubjectAddress =
@@ -1546,10 +1546,10 @@ export const tokenSwapAction = {
                                   );
 
                         let sellQuantityInWEI: bigint;
-                        let moxieInWEI: bigint;
+                        let senpiInWEI: bigint;
                         let quantityInWEI: bigint;
 
-                        // if user is asking to purchase interms of buy quantity then we need to calculate the moxie in WEI
+                        // if user is asking to purchase interms of buy quantity then we need to calculate the senpi in WEI
                         if (buyQuantity) {
                             let buyQuantityInWEI = ethers.parseUnits(
                                 buyQuantity.toString(),
@@ -1563,13 +1563,13 @@ export const tokenSwapAction = {
                                 );
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] [VALUE_TYPE]: ${value_type}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] [VALUE_TYPE]: ${value_type}`
                                 );
                                 try {
                                     if (sellTokenSymbol != "USDC") {
                                         // dont need to get price if selling USDC
                                         // const price = await get0xPrice({
-                                        //     moxieUserId,
+                                        //     senpiUserId,
                                         //     sellAmountBaseUnits: buyQuantityInWEI.toString(),
                                         //     buyTokenAddress: sellTokenAddress,
                                         //     walletAddress: agentWallet.address,
@@ -1579,7 +1579,7 @@ export const tokenSwapAction = {
                                         // use codex to get the price
                                         const price = await getPrice(
                                             traceId,
-                                            moxieUserId,
+                                            senpiUserId,
                                             buyQuantityInWEI.toString(),
                                             USDC_ADDRESS,
                                             USDC_TOKEN_DECIMALS,
@@ -1590,13 +1590,13 @@ export const tokenSwapAction = {
                                         );
                                         elizaLogger.debug(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] [USD_VALUE_TYPE] price from getPrice: ${price}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] [USD_VALUE_TYPE] price from getPrice: ${price}`
                                         );
                                         buyQuantityInWEI = BigInt(price);
 
                                         elizaLogger.debug(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] [USD_VALUE_TYPE] buyQuantityInWEI: ${buyQuantityInWEI}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] [USD_VALUE_TYPE] buyQuantityInWEI: ${buyQuantityInWEI}`
                                         );
 
                                         await callback({
@@ -1604,7 +1604,7 @@ export const tokenSwapAction = {
                                         });
                                     }
 
-                                    // swap to moxie if not MOXIE
+                                    // swap to senpi if not MOXIE
                                     if (sellTokenSymbol != "MOXIE") {
                                         try {
                                             // swap to the requested buy token
@@ -1614,7 +1614,7 @@ export const tokenSwapAction = {
                                                 MOXIE,
                                                 sellTokenAddress,
                                                 sellTokenSymbol,
-                                                moxieUserId,
+                                                senpiUserId,
                                                 agentWallet.address,
                                                 buyQuantityInWEI,
                                                 provider,
@@ -1626,33 +1626,33 @@ export const tokenSwapAction = {
                                             );
                                             elizaLogger.debug(
                                                 traceId,
-                                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] [USD_VALUE_TYPE] buyAmountInWEI: ${buyAmountInWEI}`
+                                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] [USD_VALUE_TYPE] buyAmountInWEI: ${buyAmountInWEI}`
                                             );
                                             buyQuantityInWEI = buyAmountInWEI;
                                         } catch (error) {
                                             elizaLogger.error(
                                                 traceId,
-                                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] [USD_VALUE_TYPE] Error swapping to MOXIE: ${error}`
+                                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] [USD_VALUE_TYPE] Error swapping to MOXIE: ${error}`
                                             );
                                             return true;
                                         }
                                     }
 
-                                    // check if user has enough moxie to complete this purchage
-                                    const moxieBalance = await getERC20Balance(
+                                    // check if user has enough senpi to complete this purchage
+                                    const senpiBalance = await getERC20Balance(
                                         traceId,
                                         MOXIE_TOKEN_ADDRESS,
                                         agentWallet.address
                                     );
                                     const currentBalance =
-                                        moxieBalance !== ""
-                                            ? BigInt(moxieBalance)
+                                        senpiBalance !== ""
+                                            ? BigInt(senpiBalance)
                                             : 0n;
                                     if (currentBalance < buyQuantityInWEI) {
                                         await handleInsufficientBalance(
                                             traceId,
                                             state.agentWalletBalance as Portfolio,
-                                            moxieUserId,
+                                            senpiUserId,
                                             MOXIE_TOKEN_ADDRESS,
                                             MOXIE,
                                             buyQuantityInWEI,
@@ -1667,7 +1667,7 @@ export const tokenSwapAction = {
                                     // execute buy action
                                     const swapResp = await executeBuyAction(
                                         traceId,
-                                        moxieUserId,
+                                        senpiUserId,
                                         provider,
                                         agentWallet.address,
                                         buyTokenSubjectAddress,
@@ -1678,20 +1678,20 @@ export const tokenSwapAction = {
                                     );
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] [USD_VALUE_TYPE] swap response: ${JSON.stringify(swapResp)}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] [USD_VALUE_TYPE] swap response: ${JSON.stringify(swapResp)}`
                                     );
 
                                     if (swapResp.success == false) {
                                         elizaLogger.error(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] [USD_VALUE_TYPE] executeSellAction failed: ${JSON.stringify(swapResp)}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] [USD_VALUE_TYPE] executeSellAction failed: ${JSON.stringify(swapResp)}`
                                         );
                                         return true;
                                     }
                                 } catch (error) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] [USD_VALUE_TYPE] Error getting price: ${error}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] [USD_VALUE_TYPE] Error getting price: ${error}`
                                     );
                                     return true;
                                 }
@@ -1705,26 +1705,26 @@ export const tokenSwapAction = {
                                     );
                                 }
 
-                                moxieInWEI = await calculateTokensBuy(
+                                senpiInWEI = await calculateTokensBuy(
                                     traceId,
-                                    moxieUserId,
+                                    senpiUserId,
                                     buyTokenSubjectAddress,
                                     buyQuantityInWEI
                                 );
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] moxie in WEI: ${moxieInWEI}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] senpi in WEI: ${senpiInWEI}`
                                 );
 
-                                // if the sell token is MOXIE then we can use the moxie in WEI as the quantity in WEI
+                                // if the sell token is MOXIE then we can use the senpi in WEI as the quantity in WEI
                                 if (sellTokenSymbol == "MOXIE") {
-                                    quantityInWEI = moxieInWEI;
+                                    quantityInWEI = senpiInWEI;
                                 } else {
                                     // if the sell token is not MOXIE then we need to get the price of the sell token in MOXIE
                                     // get the price
                                     // const price = await get0xPrice({
-                                    //     moxieUserId,
-                                    //     sellAmountBaseUnits: moxieInWEI.toString(),
+                                    //     senpiUserId,
+                                    //     sellAmountBaseUnits: senpiInWEI.toString(),
                                     //     buyTokenAddress: sellTokenAddress,
                                     //     walletAddress: agentWallet.address,
                                     //     sellTokenAddress: MOXIE_TOKEN_ADDRESS,
@@ -1733,8 +1733,8 @@ export const tokenSwapAction = {
                                     // use codex to get the price
                                     const price = await getPrice(
                                         traceId,
-                                        moxieUserId,
-                                        moxieInWEI.toString(),
+                                        senpiUserId,
+                                        senpiInWEI.toString(),
                                         MOXIE_TOKEN_ADDRESS,
                                         MOXIE_TOKEN_DECIMALS,
                                         MOXIE,
@@ -1744,12 +1744,12 @@ export const tokenSwapAction = {
                                     );
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] price from getPrice: ${price}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] price from getPrice: ${price}`
                                     );
-                                    moxieInWEI = BigInt(price);
+                                    senpiInWEI = BigInt(price);
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] moxie in WEI: ${moxieInWEI}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] senpi in WEI: ${senpiInWEI}`
                                     );
 
                                     // swap to the requested buy token
@@ -1760,9 +1760,9 @@ export const tokenSwapAction = {
                                             MOXIE,
                                             sellTokenAddress,
                                             sellTokenSymbol,
-                                            moxieUserId,
+                                            senpiUserId,
                                             agentWallet.address,
-                                            moxieInWEI,
+                                            senpiInWEI,
                                             provider,
                                             sellTokenDecimals,
                                             MOXIE_TOKEN_DECIMALS,
@@ -1772,33 +1772,33 @@ export const tokenSwapAction = {
                                         );
                                         elizaLogger.debug(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] buyAmountInWEI: ${buyAmountInWEI}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] buyAmountInWEI: ${buyAmountInWEI}`
                                         );
                                         quantityInWEI = buyAmountInWEI;
                                     } catch (error) {
                                         elizaLogger.error(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] Error swapping to MOXIE: ${error}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] Error swapping to MOXIE: ${error}`
                                         );
                                         return true;
                                     }
                                 }
 
-                                // check if user has enough moxie to complete this purchage
-                                const moxieBalance = await getERC20Balance(
+                                // check if user has enough senpi to complete this purchage
+                                const senpiBalance = await getERC20Balance(
                                     traceId,
                                     MOXIE_TOKEN_ADDRESS,
                                     agentWallet.address
                                 );
                                 const currentBalance =
-                                    moxieBalance !== ""
-                                        ? BigInt(moxieBalance)
+                                    senpiBalance !== ""
+                                        ? BigInt(senpiBalance)
                                         : 0n;
                                 if (currentBalance < quantityInWEI) {
                                     await handleInsufficientBalance(
                                         traceId,
                                         state.agentWalletBalance as Portfolio,
-                                        moxieUserId,
+                                        senpiUserId,
                                         MOXIE_TOKEN_ADDRESS,
                                         MOXIE,
                                         quantityInWEI,
@@ -1814,14 +1814,14 @@ export const tokenSwapAction = {
                                 await callback?.(
                                     initiatePurchaseTemplate(
                                         buyTokenSubjectTokenDetails.name,
-                                        moxieInWEI
+                                        senpiInWEI
                                     )
                                 );
 
                                 // execute buy action
                                 const swapResp = await executeBuyAction(
                                     traceId,
-                                    moxieUserId,
+                                    senpiUserId,
                                     provider,
                                     agentWallet.address,
                                     buyTokenSubjectAddress,
@@ -1832,13 +1832,13 @@ export const tokenSwapAction = {
                                 );
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] swap response: ${JSON.stringify(swapResp)}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] swap response: ${JSON.stringify(swapResp)}`
                                 );
 
                                 if (swapResp.success == false) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] executeBuyAction failed: ${JSON.stringify(swapResp)}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] executeBuyAction failed: ${JSON.stringify(swapResp)}`
                                     );
                                     return true;
                                 }
@@ -1856,13 +1856,13 @@ export const tokenSwapAction = {
                                 );
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [VALUE_TYPE]: ${value_type}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [VALUE_TYPE]: ${value_type}`
                                 );
                                 try {
                                     if (sellTokenSymbol != "USDC") {
                                         // dont need to get price if selling USDC
                                         // const price = await get0xPrice({
-                                        //     moxieUserId,
+                                        //     senpiUserId,
                                         //     sellAmountBaseUnits: sellQuantityInWEI.toString(),
                                         //     buyTokenAddress: sellTokenAddress,
                                         //     walletAddress: agentWallet.address,
@@ -1872,7 +1872,7 @@ export const tokenSwapAction = {
                                         // use codex to get the price
                                         const price = await getPrice(
                                             traceId,
-                                            moxieUserId,
+                                            senpiUserId,
                                             sellQuantityInWEI.toString(),
                                             USDC_ADDRESS,
                                             USDC_TOKEN_DECIMALS,
@@ -1883,20 +1883,20 @@ export const tokenSwapAction = {
                                         );
                                         elizaLogger.debug(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [USD_VALUE_TYPE] price from getUSDEquivalentPrice: ${price}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [USD_VALUE_TYPE] price from getUSDEquivalentPrice: ${price}`
                                         );
                                         sellQuantityInWEI = BigInt(price);
 
                                         elizaLogger.debug(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [USD_VALUE_TYPE] sellQuantityInWEI: ${sellQuantityInWEI}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [USD_VALUE_TYPE] sellQuantityInWEI: ${sellQuantityInWEI}`
                                         );
 
                                         await callback({
                                             text: `\nIndicative Conversation Rate: ${sellQuantity} ${USDC} = ${ethers.formatUnits(sellQuantityInWEI, sellTokenDecimals)} ${sellTokenSymbol} `,
                                         });
                                     }
-                                    // swap to moxie if not MOXIE
+                                    // swap to senpi if not MOXIE
                                     if (sellTokenSymbol != "MOXIE") {
                                         try {
                                             // swap to the requested buy token
@@ -1906,7 +1906,7 @@ export const tokenSwapAction = {
                                                 MOXIE,
                                                 sellTokenAddress,
                                                 sellTokenSymbol,
-                                                moxieUserId,
+                                                senpiUserId,
                                                 agentWallet.address,
                                                 sellQuantityInWEI,
                                                 provider,
@@ -1918,13 +1918,13 @@ export const tokenSwapAction = {
                                             );
                                             elizaLogger.debug(
                                                 traceId,
-                                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] buyAmountInWEI: ${buyAmountInWEI}`
+                                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] buyAmountInWEI: ${buyAmountInWEI}`
                                             );
                                             sellQuantityInWEI = buyAmountInWEI;
                                         } catch (error) {
                                             elizaLogger.error(
                                                 traceId,
-                                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [USD_VALUE_TYPE] Error swapping to MOXIE: ${error}`
+                                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [USD_VALUE_TYPE] Error swapping to MOXIE: ${error}`
                                             );
                                             return true;
                                         }
@@ -1933,7 +1933,7 @@ export const tokenSwapAction = {
                                     // execute buy action
                                     const swapResp = await executeBuyAction(
                                         traceId,
-                                        moxieUserId,
+                                        senpiUserId,
                                         provider,
                                         agentWallet.address,
                                         buyTokenSubjectAddress,
@@ -1944,27 +1944,27 @@ export const tokenSwapAction = {
                                     );
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [USD_VALUE_TYPE] swap response: ${JSON.stringify(swapResp)}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [USD_VALUE_TYPE] swap response: ${JSON.stringify(swapResp)}`
                                     );
 
                                     if (swapResp.success == false) {
                                         elizaLogger.error(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] executeSellAction failed: ${JSON.stringify(swapResp)}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] executeSellAction failed: ${JSON.stringify(swapResp)}`
                                         );
                                         return true;
                                     }
                                 } catch (error) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] Error getting USD value quantity: ${error}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] Error getting USD value quantity: ${error}`
                                     );
                                     return true;
                                 }
                             } else {
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] sellQuantityInWEI: ${sellQuantityInWEI}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] sellQuantityInWEI: ${sellQuantityInWEI}`
                                 );
 
                                 if (sellTokenSymbol === "MOXIE") {
@@ -1972,7 +1972,7 @@ export const tokenSwapAction = {
                                     // execute sell action
                                     const swapResp = await executeBuyAction(
                                         traceId,
-                                        moxieUserId,
+                                        senpiUserId,
                                         provider,
                                         agentWallet.address,
                                         buyTokenSubjectAddress,
@@ -1983,13 +1983,13 @@ export const tokenSwapAction = {
                                     );
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] [MOXIE] executeSellAction  response: ${JSON.stringify(swapResp)}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] [MOXIE] executeSellAction  response: ${JSON.stringify(swapResp)}`
                                     );
 
                                     if (swapResp.success == false) {
                                         elizaLogger.error(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] [MOXIE] executeSellAction failed: ${JSON.stringify(swapResp)}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] [MOXIE] executeSellAction failed: ${JSON.stringify(swapResp)}`
                                         );
                                         return true;
                                     }
@@ -2003,7 +2003,7 @@ export const tokenSwapAction = {
                                             MOXIE,
                                             sellTokenAddress,
                                             sellTokenSymbol,
-                                            moxieUserId,
+                                            senpiUserId,
                                             agentWallet.address,
                                             sellQuantityInWEI,
                                             provider,
@@ -2015,19 +2015,19 @@ export const tokenSwapAction = {
                                         );
                                         elizaLogger.debug(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] buyAmountInWEI: ${buyAmountInWEI}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] buyAmountInWEI: ${buyAmountInWEI}`
                                         );
                                     } catch (error) {
                                         elizaLogger.error(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] Error swapping to MOXIE: ${error}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] Error swapping to MOXIE: ${error}`
                                         );
                                         return true;
                                     }
                                     // execute buy action
                                     const swapResp = await executeBuyAction(
                                         traceId,
-                                        moxieUserId,
+                                        senpiUserId,
                                         provider,
                                         agentWallet.address,
                                         buyTokenSubjectAddress,
@@ -2038,19 +2038,19 @@ export const tokenSwapAction = {
                                     );
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] executeSellAction response: ${JSON.stringify(swapResp)}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] executeSellAction response: ${JSON.stringify(swapResp)}`
                                     );
 
                                     if (swapResp.success == false) {
                                         elizaLogger.error(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] executeSellAction failed: ${JSON.stringify(swapResp)}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] executeSellAction failed: ${JSON.stringify(swapResp)}`
                                         );
                                         return true;
                                     }
                                     elizaLogger.debug(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] swap response - buyAmountInWEI: ${buyAmountInWEI}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] swap response - buyAmountInWEI: ${buyAmountInWEI}`
                                     );
                                 }
                             }
@@ -2058,7 +2058,7 @@ export const tokenSwapAction = {
                             // balance based swap
                             elizaLogger.debug(
                                 traceId,
-                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] balance type: ${JSON.stringify(balance)}`
+                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] balance type: ${JSON.stringify(balance)}`
                             );
                             try {
                                 const result =
@@ -2067,7 +2067,7 @@ export const tokenSwapAction = {
                                         currentWalletBalanceForBalanceBasedSwaps[
                                             sellTokenAddress
                                         ],
-                                        moxieUserId,
+                                        senpiUserId,
                                         sellTokenAddress,
                                         sellTokenSymbol,
                                         agentWallet,
@@ -2080,7 +2080,7 @@ export const tokenSwapAction = {
                                 ] = result.currentWalletBalance;
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] quantityInWEI: ${quantityInWEI}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] quantityInWEI: ${quantityInWEI}`
                                 );
 
                                 if (sellTokenSymbol !== "MOXIE") {
@@ -2092,7 +2092,7 @@ export const tokenSwapAction = {
                                             MOXIE,
                                             sellTokenAddress,
                                             sellTokenSymbol,
-                                            moxieUserId,
+                                            senpiUserId,
                                             agentWallet.address,
                                             quantityInWEI,
                                             provider,
@@ -2104,13 +2104,13 @@ export const tokenSwapAction = {
                                         );
                                         elizaLogger.debug(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] [MOXIE] buyAmountInWEI: ${buyAmountInWEI}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] [MOXIE] buyAmountInWEI: ${buyAmountInWEI}`
                                         );
                                         quantityInWEI = buyAmountInWEI;
                                     } catch (error) {
                                         elizaLogger.error(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] [MOXIE] Error swapping to MOXIE: ${error}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] [MOXIE] Error swapping to MOXIE: ${error}`
                                         );
                                         return true;
                                     }
@@ -2118,7 +2118,7 @@ export const tokenSwapAction = {
                                 // execute buy action
                                 const swapResp = await executeBuyAction(
                                     traceId,
-                                    moxieUserId,
+                                    senpiUserId,
                                     provider,
                                     agentWallet.address,
                                     buyTokenSubjectAddress,
@@ -2129,30 +2129,30 @@ export const tokenSwapAction = {
                                 );
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] executeBuyAction response: ${JSON.stringify(swapResp)}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] executeBuyAction response: ${JSON.stringify(swapResp)}`
                                 );
 
                                 if (swapResp.success == false) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] executeBuyAction failed: ${JSON.stringify(swapResp)}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] executeBuyAction failed: ${JSON.stringify(swapResp)}`
                                     );
                                     return true;
                                 }
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] swap response: ${JSON.stringify(swapResp)}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] swap response: ${JSON.stringify(swapResp)}`
                                 );
                             } catch (error) {
                                 elizaLogger.error(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] Error getting balance based quantity: ${error}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] Error getting balance based quantity: ${error}`
                                 );
                                 return true;
                             }
                         }
                     } else if (swapType == "TOKEN_TO_TOKEN") {
-                        let sellTokenDecimals =
+                        const sellTokenDecimals =
                             sellTokenSymbol === "ETH"
                                 ? 18
                                 : await getERC20Decimals(
@@ -2160,7 +2160,7 @@ export const tokenSwapAction = {
                                       sellTokenAddress
                                   );
 
-                        let buyTokenDecimals =
+                        const buyTokenDecimals =
                             buyTokenSymbol === "ETH"
                                 ? 18
                                 : await getERC20Decimals(
@@ -2169,12 +2169,12 @@ export const tokenSwapAction = {
                                   );
 
                         let sellQuantityInWEI: bigint;
-                        let moxieInWEI: bigint;
+                        let senpiInWEI: bigint;
                         let quantityInWEI: bigint;
 
                         elizaLogger.debug(
                             traceId,
-                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] swap type: ${swapType}`
+                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] swap type: ${swapType}`
                         );
                         if (buyQuantity) {
                             let buyQuantityInWEI = ethers.parseUnits(
@@ -2189,13 +2189,13 @@ export const tokenSwapAction = {
                                 );
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BUY_QUANTITY] [VALUE_TYPE]: ${value_type}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BUY_QUANTITY] [VALUE_TYPE]: ${value_type}`
                                 );
                                 try {
                                     if (sellTokenSymbol != "USDC") {
                                         // dont need to get price if selling USDC
                                         // const price = await get0xPrice({
-                                        //     moxieUserId,
+                                        //     senpiUserId,
                                         //     sellAmountBaseUnits: buyQuantityInWEI.toString(),
                                         //     buyTokenAddress: sellTokenAddress,
                                         //     walletAddress: agentWallet.address,
@@ -2205,7 +2205,7 @@ export const tokenSwapAction = {
                                         // use codex to get the price
                                         const price = await getPrice(
                                             traceId,
-                                            moxieUserId,
+                                            senpiUserId,
                                             buyQuantityInWEI.toString(),
                                             USDC_ADDRESS,
                                             USDC_TOKEN_DECIMALS,
@@ -2216,13 +2216,13 @@ export const tokenSwapAction = {
                                         );
                                         elizaLogger.debug(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BUY_QUANTITY] [USD_VALUE_TYPE] price from getUSDEquivalentPrice: ${price}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BUY_QUANTITY] [USD_VALUE_TYPE] price from getUSDEquivalentPrice: ${price}`
                                         );
                                         buyQuantityInWEI = BigInt(price);
 
                                         elizaLogger.debug(
                                             traceId,
-                                            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BUY_QUANTITY] [USD_VALUE_TYPE] buyQuantityInWEI: ${buyQuantityInWEI}`
+                                            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BUY_QUANTITY] [USD_VALUE_TYPE] buyQuantityInWEI: ${buyQuantityInWEI}`
                                         );
                                     }
 
@@ -2235,7 +2235,7 @@ export const tokenSwapAction = {
                                                 buyTokenSymbol,
                                                 sellTokenAddress,
                                                 sellTokenSymbol,
-                                                moxieUserId,
+                                                senpiUserId,
                                                 agentWallet.address,
                                                 buyQuantityInWEI,
                                                 provider,
@@ -2247,13 +2247,13 @@ export const tokenSwapAction = {
                                             );
                                             elizaLogger.debug(
                                                 traceId,
-                                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BUY_QUANTITY] [USD_VALUE_TYPE] buyAmountInWEI: ${buyAmountInWEI}`
+                                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BUY_QUANTITY] [USD_VALUE_TYPE] buyAmountInWEI: ${buyAmountInWEI}`
                                             );
                                             buyQuantityInWEI = buyAmountInWEI;
                                         } catch (error) {
                                             elizaLogger.error(
                                                 traceId,
-                                                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BUY_QUANTITY] [USD_VALUE_TYPE] Error swapping to MOXIE: ${error}`
+                                                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BUY_QUANTITY] [USD_VALUE_TYPE] Error swapping to MOXIE: ${error}`
                                             );
                                             return true;
                                         }
@@ -2261,14 +2261,14 @@ export const tokenSwapAction = {
                                 } catch (error) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BUY_QUANTITY] [USD_VALUE_TYPE] Error getting price: ${error}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BUY_QUANTITY] [USD_VALUE_TYPE] Error getting price: ${error}`
                                     );
                                     return true;
                                 }
                             } else {
                                 //This gets how much sell token is required to buy the buy token
                                 // const price = await get0xPrice({
-                                //     moxieUserId,
+                                //     senpiUserId,
                                 //     sellAmountBaseUnits: buyQuantityInWEI.toString(),
                                 //     buyTokenAddress: sellTokenAddress,
                                 //     walletAddress: agentWallet.address,
@@ -2278,7 +2278,7 @@ export const tokenSwapAction = {
                                 // use codex to get the price
                                 const price = await getPrice(
                                     traceId,
-                                    moxieUserId,
+                                    senpiUserId,
                                     buyQuantityInWEI.toString(),
                                     buyTokenAddress,
                                     buyTokenDecimals,
@@ -2289,7 +2289,7 @@ export const tokenSwapAction = {
                                 );
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BUY_QUANTITY] price from getUSDEquivalentPrice: ${price}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BUY_QUANTITY] price from getUSDEquivalentPrice: ${price}`
                                 );
 
                                 const currentSellTokenBalanceInWEI =
@@ -2309,13 +2309,13 @@ export const tokenSwapAction = {
                                 ) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BUY_QUANTITY] insufficient balance: ${currentSellTokenBalanceInWEI} < ${Number(price)}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BUY_QUANTITY] insufficient balance: ${currentSellTokenBalanceInWEI} < ${Number(price)}`
                                     );
 
                                     await handleInsufficientBalance(
                                         traceId,
                                         state.agentWalletBalance as Portfolio,
-                                        moxieUserId,
+                                        senpiUserId,
                                         sellTokenAddress,
                                         sellTokenSymbol,
                                         BigInt(price),
@@ -2334,7 +2334,7 @@ export const tokenSwapAction = {
                                         buyTokenSymbol,
                                         sellTokenAddress,
                                         sellTokenSymbol,
-                                        moxieUserId,
+                                        senpiUserId,
                                         agentWallet.address,
                                         BigInt(price),
                                         provider,
@@ -2347,7 +2347,7 @@ export const tokenSwapAction = {
                                 } catch (error) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BUY_QUANTITY] Error swapping to MOXIE: ${error}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BUY_QUANTITY] Error swapping to MOXIE: ${error}`
                                     );
                                     return true;
                                 }
@@ -2363,7 +2363,7 @@ export const tokenSwapAction = {
                                     6
                                 );
                                 // const priceOfSellTokenFromUSDInWei = await get0xPrice({
-                                //     moxieUserId,
+                                //     senpiUserId,
                                 //     sellAmountBaseUnits: sellQuantityInUSDWEI.toString(),
                                 //     buyTokenAddress: sellTokenAddress,
                                 //     walletAddress: agentWallet.address,
@@ -2374,7 +2374,7 @@ export const tokenSwapAction = {
                                 const priceOfSellTokenFromUSDInWei =
                                     await getPrice(
                                         traceId,
-                                        moxieUserId,
+                                        senpiUserId,
                                         sellQuantityInUSDWEI.toString(),
                                         USDC_ADDRESS,
                                         USDC_TOKEN_DECIMALS,
@@ -2389,7 +2389,7 @@ export const tokenSwapAction = {
                                 );
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [SELL_QUANTITY] [USD_VALUE_TYPE] priceOfSellTokenFromUSDInWei: ${priceOfSellTokenFromUSDInWei}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [SELL_QUANTITY] [USD_VALUE_TYPE] priceOfSellTokenFromUSDInWei: ${priceOfSellTokenFromUSDInWei}`
                                 );
 
                                 //Check if the user has enough balance to buy the buy token
@@ -2410,7 +2410,7 @@ export const tokenSwapAction = {
                                 ) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [SELL_QUANTITY] [USD_VALUE_TYPE] insufficient balance: ${currentSellTokenBalanceInWEI} < ${Number(priceOfSellTokenFromUSDInWei)}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [SELL_QUANTITY] [USD_VALUE_TYPE] insufficient balance: ${currentSellTokenBalanceInWEI} < ${Number(priceOfSellTokenFromUSDInWei)}`
                                     );
                                     await callback({
                                         text: `\nInsufficient ${sellTokenSymbol} balance\n\nCurrent balance: ${ethers.formatUnits(currentSellTokenBalanceInWEI, sellTokenDecimals)} ${sellTokenSymbol}\nRequired amount: ${ethers.formatUnits(sellQuantityInWEI, sellTokenDecimals)} ${sellTokenSymbol}\n\nPlease add ${ethers.formatUnits(sellQuantityInWEI - BigInt(currentSellTokenBalanceInWEI), sellTokenDecimals)} ${sellTokenSymbol} to continue.`,
@@ -2425,7 +2425,7 @@ export const tokenSwapAction = {
                                         buyTokenSymbol,
                                         sellTokenAddress,
                                         sellTokenSymbol,
-                                        moxieUserId,
+                                        senpiUserId,
                                         agentWallet.address,
                                         BigInt(sellQuantityInWEI),
                                         provider,
@@ -2438,7 +2438,7 @@ export const tokenSwapAction = {
                                 } catch (error) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [SELL_QUANTITY] [USD_VALUE_TYPE] Error swapping to MOXIE: ${error}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [SELL_QUANTITY] [USD_VALUE_TYPE] Error swapping to MOXIE: ${error}`
                                     );
                                     return true;
                                 }
@@ -2464,12 +2464,12 @@ export const tokenSwapAction = {
                                 ) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [SELL_QUANTITY] insufficient balance: ${currentSellTokenBalanceInWEI} < ${Number(sellQuantityInWEI)}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [SELL_QUANTITY] insufficient balance: ${currentSellTokenBalanceInWEI} < ${Number(sellQuantityInWEI)}`
                                     );
                                     await handleInsufficientBalance(
                                         traceId,
                                         state.agentWalletBalance as Portfolio,
-                                        moxieUserId,
+                                        senpiUserId,
                                         sellTokenAddress,
                                         sellTokenSymbol,
                                         sellQuantityInWEI,
@@ -2488,7 +2488,7 @@ export const tokenSwapAction = {
                                         buyTokenSymbol,
                                         sellTokenAddress,
                                         sellTokenSymbol,
-                                        moxieUserId,
+                                        senpiUserId,
                                         agentWallet.address,
                                         BigInt(sellQuantityInWEI),
                                         provider,
@@ -2501,7 +2501,7 @@ export const tokenSwapAction = {
                                 } catch (error) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [SELL_QUANTITY] Error swapping to MOXIE: ${error}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [SELL_QUANTITY] Error swapping to MOXIE: ${error}`
                                     );
                                     return true;
                                 }
@@ -2514,7 +2514,7 @@ export const tokenSwapAction = {
                                         currentWalletBalanceForBalanceBasedSwaps[
                                             sellTokenAddress
                                         ],
-                                        moxieUserId,
+                                        senpiUserId,
                                         sellTokenAddress,
                                         sellTokenSymbol,
                                         agentWallet,
@@ -2533,7 +2533,7 @@ export const tokenSwapAction = {
                                         buyTokenSymbol,
                                         sellTokenAddress,
                                         sellTokenSymbol,
-                                        moxieUserId,
+                                        senpiUserId,
                                         agentWallet.address,
                                         quantityInWEI,
                                         provider,
@@ -2546,18 +2546,18 @@ export const tokenSwapAction = {
                                 } catch (error) {
                                     elizaLogger.error(
                                         traceId,
-                                        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BALANCE_BASED] Error swapping to MOXIE: ${error}`
+                                        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BALANCE_BASED] Error swapping to MOXIE: ${error}`
                                     );
                                     return true;
                                 }
                                 elizaLogger.debug(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BALANCE_BASED] quantityInWEI: ${quantityInWEI}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BALANCE_BASED] quantityInWEI: ${quantityInWEI}`
                                 );
                             } catch (error) {
                                 elizaLogger.error(
                                     traceId,
-                                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BALANCE_BASED] Error getting balance based quantity: ${error}`
+                                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BALANCE_BASED] Error getting balance based quantity: ${error}`
                                 );
                                 return true;
                             }
@@ -2565,17 +2565,17 @@ export const tokenSwapAction = {
                     }
                 }
                 // delete the cache
-                const cacheKey = `PORTFOLIO-${moxieUserId}`;
+                const cacheKey = `PORTFOLIO-${senpiUserId}`;
                 await runtime.cacheManager.delete(cacheKey);
                 elizaLogger.debug(
                     traceId,
-                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CACHE] deleted cache key: ${cacheKey}`
+                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] [CACHE] deleted cache key: ${cacheKey}`
                 );
             }
         } catch (error) {
             elizaLogger.error(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] error occured while performing swap operation: ${JSON.stringify(error)}`
+                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [SWAP] error occured while performing swap operation: ${JSON.stringify(error)}`
             );
             if (
                 error.message ==
@@ -2613,7 +2613,7 @@ export const tokenSwapAction = {
 
 async function isValidSwapContent(
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     content: TokenSwapResponse,
     callback: HandlerCallback
 ): Promise<boolean> {
@@ -2625,7 +2625,7 @@ async function isValidSwapContent(
     ) {
         elizaLogger.error(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [isValidSwapContent] Invalid content structure: ${JSON.stringify(content)}`
+            `[tokenSwap] [${senpiUserId}] [isValidSwapContent] Invalid content structure: ${JSON.stringify(content)}`
         );
         await callback?.({
             text: "\nAn error occurred while processing your request. Please try again.",
@@ -2650,7 +2650,7 @@ async function isValidSwapContent(
         ) {
             elizaLogger.error(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [isValidSwapContent] Missing required fields in transaction: ${JSON.stringify(transaction)}`
+                `[tokenSwap] [${senpiUserId}] [isValidSwapContent] Missing required fields in transaction: ${JSON.stringify(transaction)}`
             );
             await callback?.({
                 text: "\nAn error occurred while processing your request. Please try again.",
@@ -2670,7 +2670,7 @@ async function isValidSwapContent(
         ) {
             elizaLogger.error(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [isValidSwapContent] Invalid quantity: sellQuantity=${transaction.sellQuantity}, buyQuantity=${transaction.buyQuantity}`
+                `[tokenSwap] [${senpiUserId}] [isValidSwapContent] Invalid quantity: sellQuantity=${transaction.sellQuantity}, buyQuantity=${transaction.buyQuantity}`
             );
             await callback?.({
                 text: "\nTransaction quantities must be greater than 0.",
@@ -2693,7 +2693,7 @@ async function isValidSwapContent(
             ) {
                 elizaLogger.error(
                     traceId,
-                    `[tokenSwap] [${moxieUserId}] [isValidSwapContent] Invalid balance configuration: ${JSON.stringify(transaction.balance)}`
+                    `[tokenSwap] [${senpiUserId}] [isValidSwapContent] Invalid balance configuration: ${JSON.stringify(transaction.balance)}`
                 );
                 await callback?.({
                     text: "\nAn error occurred while processing your request. Please try again.",
@@ -2750,7 +2750,7 @@ interface TokenSwapResponse {
  * @param buyTokenSymbol The symbol of the token to buy
  * @param sellTokenAddress The address of the token to sell
  * @param sellTokenSymbol The symbol of the token to sell
- * @param moxieUserId The user ID of the person performing the swap
+ * @param senpiUserId The user ID of the person performing the swap
  * @param agentWalletAddress The wallet address of the person performing the swap
  * @param sellAmountInWEI The amount of the token to sell in WEI
  * @param provider The ethers JsonRpcProvider instance
@@ -2764,7 +2764,7 @@ async function swap(
     buyTokenSymbol: string,
     sellTokenAddress: string,
     sellTokenSymbol: string,
-    moxieUserId: string,
+    senpiUserId: string,
     agentWalletAddress: string,
     sellAmountInWEI: bigint,
     provider: ethers.JsonRpcProvider,
@@ -2772,11 +2772,11 @@ async function swap(
     buyTokenDecimals: number,
     callback: any,
     agentWalletBalance: Portfolio,
-    walletClient: MoxieWalletClient
+    walletClient: SenpiWalletClient
 ): Promise<bigint> {
     elizaLogger.debug(
         traceId,
-        `[tokenSwap] [${moxieUserId}] [swap] called, buyTokenAddress: ${buyTokenAddress}, buyTokenSymbol: ${buyTokenSymbol}, sellTokenAddress: ${sellTokenAddress}, sellTokenSymbol: ${sellTokenSymbol}, agentWalletAddress: ${agentWalletAddress}, sellAmountInWEI: ${sellAmountInWEI}`
+        `[tokenSwap] [${senpiUserId}] [swap] called, buyTokenAddress: ${buyTokenAddress}, buyTokenSymbol: ${buyTokenSymbol}, sellTokenAddress: ${sellTokenAddress}, sellTokenSymbol: ${sellTokenSymbol}, agentWalletAddress: ${agentWalletAddress}, sellAmountInWEI: ${sellAmountInWEI}`
     );
     let buyAmountInWEI: bigint;
     let tokenBalance: bigint;
@@ -2793,7 +2793,7 @@ async function swap(
                   );
         elizaLogger.debug(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [swap] balance: ${balance}`
+            `[tokenSwap] [${senpiUserId}] [swap] balance: ${balance}`
         );
         tokenBalance = balance ? BigInt(balance) : BigInt(0);
 
@@ -2801,7 +2801,7 @@ async function swap(
             await handleInsufficientBalance(
                 traceId,
                 agentWalletBalance,
-                moxieUserId,
+                senpiUserId,
                 sellTokenAddress,
                 sellTokenSymbol,
                 sellAmountInWEI,
@@ -2813,17 +2813,17 @@ async function swap(
             );
             elizaLogger.debug(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [swap] Insufficient balance for ${sellTokenSymbol} to ${buyTokenSymbol} swap. Token balance: ${tokenBalance}, required: ${sellAmountInWEI}`
+                `[tokenSwap] [${senpiUserId}] [swap] Insufficient balance for ${sellTokenSymbol} to ${buyTokenSymbol} swap. Token balance: ${tokenBalance}, required: ${sellAmountInWEI}`
             );
             throw new Error(
-                `[tokenSwap] [${moxieUserId}] [swap] Insufficient balance for ${sellTokenSymbol} to ${buyTokenSymbol} swap. Token balance: ${tokenBalance}, required: ${sellAmountInWEI}`
+                `[tokenSwap] [${senpiUserId}] [swap] Insufficient balance for ${sellTokenSymbol} to ${buyTokenSymbol} swap. Token balance: ${tokenBalance}, required: ${sellAmountInWEI}`
             );
         }
 
         // call 0x api to get quote
         quote = await get0xSwapQuote({
             traceId: traceId,
-            moxieUserId: moxieUserId,
+            senpiUserId: senpiUserId,
             sellAmountBaseUnits: sellAmountInWEI.toString(),
             buyTokenAddress: buyTokenAddress,
             buyTokenSymbol: buyTokenSymbol,
@@ -2833,20 +2833,20 @@ async function swap(
         });
         elizaLogger.debug(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [swap] get0xSwapQuote: ${JSON.stringify(quote)}`
+            `[tokenSwap] [${senpiUserId}] [swap] get0xSwapQuote: ${JSON.stringify(quote)}`
         );
 
         // check is liquidity is available
         if (!quote.liquidityAvailable) {
             elizaLogger.error(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [swap] liquidity not available for ${sellTokenSymbol} to ${buyTokenSymbol} swap`
+                `[tokenSwap] [${senpiUserId}] [swap] liquidity not available for ${sellTokenSymbol} to ${buyTokenSymbol} swap`
             );
             await callback?.({
                 text: `\nInsufficient liquidity to complete this transaction. Please try with a smaller amount.`,
             });
             throw new Error(
-                `[tokenSwap] [${moxieUserId}] [swap] Insufficient liquidity for ${sellTokenSymbol} to ${buyTokenSymbol} swap`
+                `[tokenSwap] [${senpiUserId}] [swap] Insufficient liquidity for ${sellTokenSymbol} to ${buyTokenSymbol} swap`
             );
         }
         // for other currencies we need to check allowance and approve spending
@@ -2854,13 +2854,13 @@ async function swap(
         const issues = quote.issues;
         elizaLogger.debug(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [swap] issues from get0xSwapQuote: ${JSON.stringify(issues)}`
+            `[tokenSwap] [${senpiUserId}] [swap] issues from get0xSwapQuote: ${JSON.stringify(issues)}`
         );
         // check allowance and approve spending
         if (issues.allowance && issues.allowance != null) {
             await checkAllowanceAndApproveSpendRequest(
                 traceId,
-                moxieUserId,
+                senpiUserId,
                 agentWalletAddress,
                 sellTokenAddress,
                 // @ts-ignore
@@ -2872,7 +2872,7 @@ async function swap(
             );
             elizaLogger.debug(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [swap] checkAllowanceAndApproveSpendRequest completed`
+                `[tokenSwap] [${senpiUserId}] [swap] checkAllowanceAndApproveSpendRequest completed`
             );
         }
         // check balance and approve spending
@@ -2887,7 +2887,7 @@ async function swap(
                       );
             elizaLogger.debug(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [swap] tokenBalance: ${balance}`
+                `[tokenSwap] [${senpiUserId}] [swap] tokenBalance: ${balance}`
             );
             if (balance) {
                 tokenBalance = BigInt(balance);
@@ -2896,7 +2896,7 @@ async function swap(
                 await handleInsufficientBalance(
                     traceId,
                     agentWalletBalance,
-                    moxieUserId,
+                    senpiUserId,
                     sellTokenAddress,
                     sellTokenSymbol,
                     sellAmountInWEI,
@@ -2908,7 +2908,7 @@ async function swap(
                 );
                 elizaLogger.debug(
                     traceId,
-                    `[tokenSwap] [${moxieUserId}] [swap] Insufficient balance for ${sellTokenSymbol} to ${buyTokenSymbol} swap. Token balance: ${tokenBalance}, required: ${sellAmountInWEI}`
+                    `[tokenSwap] [${senpiUserId}] [swap] Insufficient balance for ${sellTokenSymbol} to ${buyTokenSymbol} swap. Token balance: ${tokenBalance}, required: ${sellAmountInWEI}`
                 );
                 throw new Error(
                     `Insufficient balance for ${sellTokenSymbol} to ${buyTokenSymbol} swap. Token balance: ${tokenBalance}, required: ${sellAmountInWEI}`
@@ -2918,7 +2918,7 @@ async function swap(
     } catch (error) {
         elizaLogger.error(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [swap] Error getting 0x quote: ${error.message}`
+            `[tokenSwap] [${senpiUserId}] [swap] Error getting 0x quote: ${error.message}`
         );
 
         // Check for specific error in multiple possible locations
@@ -2948,17 +2948,17 @@ async function swap(
             }
         }
         throw new Error(
-            `[tokenSwap] [${moxieUserId}] [swap] Error getting 0x quote: ${error.message}`
+            `[tokenSwap] [${senpiUserId}] [swap] Error getting 0x quote: ${error.message}`
         );
     }
 
     // if (sellTokenSymbol != "ETH") { // skip for ETH
     // signature related
-    let signResponse: MoxieWalletSignTypedDataResponseType | undefined;
+    let signResponse: SenpiWalletSignTypedDataResponseType | undefined;
     try {
         elizaLogger.debug(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [swap] quote.permit2.eip712: ${JSON.stringify(quote.permit2?.eip712)}`
+            `[tokenSwap] [${senpiUserId}] [swap] quote.permit2.eip712: ${JSON.stringify(quote.permit2?.eip712)}`
         );
         if (quote.permit2?.eip712) {
             signResponse = await walletClient.signTypedData(
@@ -2969,13 +2969,13 @@ async function swap(
             );
             elizaLogger.debug(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [swap] signResponse: ${JSON.stringify(signResponse)}`
+                `[tokenSwap] [${senpiUserId}] [swap] signResponse: ${JSON.stringify(signResponse)}`
             );
         }
 
         if (signResponse && signResponse.signature && quote.transaction?.data) {
             const signatureLengthInHex = numberToHex(
-                size(signResponse.signature as MoxieHex),
+                size(signResponse.signature as SenpiHex),
                 {
                     signed: false,
                     size: 32,
@@ -2989,13 +2989,13 @@ async function swap(
             ]);
             elizaLogger.debug(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [swap] quote.transaction.data: ${JSON.stringify(quote.transaction.data)}`
+                `[tokenSwap] [${senpiUserId}] [swap] quote.transaction.data: ${JSON.stringify(quote.transaction.data)}`
             );
         }
     } catch (error) {
         elizaLogger.error(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [swap] Error signing typed data: ${JSON.stringify(error)}`
+            `[tokenSwap] [${senpiUserId}] [swap] Error signing typed data: ${JSON.stringify(error)}`
         );
         await callback?.({
             text: `\nAn error occurred while processing your request. Please try again.`,
@@ -3008,23 +3008,23 @@ async function swap(
     // }
 
     // execute 0x swap
-    let tx: MoxieWalletSendTransactionResponseType | null = null;
+    let tx: SenpiWalletSendTransactionResponseType | null = null;
     try {
         tx = await execute0xSwap({
             traceId: traceId,
-            moxieUserId: moxieUserId,
+            senpiUserId: senpiUserId,
             walletAddress: agentWalletAddress,
             quote: quote,
             walletClient: walletClient,
         });
         elizaLogger.debug(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [swap] 0x tx: ${JSON.stringify(tx)}`
+            `[tokenSwap] [${senpiUserId}] [swap] 0x tx: ${JSON.stringify(tx)}`
         );
     } catch (error) {
         elizaLogger.error(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [swap] Error executing 0x swap: ${JSON.stringify(error)}`
+            `[tokenSwap] [${senpiUserId}] [swap] Error executing 0x swap: ${JSON.stringify(error)}`
         );
         await callback?.({
             text: `\nAn error occurred while processing your request. Please try again.`,
@@ -3034,7 +3034,7 @@ async function swap(
             },
         });
         throw new Error(
-            `[tokenSwap] [${moxieUserId}] [swap] Error executing 0x swap: ${JSON.stringify(error)}`
+            `[tokenSwap] [${senpiUserId}] [swap] Error executing 0x swap: ${JSON.stringify(error)}`
         );
     }
 
@@ -3047,14 +3047,14 @@ async function swap(
     try {
         txnReceipt = await handleTransactionStatus(
             traceId,
-            moxieUserId,
+            senpiUserId,
             provider,
             tx.hash
         );
         if (!txnReceipt) {
             elizaLogger.error(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [swap] txnReceipt is null`
+                `[tokenSwap] [${senpiUserId}] [swap] txnReceipt is null`
             );
             await callback?.({
                 text: `\nTransaction is failed. Please try again`,
@@ -3068,7 +3068,7 @@ async function swap(
     } catch (error) {
         elizaLogger.error(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [swap] Error handling transaction status: ${JSON.stringify(error)}`
+            `[tokenSwap] [${senpiUserId}] [swap] Error handling transaction status: ${JSON.stringify(error)}`
         );
         await callback?.({
             text: `\nAn error occurred while processing your request. Please try again.`,
@@ -3082,32 +3082,32 @@ async function swap(
 
     elizaLogger.debug(
         traceId,
-        `[tokenSwap] [${moxieUserId}] [swap] 0x swap txnReceipt: ${JSON.stringify(txnReceipt)}`
+        `[tokenSwap] [${senpiUserId}] [swap] 0x swap txnReceipt: ${JSON.stringify(txnReceipt)}`
     );
     if (txnReceipt.status == 1) {
         if (buyTokenAddress !== ETH_ADDRESS) {
-            // decode the txn receipt to get the moxie purchased
+            // decode the txn receipt to get the senpi purchased
             const transferDetails = await decodeTokenTransfer(
                 traceId,
-                moxieUserId,
+                senpiUserId,
                 txnReceipt,
                 buyTokenAddress,
                 agentWalletAddress
             );
             elizaLogger.debug(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [swap] 0x swap decodeTokenTransfer: ${JSON.stringify(transferDetails)}`
+                `[tokenSwap] [${senpiUserId}] [swap] 0x swap decodeTokenTransfer: ${JSON.stringify(transferDetails)}`
             );
             if (transferDetails) {
                 buyAmountInWEI = BigInt(transferDetails.amount);
                 elizaLogger.debug(
                     traceId,
-                    `[tokenSwap] [${moxieUserId}] [swap] buyAmountInWEI: ${buyAmountInWEI}`
+                    `[tokenSwap] [${senpiUserId}] [swap] buyAmountInWEI: ${buyAmountInWEI}`
                 );
             } else {
                 elizaLogger.error(
                     traceId,
-                    `[tokenSwap] [${moxieUserId}] [swap] Error decoding token transfer`
+                    `[tokenSwap] [${senpiUserId}] [swap] Error decoding token transfer`
                 );
                 await callback?.({
                     text: `\nAn error occurred while processing your request. Please try again.`,
@@ -3132,7 +3132,7 @@ async function swap(
     } else {
         elizaLogger.error(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [swap] 0x swap failed: ${tx.hash} `
+            `[tokenSwap] [${senpiUserId}] [swap] 0x swap failed: ${tx.hash} `
         );
         await callback?.({
             text: `\nAn error occurred while processing your request. Please try again.`,
@@ -3147,7 +3147,7 @@ async function swap(
 
 /**
  * Get the current wallet balance
- * @param moxieUserId The user ID of the person performing the swap
+ * @param senpiUserId The user ID of the person performing the swap
  * @param sellToken The token to sell
  * @param agentWallet The wallet address to receive the tokens
  * @param balance The balance object
@@ -3157,7 +3157,7 @@ async function swap(
 async function getTargetQuantityForBalanceBasedSwaps(
     traceId: string,
     currentWalletBalance: bigint | undefined,
-    moxieUserId: string,
+    senpiUserId: string,
     sellTokenAddress: string,
     sellTokenSymbol: string,
     agentWallet: any,
@@ -3178,18 +3178,18 @@ async function getTargetQuantityForBalanceBasedSwaps(
     }
     elizaLogger.debug(
         traceId,
-        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [getTargetQuantityForBalanceBasedSwaps] currentWalletBalance: ${currentWalletBalance} ${sellTokenAddress}`
+        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [getTargetQuantityForBalanceBasedSwaps] currentWalletBalance: ${currentWalletBalance} ${sellTokenAddress}`
     );
     if (!currentWalletBalance || currentWalletBalance === 0n) {
         elizaLogger.debug(
             traceId,
-            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [balance] currentWalletBalance is ${currentWalletBalance}`
+            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [balance] currentWalletBalance is ${currentWalletBalance}`
         );
         await callback?.({
             text: `\nYour agent wallet doesn't have any ${sellTokenSymbol} balance to complete this operation.`,
         });
         throw new Error(
-            `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [balance] currentWalletBalance is ${currentWalletBalance}`
+            `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [balance] currentWalletBalance is ${currentWalletBalance}`
         );
     }
 
@@ -3200,7 +3200,7 @@ async function getTargetQuantityForBalanceBasedSwaps(
         (BigInt(currentWalletBalance) * BigInt(percentage * 1e7)) / BigInt(1e9);
     elizaLogger.debug(
         traceId,
-        `[tokenSwap] [${moxieUserId}] [tokenSwapAction] [balance] quantityInWEI: ${quantityInWEI}`
+        `[tokenSwap] [${senpiUserId}] [tokenSwapAction] [balance] quantityInWEI: ${quantityInWEI}`
     );
     return { quantityInWEI, currentWalletBalance };
 }
@@ -3208,7 +3208,7 @@ async function getTargetQuantityForBalanceBasedSwaps(
 /**
  * Fetches FTA responses for given creator IDs
  * @param creatorIds - Array of creator IDs to fetch FTA responses for
- * @param moxieUserId - The user ID of the person performing the swap
+ * @param senpiUserId - The user ID of the person performing the swap
  * @param runtime - The runtime environment
  * @param callback - The callback function to receive status updates
  * @returns Promise that resolves to a record of creator IDs and their FTA responses
@@ -3216,7 +3216,7 @@ async function getTargetQuantityForBalanceBasedSwaps(
 async function getFtaResponses(
     traceId: string,
     creatorIds: string[],
-    moxieUserId: string,
+    senpiUserId: string,
     runtime: any,
     callback: HandlerCallback
 ): Promise<Record<string, any>> {
@@ -3228,7 +3228,7 @@ async function getFtaResponses(
         if (ftaResponse) {
             elizaLogger.debug(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] fta response fetched successfully from cache for creator moxie user id: ${creatorId}, ${JSON.stringify(ftaResponse)}`
+                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] fta response fetched successfully from cache for creator senpi user id: ${creatorId}, ${JSON.stringify(ftaResponse)}`
             );
             ftaResponses[creatorId] = ftaResponse;
         } else {
@@ -3236,13 +3236,13 @@ async function getFtaResponses(
             if (!newFtaResponse || newFtaResponse == null) {
                 elizaLogger.error(
                     traceId,
-                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] fta response not found for creator ${creatorId}`
+                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] fta response not found for creator ${creatorId}`
                 );
                 await callback?.({
-                    text: `\nUnfortunately, the user you are querying has not launched a creator coin yet. Creator coins are required to analyze user data using the Moxie AI Agent.`,
+                    text: `\nUnfortunately, the user you are querying has not launched a creator coin yet. Creator coins are required to analyze user data using the Senpi AI Agent.`,
                 });
                 throw new Error(
-                    `[tokenSwap] [${moxieUserId}] [tokenSwapAction] The creator with ID ${creatorId} could not be found. Please verify the creator ID`
+                    `[tokenSwap] [${senpiUserId}] [tokenSwapAction] The creator with ID ${creatorId} could not be found. Please verify the creator ID`
                 );
             }
             await runtime.cacheManager.set(
@@ -3252,7 +3252,7 @@ async function getFtaResponses(
             ftaResponses[creatorId] = newFtaResponse;
             elizaLogger.debug(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [tokenSwapAction] fta response fetched successfully for creator ${creatorId} and set in cache`
+                `[tokenSwap] [${senpiUserId}] [tokenSwapAction] fta response fetched successfully for creator ${creatorId} and set in cache`
             );
         }
     }
@@ -3268,7 +3268,7 @@ async function getFtaResponses(
  * @param sellTokenCreatorId - The creator ID of the sell token
  * @param buyTokenCreatorId - The creator ID of the buy token
  * @param subjectTokenDetails - The subject token details
- * @param moxieUserId - The user ID of the person performing the swap
+ * @param senpiUserId - The user ID of the person performing the swap
  * @param runtime - The runtime environment
  * @param callback - The callback function to receive status updates
  * @returns Promise that resolves to the creator coin details
@@ -3282,7 +3282,7 @@ async function getCreatorCoinDetails(
     sellTokenCreatorId: string,
     buyTokenCreatorId: string,
     subjectTokenDetails: { [key: string]: SubjectToken },
-    moxieUserId: string,
+    senpiUserId: string,
     runtime: any,
     callback?: any
 ): Promise<{
@@ -3308,14 +3308,14 @@ async function getCreatorCoinDetails(
             ftaResponses = await getFtaResponses(
                 traceId,
                 creatorIds,
-                moxieUserId,
+                senpiUserId,
                 runtime,
                 callback
             );
         } catch (error) {
             elizaLogger.error(
                 traceId,
-                `[tokenSwap] [${moxieUserId}] [getCreatorCoinDetails] Error getting FTA responses for creator IDs ${creatorIds.join(", ")}: ${error}`
+                `[tokenSwap] [${senpiUserId}] [getCreatorCoinDetails] Error getting FTA responses for creator IDs ${creatorIds.join(", ")}: ${error}`
             );
             throw error;
         }
@@ -3362,11 +3362,11 @@ async function getCreatorCoinDetails(
 
     elizaLogger.debug(
         traceId,
-        `[tokenSwap] [${moxieUserId}] [getCreatorCoinDetails]  [SELL_TOKEN_DETAILS]: ${JSON.stringify(sellTokenSubjectTokenDetails)}`
+        `[tokenSwap] [${senpiUserId}] [getCreatorCoinDetails]  [SELL_TOKEN_DETAILS]: ${JSON.stringify(sellTokenSubjectTokenDetails)}`
     );
     elizaLogger.debug(
         traceId,
-        `[tokenSwap] [${moxieUserId}] [getCreatorCoinDetails]  [BUY_TOKEN_DETAILS]: ${JSON.stringify(buyTokenSubjectTokenDetails)}`
+        `[tokenSwap] [${senpiUserId}] [getCreatorCoinDetails]  [BUY_TOKEN_DETAILS]: ${JSON.stringify(buyTokenSubjectTokenDetails)}`
     );
 
     // Before returning, validate both values exist
@@ -3383,7 +3383,7 @@ async function getCreatorCoinDetails(
 /**
  * Handle insufficient balance
  * @param currentWalletBalance - The current wallet balance
- * @param moxieUserId - The user ID of the person performing the swap
+ * @param senpiUserId - The user ID of the person performing the swap
  * @param sellTokenAddress - The address of the sell token
  * @param sellTokenSymbol - The symbol of the sell token
  * @param sellAmountInWEI - The amount of the sell token in WEI
@@ -3395,7 +3395,7 @@ async function getCreatorCoinDetails(
 async function handleInsufficientBalance(
     traceId: string,
     currentWalletBalance: Portfolio,
-    moxieUserId: string,
+    senpiUserId: string,
     sellTokenAddress: string,
     sellTokenSymbol: string,
     sellAmountInWEI: bigint,
@@ -3407,13 +3407,13 @@ async function handleInsufficientBalance(
 ) {
     elizaLogger.debug(
         traceId,
-        `[tokenSwap] [${moxieUserId}] [handleInsufficientBalance] [currentWalletBalance]: ${JSON.stringify(currentWalletBalance)}`
+        `[tokenSwap] [${senpiUserId}] [handleInsufficientBalance] [currentWalletBalance]: ${JSON.stringify(currentWalletBalance)}`
     );
     // Get indicative price of buy token in USD
     let indicativePriceOfBuyTokenInUSD: string;
     if (sellTokenAddress !== USDC_ADDRESS) {
         // const priceResponse = await get0xPrice({
-        //     moxieUserId,
+        //     senpiUserId,
         //     sellAmountBaseUnits: sellAmountInWEI.toString(),
         //     buyTokenAddress: USDC_ADDRESS,
         //     walletAddress: agentWalletAddress,
@@ -3423,7 +3423,7 @@ async function handleInsufficientBalance(
         // use codex to get the price
         const price = await getPrice(
             traceId,
-            moxieUserId,
+            senpiUserId,
             sellAmountInWEI.toString(),
             sellTokenAddress,
             sellTokenDecimals,
@@ -3454,7 +3454,7 @@ async function handleInsufficientBalance(
         );
     elizaLogger.debug(
         traceId,
-        `[tokenSwap] [${moxieUserId}] [handleInsufficientBalance] [otherTokensWithSufficientBalance]: ${JSON.stringify(otherTokensWithSufficientBalance)}`
+        `[tokenSwap] [${senpiUserId}] [handleInsufficientBalance] [otherTokensWithSufficientBalance]: ${JSON.stringify(otherTokensWithSufficientBalance)}`
     );
 
     // extract the symbols from otherTokensWithSufficientBalance
@@ -3466,7 +3466,7 @@ async function handleInsufficientBalance(
         .map((token) => token.token.baseToken.symbol);
     elizaLogger.debug(
         traceId,
-        `[tokenSwap] [${moxieUserId}] [handleInsufficientBalance] [otherTokenSymbols]: ${JSON.stringify(otherTokenSymbols)}`
+        `[tokenSwap] [${senpiUserId}] [handleInsufficientBalance] [otherTokenSymbols]: ${JSON.stringify(otherTokenSymbols)}`
     );
 
     // extract a map with symbol as key and token as value
@@ -3479,7 +3479,7 @@ async function handleInsufficientBalance(
     );
     elizaLogger.debug(
         traceId,
-        `[tokenSwap] [${moxieUserId}] [handleInsufficientBalance] [otherTokenSymbolsMap]: ${JSON.stringify(otherTokenSymbolsMap)}`
+        `[tokenSwap] [${senpiUserId}] [handleInsufficientBalance] [otherTokenSymbolsMap]: ${JSON.stringify(otherTokenSymbolsMap)}`
     );
 
     await callback?.({

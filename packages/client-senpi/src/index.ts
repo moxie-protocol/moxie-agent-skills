@@ -8,7 +8,7 @@ import {
     type IDatabaseAdapter,
 } from "@senpi-ai/core";
 import { validateBaseEconomyTokenBalance } from "./helpers.ts";
-import { createMoxieApiRouter } from "./moxieApis.ts";
+import { createSenpiApiRouter } from "./senpiApis.ts";
 
 export const messageHandlerTemplate =
     // {{goals}}
@@ -62,7 +62,7 @@ Note that {{agentName}} is capable of reading/seeing/hearing various forms of me
 # Instructions: Write the next message for {{agentName}}.
 ` + messageCompletionFooter;
 
-export class MoxieClient {
+export class SenpiClient {
     public app: express.Application;
     private agents: Map<string, AgentRuntime>; // container management
     private server: any; // Store server instance
@@ -70,7 +70,7 @@ export class MoxieClient {
     public db: IDatabaseAdapter;
 
     constructor(db: IDatabaseAdapter) {
-        elizaLogger.log("MoxieClient constructor");
+        elizaLogger.log("SenpiClient constructor");
         this.app = express();
         this.app.use(cors());
         this.agents = new Map();
@@ -79,8 +79,8 @@ export class MoxieClient {
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({ extended: true }));
 
-        const moxieApiRouter = createMoxieApiRouter(this.agents, this);
-        this.app.use(moxieApiRouter);
+        const senpiApiRouter = createSenpiApiRouter(this.agents, this);
+        this.app.use(senpiApiRouter);
     }
 
     // agent/src/index.ts:startAgent calls this

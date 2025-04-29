@@ -12,7 +12,7 @@
         "capabilities": ["Token prices", "Market caps", "Liquidity", "Holders"],
         "starterQuestions": [
             {
-                "label": "Show token details for $moxie",
+                "label": "Show token details for $usdc",
                 "value": "Show token details for $[USDC|0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913]"
             },
             {
@@ -205,17 +205,17 @@
         "settings": {},
         "capabilities": [
             "Swap any token on Base. 💡Pro Tip: use “$” to auto-complete token names",
-            "Swap any creator coin on Moxie. 💡Pro Tip: use “@” to auto-complete creator coin names",
+            "Swap any creator coin on Senpi. 💡Pro Tip: use “@” to auto-complete creator coin names",
             "Spend a % of your wallet to buy coins"
         ],
         "starterQuestions": [
             {
-                "label": "Buy me $25 worth of $moxie",
-                "value": "Buy me $25 worth of $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527]"
+                "label": "Buy me $25 worth of $usdc",
+                "value": "Buy me $25 worth of $[USDC|0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913]"
             },
             {
-                "label": "Swap 100 $degen for $moxie_ai",
-                "value": "Swap 100 $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed] for $[MOXIE_AI|0xda7e153bbe75902bd23496284fe0c4b90c9ace7b]"
+                "label": "Swap 100 $degen for $usdc",
+                "value": "Swap 100 $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed] for $[USDC|0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913]"
             },
             {
                 "label": "Use 40% of my $eth to buy $usdc and 20% to buy $degen",
@@ -256,7 +256,7 @@
         "displayName": "Portfolios",
         "version": "0.1.8+build.1",
         "author": null,
-        "description": "Enables your agent to fetch portfolio details for thousands of wallets indexed by Moxie",
+        "description": "Enables your agent to fetch portfolio details for thousands of wallets indexed by Senpi",
         "githubUrl": "https://github.com/senpi-ai/senpi-agent-skills/tree/main/packages/plugin-senpi-balance",
         "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-senpi-balance/images/logo.svg",
         "settings": {},

@@ -1,13 +1,13 @@
 import { Plugin } from "@senpi-ai/core";
-import getMoxiePortfolio from "./actions/getMoxiePortfolio";
-import getMoxieFanTokenPortfolio from "./actions/getMoxieFanTokenPortfolio";
+import getSenpiPortfolio from "./actions/getSenpiPortfolio";
+import getSenpiFanTokenPortfolio from "./actions/getSenpiFanTokenPortfolio";
 
-export const moxieBalancePlugin: Plugin = {
-    name: "Moxie Balance Plugin ",
+export const senpiBalancePlugin: Plugin = {
+    name: "Senpi Balance Plugin ",
     description: "Gives the user their balance, portfolio, positions, and more",
-    actions: [getMoxiePortfolio, getMoxieFanTokenPortfolio],
+    actions: [getSenpiPortfolio, getSenpiFanTokenPortfolio],
     evaluators: [],
     providers: [],
 };
 
-export default moxieBalancePlugin;
+export default senpiBalancePlugin;

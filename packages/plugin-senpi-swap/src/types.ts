@@ -164,7 +164,7 @@ export interface GetIndicativePriceResponse {
 
 export interface Context {
     traceId: string;
-    moxieUserId?: string;
+    senpiUserId?: string;
     runtime: IAgentRuntime;
     state: State;
     provider?: ethers.JsonRpcProvider;

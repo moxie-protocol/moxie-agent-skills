@@ -1,6 +1,6 @@
 import { CasinoChainId, Token, casinoChainById } from "@betswirl/sdk-core";
 
-export function formatTokenForMoxieTerminal(
+export function formatTokenForSenpiTerminal(
     chainId: CasinoChainId,
     token: Token
 ) {

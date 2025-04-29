@@ -1,9 +1,9 @@
 import type { Plugin } from "@senpi-ai/core";
 import { manageGroupsAction } from "./actions";
 
-const moxieGroupsPlugin: Plugin = {
-    name: "Moxie Groups Plugin",
-    description: "Manage groups of Moxie users",
+const senpiGroupsPlugin: Plugin = {
+    name: "Senpi Groups Plugin",
+    description: "Manage groups of Senpi users",
     actions: [manageGroupsAction],
     providers: [],
     evaluators: [],
@@ -11,4 +11,4 @@ const moxieGroupsPlugin: Plugin = {
     clients: [],
 };
 
-export default moxieGroupsPlugin;
+export default senpiGroupsPlugin;

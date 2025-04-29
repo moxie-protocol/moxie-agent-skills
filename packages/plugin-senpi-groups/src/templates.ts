@@ -126,7 +126,7 @@ You are tasked with creating a markdown table that displays group information ba
 {{userDetails}}
 </user_details>
 
-Your goal is to create a markdown table with the following columns: Group ID, Group Name, and Members. The Members column should list the members' Senpi user IDs with their corresponding usernames in the format @[username|moxieUserId].
+Your goal is to create a markdown table with the following columns: Group ID, Group Name, and Members. The Members column should list the members' Senpi user IDs with their corresponding usernames in the format @[username|senpiUserId].
 
 Instructions:
 
@@ -142,9 +142,9 @@ Instructions:
    - Group ID: Use the "id" field from the group information.
    - Group Name: Use the "name" field from the group information.
    - Members: For each member in the "members" array:
-     a. Get the Senpi user ID from the "moxieUserId" field.
+     a. Get the Senpi user ID from the "senpiUserId" field.
      b. Look up the corresponding username in the USER_DETAILS JSON.
-     c. Format as @[username|moxieUserId].
+     c. Format as @[username|senpiUserId].
      d. Separate multiple members with a space.
 
 4. Format the output:
@@ -154,7 +154,7 @@ Instructions:
 Before creating the final table, wrap your data extraction and processing steps inside <data_extraction> tags:
 
 a. List all groups extracted from GROUP_DETAILS, including their IDs and names.
-b. List all users extracted from USER_DETAILS, including their moxieUserIds and usernames.
+b. List all users extracted from USER_DETAILS, including their senpiUserIds and usernames.
 c. For each group, list its members and look up their usernames from the user list.
 
 This will help ensure accuracy in the final output. It's OK for this section to be quite long.

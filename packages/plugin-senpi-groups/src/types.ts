@@ -13,10 +13,10 @@ export type Group = {
     updatedAt: string;
     members: GroupMember[];
     status: Status;
-}
+};
 
 export interface GroupMember {
-    moxieUserId: string;
+    senpiUserId: string;
     createdAt: string;
     updatedAt: string;
     status: Status;
@@ -24,7 +24,7 @@ export interface GroupMember {
 
 export enum Status {
     ACTIVE = "ACTIVE",
-    INACTIVE = "INACTIVE"
+    INACTIVE = "INACTIVE",
 }
 
 export interface CreateGroupInput {

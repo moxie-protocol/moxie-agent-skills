@@ -12,11 +12,11 @@ import {
     stringToUuid,
 } from "@senpi-ai/core";
 import {
-    MoxieUser,
-    moxieUserService,
+    SenpiUser,
+    senpiUserService,
     getTokenDetails,
     TokenDetails,
-    MoxieAgentDBAdapter,
+    SenpiAgentDBAdapter,
 } from "@senpi-ai/senpi-agent-lib";
 import {
     extractTokenAddressTemplate,
@@ -79,20 +79,20 @@ export const topTokenHoldersAction: Action = {
             actors: state?.actorsData ?? [],
             messages: state?.recentMessagesData,
         });
-        const moxieUserId = (state.moxieUserInfo as MoxieUser)?.id;
+        const senpiUserId = (state.senpiUserInfo as SenpiUser)?.id;
 
         // Check and handle free trial usage
         await (
-            runtime.databaseAdapter as MoxieAgentDBAdapter
-        ).getFreeTrailBalance(moxieUserId, stringToUuid("WHALE_HUNTER"));
-        // const { remaining_free_queries: new_remaining_free_queries } = await (runtime.databaseAdapter as MoxieAgentDBAdapter).deductFreeTrail(moxieUserId, stringToUuid("WHALE_HUNTER"));
+            runtime.databaseAdapter as SenpiAgentDBAdapter
+        ).getFreeTrailBalance(senpiUserId, stringToUuid("WHALE_HUNTER"));
+        // const { remaining_free_queries: new_remaining_free_queries } = await (runtime.databaseAdapter as SenpiAgentDBAdapter).deductFreeTrail(senpiUserId, stringToUuid("WHALE_HUNTER"));
 
         // if (new_remaining_free_queries > 0) {
-        //     elizaLogger.debug(`[topTokenHoldersAction] [${moxieUserId}] Remaining free queries: ${new_remaining_free_queries}`);
+        //     elizaLogger.debug(`[topTokenHoldersAction] [${senpiUserId}] Remaining free queries: ${new_remaining_free_queries}`);
         // } else {
         //     // Verify base economy token ownership if no free queries remain
         //     try {
-        //         const hasSufficientBalance = await verifyUserBaseEconomyTokenOwnership(moxieUserId, runtime);
+        //         const hasSufficientBalance = await verifyUserBaseEconomyTokenOwnership(senpiUserId, runtime);
         //         if (!hasSufficientBalance) {
         //             await callback({ text: "You need to hold at least 1 base economy token to use this action.", action: "TOP_TOKEN_HOLDERS" });
         //             return false;
@@ -113,7 +113,7 @@ export const topTokenHoldersAction: Action = {
             state = (await runtime.composeState(message, {
                 conversation,
                 latestMessage: message.content.text,
-                userMoxieId: moxieUserId,
+                userSenpiId: senpiUserId,
             })) as State;
 
             const context = composeContext({
@@ -201,21 +201,21 @@ export const topTokenHoldersAction: Action = {
         // Calculate USD values and enrich holder data
         const priceUSD = Number(tokenDetails[0].priceUSD);
         elizaLogger.debug(
-            `[topTokenHoldersAction] [${moxieUserId}] Price USD: ${priceUSD}`
+            `[topTokenHoldersAction] [${senpiUserId}] Price USD: ${priceUSD}`
         );
 
-        const moxieUserIds = topTokenHolders.map(
-            (holder) => holder.moxie_user_id
+        const senpiUserIds = topTokenHolders.map(
+            (holder) => holder.senpi_user_id
         );
-        const moxieUserProfiles =
-            await moxieUserService.getUserByMoxieIdMultipleMinimal(
-                moxieUserIds
+        const senpiUserProfiles =
+            await senpiUserService.getUserBySenpiIdMultipleMinimal(
+                senpiUserIds
             );
 
         const enrichedTokenHolders = topTokenHolders.map((holder) => {
-            const userProfile = moxieUserProfiles.get(holder.moxie_user_id);
-            const username = userProfile?.userName || holder.moxie_user_id;
-            const profileLink = `@[${username}|${holder.moxie_user_id}]`;
+            const userProfile = senpiUserProfiles.get(holder.senpi_user_id);
+            const username = userProfile?.userName || holder.senpi_user_id;
+            const profileLink = `@[${username}|${holder.senpi_user_id}]`;
             const totalBalanceInUsd = holder.total_balance * priceUSD;
             return {
                 ...holder,
@@ -227,7 +227,7 @@ export const topTokenHoldersAction: Action = {
         topTokenHolders = enrichedTokenHolders;
 
         elizaLogger.debug(
-            `[topTokenHoldersAction] [${moxieUserId}] Top token holders: ${JSON.stringify(topTokenHolders)}`
+            `[topTokenHoldersAction] [${senpiUserId}] Top token holders: ${JSON.stringify(topTokenHolders)}`
         );
 
         // Generate and stream summary

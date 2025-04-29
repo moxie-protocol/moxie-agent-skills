@@ -7,10 +7,10 @@ import {
     Hex,
 } from "@privy-io/server-auth";
 import { ethers } from "ethers";
-import { moxieUserService } from ".";
+import { senpiUserService } from ".";
 import { TransactionDetails } from "./services/types";
 
-export class MoxieWalletClient {
+export class SenpiWalletClient {
     address: string;
     // make this private to avoid usage on local development
     private wallet: ethers.Wallet;
@@ -38,7 +38,7 @@ export class MoxieWalletClient {
      */
     async signMessage(
         message: string
-    ): Promise<MoxieWalletSignMessageResponseType> {
+    ): Promise<SenpiWalletSignMessageResponseType> {
         //Add validation that bearerToken or private key is present
         if (!validateRequest(this.bearerToken)) {
             throw new Error("Bearer token or private key is required");
@@ -51,7 +51,7 @@ export class MoxieWalletClient {
             };
         }
 
-        return await moxieUserService.SignMessage(
+        return await senpiUserService.SignMessage(
             { message, address: this.address },
             this.bearerToken
         );
@@ -70,7 +70,7 @@ export class MoxieWalletClient {
         types: Record<string, any>,
         message: Record<string, any>,
         primaryType: string
-    ): Promise<MoxieWalletSignTypedDataResponseType> {
+    ): Promise<SenpiWalletSignTypedDataResponseType> {
         if (!validateRequest(this.bearerToken)) {
             throw new Error("Bearer token or private key is required");
         }
@@ -87,7 +87,7 @@ export class MoxieWalletClient {
                 encoding: "utf8",
             };
         }
-        return await moxieUserService.SignTypedData(
+        return await senpiUserService.SignTypedData(
             {
                 domain: domain,
                 types: types,
@@ -117,7 +117,7 @@ export class MoxieWalletClient {
     async sendTransaction(
         chainId: string,
         transactionDetails: TransactionDetails
-    ): Promise<MoxieWalletSendTransactionResponseType> {
+    ): Promise<SenpiWalletSendTransactionResponseType> {
         if (!validateRequest(this.bearerToken)) {
             throw new Error("Bearer token or private key is required");
         }
@@ -136,7 +136,7 @@ export class MoxieWalletClient {
             };
         }
 
-        let response = await moxieUserService.sendTransaction(
+        let response = await senpiUserService.sendTransaction(
             {
                 chainId: Number(chainId),
                 address: this.address,
@@ -177,13 +177,13 @@ function validateRequest(bearerToken: string): boolean {
     return Boolean(bearerToken);
 }
 
-export type MoxieWalletSignMessageResponseType =
+export type SenpiWalletSignMessageResponseType =
     EthereumSignMessageResponseType;
-export type MoxieWalletSignTypedDataResponseType =
+export type SenpiWalletSignTypedDataResponseType =
     EthereumSignTypedDataResponseType;
-export type MoxieWalletSendTransactionResponseType =
+export type SenpiWalletSendTransactionResponseType =
     EthereumSendTransactionResponseType;
-export type MoxieWalletSendTransactionInputType =
+export type SenpiWalletSendTransactionInputType =
     EthereumSendTransactionInputType;
-export type MoxieClientWallet = Wallet;
-export type MoxieHex = Hex;
+export type SenpiClientWalet = Wallet;
+export type SenpiHex = Hex;

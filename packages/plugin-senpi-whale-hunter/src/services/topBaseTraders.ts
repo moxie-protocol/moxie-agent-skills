@@ -1,5 +1,5 @@
 import { elizaLogger } from "@senpi-ai/core";
-import { MOXIE_BACKEND_INTERNAL_URL } from "../config";
+import { SENPI_BACKEND_INTERNAL_URL } from "../config";
 
 interface Trader {
     user_id: string;
@@ -47,8 +47,8 @@ interface TopTraderOfAToken {
 
 export async function getTopBaseTraders(): Promise<Trader[]> {
     try {
-        if (!MOXIE_BACKEND_INTERNAL_URL) {
-            throw new Error("MOXIE_BACKEND_INTERNAL_URL is not set");
+        if (!SENPI_BACKEND_INTERNAL_URL) {
+            throw new Error("SENPI_BACKEND_INTERNAL_URL is not set");
         }
 
         const variables = {
@@ -62,7 +62,7 @@ export async function getTopBaseTraders(): Promise<Trader[]> {
             },
         };
 
-        const response = await fetch(`${MOXIE_BACKEND_INTERNAL_URL}`, {
+        const response = await fetch(`${SENPI_BACKEND_INTERNAL_URL}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -108,8 +108,8 @@ export async function getTopBaseTraderOfAToken(
     token: string
 ): Promise<TopTraderOfAToken[]> {
     try {
-        if (!MOXIE_BACKEND_INTERNAL_URL) {
-            throw new Error("MOXIE_BACKEND_INTERNAL_URL is not set");
+        if (!SENPI_BACKEND_INTERNAL_URL) {
+            throw new Error("SENPI_BACKEND_INTERNAL_URL is not set");
         }
 
         const variables = {
@@ -129,7 +129,7 @@ export async function getTopBaseTraderOfAToken(
             },
         };
 
-        const response = await fetch(`${MOXIE_BACKEND_INTERNAL_URL}`, {
+        const response = await fetch(`${SENPI_BACKEND_INTERNAL_URL}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

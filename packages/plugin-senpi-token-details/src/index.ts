@@ -1,7 +1,7 @@
 import { Plugin } from "@senpi-ai/core";
 import getTokenDetails from "./actions/getTokenDetails";
-export const moxieTokenDetailsPlugin: Plugin = {
-    name: "Moxie Token Details Plugin ",
+export const senpiTokenDetailsPlugin: Plugin = {
+    name: "Senpi Token Details Plugin ",
     description:
         "Fetches Token details (ERC20 on base) and provides a summary about them",
     actions: [getTokenDetails],
@@ -9,4 +9,4 @@ export const moxieTokenDetailsPlugin: Plugin = {
     providers: [],
 };
 
-export default moxieTokenDetailsPlugin;
+export default senpiTokenDetailsPlugin;

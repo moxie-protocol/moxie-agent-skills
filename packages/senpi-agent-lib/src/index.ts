@@ -1,9 +1,9 @@
-import * as moxieUserService from "./services/moxieUserService";
+import * as senpiUserService from "./services/senpiUserService";
 import * as ftaService from "./services/fta";
 import * as portfolioService from "./services/portfolio";
 import * as walletService from "./wallet";
 
-export { moxieUserService };
+export { senpiUserService };
 
 export { ftaService };
 
@@ -13,21 +13,24 @@ export { portfolioService };
 
 export { RedisClient } from "./services/RedisClient";
 
-export type { MoxiePortfolio } from "./services/portfolio";
-export { getMoxiePortfolioInfoByCreatorTokenDetails } from "./services/portfolioService";
+export type { SenpiPortfolio } from "./services/portfolio";
+export { getSenpiPortfolioInfoByCreatorTokenDetails } from "./services/portfolioService";
 
-export { MoxieAgentDBAdapter } from "./services/MoxieAgentDBAdapter";
+export { SenpiAgentDBAdapter } from "./services/SenpiAgentDBAdapter";
 
-export { getTokenDetails, getTrendingTokenDetails } from "./services/tokenDetails";
+export {
+    getTokenDetails,
+    getTrendingTokenDetails,
+} from "./services/tokenDetails";
 
 export { getERC20TokenSymbol } from "./services/tokenSymbol";
 
 export type {
     TwitterMetadata,
     FarcasterMetadata,
-    MoxieIdentity,
-    MoxieWallet,
-    MoxieUser,
+    SenpiIdentity,
+    SenpiWallet,
+    SenpiUser,
     MeQueryResponse,
     GetUserResponse,
     GetWalletDetailsOutput,
@@ -46,18 +49,18 @@ export type {
 } from "./services/types";
 
 export {
-    type MoxieWalletSignMessageResponseType,
-    type MoxieWalletSignTypedDataResponseType,
-    type MoxieWalletSendTransactionResponseType,
-    type MoxieWalletSendTransactionInputType,
-    type MoxieHex,
-    type MoxieClientWallet,
-    MoxieWalletClient,
+    type SenpiWalletSignMessageResponseType,
+    type SenpiWalletSignTypedDataResponseType,
+    type SenpiWalletSendTransactionResponseType,
+    type SenpiWalletSendTransactionInputType,
+    type SenpiHex,
+    type SenpiClientWalet,
+    SenpiWalletClient,
 } from "./wallet";
 
 export {
-    getMoxiePortfolioInfo,
-    type MoxiePortfolioInfo,
+    getSenpiPortfolioInfo,
+    type SenpiPortfolioInfo,
 } from "./services/portfolioService";
 
 export {
@@ -71,11 +74,15 @@ export {
 } from "./services/zapperService";
 
 export {
-    validateMoxieUserTokens,
+    validateSenpiUserTokens,
     type PluginToken,
     fetchPluginTokenGate,
 } from "./services/balanceValidator";
 
 export { deleteLimitOrders } from "./services/cowService";
 
-export { formatUserMention, formatGroupMention, formatTokenMention } from "./utils";
+export {
+    formatUserMention,
+    formatGroupMention,
+    formatTokenMention,
+} from "./utils";

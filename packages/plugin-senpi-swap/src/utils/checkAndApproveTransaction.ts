@@ -1,8 +1,8 @@
 import { elizaLogger, HandlerCallback } from "@senpi-ai/core";
 import {
-    MoxieWalletClient,
-    MoxieWalletSendTransactionInputType,
-} from "@elizaos/moxie-lib";
+    SenpiWalletClient,
+    SenpiWalletSendTransactionInputType,
+} from "@elizaos/senpi-lib";
 import { ethers } from "ethers";
 import { encodeFunctionData } from "viem";
 import {
@@ -67,24 +67,24 @@ const ERC20_ABI = [
 
 /**
  * Checks the allowance of a token and approves spending if necessary
- * @param moxieUserId The ID of the Moxie user making the purchase
+ * @param senpiUserId The ID of the Senpi user making the purchase
  * @param walletAddress The address of the wallet to check allowance for
  * @param tokenAddress The address of the token to check allowance for
  * @param spenderAddress The address of the spender to check allowance for
  * @param amountInWEI The amount of tokens to check allowance for
  * @param provider The provider to use for the transaction
- * @param walletClient The Moxie wallet client to use for the transaction
+ * @param walletClient The Senpi wallet client to use for the transaction
  * @param callback The callback to use for the transaction
  */
 export async function checkAllowanceAndApproveSpendRequest(
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     walletAddress: string,
     tokenAddress: string,
     spenderAddress: string,
     amountInWEI: bigint,
     provider: ethers.Provider,
-    walletClient: MoxieWalletClient,
+    walletClient: SenpiWalletClient,
     callback: HandlerCallback
 ) {
     // Add input validation
@@ -103,7 +103,7 @@ export async function checkAllowanceAndApproveSpendRequest(
 
     elizaLogger.debug(
         traceId,
-        `[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] called, walletAddress: ${walletAddress}, tokenAddress: ${tokenAddress}, spenderAddress: ${spenderAddress}, tokenAmount: ${amountInWEI}`
+        `[${senpiUserId}] [checkAllowanceAndApproveSpendRequest] called, walletAddress: ${walletAddress}, tokenAddress: ${tokenAddress}, spenderAddress: ${spenderAddress}, tokenAmount: ${amountInWEI}`
     );
     try {
         // First, create contract instance to check allowance
@@ -120,21 +120,21 @@ export async function checkAllowanceAndApproveSpendRequest(
         );
         elizaLogger.debug(
             traceId,
-            `[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] current ${spenderAddress} allowance for wallet address: ${walletAddress}, ${currentAllowance}`
+            `[${senpiUserId}] [checkAllowanceAndApproveSpendRequest] current ${spenderAddress} allowance for wallet address: ${walletAddress}, ${currentAllowance}`
         );
 
         // If allowance is already sufficient, return early
         if (currentAllowance && currentAllowance >= amountInWEI) {
             elizaLogger.debug(
                 traceId,
-                `[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] Sufficient allowance already exists. hence no approval is required`
+                `[${senpiUserId}] [checkAllowanceAndApproveSpendRequest] Sufficient allowance already exists. hence no approval is required`
             );
             return true;
         }
 
         elizaLogger.debug(
             traceId,
-            `[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] Sufficient allowance not exists. hence proceeeding with approval is required`
+            `[${senpiUserId}] [checkAllowanceAndApproveSpendRequest] Sufficient allowance not exists. hence proceeeding with approval is required`
         );
 
         // Get gas estimate for approval transaction
@@ -148,7 +148,7 @@ export async function checkAllowanceAndApproveSpendRequest(
         const feeData = await provider.getFeeData();
         elizaLogger.debug(
             traceId,
-            `[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] feeData: ${JSON.stringify(feeData)}`
+            `[${senpiUserId}] [checkAllowanceAndApproveSpendRequest] feeData: ${JSON.stringify(feeData)}`
         );
 
         // Add 20% buffer to gas fees
@@ -157,7 +157,7 @@ export async function checkAllowanceAndApproveSpendRequest(
         const maxPriorityFeePerGas =
             (feeData.maxPriorityFeePerGas! * BigInt(120)) / BigInt(100);
 
-        const approveRequestInput: MoxieWalletSendTransactionInputType = {
+        const approveRequestInput: SenpiWalletSendTransactionInputType = {
             address: walletAddress,
             chainType: "ethereum",
             caip2: "eip155:" + (process.env.CHAIN_ID || "8453"),
@@ -173,7 +173,7 @@ export async function checkAllowanceAndApproveSpendRequest(
 
         elizaLogger.debug(
             traceId,
-            `[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] approve request: ${JSON.stringify(
+            `[${senpiUserId}] [checkAllowanceAndApproveSpendRequest] approve request: ${JSON.stringify(
                 approveRequestInput,
                 (key, value) =>
                     typeof value === "bigint" ? value.toString() : value
@@ -191,7 +191,7 @@ export async function checkAllowanceAndApproveSpendRequest(
         );
         elizaLogger.debug(
             traceId,
-            `[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] approval txn_hash: ${JSON.stringify(approveResponse)}`
+            `[${senpiUserId}] [checkAllowanceAndApproveSpendRequest] approval txn_hash: ${JSON.stringify(approveResponse)}`
         );
         const approvalTxHash = approveResponse.hash;
         await callback(approvalTransactionSubmitted(approvalTxHash));
@@ -213,18 +213,18 @@ export async function checkAllowanceAndApproveSpendRequest(
             }
             elizaLogger.debug(
                 traceId,
-                `[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] approval tx receipt: ${JSON.stringify(receipt)}`
+                `[${senpiUserId}] [checkAllowanceAndApproveSpendRequest] approval tx receipt: ${JSON.stringify(receipt)}`
             );
             if (receipt.status === 1) {
                 elizaLogger.debug(
                     traceId,
-                    `[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] [SUCCESS] Approval transaction successful: ${approvalTxHash}`
+                    `[${senpiUserId}] [checkAllowanceAndApproveSpendRequest] [SUCCESS] Approval transaction successful: ${approvalTxHash}`
                 );
                 await callback(approvalTransactionConfirmed(approvalTxHash));
             } else {
                 elizaLogger.error(
                     traceId,
-                    `[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] [ERROR] Approval transaction failed: ${approvalTxHash}`
+                    `[${senpiUserId}] [checkAllowanceAndApproveSpendRequest] [ERROR] Approval transaction failed: ${approvalTxHash}`
                 );
                 await callback(approvalTransactionFailed(approvalTxHash));
                 throw new Error(`Approval transaction failed`);
@@ -232,7 +232,7 @@ export async function checkAllowanceAndApproveSpendRequest(
         } else {
             elizaLogger.error(
                 traceId,
-                `[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] [ERROR] No transaction hash returned for approval`
+                `[${senpiUserId}] [checkAllowanceAndApproveSpendRequest] [ERROR] No transaction hash returned for approval`
             );
             throw new Error(`Approval transaction not initiated`);
         }
@@ -240,7 +240,7 @@ export async function checkAllowanceAndApproveSpendRequest(
     } catch (error) {
         elizaLogger.error(
             traceId,
-            `[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] [ERROR] error in checkAllowanceAndApproveSpendRequest, ${JSON.stringify(error)}`
+            `[${senpiUserId}] [checkAllowanceAndApproveSpendRequest] [ERROR] error in checkAllowanceAndApproveSpendRequest, ${JSON.stringify(error)}`
         );
         throw error;
     }

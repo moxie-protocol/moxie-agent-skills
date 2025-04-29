@@ -1,4 +1,4 @@
-export interface MoxieScoreLedger {
+export interface SenpiScoreLedger {
     id: string;
     userId: string;
     groupId: string;
@@ -14,35 +14,34 @@ export interface MoxieScoreLedger {
     updatedBy?: string;
     createdBy?: string;
     deletedBy?: string;
-  };
+}
 
-  export interface MoxieScore {
+export interface SenpiScore {
     userId: string;
     value: number; // Decimal is represented as number in TypeScript
     createdAt: Date;
     updatedAt: Date;
-  };
-
+}
 
 export interface ApiResponse<T> {
     success: boolean;
     message: string;
     data: T | null;
     error?: {
-      code: string;
-      details: string;
-      path?: string;
+        code: string;
+        details: string;
+        path?: string;
     };
     metadata?: {
-      traceId: string;
+        traceId: string;
     };
-  }
+}
 
 export interface UserAgentInfo {
-    userId: string
-    agentExists?: boolean
-    agentId?: string
-    roomId?: string
+    userId: string;
+    agentExists?: boolean;
+    agentId?: string;
+    roomId?: string;
 }
 
 export interface ValidationError {
@@ -56,4 +55,4 @@ export type UserAgentInteraction = {
     agentId: string;
     createdAt: number;
     text: string;
-}
+};

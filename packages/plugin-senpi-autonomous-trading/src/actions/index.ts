@@ -12,9 +12,9 @@ import {
     generateObjectDeprecated,
 } from "@senpi-ai/core";
 import {
-    MoxieClientWallet,
-    MoxieUser,
-    MoxieWalletClient,
+    SenpiClientWalet,
+    SenpiUser,
+    SenpiWalletClient,
     formatUserMention,
 } from "@senpi-ai/senpi-agent-lib";
 import {
@@ -28,14 +28,14 @@ import {
     UserTradeParams,
     agentWalletNotFound,
     delegateAccessNotFound,
-    moxieWalletClientNotFound,
+    SenpiWalletClientNotFound,
     checkUserCommunicationPreferences,
     Condition,
 } from "../utils/utility";
 import { autonomousTradingTemplate } from "../templates";
 
 export interface AutonomousTradingRuleParams {
-    moxieIds?: string[];
+    senpiIds?: string[];
     groupId?: string;
     timeDurationInSec: number;
     amountInUSD: number;
@@ -84,22 +84,22 @@ export const autonomousTradingAction: Action = {
         callback: HandlerCallback
     ) => {
         const traceId = message.id;
-        const moxieUserInfo = state.moxieUserInfo as MoxieUser;
-        const moxieUserId = moxieUserInfo.id;
+        const senpiUserInfo = state.senpiUserInfo as SenpiUser;
+        const senpiUserId = senpiUserInfo.id;
 
         try {
             elizaLogger.debug(
                 traceId,
-                `[AUTONOMOUS_TRADING] [${moxieUserId}] [AUTONOMOUS_TRADING] Starting AUTONOMOUS_TRADING handler with user message: ${JSON.stringify(message)}`
+                `[AUTONOMOUS_TRADING] [${senpiUserId}] [AUTONOMOUS_TRADING] Starting AUTONOMOUS_TRADING handler with user message: ${JSON.stringify(message)}`
             );
 
-            // read moxieUserInfo from state
-            const agentWallet = state.agentWallet as MoxieClientWallet;
+            // read senpiUserInfo from state
+            const agentWallet = state.agentWallet as SenpiClientWalet;
 
             if (!agentWallet) {
                 elizaLogger.error(
                     traceId,
-                    `[AUTONOMOUS_TRADING] [${moxieUserId}] [AUTONOMOUS_TRADING] agentWallet not found`
+                    `[AUTONOMOUS_TRADING] [${senpiUserId}] [AUTONOMOUS_TRADING] agentWallet not found`
                 );
                 await callback?.(agentWalletNotFound);
                 return true;
@@ -108,27 +108,27 @@ export const autonomousTradingAction: Action = {
             if (!agentWallet.delegated) {
                 elizaLogger.error(
                     traceId,
-                    `[AUTONOMOUS_TRADING] [${moxieUserId}] [AUTONOMOUS_TRADING] agentWallet is not delegated`
+                    `[AUTONOMOUS_TRADING] [${senpiUserId}] [AUTONOMOUS_TRADING] agentWallet is not delegated`
                 );
                 await callback?.(delegateAccessNotFound);
                 return true;
             }
 
-            const walletClient = state.moxieWalletClient as MoxieWalletClient;
+            const walletClient = state.SenpiWalletClient as SenpiWalletClient;
             if (!walletClient) {
                 elizaLogger.error(
                     traceId,
-                    `[AUTONOMOUS_TRADING] [${moxieUserId}] [AUTONOMOUS_TRADING] walletClient not found`
+                    `[AUTONOMOUS_TRADING] [${senpiUserId}] [AUTONOMOUS_TRADING] walletClient not found`
                 );
-                await callback?.(moxieWalletClientNotFound);
+                await callback?.(SenpiWalletClientNotFound);
                 return true;
             }
 
             const communicationPreference =
-                await checkUserCommunicationPreferences(traceId, moxieUserId);
+                await checkUserCommunicationPreferences(traceId, senpiUserId);
             elizaLogger.debug(
                 traceId,
-                `[AUTONOMOUS_TRADING] [${moxieUserId}] [AUTONOMOUS_TRADING] [checkUserCommunicationPreferences] communicationPreference: ${communicationPreference}`
+                `[AUTONOMOUS_TRADING] [${senpiUserId}] [AUTONOMOUS_TRADING] [checkUserCommunicationPreferences] communicationPreference: ${communicationPreference}`
             );
 
             // Compose autonomous trading context
@@ -155,7 +155,7 @@ export const autonomousTradingAction: Action = {
             if (!autonomousTradingResponse.success) {
                 elizaLogger.warn(
                     traceId,
-                    `[autonomous trading] [${moxieUserId}] [AUTONOMOUS_TRADING] [ADD_RULE] error occured while performing add rule operation: ${JSON.stringify(autonomousTradingResponse.error)}`
+                    `[autonomous trading] [${senpiUserId}] [AUTONOMOUS_TRADING] [ADD_RULE] error occured while performing add rule operation: ${JSON.stringify(autonomousTradingResponse.error)}`
                 );
                 callback?.({
                     text: autonomousTradingResponse.error.prompt_message,
@@ -229,7 +229,7 @@ export const autonomousTradingAction: Action = {
                 };
             } else {
                 ruleTriggers = "USER";
-                if (params.sellTriggerCount > params.moxieIds.length) {
+                if (params.sellTriggerCount > params.senpiIds.length) {
                     callback?.({
                         text: `The number of users you are tracking is less than the number of users you are setting the sell trigger count to. Please try again with a lower sell trigger count.`,
                         action: "AUTONOMOUS_TRADING",
@@ -237,7 +237,7 @@ export const autonomousTradingAction: Action = {
                     return true;
                 }
                 userTradeParams = {
-                    moxieUsers: params.moxieIds,
+                    senpiUsers: params.senpiIds,
                     minPurchaseAmount: {
                         valueType: "USD",
                         amount: params.minPurchaseAmount || 0,
@@ -281,7 +281,7 @@ export const autonomousTradingAction: Action = {
             } catch (error) {
                 elizaLogger.error(
                     traceId,
-                    `[autonomous trading] [${moxieUserId}] [AUTONOMOUS_TRADING] [ADD_RULE] error creating trading rule: ${error.message}`
+                    `[autonomous trading] [${senpiUserId}] [AUTONOMOUS_TRADING] [ADD_RULE] error creating trading rule: ${error.message}`
                 );
                 callback?.({
                     text: getErrorMessageFromCode(error),
@@ -295,7 +295,7 @@ export const autonomousTradingAction: Action = {
             });
             elizaLogger.error(
                 traceId,
-                `[[autonomous trading]] [${moxieUserId}] [AUTONOMOUS_TRADING] [ADD_RULE] error occured while performing add rule operation: ${JSON.stringify(error)}`
+                `[[autonomous trading]] [${senpiUserId}] [AUTONOMOUS_TRADING] [ADD_RULE] error occured while performing add rule operation: ${JSON.stringify(error)}`
             );
         }
 
@@ -334,7 +334,7 @@ export const getAutonomousTradingRuleDetailAction: Action = {
         _options: { [key: string]: unknown },
         callback: HandlerCallback
     ) => {
-        const user = state.moxieUserInfo as MoxieUser;
+        const user = state.senpiUserInfo as SenpiUser;
 
         const response = getAutonomousTradingRuleDetails(
             formatUserMention(user.id, user.userName)

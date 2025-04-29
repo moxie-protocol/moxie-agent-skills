@@ -1,9 +1,9 @@
 import { elizaLogger } from "@senpi-ai/core";
 import {
-    MoxieUser,
+    SenpiUser,
     GetUserResponse,
     MeQueryResponse,
-    MoxieIdentity,
+    SenpiIdentity,
     SignMessageResponse,
     SignMessageInput,
     SignTransactionInput,
@@ -17,14 +17,14 @@ import {
     ErrorDetails,
     GetUserInfoBatchOutput,
     GetUserInfoMinimalResponse,
-    MoxieUserMinimal,
+    SenpiUserMinimal,
     PublishPostInput,
     PublishPostResponse,
 } from "./types";
 
-export async function getUserByMoxieId(
+export async function getUserBySenpiId(
     userId: string
-): Promise<MoxieUser | undefined> {
+): Promise<SenpiUser | undefined> {
     try {
         const query = `
             query GetUser($userId: String!, $vestingContractRequired: Boolean!) {
@@ -60,7 +60,7 @@ export async function getUserByMoxieId(
             }
         `;
 
-        const response = await fetch(process.env.MOXIE_API_URL_INTERNAL, {
+        const response = await fetch(process.env.SENPI_API_URL_INTERNAL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -74,20 +74,20 @@ export async function getUserByMoxieId(
         const { data } = (await response.json()) as GetUserResponse;
         return data.GetUser;
     } catch (error) {
-        elizaLogger.error("Error in getUserByMoxieId:", error);
+        elizaLogger.error("Error in getUserBySenpiId:", error);
         return undefined;
     }
 }
 
-export async function getUserByMoxieIdMultiple(
+export async function getUserBySenpiIdMultiple(
     userIds: string[]
-): Promise<Map<string, MoxieUser>> {
+): Promise<Map<string, SenpiUser>> {
     try {
         const results = await Promise.all(
-            userIds.map((userId) => getUserByMoxieId(userId))
+            userIds.map((userId) => getUserBySenpiId(userId))
         );
 
-        const userIdToTUser = new Map<string, MoxieUser>();
+        const userIdToTUser = new Map<string, SenpiUser>();
 
         userIds.forEach((userId, index) => {
             const user = results[index];
@@ -101,12 +101,12 @@ export async function getUserByMoxieIdMultiple(
 
         return userIdToTUser;
     } catch (error) {
-        elizaLogger.error("Error in getUserByMoxieIdMultiple:", error);
+        elizaLogger.error("Error in getUserBySenpiIdMultiple:", error);
         return new Map();
     }
 }
 
-export async function getUserByMoxieIdMultipleTokenGate(
+export async function getUserBySenpiIdMultipleTokenGate(
     userIds: string[],
     authorizationHeader: string,
     pluginId: string
@@ -125,7 +125,7 @@ export async function getUserByMoxieIdMultipleTokenGate(
                         requestedUserName
                         requestedId
                         requesterId
-                        requiredMoxieAmountInUSD
+                        requiredSenpiAmountInUSD
                     }
                     user {
                         id
@@ -166,7 +166,7 @@ export async function getUserByMoxieIdMultipleTokenGate(
         while (retryCount < maxRetries) {
             try {
                 const response = await fetch(
-                    process.env.MOXIE_API_URL_INTERNAL,
+                    process.env.SENPI_API_URL_INTERNAL,
                     {
                         method: "POST",
                         headers: {
@@ -201,7 +201,7 @@ export async function getUserByMoxieIdMultipleTokenGate(
             } catch (error) {
                 retryCount++;
                 elizaLogger.error(
-                    `Retry ${retryCount}: Error in getUserByMoxieIdMultipleTokenGate:`,
+                    `Retry ${retryCount}: Error in getUserBySenpiIdMultipleTokenGate:`,
                     error
                 );
                 if (retryCount === maxRetries) throw error;
@@ -221,7 +221,7 @@ export async function getUserByMoxieIdMultipleTokenGate(
         return { users: [], freeTrialLimit: 0, remainingFreeTrialCount: 0 };
     } catch (error) {
         elizaLogger.error(
-            "Error in getUserByMoxieIdMultipleTokenGate:",
+            "Error in getUserBySenpiIdMultipleTokenGate:",
             error instanceof Error ? error.stack : error
         );
         throw error;
@@ -234,7 +234,7 @@ export interface SocialProfile {
     farcasterUserId?: string;
 }
 
-export async function getSocialProfilesByMoxieIdMultiple(
+export async function getSocialProfilesBySenpiIdMultiple(
     userIds: string[],
     bearerToken: string,
     pluginId: string
@@ -243,7 +243,7 @@ export async function getSocialProfilesByMoxieIdMultiple(
     const errorDetails = new Map<string, ErrorDetails>();
 
     try {
-        const results = await getUserByMoxieIdMultipleTokenGate(
+        const results = await getUserBySenpiIdMultipleTokenGate(
             userIds,
             bearerToken,
             pluginId
@@ -310,7 +310,7 @@ export async function getSocialProfilesByMoxieIdMultiple(
         };
     } catch (error) {
         elizaLogger.error(
-            "Error in getTwitteruserNameByMoxieIdMultiple:",
+            "Error in getTwitteruserNameBySenpiIdMultiple:",
             error
         );
     }
@@ -318,7 +318,7 @@ export async function getSocialProfilesByMoxieIdMultiple(
 
 export async function getUserByPrivyBearerToken(
     bearerToken: string
-): Promise<MoxieUser> {
+): Promise<SenpiUser> {
     const query = `
         query Me {
             Me {
@@ -329,8 +329,8 @@ export async function getUserByPrivyBearerToken(
                 profileImageUrl
                 referralCode
                 referrerId
-                moxieScore
-                moxieRank
+                senpiScore
+                senpiRank
                 totalUsers
                 primaryWalletId
                 communicationPreference
@@ -361,7 +361,7 @@ export async function getUserByPrivyBearerToken(
     `;
 
     try {
-        const response = await fetch(process.env.MOXIE_API_URL, {
+        const response = await fetch(process.env.SENPI_API_URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -416,7 +416,7 @@ query GetWalletDetails {
 
     while (retryCount < maxRetries) {
         try {
-            const response = await fetch(process.env.MOXIE_API_URL, {
+            const response = await fetch(process.env.SENPI_API_URL, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -509,7 +509,7 @@ export async function SignMessage(
 
     while (retryCount < maxRetries) {
         try {
-            const response = await fetch(process.env.MOXIE_API_URL, {
+            const response = await fetch(process.env.SENPI_API_URL, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -601,7 +601,7 @@ export async function SignTransaction(
 
     while (retryCount < maxRetries) {
         try {
-            const response = await fetch(process.env.MOXIE_API_URL, {
+            const response = await fetch(process.env.SENPI_API_URL, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -689,7 +689,7 @@ export async function SignTypedData(
 
     while (retryCount < maxRetries) {
         try {
-            const response = await fetch(process.env.MOXIE_API_URL, {
+            const response = await fetch(process.env.SENPI_API_URL, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -779,7 +779,7 @@ export async function sendTransaction(
 
     while (retryCount < maxRetries) {
         try {
-            const response = await fetch(process.env.MOXIE_API_URL, {
+            const response = await fetch(process.env.SENPI_API_URL, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -850,9 +850,9 @@ export async function sendTransaction(
     throw new Error("Failed to send transaction after maximum retries");
 }
 
-export async function getUserByMoxieIdMultipleMinimal(
+export async function getUserBySenpiIdMultipleMinimal(
     userIds: string[]
-): Promise<Map<string, MoxieUserMinimal>> {
+): Promise<Map<string, SenpiUserMinimal>> {
     try {
         const query = `
             query GetUserInfoMinimal($userIds:[String!]!) {
@@ -867,7 +867,7 @@ export async function getUserByMoxieIdMultipleMinimal(
                 }
          }
         `;
-        const response = await fetch(process.env.MOXIE_API_URL_INTERNAL, {
+        const response = await fetch(process.env.SENPI_API_URL_INTERNAL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -881,14 +881,14 @@ export async function getUserByMoxieIdMultipleMinimal(
         let res = await response.json();
         const { data } = res as GetUserInfoMinimalResponse;
 
-        const userIdToUser = new Map<string, MoxieUserMinimal>();
+        const userIdToUser = new Map<string, SenpiUserMinimal>();
         data.GetUserInfoMinimal.users.forEach((user) => {
             userIdToUser.set(user.id, user);
         });
 
         return userIdToUser;
     } catch (error) {
-        elizaLogger.error("Error in getUserByMoxieIdMultipleMinimal:", error);
+        elizaLogger.error("Error in getUserBySenpiIdMultipleMinimal:", error);
         return new Map();
     }
 }
@@ -910,7 +910,7 @@ export async function publishPost(
                 }
             }
         `;
-        const response = await fetch(process.env.MOXIE_BACKEND_INTERNAL_URL, {
+        const response = await fetch(process.env.SENPI_BACKEND_INTERNAL_URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

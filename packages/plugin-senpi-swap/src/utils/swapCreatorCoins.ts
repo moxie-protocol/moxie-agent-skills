@@ -1,13 +1,13 @@
 import { elizaLogger, HandlerCallback } from "@senpi-ai/core";
 import {
-    MoxieWalletClient,
-    MoxieWalletSendTransactionResponseType,
-} from "@elizaos/moxie-lib";
+    SenpiWalletClient,
+    SenpiWalletSendTransactionResponseType,
+} from "@elizaos/senpi-lib";
 import { ethers } from "ethers";
 import { checkAllowanceAndApproveSpendRequest } from "./checkAndApproveTransaction";
-import { buyShares, decodeBuySharesEvent } from "./moxieBondingCurve";
+import { buyShares, decodeBuySharesEvent } from "./senpiBondingCurve";
 import { handleTransactionStatus } from "./common";
-import { sellShares, decodeSellSharesEvent } from "./moxieBondingCurve";
+import { sellShares, decodeSellSharesEvent } from "./senpiBondingCurve";
 import {
     insufficientEthBalanceTemplate,
     swapOperationFailedTemplate,
@@ -19,44 +19,44 @@ import { getERC20Balance } from "./erc20";
 import { MOXIE_TOKEN_DECIMALS } from "./constants";
 
 /**
- * Executes a swap action to purchase creator coins using Moxie tokens
- * @param moxieUserId The user ID of the user performing the swap
+ * Executes a swap action to purchase creator coins using Senpi tokens
+ * @param senpiUserId The user ID of the user performing the swap
  * @param provider The Ethereum provider
  * @param embeddedWallet The wallet address of the user performing the swap
  * @param creatorSubjectAddress The subject address of the creator whose coins are being purchased
- * @param amountInWEI The amount of Moxie tokens to spend in WEI
+ * @param amountInWEI The amount of Senpi tokens to spend in WEI
  * @param callback Callback function to provide status updates during the swap process
- * @param walletClient The Moxie wallet client
+ * @param walletClient The Senpi wallet client
  * @param buyTokenCreatorUsername The username of the creator whose coins are being purchased
  * @returns Promise that resolves when the swap is complete
  */
 export async function executeBuyAction(
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     provider: ethers.JsonRpcProvider,
     embeddedWallet: string,
     creatorSubjectAddress: string,
     amountInWEI: bigint,
     callback: HandlerCallback,
-    walletClient: MoxieWalletClient,
+    walletClient: SenpiWalletClient,
     buyTokenCreatorUsername: string
 ) {
     elizaLogger.debug(
         traceId,
-        `[creatorCoinSwap] [executeBuyAction] [${moxieUserId}] started, embeddedWallet: ${embeddedWallet}, creatorSubjectAddress: ${creatorSubjectAddress}, amountInWEI: ${amountInWEI}, buyTokenCreatorUsername: ${buyTokenCreatorUsername}`
+        `[creatorCoinSwap] [executeBuyAction] [${senpiUserId}] started, embeddedWallet: ${embeddedWallet}, creatorSubjectAddress: ${creatorSubjectAddress}, amountInWEI: ${amountInWEI}, buyTokenCreatorUsername: ${buyTokenCreatorUsername}`
     );
 
     // Add input validation
     if (
-        !moxieUserId ||
+        !senpiUserId ||
         !embeddedWallet ||
         !creatorSubjectAddress ||
         !amountInWEI
     ) {
         throw new Error("Missing required parameters");
     }
-    const moxieTokenAddress = process.env.MOXIE_TOKEN_ADDRESS;
-    if (!moxieTokenAddress) {
+    const senpiTokenAddress = process.env.MOXIE_TOKEN_ADDRESS;
+    if (!senpiTokenAddress) {
         throw new Error(
             "MOXIE_TOKEN_ADDRESS environment variable is not defined"
         );
@@ -72,9 +72,9 @@ export async function executeBuyAction(
         // Check allowance and approve spending
         await checkAllowanceAndApproveSpendRequest(
             traceId,
-            moxieUserId,
+            senpiUserId,
             embeddedWallet,
-            moxieTokenAddress,
+            senpiTokenAddress,
             bondingCurveAddress,
             amountInWEI,
             provider,
@@ -83,11 +83,11 @@ export async function executeBuyAction(
         );
 
         // Buy Fan token request
-        let swapResponse: MoxieWalletSendTransactionResponseType;
+        let swapResponse: SenpiWalletSendTransactionResponseType;
         try {
             swapResponse = await buyShares(
                 traceId,
-                moxieUserId,
+                senpiUserId,
                 embeddedWallet,
                 creatorSubjectAddress,
                 amountInWEI,
@@ -95,12 +95,12 @@ export async function executeBuyAction(
             );
             elizaLogger.debug(
                 traceId,
-                `[creatorCoinSwap] [${moxieUserId}] [executeBuyAction] buyShares response: ${JSON.stringify(swapResponse)}`
+                `[creatorCoinSwap] [${senpiUserId}] [executeBuyAction] buyShares response: ${JSON.stringify(swapResponse)}`
             );
         } catch (error) {
             elizaLogger.error(
                 traceId,
-                `[creatorCoinSwap] [${moxieUserId}] [executeBuyAction] Failed to execute buyShares: ${error.message}`
+                `[creatorCoinSwap] [${senpiUserId}] [executeBuyAction] Failed to execute buyShares: ${error.message}`
             );
 
             // Handle specific error cases
@@ -130,7 +130,7 @@ export async function executeBuyAction(
         try {
             swapReceipt = await handleTransactionStatus(
                 traceId,
-                moxieUserId,
+                senpiUserId,
                 provider,
                 swapTxnHash
             );
@@ -140,7 +140,7 @@ export async function executeBuyAction(
         } catch (error) {
             elizaLogger.error(
                 traceId,
-                `[creatorCoinSwap] [${moxieUserId}] [executeBuyAction] Failed to handle transaction status: ${error.message}`
+                `[creatorCoinSwap] [${senpiUserId}] [executeBuyAction] Failed to handle transaction status: ${error.message}`
             );
             await callback?.(transactionFailedTemplate(error));
             return {
@@ -152,10 +152,10 @@ export async function executeBuyAction(
         // await callback?.(transactionConfirmedTemplate(swapTxnHash));
 
         // Decode event and return results
-        const { creatorCoinsBought, moxieSold } = decodeBuySharesEvent(
+        const { creatorCoinsBought, senpiSold } = decodeBuySharesEvent(
             traceId,
             swapReceipt,
-            moxieUserId
+            senpiUserId
         );
 
         await callback?.({
@@ -164,53 +164,53 @@ export async function executeBuyAction(
 
         elizaLogger.debug(
             traceId,
-            `[creatorCoinSwap] [${moxieUserId}] [executeBuyAction] swap response: ${JSON.stringify({ swapTxnHash, creatorCoinsBought, moxieSold })}`
+            `[creatorCoinSwap] [${senpiUserId}] [executeBuyAction] swap response: ${JSON.stringify({ swapTxnHash, creatorCoinsBought, senpiSold })}`
         );
 
         return {
             success: true,
             hash: swapTxnHash,
             creatorCoinsBought,
-            moxieSold,
+            senpiSold,
         };
     } catch (error) {
         elizaLogger.error(
             traceId,
-            `[creatorCoinSwap] [${moxieUserId}] [executeBuyAction] [ERROR] Unhandled error: ${error.message}`
+            `[creatorCoinSwap] [${senpiUserId}] [executeBuyAction] [ERROR] Unhandled error: ${error.message}`
         );
         throw error;
     }
 }
 
 /**
- * Executes a swap action to sell creator coins for Moxie tokens
- * @param moxieUserId The user ID of the user performing the swap
+ * Executes a swap action to sell creator coins for Senpi tokens
+ * @param senpiUserId The user ID of the user performing the swap
  * @param provider The Ethereum provider
  * @param embeddedWallet The wallet address of the user performing the swap
  * @param creatorSubjectAddress The subject address of the creator whose coins are being sold
  * @param amountInWEI The amount of creator coins to sell in WEI
  * @param callback Callback function to provide status updates during the swap process
- * @param walletClient The Moxie wallet client
+ * @param walletClient The Senpi wallet client
  * @returns Promise that resolves when the swap is complete
  */
 export async function executeSellAction(
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     provider: ethers.JsonRpcProvider,
     embeddedWallet: string,
     creatorSubjectAddress: string,
     creatorSubjectTokenAddress: string,
     amountInWEI: bigint,
     callback: HandlerCallback,
-    walletClient: MoxieWalletClient
+    walletClient: SenpiWalletClient
 ) {
     elizaLogger.debug(
         traceId,
-        `[creatorCoinSwap] [executeSellAction] [${moxieUserId}] started, embeddedWallet: ${embeddedWallet}, creatorSubjectAddress: ${creatorSubjectAddress}, creatorSubjectTokenAddress: ${creatorSubjectTokenAddress}, amountInWEI: ${amountInWEI}`
+        `[creatorCoinSwap] [executeSellAction] [${senpiUserId}] started, embeddedWallet: ${embeddedWallet}, creatorSubjectAddress: ${creatorSubjectAddress}, creatorSubjectTokenAddress: ${creatorSubjectTokenAddress}, amountInWEI: ${amountInWEI}`
     );
     // Add input validation
     if (
-        !moxieUserId ||
+        !senpiUserId ||
         !embeddedWallet ||
         !creatorSubjectAddress ||
         !creatorSubjectTokenAddress ||
@@ -233,7 +233,7 @@ export async function executeSellAction(
     if (BigInt(availableTokenBalanceInWEI) < amountInWEI) {
         elizaLogger.debug(
             traceId,
-            `[creatorCoinSwap] [${moxieUserId}] [executeSellAction] [INSUFFICIENT_FUNDS] insufficient balance: ${availableTokenBalanceInWEI} < ${amountInWEI}`
+            `[creatorCoinSwap] [${senpiUserId}] [executeSellAction] [INSUFFICIENT_FUNDS] insufficient balance: ${availableTokenBalanceInWEI} < ${amountInWEI}`
         );
         await callback({
             text: `\nInsufficient balance to complete this transaction.
@@ -254,7 +254,7 @@ export async function executeSellAction(
         // Check allowance and approve spending
         await checkAllowanceAndApproveSpendRequest(
             traceId,
-            moxieUserId,
+            senpiUserId,
             embeddedWallet,
             creatorSubjectTokenAddress,
             process.env.BONDING_CURVE_ADDRESS,
@@ -265,11 +265,11 @@ export async function executeSellAction(
         );
 
         // Sell Fan token request
-        let swapResponse: MoxieWalletSendTransactionResponseType;
+        let swapResponse: SenpiWalletSendTransactionResponseType;
         try {
             swapResponse = await sellShares(
                 traceId,
-                moxieUserId,
+                senpiUserId,
                 embeddedWallet,
                 creatorSubjectAddress,
                 amountInWEI,
@@ -277,12 +277,12 @@ export async function executeSellAction(
             );
             elizaLogger.debug(
                 traceId,
-                `[creatorCoinSwap] [${moxieUserId}] [executeSellAction] sellShares response: ${JSON.stringify(swapResponse)}`
+                `[creatorCoinSwap] [${senpiUserId}] [executeSellAction] sellShares response: ${JSON.stringify(swapResponse)}`
             );
         } catch (error) {
             elizaLogger.error(
                 traceId,
-                `[creatorCoinSwap] [${moxieUserId}] [executeSellAction] Failed to execute sellShares: ${error.message}`
+                `[creatorCoinSwap] [${senpiUserId}] [executeSellAction] Failed to execute sellShares: ${error.message}`
             );
 
             // Handle specific error cases
@@ -315,7 +315,7 @@ export async function executeSellAction(
         try {
             swapReceipt = await handleTransactionStatus(
                 traceId,
-                moxieUserId,
+                senpiUserId,
                 provider,
                 swapTxnHash
             );
@@ -325,7 +325,7 @@ export async function executeSellAction(
         } catch (error) {
             elizaLogger.error(
                 traceId,
-                `[creatorCoinSwap] [${moxieUserId}] [executeSellAction] Failed to handle transaction status: ${error.message}`
+                `[creatorCoinSwap] [${senpiUserId}] [executeSellAction] Failed to handle transaction status: ${error.message}`
             );
             return createSwapError(
                 "TRANSACTION_CONFIRMATION_FAILED",
@@ -334,31 +334,31 @@ export async function executeSellAction(
         }
 
         // Decode event and return results
-        const { creatorCoinsSold, moxieReceived } = decodeSellSharesEvent(
+        const { creatorCoinsSold, senpiReceived } = decodeSellSharesEvent(
             traceId,
             swapReceipt,
-            moxieUserId
+            senpiUserId
         );
 
         await callback?.({
-            text: `\nTransaction Complete: Successfully sold ${creatorCoinsSold} creator coins and received ${moxieReceived} $MOXIE `,
+            text: `\nTransaction Complete: Successfully sold ${creatorCoinsSold} creator coins and received ${senpiReceived} $MOXIE `,
         });
 
         elizaLogger.debug(
             traceId,
-            `[creatorCoinSwap] [${moxieUserId}] [executeSellAction] swap response: ${JSON.stringify({ swapTxnHash, creatorCoinsSold, moxieReceived })}`
+            `[creatorCoinSwap] [${senpiUserId}] [executeSellAction] swap response: ${JSON.stringify({ swapTxnHash, creatorCoinsSold, senpiReceived })}`
         );
 
         return {
             success: true,
             hash: swapTxnHash,
             creatorCoinsSold,
-            moxieReceived,
+            senpiReceived,
         };
     } catch (error) {
         elizaLogger.error(
             traceId,
-            `[creatorCoinSwap] [${moxieUserId}] [executeSellAction] [ERROR] Unhandled error: ${error.message}`
+            `[creatorCoinSwap] [${senpiUserId}] [executeSellAction] [ERROR] Unhandled error: ${error.message}`
         );
         throw error;
     }

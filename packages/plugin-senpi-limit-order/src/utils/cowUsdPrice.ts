@@ -10,7 +10,7 @@ const RETRY_DELAY = 1000; // 1 second
 /**
  * Get the price of a token in USD and calculate equivalent amount in target token
  * @param traceId Trace ID for logging
- * @param moxieUserId User ID performing the operation
+ * @param senpiUserId User ID performing the operation
  * @param amount Amount of source token in WEI
  * @param sourceTokenAddress Address of source token
  * @param sourceTokenDecimals Decimals of source token
@@ -22,7 +22,7 @@ const RETRY_DELAY = 1000; // 1 second
  */
 export async function getPrice(
     traceId: string,
-    moxieUserId: string,
+    senpiUserId: string,
     amount: string,
     sourceTokenAddress: string,
     sourceTokenDecimals: number,
@@ -34,7 +34,7 @@ export async function getPrice(
     try {
         elizaLogger.debug(
             traceId,
-            `[getPrice] started with [${moxieUserId}] ` +
+            `[getPrice] started with [${senpiUserId}] ` +
                 `[amount]: ${amount}, ` +
                 `[sourceTokenAddress]: ${sourceTokenAddress}, ` +
                 `[sourceTokenDecimals]: ${sourceTokenDecimals}, ` +
@@ -63,13 +63,13 @@ export async function getPrice(
                 sourceTokenAddress,
                 sourceTokenSymbol,
                 traceId,
-                moxieUserId
+                senpiUserId
             ),
             fetchPriceWithRetry(
                 targetTokenAddress,
                 targetTokenSymbol,
                 traceId,
-                moxieUserId
+                senpiUserId
             ),
         ]);
 
@@ -85,7 +85,7 @@ export async function getPrice(
 
         elizaLogger.debug(
             traceId,
-            `[getPrice] [${moxieUserId}] [${sourceTokenSymbol}] amount in ether: ${amountInEther}`
+            `[getPrice] [${senpiUserId}] [${sourceTokenSymbol}] amount in ether: ${amountInEther}`
         );
 
         // Calculate equivalent amount in target token using USD prices
@@ -101,7 +101,7 @@ export async function getPrice(
 
         elizaLogger.debug(
             traceId,
-            `[getPrice] [${moxieUserId}] [${targetTokenSymbol}] amount: ${amountInTargetTokenFixed}`
+            `[getPrice] [${senpiUserId}] [${targetTokenSymbol}] amount: ${amountInTargetTokenFixed}`
         );
 
         // Convert back to WEI
@@ -111,7 +111,7 @@ export async function getPrice(
     } catch (error) {
         elizaLogger.error(
             traceId,
-            `[getPrice] [${moxieUserId}] [ERROR] Unhandled error: ${error.message}`
+            `[getPrice] [${senpiUserId}] [ERROR] Unhandled error: ${error.message}`
         );
         throw error;
     }
@@ -122,7 +122,7 @@ export async function fetchPriceWithRetry(
     tokenAddress: string,
     tokenSymbol: string,
     traceId: string,
-    moxieUserId: string
+    senpiUserId: string
 ): Promise<number> {
     let lastError;
     for (let i = 0; i < MAX_RETRIES; i++) {
@@ -137,14 +137,14 @@ export async function fetchPriceWithRetry(
             const cowPriceData = await cowResponse.json();
             elizaLogger.debug(
                 traceId,
-                `[getPrice] [${moxieUserId}] [COW_PRICE] [${tokenSymbol}] ${JSON.stringify(cowPriceData)}`
+                `[getPrice] [${senpiUserId}] [COW_PRICE] [${tokenSymbol}] ${JSON.stringify(cowPriceData)}`
             );
             return cowPriceData.price;
         } catch (error) {
             lastError = error;
             elizaLogger.warn(
                 traceId,
-                `[getPrice] [${moxieUserId}] [RETRY ${i + 1}/${MAX_RETRIES}] [${tokenSymbol}] Failed to get price from CoW API: ${error}`
+                `[getPrice] [${senpiUserId}] [RETRY ${i + 1}/${MAX_RETRIES}] [${tokenSymbol}] Failed to get price from CoW API: ${error}`
             );
             if (i < MAX_RETRIES - 1) {
                 await new Promise((resolve) =>
@@ -155,7 +155,7 @@ export async function fetchPriceWithRetry(
     }
     elizaLogger.error(
         traceId,
-        `[getPrice] [${moxieUserId}] [ERROR] [${tokenSymbol}] Failed to get price from CoW API after ${MAX_RETRIES} retries: ${lastError}`
+        `[getPrice] [${senpiUserId}] [ERROR] [${tokenSymbol}] Failed to get price from CoW API after ${MAX_RETRIES} retries: ${lastError}`
     );
     throw new Error(
         `Failed to get ${tokenSymbol} price from CoW API after ${MAX_RETRIES} retries`

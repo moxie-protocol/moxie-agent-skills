@@ -7,13 +7,13 @@ import {
 
 import { elizaLogger } from "@senpi-ai/core";
 import {
-    MoxieAgentDBAdapter,
+    SenpiAgentDBAdapter,
     TransactionDetails,
 } from "@senpi-ai/senpi-agent-lib";
 import {
-    MoxieClientWallet,
-    MoxieWalletClient,
-    MoxieWalletSignTypedDataResponseType,
+    SenpiClientWalet,
+    SenpiWalletClient,
+    SenpiWalletSignTypedDataResponseType,
 } from "@senpi-ai/senpi-agent-lib/src/wallet";
 import { ethers } from "ethers";
 import axios from "axios";
@@ -97,9 +97,9 @@ export async function createCowLimitOrder(
             context.state?.agentWallet,
             "Agent wallet is required for transactions",
         ],
-        moxieWalletClient: [
-            context.state.moxieWalletClient,
-            "Moxie wallet client is required for transactions",
+        SenpiWalletClient: [
+            context.state.SenpiWalletClient,
+            "Senpi wallet client is required for transactions",
         ],
         orderParams: [orderParams, "Order parameters are required"],
         sellToken: [orderParams?.sellToken, "Sell token address is required"],
@@ -134,7 +134,7 @@ export async function createCowLimitOrder(
             provider
         );
 
-        const agentWallet = (context.state.agentWallet as MoxieClientWallet)
+        const agentWallet = (context.state.agentWallet as SenpiClientWalet)
             .address;
         elizaLogger.debug(
             traceId,
@@ -261,17 +261,16 @@ async function sendApprovalTransactionFromEmbeddedWallet(
     context: Context,
     tx: ethers.ContractTransaction
 ) {
-    const { traceId, moxieUserId } = context;
+    const { traceId, senpiUserId } = context;
     elizaLogger.debug(
         traceId,
         "[sendApprovalTransactionFromEmbeddedWallet] started"
     );
 
-    const agentWallet = (context.state.agentWallet as MoxieClientWallet)
-        .address;
+    const agentWallet = (context.state.agentWallet as SenpiClientWalet).address;
     const chainId = process.env.CHAIN_ID || "8453";
-    const moxieWalletClient = context.state
-        .moxieWalletClient as MoxieWalletClient;
+    const SenpiWalletClient = context.state
+        .SenpiWalletClient as SenpiWalletClient;
 
     try {
         const sendTransactionInput: TransactionDetails = {
@@ -286,7 +285,7 @@ async function sendApprovalTransactionFromEmbeddedWallet(
             )}`
         );
 
-        const sendTransactionResponse = await moxieWalletClient.sendTransaction(
+        const sendTransactionResponse = await SenpiWalletClient.sendTransaction(
             chainId,
             sendTransactionInput
         );
@@ -307,7 +306,7 @@ async function sendApprovalTransactionFromEmbeddedWallet(
         if (!txnReceipt) {
             elizaLogger.error(
                 traceId,
-                `[${moxieUserId}] [sendApprovalTransactionFromEmbeddedWallet] Transaction receipt timeout`
+                `[${senpiUserId}] [sendApprovalTransactionFromEmbeddedWallet] Transaction receipt timeout`
             );
             throw new Error("Approval transaction failed: Receipt not found");
         }
@@ -316,14 +315,14 @@ async function sendApprovalTransactionFromEmbeddedWallet(
             // 1 is success
             elizaLogger.debug(
                 traceId,
-                `[${moxieUserId}] [sendApprovalTransactionFromEmbeddedWallet] approval transaction successful: ${sendTransactionResponse.hash}`
+                `[${senpiUserId}] [sendApprovalTransactionFromEmbeddedWallet] approval transaction successful: ${sendTransactionResponse.hash}`
             );
             return sendTransactionResponse;
         }
 
         elizaLogger.error(
             traceId,
-            `[${moxieUserId}] [sendApprovalTransactionFromEmbeddedWallet] approval transaction failed: ${sendTransactionResponse.hash} with status: ${txnReceipt.status}`
+            `[${senpiUserId}] [sendApprovalTransactionFromEmbeddedWallet] approval transaction failed: ${sendTransactionResponse.hash} with status: ${txnReceipt.status}`
         );
         throw new Error("Approval transaction failed: Transaction reverted");
     } catch (error) {
@@ -408,7 +407,7 @@ async function sendTransactionWithRetries(
 async function signTypedDataFromEmbeddedWallet(
     context: Context,
     orderParams: OrderCreation
-): Promise<MoxieWalletSignTypedDataResponseType> {
+): Promise<SenpiWalletSignTypedDataResponseType> {
     const { traceId } = context;
     elizaLogger.debug(
         traceId,
@@ -417,8 +416,8 @@ async function signTypedDataFromEmbeddedWallet(
     );
 
     try {
-        const moxieWalletClient = context.state
-            .moxieWalletClient as MoxieWalletClient;
+        const SenpiWalletClient = context.state
+            .SenpiWalletClient as SenpiWalletClient;
         const orderData = {
             types: orderTypes,
             domain,
@@ -432,7 +431,7 @@ async function signTypedDataFromEmbeddedWallet(
             JSON.stringify(orderData)
         );
 
-        const signatureData = await moxieWalletClient.signTypedData(
+        const signatureData = await SenpiWalletClient.signTypedData(
             orderData.domain,
             orderData.types,
             orderData.message,

@@ -1,1 +1,1 @@
-# Moxie Whale Hunter plugin
+# Senpi Whale Hunter plugin

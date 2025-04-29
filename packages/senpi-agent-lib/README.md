@@ -1,5 +1,3 @@
-# Lib for moxie related operations
+# Lib for senpi related operations
 
-1. Fetching user details by moxieId
-   
-
+1. Fetching user details by senpiId

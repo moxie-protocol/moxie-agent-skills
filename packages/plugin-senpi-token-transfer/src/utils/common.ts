@@ -16,7 +16,7 @@ export async function handleTransactionStatus(
     txHash: string
 ): Promise<FunctionResponse<string>> {
     elizaLogger.debug(
-        `[${context.moxieUserId}] [handleTransactionStatus] called with input details: [${txHash}]`
+        `[${context.senpiUserId}] [handleTransactionStatus] called with input details: [${txHash}]`
     );
     let txnReceipt: ethers.TransactionReceipt | null = null;
 
@@ -28,7 +28,7 @@ export async function handleTransactionStatus(
         );
         if (!txnReceipt) {
             elizaLogger.error(
-                `[${context.moxieUserId}] [handleTransactionStatus] Transaction receipt timeout`
+                `[${context.senpiUserId}] [handleTransactionStatus] Transaction receipt timeout`
             );
             return {
                 data: null,
@@ -40,14 +40,14 @@ export async function handleTransactionStatus(
 
         if (txnReceipt.status === 1) {
             elizaLogger.debug(
-                `[${context.moxieUserId}] [handleTransactionStatus] transaction successful: ${txHash}`
+                `[${context.senpiUserId}] [handleTransactionStatus] transaction successful: ${txHash}`
             );
             return {
                 data: txHash,
             };
         } else {
             elizaLogger.error(
-                `[${context.moxieUserId}] [handleTransactionStatus] transaction failed: ${txHash} with status: ${txnReceipt.status}`
+                `[${context.senpiUserId}] [handleTransactionStatus] transaction failed: ${txHash} with status: ${txnReceipt.status}`
             );
             return {
                 data: null,
@@ -58,7 +58,7 @@ export async function handleTransactionStatus(
         const errorMessage =
             error instanceof Error ? error.message : "Unknown error";
         elizaLogger.error(
-            `[${context.moxieUserId}] [handleTransactionStatus] Error waiting for transaction receipt: ${errorMessage}`
+            `[${context.senpiUserId}] [handleTransactionStatus] Error waiting for transaction receipt: ${errorMessage}`
         );
         return {
             callBackTemplate: APPLICATION_ERROR(

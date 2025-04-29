@@ -16,15 +16,15 @@ import {
 } from "@senpi-ai/core";
 
 import {
-    moxieUserService,
-    MoxieAgentDBAdapter,
-    MoxieUser,
+    senpiUserService,
+    SenpiAgentDBAdapter,
+    SenpiUser,
 } from "@senpi-ai/senpi-agent-lib";
 import * as templates from "../templates";
 import {
-    getMoxieIdsFromMessage,
+    getSenpiIdsFromMessage,
     streamTextByLines,
-    handleIneligibleMoxieUsers,
+    handleIneligibleSenpiUsers,
 } from "./utils";
 import { FIVE_MINS, getTweetsCacheKey, ONE_HOUR } from "../cache";
 import { Tweet } from "agent-twitter-client";
@@ -49,7 +49,7 @@ function formatTweets(tweets: Tweet[]) {
     }));
 }
 
-export async function fetchTweetsByMoxieUserIds(
+export async function fetchTweetsBySenpiUserIds(
     userIdToTwitterUsernames: Map<string, string>,
     runtime: IAgentRuntime,
     maxTweetsPerUser: number = 20
@@ -57,15 +57,15 @@ export async function fetchTweetsByMoxieUserIds(
     await twitterService.initialize();
 
     const tweetPromises = Array.from(userIdToTwitterUsernames.entries()).map(
-        async ([moxieId, twitterHandle]) => {
+        async ([senpiId, twitterHandle]) => {
             try {
                 const cachedTweets = await runtime.cacheManager.get(
-                    getTweetsCacheKey(moxieId)
+                    getTweetsCacheKey(senpiId)
                 );
                 if (cachedTweets) {
-                    elizaLogger.debug(`using cached tweets for ${moxieId}`);
+                    elizaLogger.debug(`using cached tweets for ${senpiId}`);
                     return {
-                        moxieId,
+                        senpiId,
                         twitterHandle,
                         tweets: formatTweets(
                             JSON.parse(cachedTweets as string)
@@ -79,16 +79,16 @@ export async function fetchTweetsByMoxieUserIds(
                 elizaLogger.debug(`${twitterHandle} ${tweets.length}}`);
 
                 runtime.cacheManager.set(
-                    getTweetsCacheKey(moxieId),
+                    getTweetsCacheKey(senpiId),
                     JSON.stringify(tweets),
                     {
                         // Cache tweets for 5 minutes (60 seconds * 5)
                         expires: Date.now() + ONE_HOUR,
                     }
                 );
-                elizaLogger.debug(`cached tweets for ${moxieId}`);
+                elizaLogger.debug(`cached tweets for ${senpiId}`);
                 return {
-                    moxieId,
+                    senpiId,
                     twitterHandle,
                     tweets: formatTweets(tweets),
                 };
@@ -141,12 +141,12 @@ async function fetchAndValidateTweets(
 
     const { isTopTokenOwnersQuery, selfQuery } = responseJson;
 
-    let moxieIds: string[] = [];
+    let senpiIds: string[] = [];
     if (selfQuery === true) {
-        const moxieUserId = (state.moxieUserInfo as MoxieUser)?.id;
-        moxieIds = [moxieUserId];
+        const senpiUserId = (state.senpiUserInfo as SenpiUser)?.id;
+        senpiIds = [senpiUserId];
     } else {
-        moxieIds = await getMoxieIdsFromMessage(
+        senpiIds = await getSenpiIdsFromMessage(
             message,
             templates.topCreatorsTwitterExamples,
             state,
@@ -155,22 +155,22 @@ async function fetchAndValidateTweets(
             TOP_CREATORS_COUNT
         );
     }
-    const moxieUserInfo: MoxieUser = state.moxieUserInfo as MoxieUser;
+    const senpiUserInfo: SenpiUser = state.senpiUserInfo as SenpiUser;
 
-    const ineligibleMoxieUsers = [];
-    const eligibleMoxieIds = [];
+    const ineligibleSenpiUsers = [];
+    const eligibleSenpiIds = [];
 
-    // if (moxieIds.length === 0) {
+    // if (senpiIds.length === 0) {
     //     callback({
     //         text: "I couldn't find your favorite creators. Please buy creator tokens to get started.",
     //     });
     //     return null;
     // }
-    // Get Twitter usernames for all Moxie IDs
+    // Get Twitter usernames for all Senpi IDs
 
     const socialProfiles =
-        await moxieUserService.getSocialProfilesByMoxieIdMultiple(
-            moxieIds,
+        await senpiUserService.getSocialProfilesBySenpiIdMultiple(
+            senpiIds,
             state.authorizationHeader as string,
             stringToUuid("SOCIAL_ALPHA")
         );
@@ -183,25 +183,25 @@ async function fetchAndValidateTweets(
         if (profile.farcasterUsername) {
             userIdToFarcasterUsernames.set(userId, profile.farcasterUsername);
         }
-        eligibleMoxieIds.push(userId);
+        eligibleSenpiIds.push(userId);
     });
 
     socialProfiles.errorDetails.forEach((errorDetails, userId) => {
         if (errorDetails) {
-            ineligibleMoxieUsers.push(errorDetails);
+            ineligibleSenpiUsers.push(errorDetails);
         }
     });
 
     elizaLogger.debug(
-        `eligibleMoxieIds: ${eligibleMoxieIds}, ineligibleMoxieUsers: ${ineligibleMoxieUsers}`
+        `eligibleSenpiIds: ${eligibleSenpiIds}, ineligibleSenpiUsers: ${ineligibleSenpiUsers}`
     );
 
-    if (ineligibleMoxieUsers.length > 0 && eligibleMoxieIds.length == 0) {
-        await handleIneligibleMoxieUsers(ineligibleMoxieUsers, callback);
+    if (ineligibleSenpiUsers.length > 0 && eligibleSenpiIds.length == 0) {
+        await handleIneligibleSenpiUsers(ineligibleSenpiUsers, callback);
         return null;
     }
 
-    if (eligibleMoxieIds.length === 0 && moxieIds.length === 0) {
+    if (eligibleSenpiIds.length === 0 && senpiIds.length === 0) {
         callback({
             text: "I couldn't find your favorite creators. Please buy creator tokens to get started.",
         });
@@ -210,12 +210,12 @@ async function fetchAndValidateTweets(
 
     if (userIdToTwitterUsernames.size === 0) {
         callback({
-            text: "I couldn't find any Twitter accounts linked to these Moxie users",
+            text: "I couldn't find any Twitter accounts linked to these Senpi users",
         });
         return null;
     }
 
-    const allTweets = await fetchTweetsByMoxieUserIds(
+    const allTweets = await fetchTweetsBySenpiUserIds(
         userIdToTwitterUsernames,
         runtime
     );
@@ -229,7 +229,7 @@ async function fetchAndValidateTweets(
 
     return {
         allTweets,
-        ineligibleMoxieUsers,
+        ineligibleSenpiUsers,
         totalFreeQueries: socialProfiles.freeTrialLimit,
         newRemainingFreeQueries: socialProfiles.remainingFreeTrialCount,
     };
@@ -255,7 +255,7 @@ export const creatorTweetSummary: Action = {
         options?: { [key: string]: unknown },
         callback?: HandlerCallback
     ) => {
-        const moxieUserInfo: MoxieUser = state.moxieUserInfo as MoxieUser;
+        const senpiUserInfo: SenpiUser = state.senpiUserInfo as SenpiUser;
 
         const response = await fetchAndValidateTweets(
             message,
@@ -270,7 +270,7 @@ export const creatorTweetSummary: Action = {
 
         const {
             allTweets,
-            ineligibleMoxieUsers,
+            ineligibleSenpiUsers,
             totalFreeQueries,
             newRemainingFreeQueries,
         } = response;
@@ -288,7 +288,7 @@ export const creatorTweetSummary: Action = {
                 Number(totalFreeQueries) - Number(newRemainingFreeQueries),
             topCreatorsCount: TOP_CREATORS_COUNT,
             displayFreeQueriesHeader: displayFreeQueriesHeader,
-            ineligibleMoxieUsers: JSON.stringify(ineligibleMoxieUsers),
+            ineligibleSenpiUsers: JSON.stringify(ineligibleSenpiUsers),
         });
         // Create a summary context for the model
         const newContext = composeContext({
@@ -317,8 +317,8 @@ export const creatorTweetSummary: Action = {
             callback({ text: textPart });
         }
 
-        if (ineligibleMoxieUsers.length > 0) {
-            handleIneligibleMoxieUsers(ineligibleMoxieUsers, callback, true);
+        if (ineligibleSenpiUsers.length > 0) {
+            handleIneligibleSenpiUsers(ineligibleSenpiUsers, callback, true);
         }
 
         return true;

@@ -2,7 +2,7 @@ import { State } from "@senpi-ai/core";
 import { IAgentRuntime } from "@senpi-ai/core";
 import { Wallet as PrivyWallet } from "@privy-io/server-auth";
 import { ethers } from "ethers";
-import { MoxieClientWallet, MoxieWalletClient } from "../wallet";
+import { SenpiClientWalet, SenpiWalletClient } from "../wallet";
 export interface TwitterMetadata {
     username: string;
     name?: string;
@@ -27,7 +27,7 @@ export interface FarcasterMetadata {
     latestVerifiedAt: string;
 }
 
-export interface MoxieIdentity {
+export interface SenpiIdentity {
     id: string;
     userId: string;
     type: string;
@@ -40,7 +40,7 @@ export interface MoxieIdentity {
     updatedAt: string;
 }
 
-export interface MoxieWallet {
+export interface SenpiWallet {
     id: string;
     userId: string;
     walletAddress: string;
@@ -55,7 +55,7 @@ export interface VestingContracts {
     vestingContractAddress?: string;
 }
 
-export interface MoxieUser {
+export interface SenpiUser {
     id: string;
     userName?: string;
     name?: string;
@@ -63,18 +63,18 @@ export interface MoxieUser {
     profileImageUrl?: string;
     referralCode: string;
     referrerId?: string;
-    moxieScore?: number;
-    moxieRank?: number;
+    senpiScore?: number;
+    senpiRank?: number;
     totalUsers?: number;
     primaryWalletId?: string;
     communicationPreference?: string;
     createdAt: string;
-    identities: MoxieIdentity[];
-    wallets: MoxieWallet[];
+    identities: SenpiIdentity[];
+    wallets: SenpiWallet[];
     vestingContracts: VestingContracts[];
 }
 
-export interface MoxieUserMinimal {
+export interface SenpiUserMinimal {
     id: string;
     userName?: string;
     name?: string;
@@ -84,7 +84,7 @@ export interface MoxieUserMinimal {
 
 export interface MeQueryResponse {
     data: {
-        Me: MoxieUser;
+        Me: SenpiUser;
     };
     errors?: Array<{
         message: string;
@@ -97,7 +97,7 @@ export interface MeQueryResponse {
 
 export interface GetUserResponse {
     data: {
-        GetUser: MoxieUser;
+        GetUser: SenpiUser;
     };
 }
 
@@ -108,7 +108,7 @@ export interface GetUserInfoBatchResponse {
 }
 
 export interface GetUserInfoMinimalOutput {
-    users: MoxieUserMinimal[];
+    users: SenpiUserMinimal[];
 }
 
 export interface GetUserInfoMinimalResponse {
@@ -230,7 +230,7 @@ export interface TokenDetails {
     liquidityPools?: LiquidityPool[];
 }
 
-export interface MoxiePortfolioInfo {
+export interface SenpiPortfolioInfo {
     fanTokenSymbol: string;
     fanTokenName: string;
     fanTokenAddress: string;
@@ -245,18 +245,18 @@ export interface MoxiePortfolioInfo {
     totalTvlInUSD: number;
     lockedTvlInUSD: number;
     unlockedTvlInUSD: number;
-    fanTokenMoxieUserId: string;
+    fanTokenSenpiUserId: string;
     displayLabel: string;
     holdingPercentage: number;
 }
 
-export interface MoxiePortfolioResponse {
+export interface SenpiPortfolioResponse {
     errors?: Array<{
         message: string;
     }>;
     data: {
         MoxieUserPortfolios: {
-            MoxieUserPortfolio: MoxiePortfolioInfo[];
+            MoxieUserPortfolio: SenpiPortfolioInfo[];
         };
     };
 }
@@ -298,7 +298,7 @@ export type GetUserInfoBatchOutput = {
 };
 
 export type UserInfo = {
-    user: MoxieUser | null;
+    user: SenpiUser | null;
     errorDetails: ErrorDetails | null;
 };
 
@@ -309,7 +309,7 @@ export type ErrorDetails = {
     requesterId: string;
     requestedId: string;
     requestedUserName: string;
-    requiredMoxieAmountInUSD: number;
+    requiredSenpiAmountInUSD: number;
 };
 export type EthereumSignMessageResponseType = {
     signature: string;

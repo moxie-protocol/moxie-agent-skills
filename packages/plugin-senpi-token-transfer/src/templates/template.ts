@@ -52,7 +52,7 @@ To process the transfer intent, follow these steps:
         * NEVER strip down to just the address
         * NEVER modify the original token format from input
         * Examples:
-            - $[MOXIE|0x8C9037D1Ef5c6D1f6816278C7AAF5491d24CD527]
+            - $[USDC|0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913]
             - $[ETH|0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE]
             - $[USDC|0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913]
    -  For amounts with $ prefix (e.g. $50, $0.5):

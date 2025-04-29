@@ -82,13 +82,13 @@ export const tokenTransferAction = {
             return true;
         }
 
-        // pick moxie user info from state
-        const moxieUserInfo = state.moxieUserInfo as agentLib.MoxieUser;
-        const moxieUserId = moxieUserInfo.id;
-        const agentWallet = state.agentWallet as agentLib.MoxieClientWallet;
+        // pick senpi user info from state
+        const senpiUserInfo = state.senpiUserInfo as agentLib.SenpiUser;
+        const senpiUserId = senpiUserInfo.id;
+        const agentWallet = state.agentWallet as agentLib.SenpiClientWalet;
 
-        // add moxie user id to context
-        context.moxieUserId = moxieUserId;
+        // add senpi user id to context
+        context.senpiUserId = senpiUserId;
 
         try {
             // process the message and extract the transfer details
@@ -101,7 +101,7 @@ export const tokenTransferAction = {
             if (transferOptions.callBackTemplate) {
                 elizaLogger.debug(
                     traceId,
-                    `[transferTokenAction] [${moxieUserId}] [processMessage] transferOptions: ${JSON.stringify(transferOptions)}`
+                    `[transferTokenAction] [${senpiUserId}] [processMessage] transferOptions: ${JSON.stringify(transferOptions)}`
                 );
                 await callback?.({
                     text: transferOptions.callBackTemplate.text,
@@ -117,7 +117,7 @@ export const tokenTransferAction = {
             if (!validationResult) {
                 elizaLogger.debug(
                     traceId,
-                    `[transferTokenAction] [${moxieUserId}] [isValidTransferContent] validationResult: ${JSON.stringify(validationResult)}`
+                    `[transferTokenAction] [${senpiUserId}] [isValidTransferContent] validationResult: ${JSON.stringify(validationResult)}`
                 );
                 await callback?.({
                     content: validationResult.callBackTemplate.content,
@@ -144,7 +144,7 @@ export const tokenTransferAction = {
         } catch (error) {
             elizaLogger.error(
                 traceId,
-                `[tokenTransferAction] [${moxieUserId}] [ERROR] error: ${error}`
+                `[tokenTransferAction] [${senpiUserId}] [ERROR] error: ${error}`
             );
             const errorTemplate = callBackTemplate.APPLICATION_ERROR(
                 `Error processing transfer: ${error.message}`
@@ -179,18 +179,18 @@ export const tokenTransferAction = {
 
 /**
  * Handles validations for the transfer token action
- * @param moxieUserId - The ID of the Moxie user
+ * @param senpiUserId - The ID of the Senpi user
  * @param runtime - The runtime environment
  * @param message - The message to validate
  * @param state - The state of the agent
  */
 function handleValidations(
-    moxieUserId: string,
+    senpiUserId: string,
     runtime: IAgentRuntime,
     message: Memory,
     state: State
 ) {
-    elizaLogger.debug(`[transferTokenAction] [${moxieUserId}] started`);
+    elizaLogger.debug(`[transferTokenAction] [${senpiUserId}] started`);
 
     // check if the context contains the agent wallet
     const agentWallet = state.agentWallet;
@@ -211,14 +211,14 @@ async function isValidTransferContent(
 ): Promise<FunctionResponse<TransactionResponse>> {
     elizaLogger.debug(
         context.traceId,
-        `[tokenTransfer] [${context.moxieUserId}] [isValidTransferContent] content: ${JSON.stringify(content)}`
+        `[tokenTransfer] [${context.senpiUserId}] [isValidTransferContent] content: ${JSON.stringify(content)}`
     );
 
     // Validate basic content structure
     if (!content?.transfers?.length) {
         elizaLogger.error(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [isValidTransferContent] Invalid content structure: ${JSON.stringify(content)}`
+            `[tokenTransfer] [${context.senpiUserId}] [isValidTransferContent] Invalid content structure: ${JSON.stringify(content)}`
         );
         return {
             callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -233,7 +233,7 @@ async function isValidTransferContent(
         if (!transfer.sender || !transfer.recipient || !transfer.token) {
             elizaLogger.error(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [isValidTransferContent] Missing required fields in transfer: ${JSON.stringify(transfer)}`
+                `[tokenTransfer] [${context.senpiUserId}] [isValidTransferContent] Missing required fields in transfer: ${JSON.stringify(transfer)}`
             );
             return {
                 callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -249,7 +249,7 @@ async function isValidTransferContent(
         ) {
             elizaLogger.error(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [isValidTransferContent] Invalid quantity: transferAmount=${transfer.transferAmount}`
+                `[tokenTransfer] [${context.senpiUserId}] [isValidTransferContent] Invalid quantity: transferAmount=${transfer.transferAmount}`
             );
             return {
                 callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -262,7 +262,7 @@ async function isValidTransferContent(
         if (transfer.value_type && transfer.value_type !== "USD") {
             elizaLogger.error(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [isValidTransferContent] Invalid value_type: ${transfer.value_type}`
+                `[tokenTransfer] [${context.senpiUserId}] [isValidTransferContent] Invalid value_type: ${transfer.value_type}`
             );
             return {
                 callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -282,7 +282,7 @@ async function isValidTransferContent(
             ) {
                 elizaLogger.error(
                     context.traceId,
-                    `[tokenTransfer] [${context.moxieUserId}] [isValidTransferContent] Invalid balance configuration: ${JSON.stringify(transfer.balance)}`
+                    `[tokenTransfer] [${context.senpiUserId}] [isValidTransferContent] Invalid balance configuration: ${JSON.stringify(transfer.balance)}`
                 );
                 return {
                     callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -299,7 +299,7 @@ async function isValidTransferContent(
             ) {
                 elizaLogger.error(
                     context.traceId,
-                    `[tokenTransfer] [${context.moxieUserId}] [isValidTransferContent] Invalid percentage in balance: ${percentage}`
+                    `[tokenTransfer] [${context.senpiUserId}] [isValidTransferContent] Invalid percentage in balance: ${percentage}`
                 );
                 return {
                     callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -331,10 +331,10 @@ async function processMessage(
 ): Promise<FunctionResponse<TransactionResponse>> {
     elizaLogger.debug(
         context.traceId,
-        `[tokenTransfer] [${context.moxieUserId}] [processMessage] message called: ${JSON.stringify(message)}`
+        `[tokenTransfer] [${context.senpiUserId}] [processMessage] message called: ${JSON.stringify(message)}`
     );
 
-    const agentWallet = state.agentWallet as agentLib.MoxieClientWallet;
+    const agentWallet = state.agentWallet as agentLib.SenpiClientWalet;
 
     // Compose transfer context
     let transferContext = composeContext({
@@ -364,7 +364,7 @@ async function processMessage(
 
     elizaLogger.debug(
         context.traceId,
-        `[tokenTransfer] [${context.moxieUserId}] transferOptions: ${JSON.stringify(transferOptions)}`
+        `[tokenTransfer] [${context.senpiUserId}] transferOptions: ${JSON.stringify(transferOptions)}`
     );
 
     // Return early if confirmation required
@@ -432,20 +432,20 @@ async function preValidateRequiredData(context: Context) {
         );
     }
 
-    // check moxie user info
-    const moxieUserInfo = state.moxieUserInfo as agentLib.MoxieUser;
-    if (!moxieUserInfo) {
+    // check senpi user info
+    const senpiUserInfo = state.senpiUserInfo as agentLib.SenpiUser;
+    if (!senpiUserInfo) {
         elizaLogger.error(
             context.traceId,
-            `[tokenTransfer] [preValidateRequiredData] Moxie user info not found`
+            `[tokenTransfer] [preValidateRequiredData] Senpi user info not found`
         );
         return callBackTemplate.APPLICATION_ERROR(
-            "Moxie user info not found in state"
+            "Senpi user info not found in state"
         );
     }
 
     // check agent wallet
-    const agentWallet = state.agentWallet as agentLib.MoxieClientWallet;
+    const agentWallet = state.agentWallet as agentLib.SenpiClientWalet;
     if (!agentWallet) {
         elizaLogger.error(
             context.traceId,
@@ -467,14 +467,14 @@ async function preValidateRequiredData(context: Context) {
         );
     }
 
-    // check if the moxie wallet client is set
-    if (!state.moxieWalletClient) {
+    // check if the senpi wallet client is set
+    if (!state.SenpiWalletClient) {
         elizaLogger.error(
             context.traceId,
-            `[tokenTransfer] [preValidateRequiredData] Moxie wallet client not found`
+            `[tokenTransfer] [preValidateRequiredData] Senpi wallet client not found`
         );
         return callBackTemplate.APPLICATION_ERROR(
-            "Moxie wallet client not found in state"
+            "Senpi wallet client not found in state"
         );
     }
 
@@ -491,12 +491,12 @@ async function preValidateRequiredData(context: Context) {
 async function processTransfer(
     context: Context,
     transferOptions: TransactionResponse,
-    agentWallet: agentLib.MoxieClientWallet,
+    agentWallet: agentLib.SenpiClientWalet,
     callback: HandlerCallback
 ): Promise<FunctionResponse<CallbackTemplate>> {
     elizaLogger.debug(
         context.traceId,
-        `[tokenTransfer] [${context.moxieUserId}] [processTransfer] started`
+        `[tokenTransfer] [${context.senpiUserId}] [processTransfer] started`
     );
 
     // Map to cache wallet balances for balance-based transfers to avoid duplicate queries
@@ -509,7 +509,7 @@ async function processTransfer(
     for (const transfer of transferOptions.transfers) {
         elizaLogger.debug(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [processTransfer] Processing transfer: ${JSON.stringify(transfer)}`
+            `[tokenTransfer] [${context.senpiUserId}] [processTransfer] Processing transfer: ${JSON.stringify(transfer)}`
         );
 
         try {
@@ -524,7 +524,7 @@ async function processTransfer(
             if (transferResult.callBackTemplate) {
                 elizaLogger.error(
                     context.traceId,
-                    `[tokenTransfer] [${context.moxieUserId}] [processTransfer] Transfer failed: ${JSON.stringify(transferResult.callBackTemplate)}`
+                    `[tokenTransfer] [${context.senpiUserId}] [processTransfer] Transfer failed: ${JSON.stringify(transferResult.callBackTemplate)}`
                 );
                 return {
                     callBackTemplate: transferResult.callBackTemplate,
@@ -535,7 +535,7 @@ async function processTransfer(
             if (transferResult.data) {
                 elizaLogger.debug(
                     context.traceId,
-                    `[tokenTransfer] [${context.moxieUserId}] [processTransfer] Transfer successful: ${JSON.stringify(transferResult.data)}`
+                    `[tokenTransfer] [${context.senpiUserId}] [processTransfer] Transfer successful: ${JSON.stringify(transferResult.data)}`
                 );
                 await callback({
                     content: transferResult.data.content,
@@ -545,7 +545,7 @@ async function processTransfer(
         } catch (error) {
             elizaLogger.error(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [processTransfer] Unexpected error: ${error}`
+                `[tokenTransfer] [${context.senpiUserId}] [processTransfer] Unexpected error: ${error}`
             );
             return {
                 callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -567,12 +567,12 @@ async function processTransfer(
 async function processSingleTransfer(
     context: Context,
     transfer: Transfer,
-    agentWallet: agentLib.MoxieClientWallet,
+    agentWallet: agentLib.SenpiClientWalet,
     currentWalletBalanceForBalanceBasedSwaps: Map<string, bigint | undefined>
 ): Promise<FunctionResponse<CallbackTemplate>> {
     elizaLogger.debug(
         context.traceId,
-        `[tokenTransfer] [${context.moxieUserId}] [processSingleTransfer] transfer: ${JSON.stringify(transfer)}`
+        `[tokenTransfer] [${context.senpiUserId}] [processSingleTransfer] transfer: ${JSON.stringify(transfer)}`
     );
     try {
         // Validate required transfer parameters
@@ -595,7 +595,7 @@ async function processSingleTransfer(
         if (!tokenAddressResult.data) {
             elizaLogger.error(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [processTransfer] resolvedTokenAddress not found`
+                `[tokenTransfer] [${context.senpiUserId}] [processTransfer] resolvedTokenAddress not found`
             );
             return {
                 callBackTemplate: tokenAddressResult.callBackTemplate,
@@ -603,7 +603,7 @@ async function processSingleTransfer(
         }
         elizaLogger.debug(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [processTransfer] resolvedTokenAddress: ${JSON.stringify(tokenAddressResult.data)}`
+            `[tokenTransfer] [${context.senpiUserId}] [processTransfer] resolvedTokenAddress: ${JSON.stringify(tokenAddressResult.data)}`
         );
 
         // Resolve recipient address
@@ -614,7 +614,7 @@ async function processSingleTransfer(
         if (!recipientAddressResult.data) {
             elizaLogger.error(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [processTransfer] resolvedRecipientAddress not found`
+                `[tokenTransfer] [${context.senpiUserId}] [processTransfer] resolvedRecipientAddress not found`
             );
             return {
                 callBackTemplate: recipientAddressResult.callBackTemplate,
@@ -622,7 +622,7 @@ async function processSingleTransfer(
         }
         elizaLogger.debug(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [processTransfer] resolvedRecipientAddress: ${recipientAddressResult.data}`
+            `[tokenTransfer] [${context.senpiUserId}] [processTransfer] resolvedRecipientAddress: ${recipientAddressResult.data}`
         );
 
         const {
@@ -630,7 +630,7 @@ async function processSingleTransfer(
             tokenDecimals: resolvedTokenDecimals,
             tokenSymbol: resolvedTokenSymbol,
             tokenType: resolvedTokenType,
-            currentMoxiePriceInWEI,
+            currentSenpiPriceInWEI,
         } = tokenAddressResult.data;
         const resolvedRecipientAddress = recipientAddressResult.data;
 
@@ -643,12 +643,12 @@ async function processSingleTransfer(
                 resolvedTokenAddress,
                 resolvedTokenDecimals,
                 resolvedTokenType,
-                currentMoxiePriceInWEI
+                currentSenpiPriceInWEI
             );
             if (!conversionResult.data) {
                 elizaLogger.error(
                     context.traceId,
-                    `[tokenTransfer] [${context.moxieUserId}] [processTransfer] [ERROR] Error converting USD to token amount: ${conversionResult.callBackTemplate}`
+                    `[tokenTransfer] [${context.senpiUserId}] [processTransfer] [ERROR] Error converting USD to token amount: ${conversionResult.callBackTemplate}`
                 );
                 return { callBackTemplate: conversionResult.callBackTemplate };
             }
@@ -670,7 +670,7 @@ async function processSingleTransfer(
             if (targetQuantity.callBackTemplate) {
                 elizaLogger.error(
                     context.traceId,
-                    `[tokenTransfer] [${context.moxieUserId}] [processTransfer] [BALANCE_BASED_TOKEN_TRANSFER] [ERROR] Error: ${targetQuantity.callBackTemplate}`
+                    `[tokenTransfer] [${context.senpiUserId}] [processTransfer] [BALANCE_BASED_TOKEN_TRANSFER] [ERROR] Error: ${targetQuantity.callBackTemplate}`
                 );
                 return {
                     callBackTemplate: targetQuantity.callBackTemplate,
@@ -679,7 +679,7 @@ async function processSingleTransfer(
             transferAmountInWEI = targetQuantity.data;
             elizaLogger.debug(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [processTransfer] [BALANCE_BASED_TOKEN_TRANSFER] [transferAmountInWEI]: ${transferAmountInWEI}`
+                `[tokenTransfer] [${context.senpiUserId}] [processTransfer] [BALANCE_BASED_TOKEN_TRANSFER] [transferAmountInWEI]: ${transferAmountInWEI}`
             );
         } else {
             transferAmountInWEI = ethers.parseUnits(
@@ -690,7 +690,7 @@ async function processSingleTransfer(
 
         elizaLogger.debug(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [processTransfer] [transferAmountInWEI]: ${transferAmountInWEI}`
+            `[tokenTransfer] [${context.senpiUserId}] [processTransfer] [transferAmountInWEI]: ${transferAmountInWEI}`
         );
 
         // check if the agent wallet has enough balance to cover the transfer amount
@@ -703,7 +703,7 @@ async function processSingleTransfer(
                   );
         elizaLogger.debug(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [processTransfer] [currentBalanceInWEI]: ${currentBalanceInWEI}`
+            `[tokenTransfer] [${context.senpiUserId}] [processTransfer] [currentBalanceInWEI]: ${currentBalanceInWEI}`
         );
 
         if (BigInt(currentBalanceInWEI) < transferAmountInWEI) {
@@ -731,7 +731,7 @@ async function processSingleTransfer(
         if (transferResult.callBackTemplate) {
             elizaLogger.error(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [processTransfer] [EXECUTE_TRANSFER] [ERROR] Error: ${transferResult.callBackTemplate}`
+                `[tokenTransfer] [${context.senpiUserId}] [processTransfer] [EXECUTE_TRANSFER] [ERROR] Error: ${transferResult.callBackTemplate}`
             );
             return {
                 callBackTemplate: transferResult.callBackTemplate,
@@ -739,7 +739,7 @@ async function processSingleTransfer(
         }
         elizaLogger.debug(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [processTransfer] transferResult: ${JSON.stringify(transferResult)}`
+            `[tokenTransfer] [${context.senpiUserId}] [processTransfer] transferResult: ${JSON.stringify(transferResult)}`
         );
 
         // Verify transaction status
@@ -750,7 +750,7 @@ async function processSingleTransfer(
         if (txnReceipt.callBackTemplate) {
             elizaLogger.error(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [processTransfer] [HANDLE_TRANSACTION_STATUS] [ERROR] Transaction failed`
+                `[tokenTransfer] [${context.senpiUserId}] [processTransfer] [HANDLE_TRANSACTION_STATUS] [ERROR] Transaction failed`
             );
             return {
                 callBackTemplate:
@@ -761,7 +761,7 @@ async function processSingleTransfer(
         if (txnReceipt.data) {
             elizaLogger.debug(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [processTransfer] [HANDLE_TRANSACTION_STATUS] [SUCCESS] Transaction successful: ${txnReceipt.data}`
+                `[tokenTransfer] [${context.senpiUserId}] [processTransfer] [HANDLE_TRANSACTION_STATUS] [SUCCESS] Transaction successful: ${txnReceipt.data}`
             );
             return {
                 data: callBackTemplate.TRANSACTION_SUCCESSFUL(
@@ -777,7 +777,7 @@ async function processSingleTransfer(
     } catch (error) {
         elizaLogger.error(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [processSingleTransfer] Error: ${error}`
+            `[tokenTransfer] [${context.senpiUserId}] [processSingleTransfer] Error: ${error}`
         );
         return {
             callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -788,9 +788,9 @@ async function processSingleTransfer(
 }
 
 /**
- * Resolves the recipient address by checking ENS name or getting Moxie user wallet
- * @param context - The context containing traceId and moxieUserId
- * @param recipient - The recipient identifier (address, ENS name, or Moxie user ID)
+ * Resolves the recipient address by checking ENS name or getting Senpi user wallet
+ * @param context - The context containing traceId and senpiUserId
+ * @param recipient - The recipient identifier (address, ENS name, or Senpi user ID)
  * @returns The resolved recipient address or a callback template if resolution fails
  */
 async function resolveRecipientAddress(
@@ -800,7 +800,7 @@ async function resolveRecipientAddress(
     if (!recipient) {
         elizaLogger.error(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [resolveRecipientAddress] No recipient provided`
+            `[tokenTransfer] [${context.senpiUserId}] [resolveRecipientAddress] No recipient provided`
         );
         return {
             callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -811,7 +811,7 @@ async function resolveRecipientAddress(
 
     elizaLogger.debug(
         context.traceId,
-        `[tokenTransfer] [${context.moxieUserId}] [resolveRecipientAddress] Resolving recipient: ${recipient}`
+        `[tokenTransfer] [${context.senpiUserId}] [resolveRecipientAddress] Resolving recipient: ${recipient}`
     );
 
     try {
@@ -819,7 +819,7 @@ async function resolveRecipientAddress(
         if (ethers.isAddress(recipient)) {
             elizaLogger.debug(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [resolveRecipientAddress] Valid Ethereum address: ${recipient}`
+                `[tokenTransfer] [${context.senpiUserId}] [resolveRecipientAddress] Valid Ethereum address: ${recipient}`
             );
             return {
                 data: recipient,
@@ -831,7 +831,7 @@ async function resolveRecipientAddress(
         if (ensResult.resolvedAddress) {
             elizaLogger.debug(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [resolveRecipientAddress] Resolved ENS address: ${ensResult.resolvedAddress}`
+                `[tokenTransfer] [${context.senpiUserId}] [resolveRecipientAddress] Resolved ENS address: ${ensResult.resolvedAddress}`
             );
             return {
                 data: ensResult.resolvedAddress,
@@ -843,7 +843,7 @@ async function resolveRecipientAddress(
         if (creatorCoinResult?.data) {
             elizaLogger.debug(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [resolveRecipientAddress] Resolved creator coin: ${creatorCoinResult.data}`
+                `[tokenTransfer] [${context.senpiUserId}] [resolveRecipientAddress] Resolved creator coin: ${creatorCoinResult.data}`
             );
             return {
                 data: creatorCoinResult.data,
@@ -852,7 +852,7 @@ async function resolveRecipientAddress(
 
         elizaLogger.error(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [resolveRecipientAddress] Unable to resolve recipient: ${recipient}`
+            `[tokenTransfer] [${context.senpiUserId}] [resolveRecipientAddress] Unable to resolve recipient: ${recipient}`
         );
         return {
             callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -862,7 +862,7 @@ async function resolveRecipientAddress(
     } catch (error) {
         elizaLogger.error(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [resolveRecipientAddress] Error resolving recipient: ${error}`
+            `[tokenTransfer] [${context.senpiUserId}] [resolveRecipientAddress] Error resolving recipient: ${error}`
         );
         return {
             callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -948,7 +948,7 @@ async function resolveENSAddress(context: Context, address: string) {
 
 /**
  * Processes a creator coin
- * @param moxieUserId - The ID of the Moxie user
+ * @param senpiUserId - The ID of the Senpi user
  * @param recipient - The recipient of the creator coin
  * @returns A promise that resolves to a string or CallbackTemplate
  */
@@ -964,41 +964,41 @@ async function processCreatorCoin(
         } = extractCreatorDetails(recipient);
         elizaLogger.debug(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [processCreatorCoin] recipientTokenCreatorId: ${recipientTokenCreatorId} and recipientTokenCreatorUsername: ${recipientTokenCreatorUsername}`
+            `[tokenTransfer] [${context.senpiUserId}] [processCreatorCoin] recipientTokenCreatorId: ${recipientTokenCreatorId} and recipientTokenCreatorUsername: ${recipientTokenCreatorUsername}`
         );
 
         if (!recipientTokenCreatorId) {
             elizaLogger.debug(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [processCreatorCoin] recipientTokenCreatorId not found`
+                `[tokenTransfer] [${context.senpiUserId}] [processCreatorCoin] recipientTokenCreatorId not found`
             );
             return null;
         }
         // fetch the creator agent wallet address
-        const moxieUserDetails =
-            await agentLib.moxieUserService.getUserByMoxieId(
+        const senpiUserDetails =
+            await agentLib.senpiUserService.getUserBySenpiId(
                 recipientTokenCreatorId
             );
         elizaLogger.debug(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [processCreatorCoin]  moxieUserDetails: ${JSON.stringify(moxieUserDetails)}`
+            `[tokenTransfer] [${context.senpiUserId}] [processCreatorCoin]  senpiUserDetails: ${JSON.stringify(senpiUserDetails)}`
         );
 
-        if (!moxieUserDetails) {
+        if (!senpiUserDetails) {
             elizaLogger.debug(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [processCreatorCoin] moxieUserDetails not found`
+                `[tokenTransfer] [${context.senpiUserId}] [processCreatorCoin] senpiUserDetails not found`
             );
             return null;
         }
-        const creatorAgentWallet = moxieUserDetails.wallets.filter(
+        const creatorAgentWallet = senpiUserDetails.wallets.filter(
             (Wallet) => Wallet.walletType === "embedded"
         )[0];
 
         if (!creatorAgentWallet) {
             elizaLogger.debug(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [processCreatorCoin] creatorAgentWallet not found`
+                `[tokenTransfer] [${context.senpiUserId}] [processCreatorCoin] creatorAgentWallet not found`
             );
             return null;
         }
@@ -1009,7 +1009,7 @@ async function processCreatorCoin(
     } catch (error) {
         elizaLogger.error(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [processCreatorCoin] Error: ${error}`
+            `[tokenTransfer] [${context.senpiUserId}] [processCreatorCoin] Error: ${error}`
         );
         return {
             callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -1021,7 +1021,7 @@ async function processCreatorCoin(
 
 /**
  * Processes an ERC20 token
- * @param moxieUserId - The ID of the Moxie user
+ * @param senpiUserId - The ID of the Senpi user
  * @param recipient - The recipient of the ERC20 token
  * @returns A promise that resolves to a string or CallbackTemplate
  */
@@ -1033,14 +1033,14 @@ async function processERC20(
         const { tokenSymbol, tokenAddress } = extractTokenDetails(recipient);
         elizaLogger.debug(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [processERC20] tokenSymbol: ${tokenSymbol} and tokenAddress: ${tokenAddress}`
+            `[tokenTransfer] [${context.senpiUserId}] [processERC20] tokenSymbol: ${tokenSymbol} and tokenAddress: ${tokenAddress}`
         );
 
         // fetch the token details
         if (!tokenSymbol || !tokenAddress) {
             elizaLogger.error(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [processERC20] Invalid token details: ${recipient}`
+                `[tokenTransfer] [${context.senpiUserId}] [processERC20] Invalid token details: ${recipient}`
             );
             return {
                 callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -1055,7 +1055,7 @@ async function processERC20(
     } catch (error) {
         elizaLogger.error(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [processERC20] Error: ${error}`
+            `[tokenTransfer] [${context.senpiUserId}] [processERC20] Error: ${error}`
         );
         return {
             callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -1127,7 +1127,7 @@ async function getFtaResponses(
     if (!creatorIds?.length) {
         elizaLogger.error(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [getFtaResponses] No creator IDs provided`
+            `[tokenTransfer] [${context.senpiUserId}] [getFtaResponses] No creator IDs provided`
         );
         return {
             callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -1150,7 +1150,7 @@ async function getFtaResponses(
                 if (cachedResponse) {
                     elizaLogger.debug(
                         context.traceId,
-                        `[tokenTransfer] [${context.moxieUserId}] [getFtaResponses] Cache hit for creator ${creatorId}`
+                        `[tokenTransfer] [${context.senpiUserId}] [getFtaResponses] Cache hit for creator ${creatorId}`
                     );
                     return { creatorId, response: cachedResponse };
                 }
@@ -1161,7 +1161,7 @@ async function getFtaResponses(
                 if (!newResponse) {
                     elizaLogger.error(
                         context.traceId,
-                        `[tokenTransfer] [${context.moxieUserId}] [getFtaResponses] Creator ${creatorId} not found`
+                        `[tokenTransfer] [${context.senpiUserId}] [getFtaResponses] Creator ${creatorId} not found`
                     );
                     return { error: true, creatorId };
                 }
@@ -1170,13 +1170,13 @@ async function getFtaResponses(
                 await context.runtime.cacheManager.set(cacheKey, newResponse);
                 elizaLogger.debug(
                     context.traceId,
-                    `[tokenTransfer] [${context.moxieUserId}] [getFtaResponses] Cached new data for creator ${creatorId}`
+                    `[tokenTransfer] [${context.senpiUserId}] [getFtaResponses] Cached new data for creator ${creatorId}`
                 );
                 return { creatorId, response: newResponse };
             } catch (error) {
                 elizaLogger.error(
                     context.traceId,
-                    `[tokenTransfer] [${context.moxieUserId}] [getFtaResponses] Error processing creator ${creatorId}: ${error}`
+                    `[tokenTransfer] [${context.senpiUserId}] [getFtaResponses] Error processing creator ${creatorId}: ${error}`
                 );
                 return { error: true, creatorId };
             }
@@ -1212,7 +1212,7 @@ async function resolveTokenAddress(
 ): Promise<FunctionResponse<TokenDetails>> {
     elizaLogger.debug(
         context.traceId,
-        `[tokenTransfer] [${context.moxieUserId}] [resolveTokenAddress] Resolving token: ${token}`
+        `[tokenTransfer] [${context.senpiUserId}] [resolveTokenAddress] Resolving token: ${token}`
     );
     try {
         // First check if it's a creator coin
@@ -1231,8 +1231,8 @@ async function resolveTokenAddress(
                     tokenSymbol: subjectTokenDetails.data.symbol,
                     tokenDecimals: Number(subjectTokenDetails.data.decimals),
                     tokenType: "CREATOR_COIN",
-                    currentMoxiePriceInWEI:
-                        subjectTokenDetails.data.currentPriceInWeiInMoxie,
+                    currentSenpiPriceInWEI:
+                        subjectTokenDetails.data.currentPriceInWeiInSenpi,
                 },
             };
         }
@@ -1247,7 +1247,7 @@ async function resolveTokenAddress(
                 tokenAddress = token;
                 elizaLogger.debug(
                     context.traceId,
-                    `[tokenTransfer] [${context.moxieUserId}] [resolveTokenAddress] Token details: ${JSON.stringify(
+                    `[tokenTransfer] [${context.senpiUserId}] [resolveTokenAddress] Token details: ${JSON.stringify(
                         {
                             tokenAddress: tokenAddress,
                             tokenSymbol: tokenSymbol,
@@ -1258,7 +1258,7 @@ async function resolveTokenAddress(
             } catch (error) {
                 elizaLogger.error(
                     context.traceId,
-                    `[tokenTransfer] [${context.moxieUserId}] [resolveTokenAddress] Error fetching token symbol: ${error}`
+                    `[tokenTransfer] [${context.senpiUserId}] [resolveTokenAddress] Error fetching token symbol: ${error}`
                 );
                 return {
                     callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -1272,7 +1272,7 @@ async function resolveTokenAddress(
             if (!tokenAddress || !ethers.isAddress(tokenAddress)) {
                 elizaLogger.error(
                     context.traceId,
-                    `[tokenTransfer] [${context.moxieUserId}] [resolveTokenAddress] Invalid token format: ${token}`
+                    `[tokenTransfer] [${context.senpiUserId}] [resolveTokenAddress] Invalid token format: ${token}`
                 );
                 return {
                     callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -1284,7 +1284,7 @@ async function resolveTokenAddress(
 
         elizaLogger.debug(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [resolveTokenAddress] Extracted ERC20 address: ${tokenAddress}`
+            `[tokenTransfer] [${context.senpiUserId}] [resolveTokenAddress] Extracted ERC20 address: ${tokenAddress}`
         );
 
         const tokenDecimals =
@@ -1293,7 +1293,7 @@ async function resolveTokenAddress(
                 : await getERC20Decimals(context, tokenAddress);
         elizaLogger.debug(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [resolveTokenAddress] Token decimals: ${tokenDecimals}`
+            `[tokenTransfer] [${context.senpiUserId}] [resolveTokenAddress] Token decimals: ${tokenDecimals}`
         );
 
         return {
@@ -1307,7 +1307,7 @@ async function resolveTokenAddress(
     } catch (error) {
         elizaLogger.error(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [resolveTokenAddress] Error: ${error}`
+            `[tokenTransfer] [${context.senpiUserId}] [resolveTokenAddress] Error: ${error}`
         );
         return {
             callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -1320,7 +1320,7 @@ async function resolveTokenAddress(
 /**
  * Get the creator coin details
  * @param tokenAddress - The address of the token
- * @param moxieUserId - The ID of the Moxie user
+ * @param senpiUserId - The ID of the Senpi user
  * @param runtime - The runtime environment
  * @returns A promise that resolves to a SubjectToken or CallbackTemplate
  */
@@ -1354,7 +1354,7 @@ async function getCreatorCoinDetails(
         } catch (error) {
             elizaLogger.error(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [getCreatorCoinDetails] Error getting FTA responses for creator ID ${tokenCreatorId}: ${error}`
+                `[tokenTransfer] [${context.senpiUserId}] [getCreatorCoinDetails] Error getting FTA responses for creator ID ${tokenCreatorId}: ${error}`
             );
             return {
                 callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -1372,7 +1372,7 @@ async function getCreatorCoinDetails(
 /**
  * Executes a transfer of ERC20 tokens
  * @param traceId - The trace ID of the message
- * @param moxieUserId - The ID of the Moxie user
+ * @param senpiUserId - The ID of the Senpi user
  * @param tokenAddress - The address of the token
  * @param recipientAddress - The address of the recipient
  * @param agentWallet - The address of the agent's wallet
@@ -1388,13 +1388,13 @@ async function executeTransfer(
 ): Promise<FunctionResponse<string>> {
     elizaLogger.debug(
         context.traceId,
-        `[tokenTransfer] [${context.moxieUserId}] [executeTransfer] Executing transfer of ${amountInWEI} tokens from ${agentWallet} to ${recipientAddress}`
+        `[tokenTransfer] [${context.senpiUserId}] [executeTransfer] Executing transfer of ${amountInWEI} tokens from ${agentWallet} to ${recipientAddress}`
     );
 
     const feeData = await context.provider.getFeeData();
     elizaLogger.debug(
         context.traceId,
-        `[tokenTransfer] [${context.moxieUserId}] [executeTransfer] feeData: ${JSON.stringify(feeData)}`
+        `[tokenTransfer] [${context.senpiUserId}] [executeTransfer] feeData: ${JSON.stringify(feeData)}`
     );
 
     // Add 20% buffer to gas fees
@@ -1403,7 +1403,7 @@ async function executeTransfer(
     const maxFeePerGas = (feeData.maxFeePerGas! * BigInt(120)) / BigInt(100);
     elizaLogger.debug(
         context.traceId,
-        `[tokenTransfer] [${context.moxieUserId}] [executeTransfer] maxPriorityFeePerGas: ${maxPriorityFeePerGas} maxFeePerGas: ${maxFeePerGas}`
+        `[tokenTransfer] [${context.senpiUserId}] [executeTransfer] maxPriorityFeePerGas: ${maxPriorityFeePerGas} maxFeePerGas: ${maxFeePerGas}`
     );
 
     // Prepare transaction input for ERC20 token transfer
@@ -1424,13 +1424,13 @@ async function executeTransfer(
     };
     elizaLogger.debug(
         context.traceId,
-        `[tokenTransfer] [${context.moxieUserId}] [executeTransfer] request: ${JSON.stringify(request)}`
+        `[tokenTransfer] [${context.senpiUserId}] [executeTransfer] request: ${JSON.stringify(request)}`
     );
 
     // Send the transaction
     const walletClient = context.state
-        .moxieWalletClient as agentLib.MoxieWalletClient;
-    let transactionResponse: agentLib.MoxieWalletSendTransactionResponseType;
+        .SenpiWalletClient as agentLib.SenpiWalletClient;
+    let transactionResponse: agentLib.SenpiWalletSendTransactionResponseType;
     try {
         transactionResponse = await walletClient.sendTransaction(
             process.env.CHAIN_ID || "8453",
@@ -1439,7 +1439,7 @@ async function executeTransfer(
     } catch (error) {
         elizaLogger.error(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [executeTransfer] Error sending transaction: ${error}`
+            `[tokenTransfer] [${context.senpiUserId}] [executeTransfer] Error sending transaction: ${error}`
         );
         return {
             callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -1450,7 +1450,7 @@ async function executeTransfer(
 
     elizaLogger.debug(
         context.traceId,
-        `[tokenTransfer] [${context.moxieUserId}] [executeTransfer] transactionResponse: ${JSON.stringify(transactionResponse)}`
+        `[tokenTransfer] [${context.senpiUserId}] [executeTransfer] transactionResponse: ${JSON.stringify(transactionResponse)}`
     );
 
     return {
@@ -1460,7 +1460,7 @@ async function executeTransfer(
 
 /**
  * Get the current wallet balance and calculate transfer amount based on percentage
- * @param context The context object containing traceId and moxieUserId
+ * @param context The context object containing traceId and senpiUserId
  * @param currentWalletBalance Optional pre-fetched wallet balance to avoid duplicate queries
  * @param tokenAddress The token contract address
  * @param tokenSymbol The token symbol (e.g. "ETH")
@@ -1473,14 +1473,14 @@ async function getTargetQuantityForBalanceBasedTokenTransfer(
     currentWalletBalance: bigint | undefined,
     tokenAddress: string,
     tokenSymbol: string,
-    agentWallet: agentLib.MoxieClientWallet,
+    agentWallet: agentLib.SenpiClientWalet,
     balance: Balance
 ): Promise<FunctionResponse<bigint>> {
     // Input validation
     if (!tokenAddress || !tokenSymbol || !agentWallet || !balance) {
         elizaLogger.error(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [getTargetQuantityForBalanceBasedTokenTransfer] Missing required parameters`
+            `[tokenTransfer] [${context.senpiUserId}] [getTargetQuantityForBalanceBasedTokenTransfer] Missing required parameters`
         );
         return {
             callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -1496,7 +1496,7 @@ async function getTargetQuantityForBalanceBasedTokenTransfer(
     ) {
         elizaLogger.error(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [getTargetQuantityForBalanceBasedTokenTransfer] Invalid percentage: ${balance.percentage}`
+            `[tokenTransfer] [${context.senpiUserId}] [getTargetQuantityForBalanceBasedTokenTransfer] Invalid percentage: ${balance.percentage}`
         );
         return {
             callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -1507,7 +1507,7 @@ async function getTargetQuantityForBalanceBasedTokenTransfer(
 
     elizaLogger.debug(
         context.traceId,
-        `[tokenTransfer] [${context.moxieUserId}] [getTargetQuantityForBalanceBasedTokenTransfer] Processing transfer with: token=${tokenSymbol}, percentage=${balance.percentage}%`
+        `[tokenTransfer] [${context.senpiUserId}] [getTargetQuantityForBalanceBasedTokenTransfer] Processing transfer with: token=${tokenSymbol}, percentage=${balance.percentage}%`
     );
 
     try {
@@ -1523,13 +1523,13 @@ async function getTargetQuantityForBalanceBasedTokenTransfer(
 
         elizaLogger.debug(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [getTargetQuantityForBalanceBasedTokenTransfer] Current balance: ${walletBalance}`
+            `[tokenTransfer] [${context.senpiUserId}] [getTargetQuantityForBalanceBasedTokenTransfer] Current balance: ${walletBalance}`
         );
 
         if (!walletBalance) {
             elizaLogger.error(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [getTargetQuantityForBalanceBasedTokenTransfer] Insufficient balance for ${tokenSymbol}`
+                `[tokenTransfer] [${context.senpiUserId}] [getTargetQuantityForBalanceBasedTokenTransfer] Insufficient balance for ${tokenSymbol}`
             );
             return {
                 callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -1547,7 +1547,7 @@ async function getTargetQuantityForBalanceBasedTokenTransfer(
 
         elizaLogger.debug(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [getTargetQuantityForBalanceBasedTokenTransfer] Calculated amount: ${quantityInWEI}`
+            `[tokenTransfer] [${context.senpiUserId}] [getTargetQuantityForBalanceBasedTokenTransfer] Calculated amount: ${quantityInWEI}`
         );
 
         return {
@@ -1556,7 +1556,7 @@ async function getTargetQuantityForBalanceBasedTokenTransfer(
     } catch (error) {
         elizaLogger.error(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [getTargetQuantityForBalanceBasedTokenTransfer] Error: ${error}`
+            `[tokenTransfer] [${context.senpiUserId}] [getTargetQuantityForBalanceBasedTokenTransfer] Error: ${error}`
         );
         return {
             callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -1573,7 +1573,7 @@ async function getTargetQuantityForBalanceBasedTokenTransfer(
  * @param tokenAddress - The address of the token to transfer
  * @param tokenDecimals - The number of decimals of the token
  * @param tokenType - The type of token (CREATOR_COIN or ERC20)
- * @param currentMoxiePriceInWEI - Current price of Moxie token in WEI (only used for CREATOR_COIN)
+ * @param currentSenpiPriceInWEI - Current price of Senpi token in WEI (only used for CREATOR_COIN)
  * @returns Promise resolving to token amount in WEI or error
  */
 async function convertUSDToTokenAmount(
@@ -1582,11 +1582,11 @@ async function convertUSDToTokenAmount(
     tokenAddress: string,
     tokenDecimals: number,
     tokenType: string,
-    currentMoxiePriceInWEI: string
+    currentSenpiPriceInWEI: string
 ): Promise<FunctionResponse<bigint>> {
     elizaLogger.debug(
         context.traceId,
-        `[tokenTransfer] [${context.moxieUserId}] [convertUSDToTokenAmount] Converting USD amount: ${transferAmount} to ${tokenAddress}`
+        `[tokenTransfer] [${context.senpiUserId}] [convertUSDToTokenAmount] Converting USD amount: ${transferAmount} to ${tokenAddress}`
     );
 
     try {
@@ -1614,13 +1614,13 @@ async function convertUSDToTokenAmount(
         ]);
         elizaLogger.debug(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [convertUSDToTokenAmount] Token details Response: ${JSON.stringify(tokenDetails)}`
+            `[tokenTransfer] [${context.senpiUserId}] [convertUSDToTokenAmount] Token details Response: ${JSON.stringify(tokenDetails)}`
         );
 
         if (!tokenDetails || tokenDetails.length === 0) {
             elizaLogger.error(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [convertUSDToTokenAmount] Error getting token details: ${tokenDetails}`
+                `[tokenTransfer] [${context.senpiUserId}] [convertUSDToTokenAmount] Error getting token details: ${tokenDetails}`
             );
             return {
                 callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -1633,7 +1633,7 @@ async function convertUSDToTokenAmount(
         if (!tokenDetail?.priceUSD) {
             elizaLogger.error(
                 context.traceId,
-                `[tokenTransfer] [${context.moxieUserId}] [convertUSDToTokenAmount] Error getting token details from getTokenDetails: ${tokenDetail}`
+                `[tokenTransfer] [${context.senpiUserId}] [convertUSDToTokenAmount] Error getting token details from getTokenDetails: ${tokenDetail}`
             );
             return {
                 callBackTemplate: callBackTemplate.APPLICATION_ERROR(
@@ -1645,7 +1645,7 @@ async function convertUSDToTokenAmount(
         const priceUSD = Decimal(tokenDetail.priceUSD);
         elizaLogger.debug(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [convertUSDToTokenAmount] Price USD: ${priceUSD}`
+            `[tokenTransfer] [${context.senpiUserId}] [convertUSDToTokenAmount] Price USD: ${priceUSD}`
         );
 
         // Calculate token amount by dividing USD amount by price per token
@@ -1654,7 +1654,7 @@ async function convertUSDToTokenAmount(
             .toFixed(tokenDecimals);
         elizaLogger.debug(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [convertUSDToTokenAmount] Calculated ${tokenAmount}`
+            `[tokenTransfer] [${context.senpiUserId}] [convertUSDToTokenAmount] Calculated ${tokenAmount}`
         );
 
         // Parse with appropriate decimals
@@ -1665,18 +1665,18 @@ async function convertUSDToTokenAmount(
 
         elizaLogger.debug(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [convertUSDToTokenAmount] Token amount in WEI: ${tokenAmountInWei}`
+            `[tokenTransfer] [${context.senpiUserId}] [convertUSDToTokenAmount] Token amount in WEI: ${tokenAmountInWei}`
         );
 
-        // For creator coins, need to convert Moxie amount to creator coin amount
+        // For creator coins, need to convert Senpi amount to creator coin amount
         if (tokenType === "CREATOR_COIN") {
-            const moxiePrice = new Decimal(currentMoxiePriceInWEI);
-            if (moxiePrice.isZero()) {
-                throw new Error("Invalid Moxie token price");
+            const senpiPrice = new Decimal(currentSenpiPriceInWEI);
+            if (senpiPrice.isZero()) {
+                throw new Error("Invalid Senpi token price");
             }
 
             const creatorCoinAmount = new Decimal(tokenAmountInWei.toString())
-                .div(moxiePrice)
+                .div(senpiPrice)
                 .toFixed(MOXIE_TOKEN_DECIMALS, Decimal.ROUND_DOWN)
                 .replace(/\.?0+$/, "");
 
@@ -1695,7 +1695,7 @@ async function convertUSDToTokenAmount(
     } catch (error) {
         elizaLogger.error(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [convertUSDToTokenAmount] Error: ${error}`
+            `[tokenTransfer] [${context.senpiUserId}] [convertUSDToTokenAmount] Error: ${error}`
         );
         return {
             callBackTemplate: callBackTemplate.APPLICATION_ERROR(

@@ -33,7 +33,7 @@ if (!process.env.CHAIN_ID || isNaN(Number(process.env.CHAIN_ID))) {
 
 /**
  * Get 0x price
- * @param moxieUserId - The moxie user id
+ * @param senpiUserId - The senpi user id
  * @param sellAmountBaseUnits - The sell amount
  * @param buyTokenAddress - The buy token address
  * @param walletAddress - The wallet address
@@ -59,7 +59,7 @@ export const get0xPrice = async ({
         }
         elizaLogger.debug(
             context.traceId,
-            `[get0xPrice] [${context.moxieUserId}] input details: [${walletAddress}] [${sellTokenAddress}] [${buyTokenAddress}] [${sellAmountBaseUnits}]`
+            `[get0xPrice] [${context.senpiUserId}] input details: [${walletAddress}] [${sellTokenAddress}] [${buyTokenAddress}] [${sellAmountBaseUnits}]`
         );
         const price = (await zxClient.gasless.getPrice.query({
             sellAmount: sellAmountBaseUnits,
@@ -69,13 +69,13 @@ export const get0xPrice = async ({
         })) as GetIndicativePriceResponse;
         elizaLogger.debug(
             context.traceId,
-            `[get0xPrice] [${context.moxieUserId}] price: ${JSON.stringify(price)}`
+            `[get0xPrice] [${context.senpiUserId}] price: ${JSON.stringify(price)}`
         );
         return price;
     } catch (error) {
         elizaLogger.error(
             context.traceId,
-            `[get0xPrice] [${context.moxieUserId}] [ERROR] Failed to get 0x price: ${JSON.stringify(error)}`
+            `[get0xPrice] [${context.senpiUserId}] [ERROR] Failed to get 0x price: ${JSON.stringify(error)}`
         );
         throw new Error("Failed to get price quote. Please try again later.");
     }

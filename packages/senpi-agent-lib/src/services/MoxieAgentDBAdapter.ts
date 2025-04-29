@@ -3,15 +3,15 @@ import { elizaLogger } from "@senpi-ai/core";
 import { IAgentRuntime } from "@senpi-ai/core";
 import { v4 as uuidv4 } from "uuid";
 import { ethers } from "ethers";
-import { MOXIE_USER_PORTFOLIOS_QUERY } from "./constants";
+import { SENPI_USER_PORTFOLIOS_QUERY } from "./constants";
 import {
     CampaignTokenDetails,
-    MoxiePortfolioInfo,
-    MoxiePortfolioResponse,
+    SenpiPortfolioInfo,
+    SenpiPortfolioResponse,
     Skill,
 } from "./types";
 
-export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
+export class SenpiAgentDBAdapter extends PostgresDatabaseAdapter {
     private pgAdapter: PostgresDatabaseAdapter;
     constructor(connectionConfig: any) {
         super(connectionConfig);
@@ -152,7 +152,7 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
     async createUserAgentFeedback(
         roomId: string,
         messageId: string,
-        moxieUserId: string,
+        senpiUserId: string,
         agentId: string,
         feedback: string,
         rating: number,
@@ -161,9 +161,9 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
     ): Promise<string> {
         return this.pgAdapter
             .query(
-                `INSERT INTO user_agent_feedback (room_id, message_id, moxie_user_id, agent_id, feedback, rating, feedback_text, screenshot_url)
+                `INSERT INTO user_agent_feedback (room_id, message_id, senpi_user_id, agent_id, feedback, rating, feedback_text, screenshot_url)
                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-                 ON CONFLICT (message_id, moxie_user_id) DO UPDATE
+                 ON CONFLICT (message_id, senpi_user_id) DO UPDATE
                  SET feedback = $5,
                      feedback_text = $7,
                      rating = $6,
@@ -172,7 +172,7 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
                 [
                     roomId,
                     messageId,
-                    moxieUserId,
+                    senpiUserId,
                     agentId,
                     feedback,
                     rating,
@@ -458,19 +458,19 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
 
     /**
      * Validates the balance of a creator coin token for a given wallet address
-     * @param moxieUserId - The Moxie user ID
+     * @param senpiUserId - The Senpi user ID
      * @param runtime - The runtime object. If provided, the function will cache the result in the runtime cache. If not provided, the function will not cache the result.
      * @param creatorCoinTokenAddress - The address of the creator coin token
      * @param requiredBalance - The required balance of the creator coin token
      */
 
     async validateCreatorCoinTokenBalance({
-        moxieUserId,
+        senpiUserId,
         runtime,
         creatorCoinTokenAddress,
         requiredBalance,
     }: {
-        moxieUserId: string;
+        senpiUserId: string;
         runtime?: IAgentRuntime;
         creatorCoinTokenAddress: string;
         requiredBalance: number;
@@ -479,7 +479,7 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
         hasSufficientBalance: boolean;
     }> {
         elizaLogger.debug(
-            `[validateCreatorCoinTokenBalance] [${moxieUserId}] Validating creator coin token balance`
+            `[validateCreatorCoinTokenBalance] [${senpiUserId}] Validating creator coin token balance`
         );
 
         const response = {
@@ -487,15 +487,15 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
             hasSufficientBalance: false,
         };
         // bypass this check for internal dev team
-        const devTeamMoxieUserIds =
-            process.env.DEV_TEAM_MOXIE_USER_IDS?.split(",") || [];
-        if (devTeamMoxieUserIds.includes(moxieUserId)) {
+        const devTeamSenpiUserIds =
+            process.env.DEV_TEAM_SENPI_USER_IDS?.split(",") || [];
+        if (devTeamSenpiUserIds.includes(senpiUserId)) {
             return {
                 creatorCoinTokenBalance: 0,
                 hasSufficientBalance: true,
             };
         }
-        const cacheKey = `creator-coin-token-balance-${moxieUserId}-${creatorCoinTokenAddress}`;
+        const cacheKey = `creator-coin-token-balance-${senpiUserId}-${creatorCoinTokenAddress}`;
 
         // Check cache first if runtime provided
         if (runtime) {
@@ -508,13 +508,13 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
         try {
             // Get portfolio info
             const portfolioInfo =
-                await getMoxiePortfolioInfoByCreatorTokenDetails(moxieUserId, {
+                await getSenpiPortfolioInfoByCreatorTokenDetails(senpiUserId, {
                     address: creatorCoinTokenAddress,
                 });
 
             // Throw error if no portfolio found
             if (!portfolioInfo?.length) {
-                const errorMessage = `No portfolio info found for moxie user ${moxieUserId}`;
+                const errorMessage = `No portfolio info found for senpi user ${senpiUserId}`;
                 elizaLogger.error(errorMessage);
                 return response;
             }
@@ -524,7 +524,7 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
             const totalAmount = totalLockedAmount + totalUnlockedAmount;
 
             elizaLogger.debug(
-                `[validateCreatorCoinTokenBalance] [${moxieUserId}] Total amount: ${totalAmount}`
+                `[validateCreatorCoinTokenBalance] [${senpiUserId}] Total amount: ${totalAmount}`
             );
 
             response.creatorCoinTokenBalance = totalAmount;
@@ -532,7 +532,7 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
 
             if (!response.hasSufficientBalance) {
                 elizaLogger.error(
-                    `[validateCreatorCoinTokenBalance] [${moxieUserId}] Total amount is less than required balance`
+                    `[validateCreatorCoinTokenBalance] [${senpiUserId}] Total amount is less than required balance`
                 );
             }
 
@@ -560,21 +560,21 @@ export class MoxieAgentDBAdapter extends PostgresDatabaseAdapter {
 
 /**
  * Get the portfolio info for a creator token
- * @param moxieUserId - The moxie user id
+ * @param senpiUserId - The senpi user id
  * @param creatorToken - The creator token details
  * @returns The portfolio info for the creator token or undefined if no portfolio info is found
  */
-export async function getMoxiePortfolioInfoByCreatorTokenDetails(
-    moxieUserId: string,
+export async function getSenpiPortfolioInfoByCreatorTokenDetails(
+    senpiUserId: string,
     creatorToken: {
         address?: string;
         name?: string;
         symbol?: string;
     }
-): Promise<MoxiePortfolioInfo[] | undefined> {
+): Promise<SenpiPortfolioInfo[] | undefined> {
     try {
         elizaLogger.debug(
-            `[getMoxiePortfolioInfoByCreatorTokenDetails] [${moxieUserId}] Getting portfolio info for user ${moxieUserId} and creator token ${JSON.stringify(creatorToken)}`
+            `[getSenpiPortfolioInfoByCreatorTokenDetails] [${senpiUserId}] Getting portfolio info for user ${senpiUserId} and creator token ${JSON.stringify(creatorToken)}`
         );
 
         // Validate that at least one token detail is provided
@@ -603,7 +603,7 @@ export async function getMoxiePortfolioInfoByCreatorTokenDetails(
 
         // Build filter conditions
         const filterConditions = [
-            `moxieUserId: {_eq: "${moxieUserId}"}`,
+            `senpiUserId: {_eq: "${senpiUserId}"}`,
             ...(creatorToken.address
                 ? [
                       `fanTokenAddress: {_eq: "${creatorToken.address.toLowerCase()}"}`,
@@ -618,10 +618,10 @@ export async function getMoxiePortfolioInfoByCreatorTokenDetails(
         ];
 
         elizaLogger.debug(
-            `[getMoxiePortfolioInfoByCreatorTokenDetails] [${moxieUserId}] Filter conditions: ${filterConditions.join(", ")}`
+            `[getSenpiPortfolioInfoByCreatorTokenDetails] [${senpiUserId}] Filter conditions: ${filterConditions.join(", ")}`
         );
 
-        const query = MOXIE_USER_PORTFOLIOS_QUERY(filterConditions);
+        const query = SENPI_USER_PORTFOLIOS_QUERY(filterConditions);
 
         let attempts = 0;
         const maxAttempts = 3;
@@ -648,21 +648,21 @@ export async function getMoxiePortfolioInfoByCreatorTokenDetails(
                 }
 
                 const result =
-                    (await response.json()) as MoxiePortfolioResponse;
+                    (await response.json()) as SenpiPortfolioResponse;
 
                 if (result.errors) {
                     elizaLogger.error(
-                        `Error fetching portfolio info for user ${moxieUserId}:`,
+                        `Error fetching portfolio info for user ${senpiUserId}:`,
                         result.errors
                     );
                     throw new Error(
-                        `Error fetching portfolio info for user ${moxieUserId}: ${result.errors[0].message}`
+                        `Error fetching portfolio info for user ${senpiUserId}: ${result.errors[0].message}`
                     );
                 }
 
                 if (!result.data?.MoxieUserPortfolios?.MoxieUserPortfolio) {
                     elizaLogger.error(
-                        `No portfolio data found for user ${moxieUserId}`
+                        `No portfolio data found for user ${senpiUserId}`
                     );
                     return undefined;
                 }
@@ -670,20 +670,20 @@ export async function getMoxiePortfolioInfoByCreatorTokenDetails(
                 const portfolioInfo =
                     result.data.MoxieUserPortfolios.MoxieUserPortfolio;
                 elizaLogger.debug(
-                    `[getMoxiePortfolioInfoByCreatorTokenDetails] [${moxieUserId}] Portfolio response: ${JSON.stringify(portfolioInfo)}`
+                    `[getSenpiPortfolioInfoByCreatorTokenDetails] [${senpiUserId}] Portfolio response: ${JSON.stringify(portfolioInfo)}`
                 );
                 return portfolioInfo;
             } catch (error) {
                 attempts++;
                 if (attempts === maxAttempts) {
                     elizaLogger.error(
-                        `[getMoxiePortfolioInfoByCreatorTokenDetails] [${moxieUserId}] Failed after ${maxAttempts} attempts:`,
+                        `[getSenpiPortfolioInfoByCreatorTokenDetails] [${senpiUserId}] Failed after ${maxAttempts} attempts:`,
                         error
                     );
                     throw error;
                 }
                 elizaLogger.warn(
-                    `[getMoxiePortfolioInfoByCreatorTokenDetails] [${moxieUserId}] API call failed, attempt ${attempts}/${maxAttempts}. Retrying...`
+                    `[getSenpiPortfolioInfoByCreatorTokenDetails] [${senpiUserId}] API call failed, attempt ${attempts}/${maxAttempts}. Retrying...`
                 );
                 await new Promise((resolve) =>
                     setTimeout(resolve, backoffMs * attempts)
@@ -692,7 +692,7 @@ export async function getMoxiePortfolioInfoByCreatorTokenDetails(
         }
     } catch (error) {
         elizaLogger.error(
-            `[getMoxiePortfolioInfoByCreatorTokenDetails] [${moxieUserId}] Error fetching portfolio info:`,
+            `[getSenpiPortfolioInfoByCreatorTokenDetails] [${senpiUserId}] Error fetching portfolio info:`,
             error
         );
         throw error;

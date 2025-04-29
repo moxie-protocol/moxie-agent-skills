@@ -49,7 +49,7 @@ export interface FunctionResponse<T> {
 
 export interface Context {
     traceId: string;
-    moxieUserId?: string;
+    senpiUserId?: string;
     runtime: IAgentRuntime;
     state: State;
     provider?: ethers.JsonRpcProvider;
@@ -61,7 +61,7 @@ export type TokenDetails = {
     tokenSymbol: string;
     tokenDecimals: number;
     tokenType: string;
-    currentMoxiePriceInWEI?: string;
+    currentSenpiPriceInWEI?: string;
 };
 
 export interface GetQuoteResponse {

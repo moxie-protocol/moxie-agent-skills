@@ -124,13 +124,13 @@ export async function extractTokenDetails(
 }
 
 export async function verifyUserBaseEconomyTokenOwnership(
-    moxieUserId: string,
+    senpiUserId: string,
     runtime: IAgentRuntime
 ): Promise<boolean> {
     let baseEconomyTokenBalance, hasSufficientBalance;
     try {
         ({ baseEconomyTokenBalance, hasSufficientBalance } =
-            await validateBaseEconomyTokenBalance({ moxieUserId, runtime }));
+            await validateBaseEconomyTokenBalance({ senpiUserId, runtime }));
     } catch (error) {
         elizaLogger.error(
             `[verifyUserBaseEconomyTokenOwnership] Error: ${error}`
@@ -162,7 +162,7 @@ export function extractCreatorDetails(
 /**
  * Fetches FTA responses for given creator IDs
  * @param creatorIds - Array of creator IDs to fetch FTA responses for
- * @param moxieUserId - The user ID of the person performing the swap
+ * @param senpiUserId - The user ID of the person performing the swap
  * @param runtime - The runtime environment
  * @param callback - The callback function to receive status updates
  * @returns Promise that resolves to a record of creator IDs and their FTA responses
@@ -178,7 +178,7 @@ async function getFtaResponses(
         );
         if (ftaResponse) {
             elizaLogger.debug(
-                `[whalePlugin] fta response fetched successfully from cache for creator moxie user id: ${creatorId}, ${JSON.stringify(ftaResponse)}`
+                `[whalePlugin] fta response fetched successfully from cache for creator senpi user id: ${creatorId}, ${JSON.stringify(ftaResponse)}`
             );
             ftaResponses[creatorId] = ftaResponse;
         } else {

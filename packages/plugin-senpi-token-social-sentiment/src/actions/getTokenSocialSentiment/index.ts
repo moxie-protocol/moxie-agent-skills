@@ -12,7 +12,7 @@ import {
     generateObjectDeprecated,
     ModelProviderName,
 } from "@senpi-ai/core";
-import { MoxieUser, getTokenDetails } from "@senpi-ai/senpi-agent-lib";
+import { SenpiUser, getTokenDetails } from "@senpi-ai/senpi-agent-lib";
 import { twitterScraperService } from "../../services/twitterService";
 import { getFarcasterCasts } from "../../services/neynarService";
 import {
@@ -95,7 +95,7 @@ export default {
                 `[SocialPlatform] social platform: ${socialPlatform} token symbol: ${tokenSymbol}`
             );
 
-            const moxieUserId = (state.moxieUserInfo as MoxieUser)?.id;
+            const senpiUserId = (state.senpiUserInfo as SenpiUser)?.id;
             const tokenAddress =
                 message.content.text.match(/0x[a-fA-F0-9]{40}/g) || [];
             let tokenTicker: string | RegExpMatchArray | [] =

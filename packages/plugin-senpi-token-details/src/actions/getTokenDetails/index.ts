@@ -12,7 +12,7 @@ import {
 import { tokenDetailsExamples } from "./examples";
 import { getTokenDetails } from "@senpi-ai/senpi-agent-lib";
 import { tokenDetailsSummary } from "./template";
-import { getMoxieCache, setMoxieUserIdCache } from "../../util";
+import { getSenpiCache, setSenpiUserIdCache } from "../../util";
 import { TOP_MEMORY_CONVERSATIONS, BASE_NETWORK_ID } from "../../config";
 
 export default {
@@ -98,7 +98,7 @@ export default {
 
         // Check cache for each address individually
         for (const address of formattedAddresses) {
-            const cachedDetail = await getMoxieCache(address, runtime);
+            const cachedDetail = await getSenpiCache(address, runtime);
 
             if (cachedDetail) {
                 elizaLogger.log(
@@ -123,7 +123,7 @@ export default {
             for (let i = 0; i < tokenDetailsToFetch.length; i++) {
                 const address = `${tokenDetailsToFetch[i].toLowerCase()}:8453`;
                 const addressCacheKey = `TOKEN_DETAILS-${address}`;
-                await setMoxieUserIdCache(
+                await setSenpiUserIdCache(
                     JSON.stringify(freshTokenDetails[i]),
                     addressCacheKey,
                     runtime

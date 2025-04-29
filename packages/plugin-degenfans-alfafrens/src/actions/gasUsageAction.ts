@@ -16,7 +16,7 @@ import { GasUsageSchema, Staking, StakingSchema } from "../types";
 import {
     FarcasterMetadata,
     ftaService,
-    MoxieUser,
+    SenpiUser,
     TwitterMetadata,
 } from "@senpi-ai/senpi-agent-lib";
 import {
@@ -50,7 +50,7 @@ export const gasUsageAction: Action = {
                 state = await runtime.updateRecentMessageState(state);
             }
 
-            const moxieUserInfo: MoxieUser = state.moxieUserInfo as MoxieUser;
+            const senpiUserInfo: SenpiUser = state.senpiUserInfo as SenpiUser;
 
             const context = composeContext({
                 state,
@@ -67,7 +67,7 @@ export const gasUsageAction: Action = {
                 userAddress: string;
             };
 
-            const userData = getUserData(moxieUserInfo);
+            const userData = getUserData(senpiUserInfo);
 
             const resp = await getGasUsgae(userData, userAddress);
             let tbl: string = "";

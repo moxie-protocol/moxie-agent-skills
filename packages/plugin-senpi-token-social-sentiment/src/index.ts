@@ -1,6 +1,6 @@
 import { Plugin } from "@senpi-ai/core";
 import getTokenSocialSentiment from "./actions/getTokenSocialSentiment";
-export const moxieTokensSocialSentimentPlugin: Plugin = {
+export const senpiTokensSocialSentimentPlugin: Plugin = {
     name: "Token social sentiment Plugin",
     description:
         "Gives social sentiment for any ERC20 token from Farcaster and Twitter",
@@ -9,4 +9,4 @@ export const moxieTokensSocialSentimentPlugin: Plugin = {
     providers: [],
 };
 
-export default moxieTokensSocialSentimentPlugin;
+export default senpiTokensSocialSentimentPlugin;

@@ -1,6 +1,6 @@
 import { type Hex } from "viem";
 import { ethers } from "ethers";
-import { MoxieWalletClient } from "@senpi-ai/senpi-agent-lib/src/wallet";
+import { SenpiWalletClient } from "@senpi-ai/senpi-agent-lib/src/wallet";
 import {
     casinoChainIds,
     casinoChainById,
@@ -144,7 +144,7 @@ async function getChainlinkVrfCost(
 
 export async function placeBet(
     chainId: CasinoChainId,
-    walletClient: MoxieWalletClient,
+    walletClient: SenpiWalletClient,
     game: CASINO_GAME_TYPE,
     gameEncodedInput: GameEncodedInput,
     gameMultiplier: number,
@@ -236,7 +236,7 @@ export async function placeBet(
 }
 
 export async function approveIfERC20(
-    walletClient: MoxieWalletClient,
+    walletClient: SenpiWalletClient,
     chainId: number,
     game: CASINO_GAME_TYPE,
     token: Token,

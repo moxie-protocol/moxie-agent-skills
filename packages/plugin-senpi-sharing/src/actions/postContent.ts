@@ -15,7 +15,7 @@ import {
 } from "@senpi-ai/core";
 import { postTemplate } from "../templates/postTemplate";
 import { sharingExamples } from "./examples";
-import { moxieUserService } from "@senpi-ai/senpi-agent-lib";
+import { senpiUserService } from "@senpi-ai/senpi-agent-lib";
 
 export default {
     name: "POST_CONTENT",
@@ -83,7 +83,7 @@ export default {
                 message.content.text.toLowerCase().includes("cast")
             ) {
                 const summaryText = hasRecentPostContent[0]?.content?.text;
-                const postResponse = await moxieUserService.publishPost(
+                const postResponse = await senpiUserService.publishPost(
                     {
                         text: summaryText,
                         platform: "FARCASTER",

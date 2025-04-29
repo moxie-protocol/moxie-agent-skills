@@ -14,18 +14,18 @@ import {
     parseJSONObjectFromText,
 } from "@senpi-ai/core";
 import {
-    moxieUserService,
-    MoxieAgentDBAdapter,
-    MoxieUser,
+    senpiUserService,
+    SenpiAgentDBAdapter,
+    SenpiUser,
 } from "@senpi-ai/senpi-agent-lib";
-import { fetchFarcasterCastsByMoxieUserIds } from "./farcasterSummaryAction";
-import { fetchTweetsByMoxieUserIds } from "./twitterSummaryAction";
+import { fetchFarcasterCastsBySenpiUserIds } from "./farcasterSummaryAction";
+import { fetchTweetsBySenpiUserIds } from "./twitterSummaryAction";
 import * as templates from "../templates";
 import { TOP_CREATORS_COUNT } from "../config";
 import {
-    getMoxieIdsFromMessage,
+    getSenpiIdsFromMessage,
     streamTextByLines,
-    handleIneligibleMoxieUsers,
+    handleIneligibleSenpiUsers,
 } from "./utils";
 export const creatorSocialSummary: Action = {
     name: "SOCIAL_SUMMARY",
@@ -80,12 +80,12 @@ export const creatorSocialSummary: Action = {
 
         const { isTopTokenOwnersQuery, selfQuery } = responseJson;
 
-        let moxieIds: string[] = [];
+        let senpiIds: string[] = [];
         if (selfQuery === true) {
-            const moxieUserId = (state.moxieUserInfo as MoxieUser)?.id;
-            moxieIds = [moxieUserId];
+            const senpiUserId = (state.senpiUserInfo as SenpiUser)?.id;
+            senpiIds = [senpiUserId];
         } else {
-            moxieIds = await getMoxieIdsFromMessage(
+            senpiIds = await getSenpiIdsFromMessage(
                 message,
                 templates.topCreatorsFarcasterExamples,
                 state,
@@ -96,21 +96,21 @@ export const creatorSocialSummary: Action = {
         }
 
         elizaLogger.debug(
-            `searching for social posts for moxieIds: ${moxieIds}`
+            `searching for social posts for senpiIds: ${senpiIds}`
         );
-        // if (moxieIds.length === 0) {
+        // if (senpiIds.length === 0) {
         //     callback({
         //         text: "I couldn't find your favorite creators. Please buy creator tokens to get started.",
         //     });
         //     return false;
         // }
 
-        const ineligibleMoxieUsers = [];
-        const eligibleMoxieIds = [];
+        const ineligibleSenpiUsers = [];
+        const eligibleSenpiIds = [];
 
         const socialProfiles =
-            await moxieUserService.getSocialProfilesByMoxieIdMultiple(
-                moxieIds,
+            await senpiUserService.getSocialProfilesBySenpiIdMultiple(
+                senpiIds,
                 state.authorizationHeader as string,
                 stringToUuid("SOCIAL_ALPHA")
             );
@@ -129,23 +129,23 @@ export const creatorSocialSummary: Action = {
                     userId: profile.farcasterUserId,
                 });
             }
-            eligibleMoxieIds.push(userId);
+            eligibleSenpiIds.push(userId);
         });
 
         socialProfiles.errorDetails.forEach((errorDetails, userId) => {
-            ineligibleMoxieUsers.push(errorDetails);
+            ineligibleSenpiUsers.push(errorDetails);
         });
 
         elizaLogger.debug(
-            `eligibleMoxieIds: ${eligibleMoxieIds}, ineligibleMoxieUsers: ${ineligibleMoxieUsers}`
+            `eligibleSenpiIds: ${eligibleSenpiIds}, ineligibleSenpiUsers: ${ineligibleSenpiUsers}`
         );
 
-        if (ineligibleMoxieUsers.length > 0 && eligibleMoxieIds.length == 0) {
-            await handleIneligibleMoxieUsers(ineligibleMoxieUsers, callback);
+        if (ineligibleSenpiUsers.length > 0 && eligibleSenpiIds.length == 0) {
+            await handleIneligibleSenpiUsers(ineligibleSenpiUsers, callback);
             return false;
         }
 
-        if (eligibleMoxieIds.length === 0 && moxieIds.length === 0) {
+        if (eligibleSenpiIds.length === 0 && senpiIds.length === 0) {
             callback({
                 text: "I couldn't find your favorite creators. Please make sure to mention their names or usernames (using '@').",
             });
@@ -155,7 +155,7 @@ export const creatorSocialSummary: Action = {
         const promises = [];
         if (userIdToFarcasterUser.size > 0) {
             promises.push(
-                fetchFarcasterCastsByMoxieUserIds(
+                fetchFarcasterCastsBySenpiUserIds(
                     userIdToFarcasterUser,
                     runtime,
                     10
@@ -165,7 +165,7 @@ export const creatorSocialSummary: Action = {
 
         if (userIdToTwitterUsernames.size > 0) {
             promises.push(
-                fetchTweetsByMoxieUserIds(userIdToTwitterUsernames, runtime, 10)
+                fetchTweetsBySenpiUserIds(userIdToTwitterUsernames, runtime, 10)
             );
         }
 
@@ -191,7 +191,7 @@ export const creatorSocialSummary: Action = {
                 Number(socialProfiles.remainingFreeTrialCount),
             displayFreeQueriesHeader: displayFreeQueriesHeader,
             topCreatorsCount: TOP_CREATORS_COUNT,
-            ineligibleMoxieUsers: JSON.stringify(ineligibleMoxieUsers),
+            ineligibleSenpiUsers: JSON.stringify(ineligibleSenpiUsers),
         });
 
         const newContext = composeContext({
@@ -221,9 +221,9 @@ export const creatorSocialSummary: Action = {
             callback({ text: textPart });
         }
 
-        if (ineligibleMoxieUsers.length > 0) {
-            await handleIneligibleMoxieUsers(
-                ineligibleMoxieUsers,
+        if (ineligibleSenpiUsers.length > 0) {
+            await handleIneligibleSenpiUsers(
+                ineligibleSenpiUsers,
                 callback,
                 true
             );

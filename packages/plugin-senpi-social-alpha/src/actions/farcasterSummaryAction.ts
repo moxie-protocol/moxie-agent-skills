@@ -15,23 +15,23 @@ import {
 } from "@senpi-ai/core";
 
 import {
-    moxieUserService,
-    MoxieAgentDBAdapter,
-    MoxieUser,
+    senpiUserService,
+    SenpiAgentDBAdapter,
+    SenpiUser,
 } from "@senpi-ai/senpi-agent-lib";
 import * as templates from "../templates";
 import { Cast, fetchCastByFid } from "../services/farcasterService";
 import {
-    getMoxieIdsFromMessage,
+    getSenpiIdsFromMessage,
     streamTextByLines,
-    handleIneligibleMoxieUsers,
+    handleIneligibleSenpiUsers,
 } from "./utils";
 import { FIVE_MINS, getFarcasterCastsCacheKey, ONE_HOUR } from "../cache";
 import { TOP_CREATORS_COUNT } from "../config";
 
 const SOCIAL_ALPHA = "SOCIAL_ALPHA";
 
-export async function fetchFarcasterCastsByMoxieUserIds(
+export async function fetchFarcasterCastsBySenpiUserIds(
     userIdToFarcasterUsernames: Map<
         string,
         { userName: string; userId: string }
@@ -40,7 +40,7 @@ export async function fetchFarcasterCastsByMoxieUserIds(
     maxCastsPerUser: number = 20
 ) {
     const castPromises = Array.from(userIdToFarcasterUsernames.entries()).map(
-        async ([moxieId, farcasterDetails]) => {
+        async ([senpiId, farcasterDetails]) => {
             try {
                 elizaLogger.info(
                     `Fetching farcaster casts for ${farcasterDetails.userName} ${farcasterDetails.userId}`
@@ -70,7 +70,7 @@ export async function fetchFarcasterCastsByMoxieUserIds(
                         `No casts found for ${farcasterDetails.userName}`
                     );
                     return {
-                        moxieId,
+                        senpiId,
                         userName: farcasterDetails.userName,
                         userId: farcasterDetails.userId,
                         casts: [],
@@ -97,7 +97,7 @@ export async function fetchFarcasterCastsByMoxieUserIds(
                 );
 
                 return {
-                    moxieId,
+                    senpiId,
                     userName: farcasterDetails.userName,
                     userId: farcasterDetails.userId,
                     casts: filteredCasts,
@@ -171,12 +171,12 @@ export const creatorFarcasterSummary: Action = {
 
         const { isTopTokenOwnersQuery, selfQuery } = responseJson;
 
-        let moxieIds: string[] = [];
+        let senpiIds: string[] = [];
         if (selfQuery === true) {
-            const moxieUserId = (state.moxieUserInfo as MoxieUser)?.id;
-            moxieIds = [moxieUserId];
+            const senpiUserId = (state.senpiUserInfo as SenpiUser)?.id;
+            senpiIds = [senpiUserId];
         } else {
-            moxieIds = await getMoxieIdsFromMessage(
+            senpiIds = await getSenpiIdsFromMessage(
                 message,
                 templates.topCreatorsFarcasterExamples,
                 state,
@@ -187,19 +187,19 @@ export const creatorFarcasterSummary: Action = {
         }
 
         elizaLogger.debug(
-            `searching for farcaster casts for moxieIds: ${moxieIds}`
+            `searching for farcaster casts for senpiIds: ${senpiIds}`
         );
-        // if (moxieIds.length === 0) {
+        // if (senpiIds.length === 0) {
         //     callback({
         //         text: "I couldn't find your favorite creators. Please buy creator tokens to get started.",
         //     });
         //     return false;
         // }
 
-        // Get Twitter usernames for all Moxie IDs
+        // Get Twitter usernames for all Senpi IDs
         const socialProfiles =
-            await moxieUserService.getSocialProfilesByMoxieIdMultiple(
-                moxieIds,
+            await senpiUserService.getSocialProfilesBySenpiIdMultiple(
+                senpiIds,
                 state.authorizationHeader as string,
                 stringToUuid(SOCIAL_ALPHA)
             );
@@ -207,8 +207,8 @@ export const creatorFarcasterSummary: Action = {
             string,
             { userName: string; userId: string }
         >();
-        const ineligibleMoxieUsers = [];
-        const eligibleMoxieIds = [];
+        const ineligibleSenpiUsers = [];
+        const eligibleSenpiIds = [];
         socialProfiles.userIdToSocialProfile.forEach((profile, userId) => {
             if (profile.farcasterUserId) {
                 userIdToFarcasterUser.set(userId, {
@@ -216,25 +216,25 @@ export const creatorFarcasterSummary: Action = {
                     userId: profile.farcasterUserId,
                 });
             }
-            eligibleMoxieIds.push(userId);
+            eligibleSenpiIds.push(userId);
         });
 
         socialProfiles.errorDetails.forEach((errorDetails, userId) => {
             if (errorDetails) {
-                ineligibleMoxieUsers.push(errorDetails);
+                ineligibleSenpiUsers.push(errorDetails);
             }
         });
 
-        if (ineligibleMoxieUsers.length > 0 && eligibleMoxieIds.length == 0) {
-            await handleIneligibleMoxieUsers(
-                ineligibleMoxieUsers,
+        if (ineligibleSenpiUsers.length > 0 && eligibleSenpiIds.length == 0) {
+            await handleIneligibleSenpiUsers(
+                ineligibleSenpiUsers,
                 callback,
                 false
             );
             return false;
         }
 
-        if (eligibleMoxieIds.length === 0 && moxieIds.length === 0) {
+        if (eligibleSenpiIds.length === 0 && senpiIds.length === 0) {
             callback({
                 text: "I couldn't find your favorite creators. Please buy creator tokens to get started.",
             });
@@ -243,12 +243,12 @@ export const creatorFarcasterSummary: Action = {
 
         if (userIdToFarcasterUser.size === 0) {
             callback({
-                text: "I couldn't find any Farcaster accounts linked to these Moxie users",
+                text: "I couldn't find any Farcaster accounts linked to these Senpi users",
             });
             return false;
         }
 
-        const allCasts = await fetchFarcasterCastsByMoxieUserIds(
+        const allCasts = await fetchFarcasterCastsBySenpiUserIds(
             userIdToFarcasterUser,
             runtime
         );
@@ -267,7 +267,7 @@ export const creatorFarcasterSummary: Action = {
 
         const newstate = await runtime.composeState(message, {
             tweets: JSON.stringify(allCasts),
-            ineligibleMoxieUsers: JSON.stringify(ineligibleMoxieUsers),
+            ineligibleSenpiUsers: JSON.stringify(ineligibleSenpiUsers),
             message: message.content.text,
             currentDate: new Date().toLocaleString(),
             totalFreeQueries: socialProfiles.freeTrialLimit,
@@ -305,9 +305,9 @@ export const creatorFarcasterSummary: Action = {
             callback({ text: textPart });
         }
 
-        if (ineligibleMoxieUsers.length > 0) {
-            await handleIneligibleMoxieUsers(
-                ineligibleMoxieUsers,
+        if (ineligibleSenpiUsers.length > 0) {
+            await handleIneligibleSenpiUsers(
+                ineligibleSenpiUsers,
                 callback,
                 true
             );

@@ -16,7 +16,7 @@ import { Staking, StakingSchema } from "../types";
 import {
     FarcasterMetadata,
     ftaService,
-    MoxieUser,
+    SenpiUser,
     TwitterMetadata,
 } from "@senpi-ai/senpi-agent-lib";
 import {
@@ -57,7 +57,7 @@ export const stakingConsultantAction: Action = {
                 state = await runtime.updateRecentMessageState(state);
             }
 
-            const moxieUserInfo: MoxieUser = state.moxieUserInfo as MoxieUser;
+            const senpiUserInfo: SenpiUser = state.senpiUserInfo as SenpiUser;
 
             const context = composeContext({
                 state,
@@ -79,7 +79,7 @@ export const stakingConsultantAction: Action = {
                     minsubs: number;
                 };
 
-            const userData = getUserData(moxieUserInfo);
+            const userData = getUserData(senpiUserInfo);
 
             const stakingData: StakingRequest = {
                 amount: amount,

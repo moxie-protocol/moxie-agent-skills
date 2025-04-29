@@ -4,8 +4,8 @@ import {
     autonomousTradingAction,
 } from "./actions";
 
-const moxieAutonomousTradingPlugin: Plugin = {
-    name: "moxieAutonomousTradingPlugin",
+const senpiAutonomousTradingPlugin: Plugin = {
+    name: "senpiAutonomousTradingPlugin",
     description: "Execute autonomous trading actions",
     actions: [getAutonomousTradingRuleDetailAction, autonomousTradingAction],
     providers: [],
@@ -14,4 +14,4 @@ const moxieAutonomousTradingPlugin: Plugin = {
     clients: [],
 };
 
-export default moxieAutonomousTradingPlugin;
+export default senpiAutonomousTradingPlugin;

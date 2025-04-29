@@ -53,7 +53,7 @@ If the question is about summarizing recent Twitter (X) activity, follow these i
 {{tweets}}
 
 ## Ineligible Senpi Users:
-{{ineligibleMoxieUsers}}
+{{ineligibleSenpiUsers}}
 
 #### General Guidelines:
 - The summary is derived from the **top 25 creators whose coins the user owns** for general inquiries.
@@ -79,7 +79,7 @@ If the question is about summarizing recent Twitter (X) activity, follow these i
 3. **Handling Special Cases:**
 - If no relevant posts are found, **provide a user-friendly response** instead of an error message.
 - Focus on the tweets from the last 24 hours, unless a **timeframe** is specified.
-- If the user requests summary details for users in the ineligibleMoxieUsers list, do not include those users in the response.
+- If the user requests summary details for users in the ineligibleSenpiUsers list, do not include those users in the response.
 ` +
         footerPrompt
     );
@@ -102,7 +102,7 @@ If the question is about summarizing recent posts (also known as casts) on **Far
 {{tweets}}
 
 ## Ineligible Senpi Users:
-{{ineligibleMoxieUsers}}
+{{ineligibleSenpiUsers}}
 
 #### General Guidelines:
 - **Summarize and extract key insights** from the most recent and engaging casts/posts.
@@ -130,7 +130,7 @@ If the question is about summarizing recent posts (also known as casts) on **Far
 2. **Handling Special Cases:**
     - If no relevant posts are found, **provide a user-friendly response** instead of an error message.
     - Focus on the tweets from the last 24 hours, unless a **timeframe** is specified.
-    - If the user requests summary details for users in the ineligibleMoxieUsers list, do not include those users in the response
+    - If the user requests summary details for users in the ineligibleSenpiUsers list, do not include those users in the response
 ` +
         footerPrompt
     );
@@ -154,7 +154,7 @@ If the question is about summarizing recent social media activity by users the u
 {{farcasterPosts}}
 
 ## Ineligible Senpi Users:
-{{ineligibleMoxieUsers}}
+{{ineligibleSenpiUsers}}
 
 ---
 
@@ -171,7 +171,7 @@ If the question is about summarizing recent social media activity by users the u
 
 ### **Structuring the Output:**
 - Always group the response by topics and themes, not by users.
-- **Hyperlink each creator's username to their Moxie profile pages.**
+- **Hyperlink each creator's username to their Senpi profile pages.**
 - **Use formatting (bullet points, bold text) to enhance readability.**
 - always link to the original post on Warpcast or X
 - Always summarize the overall insights at the top not the bottom of the response.
@@ -180,7 +180,7 @@ If the question is about summarizing recent social media activity by users the u
 
 ### **Handling Special Cases:**
 - If no relevant posts are found, **provide a user-friendly response** instead of an error message.
-- If the user requests summary details for users in the ineligibleMoxieUsers list, do not include those users in the response.
+- If the user requests summary details for users in the ineligibleSenpiUsers list, do not include those users in the response.
 
 ## **Platform-Specific Considerations:**
 
@@ -215,7 +215,7 @@ If the question is about summarizing recent creator coin/token purchase activity
 {{swaps}}
 
 ## Ineligible Senpi Users:
-{{ineligibleMoxieUsers}}
+{{ineligibleSenpiUsers}}
 
 **Overview**
 - The trending swaps data reflects onchain activity from hundred of thousands of Base users' wallets indexed by Senpi.
@@ -235,7 +235,7 @@ If the question is about summarizing recent creator coin/token purchase activity
 **Action-Specific Conditions**
 - If the user requests trending swaps for specific users, provide only those users' results. Do not rank users vs, each other.
 - If the user asks explicitly for buys or sells, exclude the other. Otherwise, include both.
-- If a mentioned user is in the ineligibleMoxieUsers list, exclude them from the response.
+- If a mentioned user is in the ineligibleSenpiUsers list, exclude them from the response.
 - If an invalid mention format error occurs, prompt the user to select a user by pressing @ instead of fabricating a response.
 
 **Limitations**
@@ -273,7 +273,7 @@ If the question is about summarizing recent token purchases (ERC20) activity by 
 {{tokenDetails}}
 
 ## Ineligible Senpi Users:
-{{ineligibleMoxieUsers}}
+{{ineligibleSenpiUsers}}
 
 **Overview**
 - If specific users are mentioned, adjust the context to highlight only those users' trading activity.
@@ -314,7 +314,7 @@ If the question is about summarizing recent token purchases (ERC20) activity by 
 
 export const currentUserContext = `
 There are two tasks to complete:
-1. Extract the Moxie IDs from the message for whom the user wants to get the summary
+1. Extract the Senpi IDs from the message for whom the user wants to get the summary
 2. Check if the user is asking for summary of top creators or specific users
 
 The output should be a JSON object with the following structure:
@@ -328,7 +328,7 @@ The output should be a JSON object with the following structure:
 
 ## For these inputs, provide the JSON output:
 
-userMoxieId: {{userMoxieId}}
+userSenpiId: {{userSenpiId}}
 
 previousQuestions:
 {{previousQuestion}}
@@ -340,7 +340,7 @@ Focus on recent messages.
 
 export const topCreatorsTwitterExamples = `
 Example 1: What is the twitter activity of my creators?
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": [],
@@ -349,7 +349,7 @@ Output:
 
 
 Example 2: What is the hot on twitter?
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": [],
@@ -357,7 +357,7 @@ Output:
 }
 
 Example 3: What is new on twitter for @[betashop.eth|M4] & @[jessepollak|M1245] ?
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": ["M4", "M1245"],
@@ -365,7 +365,7 @@ Output:
 }
 
 Example 4: What are my friends upto on twitter?
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": [],
@@ -373,7 +373,7 @@ Output:
 }
 
 Example 5: Give my twitter summary ?
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": ["M2"],
@@ -383,7 +383,7 @@ Output:
 
 export const topCreatorsFarcasterExamples = `
 Example 1: What is the farcaster activity of my creators?
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": [],
@@ -391,7 +391,7 @@ Output:
 }
 
 Example 2: What is the hot on farcaster?
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": [],
@@ -399,7 +399,7 @@ Output:
 }
 
 Example 3: What is new on farcaster for @[betashop.eth|M4] & @[jessepollak|M1245]?
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": ["M4", "M1245"],
@@ -407,7 +407,7 @@ Output:
 }
 
 Example 4: What are my friends upto on farcaster?
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": [],
@@ -415,7 +415,7 @@ Output:
 }
 
 Example 5: Give my farcaster summary ?
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": ["M2"],
@@ -427,7 +427,7 @@ previousQuestions:
 Give me portfolio summary for @[betashop.eth|M4] & @[jessepollak|M1245]?
 Give me the farcaster summary for those two users
 
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": ["M4", "M1245"],
@@ -437,7 +437,7 @@ Output:
 
 export const topCreatorsSwapExamples = `
 Example 1: What are my friends buying?
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": [],
@@ -445,7 +445,7 @@ Output:
 }
 
 Example 2: What are my creators buying?
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": [],
@@ -453,7 +453,7 @@ Output:
 }
 
 Example 3: What are some interesting tokens to buy?
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": [],
@@ -461,7 +461,7 @@ Output:
 }
 
 Example 4: show my recent swaps?
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": ["M2"],
@@ -469,7 +469,7 @@ Output:
 }
 
 Example 5: show my recent swaps for @[betashop.eth|M4] & @[jessepollak|M1245]?
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": ["M4", "M1245"],
@@ -479,7 +479,7 @@ Output:
 
 export const socialSummaryExamples = `
 Example 1: What is the social activity of my creators?
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": [],
@@ -487,7 +487,7 @@ Output:
 }
 
 Example 2: What is the hot on social media?
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": [],
@@ -495,7 +495,7 @@ Output:
 }
 
 Example 3: What is new on social media?
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": [],
@@ -503,7 +503,7 @@ Output:
 }
 
 Example 4: What are my friends upto?
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": [],
@@ -511,7 +511,7 @@ Output:
 }
 
 Example 5: Give my social media summary?
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": ["M2"],
@@ -523,7 +523,7 @@ previousQuestions:
 Give me portfolio summary for @[betashop.eth|M4] & @[jessepollak|M1245]?
 Give me the social media summary for those two users
 
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": ["M4", "M1245"],
@@ -535,7 +535,7 @@ previousQuestions:
 what is @[betashop.eth|M4] doing on farcaster ?
 what is he trading?
 
-userMoxieId: M2
+userSenpiId: M2
 Output:
 {
     "requestedUsers": ["M4"],
@@ -584,7 +584,7 @@ export const swapSummaryInputContextExtraction = `Please analyze the message bel
     {
     "isGeneralQuery": true/false,
     "selfQuery": true/false,
-    "onlyIncludeSpecifiedMoxieIds": true/false,
+    "onlyIncludeSpecifiedSenpiIds": true/false,
     "isTopTokenOwnersQuery": true/false,
     "timeFilter": {
         "startTimestamp": "YYYY-MM-DD HH:MM:SS",
@@ -594,14 +594,14 @@ export const swapSummaryInputContextExtraction = `Please analyze the message bel
     \`\`\`
 
     Consider these examples for guidance:
-    - "Show me trending tokens" should result in: isGeneralQuery: true, selfQuery: false, onlyIncludeSpecifiedMoxieIds: false, isTopTokenOwnersQuery: false
-    - "Show swaps for M3 and M5" should result in: isGeneralQuery: false, selfQuery: false, onlyIncludeSpecifiedMoxieIds: true, isTopTokenOwnersQuery: false
-    - "Show my trades/swaps?" should result in: isGeneralQuery: false, selfQuery: true, onlyIncludeSpecifiedMoxieIds: true, isTopTokenOwnersQuery: false
+    - "Show me trending tokens" should result in: isGeneralQuery: true, selfQuery: false, onlyIncludeSpecifiedSenpiIds: false, isTopTokenOwnersQuery: false
+    - "Show swaps for M3 and M5" should result in: isGeneralQuery: false, selfQuery: false, onlyIncludeSpecifiedSenpiIds: true, isTopTokenOwnersQuery: false
+    - "Show my trades/swaps?" should result in: isGeneralQuery: false, selfQuery: true, onlyIncludeSpecifiedSenpiIds: true, isTopTokenOwnersQuery: false
     - "Show all swaps from last week" should result in: isGeneralQuery: true, with appropriate timeFilter, selfQuery: false, isTopTokenOwnersQuery: false
-    - "Show M3's swaps from yesterday" should result in: isGeneralQuery: false, selfQuery: false, onlyIncludeSpecifiedMoxieIds: true, with appropriate timeFilter, isTopTokenOwnersQuery: false
-    - "What is M4 doing?" should result in: isGeneralQuery: false, selfQuery: false, onlyIncludeSpecifiedMoxieIds: true, isTopTokenOwnersQuery: false
-    - "What are my top fan tokens doing in the market" should result in: isGeneralQuery: false, selfQuery: false, onlyIncludeSpecifiedMoxieIds: false, isTopTokenOwnersQuery: true
-    - "What are my favorite creators doing?" should result in: isGeneralQuery: false, selfQuery: false, onlyIncludeSpecifiedMoxieIds: false, isTopTokenOwnersQuery: true
-    - "What are the trending tokens among my top creators?" should result in: isGeneralQuery: false, selfQuery: false, onlyIncludeSpecifiedMoxieIds: false, isTopTokenOwnersQuery: true
-    - "Show me what my biggest token holders are trading" should result in: isGeneralQuery: true, selfQuery: false, onlyIncludeSpecifiedMoxieIds: false, isTopTokenOwnersQuery: true
-    - "can you display my recent trades ?" should result in: isGeneralQuery: false, selfQuery: true, onlyIncludeSpecifiedMoxieIds: true, isTopTokenOwnersQuery: false`;
+    - "Show M3's swaps from yesterday" should result in: isGeneralQuery: false, selfQuery: false, onlyIncludeSpecifiedSenpiIds: true, with appropriate timeFilter, isTopTokenOwnersQuery: false
+    - "What is M4 doing?" should result in: isGeneralQuery: false, selfQuery: false, onlyIncludeSpecifiedSenpiIds: true, isTopTokenOwnersQuery: false
+    - "What are my top fan tokens doing in the market" should result in: isGeneralQuery: false, selfQuery: false, onlyIncludeSpecifiedSenpiIds: false, isTopTokenOwnersQuery: true
+    - "What are my favorite creators doing?" should result in: isGeneralQuery: false, selfQuery: false, onlyIncludeSpecifiedSenpiIds: false, isTopTokenOwnersQuery: true
+    - "What are the trending tokens among my top creators?" should result in: isGeneralQuery: false, selfQuery: false, onlyIncludeSpecifiedSenpiIds: false, isTopTokenOwnersQuery: true
+    - "Show me what my biggest token holders are trading" should result in: isGeneralQuery: true, selfQuery: false, onlyIncludeSpecifiedSenpiIds: false, isTopTokenOwnersQuery: true
+    - "can you display my recent trades ?" should result in: isGeneralQuery: false, selfQuery: true, onlyIncludeSpecifiedSenpiIds: true, isTopTokenOwnersQuery: false`;

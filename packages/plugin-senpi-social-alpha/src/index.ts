@@ -1,3 +1,3 @@
-import { moxieBigFanPlugin } from "./plugins/bigFanPlugin";
+import { senpiBigFanPlugin } from "./plugins/bigFanPlugin";
 
-export default moxieBigFanPlugin;
+export default senpiBigFanPlugin;

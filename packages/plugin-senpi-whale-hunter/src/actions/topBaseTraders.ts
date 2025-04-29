@@ -13,7 +13,7 @@ import {
 } from "@senpi-ai/core";
 import { getTopBaseTraders } from "../services/topBaseTraders";
 import * as templates from "../templates";
-import { MoxieUser, MoxieAgentDBAdapter } from "@senpi-ai/senpi-agent-lib";
+import { SenpiUser, SenpiAgentDBAdapter } from "@senpi-ai/senpi-agent-lib";
 import { verifyUserBaseEconomyTokenOwnership } from "../utils";
 
 export const topTraders: Action = {
@@ -38,28 +38,28 @@ export const topTraders: Action = {
     ) => {
         elizaLogger.debug(`== in top traders handler ==`);
 
-        const moxieUserId = (state.moxieUserInfo as MoxieUser)?.id;
+        const senpiUserId = (state.senpiUserInfo as SenpiUser)?.id;
 
         await (
-            runtime.databaseAdapter as MoxieAgentDBAdapter
-        ).getFreeTrailBalance(moxieUserId, stringToUuid("WHALE_HUNTER"));
+            runtime.databaseAdapter as SenpiAgentDBAdapter
+        ).getFreeTrailBalance(senpiUserId, stringToUuid("WHALE_HUNTER"));
         // const {
         //     total_free_queries,
         //     remaining_free_queries: new_remaining_free_queries,
         // } = await (
-        //     runtime.databaseAdapter as MoxieAgentDBAdapter
-        // ).deductFreeTrail(moxieUserId, stringToUuid("WHALE_HUNTER"));
+        //     runtime.databaseAdapter as SenpiAgentDBAdapter
+        // ).deductFreeTrail(senpiUserId, stringToUuid("WHALE_HUNTER"));
 
         // if (new_remaining_free_queries > 0) {
         //     elizaLogger.debug(
-        //         `[topBaseTradersAction] [${moxieUserId}] Remaining free queries: ${new_remaining_free_queries}`
+        //         `[topBaseTradersAction] [${senpiUserId}] Remaining free queries: ${new_remaining_free_queries}`
         //     );
         // } else {
         //     // If no remaining free queries, check if user has base economy token > 1
         //     try {
         //         const hasSufficientBalance =
         //             await verifyUserBaseEconomyTokenOwnership(
-        //                 moxieUserId,
+        //                 senpiUserId,
         //                 runtime
         //             );
         //         if (!hasSufficientBalance) {

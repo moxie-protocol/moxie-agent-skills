@@ -62,7 +62,7 @@ export const infoAction: Action = {
               - **AF Token value** may fluctuate, so stay updated on market trends to ensure the best staking returns.
             `,
             exampleUsage: `
-              ##example Moxie AI prompts
+              ##example Senpi AI prompts
               - I want to stake 50000 AF
               - I (<AlfaFrens profile Address>) want to stake 150000 AF
               - I (<AlfaFrens username>) want to stake 150000 AF

@@ -11,13 +11,13 @@ import {
     type Memory,
     ModelClass,
 } from "@senpi-ai/core";
-import { type MoxieClient, messageHandlerTemplate } from "./index.ts";
+import { type SenpiClient, messageHandlerTemplate } from "./index.ts";
 import { stringToUuid } from "@senpi-ai/core";
 import type { Content } from "@senpi-ai/core";
 import type { UserAgentInfo, UserAgentInteraction } from "./types/types.ts";
 import {
     COMMON_AGENT_ID,
-    mockMoxieUser,
+    mockSenpiUser,
     mockWallet,
     mockPortfolio,
 } from "./constants/constants.ts";
@@ -30,8 +30,8 @@ import {
     getPortfolioData,
     Portfolio,
 } from "@senpi-ai/senpi-agent-lib";
-import { walletService, MoxieUser } from "@senpi-ai/senpi-agent-lib";
-import { MoxieWalletClient } from "@senpi-ai/senpi-agent-lib/src/wallet";
+import { walletService, SenpiUser } from "@senpi-ai/senpi-agent-lib";
+import { SenpiWalletClient } from "@senpi-ai/senpi-agent-lib/src/wallet";
 
 import multer from "multer";
 import * as fs from "node:fs";
@@ -92,9 +92,9 @@ const builtinActions = [
     "CONTINUE",
     "MUTE_ROOM",
 ];
-export function createMoxieApiRouter(
+export function createSenpiApiRouter(
     agents: Map<string, AgentRuntime>,
-    moxieClient: MoxieClient
+    senpiClient: SenpiClient
 ) {
     const router = express.Router();
 
@@ -184,9 +184,9 @@ export function createMoxieApiRouter(
                 }
 
                 // Setting default mock values for states in local development
-                const moxieUserInfo: MoxieUser = mockMoxieUser;
-                const moxieUserId: string = moxieUserInfo.id;
-                const agentWallet: walletService.MoxieClientWallet = mockWallet;
+                const senpiUserInfo: SenpiUser = mockSenpiUser;
+                const senpiUserId: string = senpiUserInfo.id;
+                const agentWallet: walletService.SenpiClientWalet = mockWallet;
                 let currentWalletBalance: Portfolio = mockPortfolio;
 
                 // If Zapper API key is set, fetch the current balance of the agent wallet
@@ -195,7 +195,7 @@ export function createMoxieApiRouter(
                     currentWalletBalance = await getPortfolioData(
                         [agentWallet.address],
                         ["BASE_MAINNET"],
-                        moxieUserId,
+                        senpiUserId,
                         runtime
                     );
                     elizaLogger.info(traceId, `currentWalletBalance`, {
@@ -203,13 +203,13 @@ export function createMoxieApiRouter(
                     });
                 }
 
-                const userId = stringToUuid(moxieUserId);
+                const userId = stringToUuid(senpiUserId);
 
                 await runtime.ensureConnection(
                     userId,
                     roomId,
-                    moxieUserInfo.userName,
-                    moxieUserInfo.name,
+                    senpiUserInfo.userName,
+                    senpiUserInfo.name,
                     "direct"
                 );
 
@@ -242,16 +242,16 @@ export function createMoxieApiRouter(
                 await runtime.messageManager.addEmbeddingToMemory(memory);
                 await runtime.messageManager.createMemory(memory);
 
-                const moxieWalletClient = new MoxieWalletClient(
+                const SenpiWalletClient = new SenpiWalletClient(
                     agentWallet.address,
                     req.header("Authorization")
                 );
 
                 let state = await runtime.composeState(userMessage, {
                     agentName: runtime.character.name,
-                    moxieUserInfo: moxieUserInfo,
+                    senpiUserInfo: senpiUserInfo,
                     agentWallet: agentWallet,
-                    moxieWalletClient: moxieWalletClient,
+                    SenpiWalletClient: SenpiWalletClient,
                     agentWalletBalance: currentWalletBalance,
                     authorizationHeader: req.header("Authorization"),
                 });
@@ -438,7 +438,7 @@ export function createMoxieApiRouter(
             }
             // check if the userId has any interaction with the agent
             const userIdUUID = stringToUuid(userId);
-            const account = await moxieClient.db.getAccountById(userIdUUID);
+            const account = await senpiClient.db.getAccountById(userIdUUID);
 
             // if account doesn't exist then return
             if (!account) {
@@ -452,7 +452,7 @@ export function createMoxieApiRouter(
                     )
                 );
             } else {
-                //await moxieClient.db.getAgent
+                //await senpiClient.db.getAgent
                 // set agentExists as true if account is present
                 // for v1 version , we will just use one agent instance. hence we are going to maintain the env and return in response
                 // for v2 release, we will create new agent runtime for every user and maintain separate agentIds.
@@ -499,11 +499,11 @@ export function createMoxieApiRouter(
         );
         try {
             // validations
-            const moxieUserInfo = mockMoxieUser;
-            const moxieUserId = moxieUserInfo.id;
+            const senpiUserInfo = mockSenpiUser;
+            const senpiUserId = senpiUserInfo.id;
             // check if the userId has  already agent created
-            const userIdUUID = stringToUuid(moxieUserId);
-            const account = await moxieClient.db.getAccountById(userIdUUID);
+            const userIdUUID = stringToUuid(senpiUserId);
+            const account = await senpiClient.db.getAccountById(userIdUUID);
             if (account) {
                 res.status(403).json(
                     ResponseHelper.error<null>(
@@ -517,7 +517,7 @@ export function createMoxieApiRouter(
             }
 
             // check if the user has creator coin or not
-            const ftaResponse = await ftaService.getUserFtaData(moxieUserId);
+            const ftaResponse = await ftaService.getUserFtaData(senpiUserId);
             if (!ftaResponse) {
                 res.status(403).json(
                     ResponseHelper.error<null>(
@@ -531,19 +531,19 @@ export function createMoxieApiRouter(
             }
 
             // create an account for the user
-            const accountCreationResponse = await moxieClient.db.createAccount({
+            const accountCreationResponse = await senpiClient.db.createAccount({
                 id: userIdUUID,
-                name: `${moxieUserInfo.userName} AI Agent`,
-                username: moxieUserInfo.name,
+                name: `${senpiUserInfo.userName} AI Agent`,
+                username: senpiUserInfo.name,
             });
 
             elizaLogger.info(
-                `account is created for ${moxieUserId} agent} ${accountCreationResponse}`
+                `account is created for ${senpiUserId} agent} ${accountCreationResponse}`
             );
             res.status(201).json(
                 ResponseHelper.success<UserAgentInfo>(
                     {
-                        userId: moxieUserInfo.id,
+                        userId: senpiUserInfo.id,
                         agentId: COMMON_AGENT_ID,
                     },
                     req.traceId
@@ -591,9 +591,9 @@ export function createMoxieApiRouter(
             const agentId = COMMON_AGENT_ID;
             let runtime = agents.get(agentId);
 
-            const moxieUserInfo: MoxieUser = mockMoxieUser;
-            const moxieUserId: string = moxieUserInfo.id;
-            elizaLogger.debug(`moxieUserId ${moxieUserId}`, {
+            const senpiUserInfo: SenpiUser = mockSenpiUser;
+            const senpiUserId: string = senpiUserInfo.id;
+            elizaLogger.debug(`senpiUserId ${senpiUserId}`, {
                 traceId: req.traceId,
             });
 
@@ -618,7 +618,7 @@ export function createMoxieApiRouter(
             }
 
             // check if the userId has  already agent created
-            const userIdUUID = stringToUuid(moxieUserInfo.id);
+            const userIdUUID = stringToUuid(senpiUserInfo.id);
             const account =
                 await runtime.databaseAdapter.getAccountById(userIdUUID);
             if (!account) {

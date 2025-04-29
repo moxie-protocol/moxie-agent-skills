@@ -7,8 +7,8 @@ import {
 } from "../actions/swapSummaryAction";
 import { creatorSocialSummary } from "../actions/socialSummaryAction";
 
-export const moxieBigFanPlugin: Plugin = {
-    name: "Moxie Big Fan plugin",
+export const senpiBigFanPlugin: Plugin = {
+    name: "Senpi Big Fan plugin",
     description:
         "Provides insights about your favorite creators' activities, including Twitter and Farcaster posts, token swaps, and creator coin transactions",
     actions: [

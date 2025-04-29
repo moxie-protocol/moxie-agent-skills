@@ -19,7 +19,6 @@ Generate the response in markdown formatting. DONOT add \`\`\`markdown in the re
 
 `;
 
-
 export const socialPlatformDetectionTemplate = `
 From the given query, identify the social platform that the user is asking token sentiment for.
 also extract the token symbol from the query.
@@ -33,31 +32,31 @@ also extract the token symbol from the query.
 ## Output:
 {
     "socialPlatform": ["twitter", "farcaster"],
-    "tokenSymbol": "moxie"
+    "tokenSymbol": "senpi"
 }
 
 example 1:
-query: Show me social sentiment for $moxie
+query: Show me social sentiment for $usdc
 output: {
     "socialPlatform": ["twitter", "farcaster"],
-    "tokenSymbol": "moxie"
+    "tokenSymbol": "senpi"
 }
 
 example 2:
-query: Show me twitter sentiment for $moxie
+query: Show me twitter sentiment for $usdc
 output: {
     "socialPlatform": ["twitter"],
-    "tokenSymbol": "moxie"
+    "tokenSymbol": "senpi"
 }
 
 example 3:
 query: Show me farcaster sentiment for it
 recentMessages:
-- Show me token details for $moxie
+- Show me token details for $usdc
 - Show me farcaster sentiment for it
 output: {
     "socialPlatform": ["farcaster"],
-    "tokenSymbol": "moxie"
+    "tokenSymbol": "senpi"
 }
 
 example 4:

@@ -58,7 +58,7 @@ export interface GroupTradeParams {
 }
 
 export interface UserTradeParams {
-    moxieUsers: string[];
+    senpiUsers: string[];
     minPurchaseAmount: Amount;
 }
 
@@ -85,7 +85,7 @@ export type Group = {
 };
 
 export interface GroupMember {
-    moxieUserId: string;
+    senpiUserId: string;
     createdAt: string;
     updatedAt: string;
     status: Status;
@@ -142,7 +142,7 @@ export const GET_GROUP_DETAILS = gql`
                 name
                 createdBy
                 members {
-                    moxieUserId
+                    senpiUserId
                 }
             }
         }
@@ -341,7 +341,7 @@ export async function createTradingRule(
     }
 
     try {
-        const response = await fetch(process.env.RULE_API_MOXIE_API_URL, {
+        const response = await fetch(process.env.RULE_API_SENPI_API_URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -379,16 +379,16 @@ export const delegateAccessNotFound = {
     text: `\nPlease make sure to set up your agent wallet first and try again. (delegate access not found)`,
 };
 
-export const moxieWalletClientNotFound = {
-    text: `\nUnable to access moxie wallet details. Please ensure your moxie wallet is properly setup and try again.`,
+export const SenpiWalletClientNotFound = {
+    text: `\nUnable to access senpi wallet details. Please ensure your senpi wallet is properly setup and try again.`,
 };
 
 export async function checkUserCommunicationPreferences(
     traceId: string,
-    moxieUserId: string
+    senpiUserId: string
 ): Promise<string | null> {
     try {
-        const response = await fetch(process.env.MOXIE_API_URL_INTERNAL, {
+        const response = await fetch(process.env.SENPI_API_URL_INTERNAL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -396,7 +396,7 @@ export async function checkUserCommunicationPreferences(
             body: JSON.stringify({
                 query: `
                     query GetUser {
-                        GetUser(input: { userId: "${moxieUserId}" }) {
+                        GetUser(input: { userId: "${senpiUserId}" }) {
                             communicationPreference
                         }
                     }
@@ -407,7 +407,7 @@ export async function checkUserCommunicationPreferences(
         if (!response.ok) {
             elizaLogger.error(
                 traceId,
-                `[AUTONOMOUS_TRADING] [${moxieUserId}] Failed to fetch user preferences: ${response.statusText}`
+                `[AUTONOMOUS_TRADING] [${senpiUserId}] Failed to fetch user preferences: ${response.statusText}`
             );
             return null;
         }
@@ -415,14 +415,14 @@ export async function checkUserCommunicationPreferences(
         const data = await response.json();
         elizaLogger.debug(
             traceId,
-            `[AUTONOMOUS_TRADING] [${moxieUserId}] User communication preferences:`,
+            `[AUTONOMOUS_TRADING] [${senpiUserId}] User communication preferences:`,
             data?.data?.GetUser?.communicationPreference
         );
         return data?.data?.GetUser?.communicationPreference;
     } catch (error) {
         elizaLogger.error(
             traceId,
-            `[AUTONOMOUS_TRADING] [${moxieUserId}] Error checking user preferences: ${error.message}`
+            `[AUTONOMOUS_TRADING] [${senpiUserId}] Error checking user preferences: ${error.message}`
         );
         return null;
     }
@@ -452,7 +452,7 @@ export async function getGroupDetails(
 
         elizaLogger.debug("getGroupDetails input constructed", { input });
 
-        const data = await fetch(process.env.RULE_API_MOXIE_API_URL, {
+        const data = await fetch(process.env.RULE_API_SENPI_API_URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

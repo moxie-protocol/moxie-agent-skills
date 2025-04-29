@@ -78,13 +78,13 @@ export const tokenSwapExamples: ActionExample[][] = [
         {
             user: "{{user1}}",
             content: {
-                text: "buy me 1 $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed]] and 1 $[MOXIE|0x8C9037D1Ef5c6D1f6816278C7AAF5491d24CD527]]",
+                text: "buy me 1 $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed]] and 1 $[USDC|0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913]]",
             },
         },
         {
             user: "{{agent}}",
             content: {
-                text: "Sure, I'll help you to buy 1 $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed]] and 1 $[MOXIE|0x8C9037D1Ef5c6D1f6816278C7AAF5491d24CD527]]",
+                text: "Sure, I'll help you to buy 1 $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed]] and 1 $[USDC|0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913]]",
                 action: "SWAP_TOKENS",
             },
         },

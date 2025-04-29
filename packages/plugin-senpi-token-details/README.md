@@ -1,10 +1,10 @@
 # @senpi-ai/plugin-senpi-token-details
 
-A Skill for Moxie AI Agent that enables fetching of base token details.
+A Skill for Senpi AI Agent that enables fetching of base token details.
 
 ## Description
 
-This Skill provides real-time token details fetching capabilities for the Moxie AI Agent.
+This Skill provides real-time token details fetching capabilities for the Senpi AI Agent.
 
 ## Installation
 
@@ -53,4 +53,4 @@ Contributions are welcome! Please see the [CONTRIBUTING.md](../../CONTRIBUTING.m
 
 ## License
 
-This AI Agent Skills is part of the Moxie AI Agent project. See the main project repository for license information.
+This AI Agent Skills is part of the Senpi AI Agent project. See the main project repository for license information.

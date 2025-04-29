@@ -2,7 +2,7 @@ import { IAgentRuntime } from "@senpi-ai/core";
 import { elizaLogger } from "@senpi-ai/core";
 import { ethers } from "ethers";
 
-export interface MoxiePortfolioInfo {
+export interface SenpiPortfolioInfo {
     fanTokenSymbol: string;
     fanTokenName: string;
     fanTokenAddress: string;
@@ -17,29 +17,29 @@ export interface MoxiePortfolioInfo {
     totalTvlInUSD: number;
     lockedTvlInUSD: number;
     unlockedTvlInUSD: number;
-    fanTokenMoxieUserId: string;
+    fanTokenSenpiUserId: string;
     displayLabel: string;
     holdingPercentage: number;
 }
 
-interface MoxiePortfolioResponse {
+interface SenpiPortfolioResponse {
     errors?: Array<{
         message: string;
     }>;
     data: {
         MoxieUserPortfolios: {
-            MoxieUserPortfolio: MoxiePortfolioInfo[];
+            MoxieUserPortfolio: SenpiPortfolioInfo[];
         };
     };
 }
 
-export async function getMoxiePortfolioInfo(
-    moxieUserId: string,
+export async function getSenpiPortfolioInfo(
+    senpiUserId: string,
     runtime: IAgentRuntime
-): Promise<MoxiePortfolioInfo[] | undefined> {
+): Promise<SenpiPortfolioInfo[] | undefined> {
     try {
         // Check cache first
-        const cacheKey = `portfolio-info-${moxieUserId}`;
+        const cacheKey = `portfolio-info-${senpiUserId}`;
         const cachedData = await runtime.cacheManager.get(cacheKey);
         if (cachedData) {
             return JSON.parse(cachedData as string);
@@ -48,13 +48,13 @@ export async function getMoxiePortfolioInfo(
         const query = `
       query GetPortfolioInfo {
         MoxieUserPortfolios(
-          input: {filter: {moxieUserId: {_eq: "${moxieUserId}"}}, order: {totalTvl: DESC} limit:50}
+          input: {filter: {senpiUserId: {_eq: "${senpiUserId}"}}, order: {totalTvl: DESC} limit:50}
         ) {
           MoxieUserPortfolio {
             fanTokenSymbol
             fanTokenName
             fanTokenAddress
-            fanTokenMoxieUserId
+            fanTokenSenpiUserId
             totalLockedAmount
             totalUnlockedAmount
             totalTvl
@@ -92,11 +92,11 @@ export async function getMoxiePortfolioInfo(
                 }
 
                 const result =
-                    (await response.json()) as MoxiePortfolioResponse;
+                    (await response.json()) as SenpiPortfolioResponse;
 
                 if (!result.data?.MoxieUserPortfolios?.MoxieUserPortfolio) {
                     elizaLogger.error(
-                        `No portfolio data found for user ${moxieUserId}`
+                        `No portfolio data found for user ${senpiUserId}`
                     );
                     return undefined;
                 }
@@ -138,21 +138,21 @@ export async function getMoxiePortfolioInfo(
 
 /**
  * Get the portfolio info for a creator token
- * @param moxieUserId - The moxie user id
+ * @param senpiUserId - The senpi user id
  * @param creatorToken - The creator token details
  * @returns The portfolio info for the creator token or undefined if no portfolio info is found
  */
-export async function getMoxiePortfolioInfoByCreatorTokenDetails(
-    moxieUserId: string,
+export async function getSenpiPortfolioInfoByCreatorTokenDetails(
+    senpiUserId: string,
     creatorToken: {
         address?: string;
         name?: string;
         symbol?: string;
     }
-): Promise<MoxiePortfolioInfo[] | undefined> {
+): Promise<SenpiPortfolioInfo[] | undefined> {
     try {
         elizaLogger.debug(
-            `[getMoxiePortfolioInfoByCreatorTokenDetails] [${moxieUserId}] Getting portfolio info for user ${moxieUserId} and creator token ${JSON.stringify(creatorToken)}`
+            `[getSenpiPortfolioInfoByCreatorTokenDetails] [${senpiUserId}] Getting portfolio info for user ${senpiUserId} and creator token ${JSON.stringify(creatorToken)}`
         );
 
         // Validate that at least one token detail is provided
@@ -179,7 +179,7 @@ export async function getMoxiePortfolioInfoByCreatorTokenDetails(
 
         // Build filter conditions
         const filterConditions = [
-            `moxieUserId: {_eq: "${moxieUserId}"}`,
+            `senpiUserId: {_eq: "${senpiUserId}"}`,
             ...(creatorToken.address
                 ? [`fanTokenAddress: {_eq: "${creatorToken.address}"}`]
                 : []),
@@ -192,7 +192,7 @@ export async function getMoxiePortfolioInfoByCreatorTokenDetails(
         ];
 
         elizaLogger.debug(
-            `[getMoxiePortfolioInfoByCreatorTokenDetails] [${moxieUserId}] Filter conditions: ${filterConditions.join(", ")}`
+            `[getSenpiPortfolioInfoByCreatorTokenDetails] [${senpiUserId}] Filter conditions: ${filterConditions.join(", ")}`
         );
 
         const query = `
@@ -241,21 +241,21 @@ export async function getMoxiePortfolioInfoByCreatorTokenDetails(
                 }
 
                 const result =
-                    (await response.json()) as MoxiePortfolioResponse;
+                    (await response.json()) as SenpiPortfolioResponse;
 
                 if (result.errors) {
                     elizaLogger.error(
-                        `Error fetching portfolio info for user ${moxieUserId}:`,
+                        `Error fetching portfolio info for user ${senpiUserId}:`,
                         result.errors
                     );
                     throw new Error(
-                        `Error fetching portfolio info for user ${moxieUserId}: ${result.errors[0].message}`
+                        `Error fetching portfolio info for user ${senpiUserId}: ${result.errors[0].message}`
                     );
                 }
 
                 if (!result.data?.MoxieUserPortfolios?.MoxieUserPortfolio) {
                     elizaLogger.error(
-                        `No portfolio data found for user ${moxieUserId}`
+                        `No portfolio data found for user ${senpiUserId}`
                     );
                     return undefined;
                 }
@@ -263,20 +263,20 @@ export async function getMoxiePortfolioInfoByCreatorTokenDetails(
                 const portfolioInfo =
                     result.data.MoxieUserPortfolios.MoxieUserPortfolio;
                 elizaLogger.debug(
-                    `[getMoxiePortfolioInfoByCreatorTokenDetails] [${moxieUserId}] Portfolio response: ${JSON.stringify(portfolioInfo)}`
+                    `[getSenpiPortfolioInfoByCreatorTokenDetails] [${senpiUserId}] Portfolio response: ${JSON.stringify(portfolioInfo)}`
                 );
                 return portfolioInfo;
             } catch (error) {
                 attempts++;
                 if (attempts === maxAttempts) {
                     elizaLogger.error(
-                        `[getMoxiePortfolioInfoByCreatorTokenDetails] [${moxieUserId}] Failed after ${maxAttempts} attempts:`,
+                        `[getSenpiPortfolioInfoByCreatorTokenDetails] [${senpiUserId}] Failed after ${maxAttempts} attempts:`,
                         error
                     );
                     throw error;
                 }
                 elizaLogger.warn(
-                    `[getMoxiePortfolioInfoByCreatorTokenDetails] [${moxieUserId}] API call failed, attempt ${attempts}/${maxAttempts}. Retrying...`
+                    `[getSenpiPortfolioInfoByCreatorTokenDetails] [${senpiUserId}] API call failed, attempt ${attempts}/${maxAttempts}. Retrying...`
                 );
                 await new Promise((resolve) =>
                     setTimeout(resolve, backoffMs * attempts)
@@ -285,7 +285,7 @@ export async function getMoxiePortfolioInfoByCreatorTokenDetails(
         }
     } catch (error) {
         elizaLogger.error(
-            `[getMoxiePortfolioInfoByCreatorTokenDetails] [${moxieUserId}] Error fetching portfolio info:`,
+            `[getSenpiPortfolioInfoByCreatorTokenDetails] [${senpiUserId}] Error fetching portfolio info:`,
             error
         );
         throw error;
