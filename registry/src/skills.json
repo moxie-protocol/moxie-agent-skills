@@ -74,7 +74,7 @@
         ],
         "starterQuestions": [
             {
-                "label": "Send 50% of my $[replace with token name] to betashop.eth",
+                "label": "Send 50% of my $[replace with token name] to @betashop.eth",
                 "value": "Send 50% of my $[replace with token name] to @[betashop.eth|M4]"
             },
             {
