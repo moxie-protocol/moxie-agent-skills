@@ -217,8 +217,8 @@
                 "value": "Swap 100 $degen for $[replace with token name]"
             },
             {
-                "label": "Use 40% of my $eth to buy $$[replace with token name] and 20% to buy $degen",
-                "value": "Use 40% of my $eth to buy $$[replace with token name] and 20% to buy $degen"
+                "label": "Use 40% of my $eth to buy $[replace with token name] and 20% to buy $degen",
+                "value": "Use 40% of my $eth to buy $[replace with token name] and 20% to buy $degen"
             }
         ],
         "mediaUrls": [
