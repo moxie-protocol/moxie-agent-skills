@@ -22,7 +22,7 @@ export const topTraderOfATokenAction: Action = {
     name: "TOP_TRADER_OF_A_TOKEN",
     suppressInitialMessage: true,
     similes: [],
-    description: "Retrieves and summarizes a list of users with the highest total transaction volumes of a token in the last 24 hours on the base blockchain.",
+    description: "Retrieves and summarizes a list of users with the highest total transaction volume in the last 24 hours on the base blockchain, along with the tokens they are trading. This only shows volume.",
     validate: async function (
         runtime: IAgentRuntime,
         message: Memory,
