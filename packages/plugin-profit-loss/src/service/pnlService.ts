@@ -26,7 +26,7 @@ export const preparePnlQuery = (walletResponse: any) => {
     maxResults,
   } = walletResponse;
 
-  let query = `select * from dune.moxieprotocol.result_moxie_wallets`;
+  let query = `select moxie_user_id, token_address, profit_loss, token_sold_symbol, token_bought_symbol, total_sell_amount, total_buy_amount, total_sell_value_usd, total_buy_value_usd, buy_transaction_count, sale_transactions, avg_buy_price_usd, avg_sell_price_usd, is_oversold, first_sale_time, last_sale_time from dune.moxieprotocol.result_moxie_wallets`;
   const whereClauses = [];
 
   if (walletAddresses?.length > 0 && analysisType === "WALLET_PNL") {
@@ -79,7 +79,7 @@ export const fetchPnlData = async (query: string) => {
 
       const pnlData = result.result.rows as unknown as PnlData[];
 
-      elizaLogger.debug(`[fetchPnlData] PnL data: ${JSON.stringify(pnlData)}`);
+      elizaLogger.debug(`[fetchPnlData] PnL data: ${pnlData.length} rows`);
 
       return pnlData;
     } catch (error) {
