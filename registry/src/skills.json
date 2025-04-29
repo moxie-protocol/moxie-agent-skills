@@ -12,8 +12,8 @@
         "capabilities": ["Token prices", "Market caps", "Liquidity", "Holders"],
         "starterQuestions": [
             {
-                "label": "Show token details for $[replace with token name]",
-                "value": "Show token details for $[replace with token name]"
+                "label": "Show token details for  $ [replace with token name]",
+                "value": "Show token details for  $ [replace with token name]"
             },
             {
                 "label": "Compare $clanker and $bnkr",
@@ -74,12 +74,12 @@
         ],
         "starterQuestions": [
             {
-                "label": "Send 50% of my $[replace with token name] to @betashop.eth",
-                "value": "Send 50% of my $[replace with token name] to @[betashop.eth|M4]"
+                "label": "Send 50% of my  $ [replace with token name] to @betashop.eth",
+                "value": "Send 50% of my  $ [replace with token name] to @[betashop.eth|M4]"
             },
             {
-                "label": "Send 25% of my $[replace with token name] to @betashop.eth ",
-                "value": "Send 25% of my $[replace with token name] to @[betashop.eth|M4]"
+                "label": "Send 25% of my  $ [replace with token name] to @betashop.eth ",
+                "value": "Send 25% of my  $ [replace with token name] to @[betashop.eth|M4]"
             }
         ],
         "mediaUrls": [
@@ -209,16 +209,16 @@
         ],
         "starterQuestions": [
             {
-                "label": "Buy me $25 worth of $[replace with token name]",
-                "value": "Buy me $25 worth of $[replace with token name]"
+                "label": "Buy me $25 worth of  $ [replace with token name]",
+                "value": "Buy me $25 worth of  $ [replace with token name]"
             },
             {
-                "label": "Swap 100 $degen for $[replace with token name]",
-                "value": "Swap 100 $degen for $[replace with token name]"
+                "label": "Swap 100 $degen for  $ [replace with token name]",
+                "value": "Swap 100 $degen for  $ [replace with token name]"
             },
             {
-                "label": "Use 40% of my $eth to buy $[replace with token name] and 20% to buy $degen",
-                "value": "Use 40% of my $eth to buy $[replace with token name] and 20% to buy $degen"
+                "label": "Use 40% of my $eth to buy  $ [replace with token name] and 20% to buy $degen",
+                "value": "Use 40% of my $eth to buy  $ [replace with token name] and 20% to buy $degen"
             }
         ],
         "mediaUrls": [
