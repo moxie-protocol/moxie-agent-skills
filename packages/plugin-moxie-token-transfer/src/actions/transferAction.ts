@@ -535,7 +535,7 @@ async function processSingleTransfer(
                 `[tokenTransfer] [${context.moxieUserId}] [processTransfer] [HANDLE_TRANSACTION_STATUS] [ERROR] Transaction failed`
             );
             return {
-                callBackTemplate: callBackTemplate.APPLICATION_ERROR("Transaction failed")
+                callBackTemplate: txnReceipt.callBackTemplate
             };
         }
 
@@ -1045,15 +1045,45 @@ async function executeTransfer(
     // Send the transaction
     const walletClient = context.state.moxieWalletClient as agentLib.MoxieWalletClient;
     let transactionResponse: agentLib.MoxieWalletSendTransactionResponseType;
-    try {
-        transactionResponse = await walletClient.sendTransaction(process.env.CHAIN_ID || '8453', request);
-    } catch (error) {
+    const MAX_RETRIES = 3;
+    let retryCount = 0;
+    let lastError: any;
+
+    while (retryCount < MAX_RETRIES) {
+        try {
+            elizaLogger.debug(
+                context.traceId,
+                `[tokenTransfer] [${context.moxieUserId}] [executeTransfer] Attempt ${retryCount + 1} of ${MAX_RETRIES}`
+            );
+            transactionResponse = await walletClient.sendTransaction(process.env.CHAIN_ID || '8453', request);
+            break; // Success, exit the retry loop
+        } catch (error) {
+            lastError = error;
+            retryCount++;
+            elizaLogger.warn(
+                context.traceId,
+                `[tokenTransfer] [${context.moxieUserId}] [executeTransfer] Error sending transaction (attempt ${retryCount}): ${error}`
+            );
+            
+            if (retryCount < MAX_RETRIES) {
+                // Wait before retrying (exponential backoff)
+                const delay = 1000 * Math.pow(2, retryCount);
+                elizaLogger.debug(
+                    context.traceId,
+                    `[tokenTransfer] [${context.moxieUserId}] [executeTransfer] Retrying in ${delay}ms...`
+                );
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
+    }
+
+    if (retryCount === MAX_RETRIES) {
         elizaLogger.error(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [executeTransfer] Error sending transaction: ${error}`
+            `[tokenTransfer] [${context.moxieUserId}] [executeTransfer] Failed after ${MAX_RETRIES} attempts: ${lastError}`
         );
         return {
-            callBackTemplate: callBackTemplate.APPLICATION_ERROR("Error sending transaction")
+            callBackTemplate: callBackTemplate.TRANSACTION_SUBMISSION_FAILED()
         };
     }
 
@@ -1138,7 +1168,15 @@ async function getTargetQuantityForBalanceBasedTokenTransfer(
         // Calculate transfer amount based on percentage
         // Using 1e9 as base to maintain precision while avoiding overflow
         const percentageBase = 1e9;
-        const scaledPercentage = balance.percentage * 1e7; // Scale up by 1e7 to maintain precision
+        // If ETH and 100%, use 99% instead to leave gas for transaction
+        const adjustedPercentage = (tokenSymbol.toUpperCase() === "ETH" && balance.percentage === 100)
+            ? 99
+            : balance.percentage;
+        elizaLogger.debug(
+            context.traceId,
+            `[tokenTransfer] [${context.moxieUserId}] [getTargetQuantityForBalanceBasedTokenTransfer] Original percentage: ${balance.percentage}, Adjusted percentage: ${adjustedPercentage}`
+        );
+        const scaledPercentage = adjustedPercentage * 1e7; // Scale up by 1e7 to maintain precision
         const quantityInWEI = (walletBalance * BigInt(scaledPercentage)) / BigInt(percentageBase);
 
         elizaLogger.debug(

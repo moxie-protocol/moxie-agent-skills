@@ -41,3 +41,29 @@ export const TRANSACTION_SUCCESSFUL = (txnHash: string, transferAmount: string, 
         }
     }
 }
+
+export const TRANSACTION_FAILED = (txnHash: string, error: string) => {
+    return {
+        text: `\nTransaction verification failed. Please try again.`,
+        content: {
+            action: "TOKEN_TRANSFERS"
+        }
+    }
+}
+export const TRANSACTION_VERIFICATION_TIMEOUT = (txnHash: string) => {
+    return {
+        text: `\nTransaction verification timed out. Please check [BaseScan](https://basescan.org/tx/${txnHash}) to verify the status before retrying.`,
+        content: {
+            action: "TOKEN_TRANSFERS"
+        }
+    }
+}
+
+export const TRANSACTION_SUBMISSION_FAILED = () => {
+    return {
+        text: `\nTransaction submission failed. Please try again.`,
+        content: {
+            action: "TOKEN_TRANSFERS"
+        }
+    }
+}

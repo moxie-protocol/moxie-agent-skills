@@ -6,7 +6,7 @@ import {
   } from '@cowprotocol/cow-sdk'
 
 import { elizaLogger} from '@moxie-protocol/core';
-import { MoxieAgentDBAdapter, TransactionDetails } from '@moxie-protocol/moxie-agent-lib';
+import { MoxieAgentDBAdapter, MoxieWalletSendTransactionResponseType, TransactionDetails } from '@moxie-protocol/moxie-agent-lib';
 import { MoxieClientWallet, MoxieWalletClient, MoxieWalletSignTypedDataResponseType } from '@moxie-protocol/moxie-agent-lib/src/wallet';
 import { ethers } from 'ethers';
 import axios from 'axios';
@@ -182,9 +182,34 @@ export async function createCowLimitOrder(
             JSON.stringify(finalOrderParams)
         );
 
-        // Send order to cow
-        const order = await orderBookApi.sendOrder(finalOrderParams);
-        elizaLogger.debug(traceId, '[createCowLimitOrder] Order created:', order);
+        // Send order to cow with retries
+        let order;
+        let retries = 3;
+        let lastError;
+        
+        while (retries > 0) {
+            try {
+                order = await orderBookApi.sendOrder(finalOrderParams);
+                elizaLogger.debug(traceId, '[createCowLimitOrder] Order created:', order);
+                break;
+            } catch (error) {
+                lastError = error;
+                retries--;
+                elizaLogger.warn(
+                    traceId,
+                    `[createCowLimitOrder] Failed to send order, retries left: ${retries}`,
+                    error
+                );
+                if (retries > 0) {
+                    // Wait before retrying (exponential backoff)
+                    await new Promise(resolve => setTimeout(resolve, (3 - retries) * 1000));
+                }
+            }
+        }
+        
+        if (!order) {
+            throw new Error(`Failed to send order after multiple attempts: ${lastError?.message}`);
+        }
 
         return order;
     } catch (error) {
@@ -225,10 +250,29 @@ async function sendApprovalTransactionFromEmbeddedWallet(
             )}`
         );
 
-        const sendTransactionResponse = await moxieWalletClient.sendTransaction(
-            chainId,
-            sendTransactionInput
-        );
+        let sendTransactionResponse: MoxieWalletSendTransactionResponseType;
+        let sendTxRetries = 3;
+        let lastSendTxError: any;
+        
+        while (sendTxRetries > 0) {
+            try {
+                sendTransactionResponse = await moxieWalletClient.sendTransaction(
+                    chainId,
+                    sendTransactionInput
+                );
+                break; // Exit the loop if successful
+            } catch (error) {
+                lastSendTxError = error;
+                elizaLogger.warn(
+                    traceId,
+                    `[${moxieUserId}] [sendApprovalTransactionFromEmbeddedWallet] Error sending transaction, retries left: ${sendTxRetries-1}: ${error.message}`
+                );
+                sendTxRetries--;
+                if (sendTxRetries === 0) throw error;
+                // Wait before retrying (exponential backoff)
+                await new Promise(resolve => setTimeout(resolve, (4 - sendTxRetries) * 2000));
+            }
+        }
         elizaLogger.debug(
             traceId,
             `[sendApprovalTransactionFromEmbeddedWallet] sendTransactionResponse: ${JSON.stringify(
@@ -236,12 +280,27 @@ async function sendApprovalTransactionFromEmbeddedWallet(
             )}`
         );
 
-        // Wait for and validate transaction receipt
-        const txnReceipt = await context.provider.waitForTransaction(
-            sendTransactionResponse.hash,
-            1,
-            TRANSACTION_RECEIPT_TIMEOUT
-        );
+        // Wait for and validate transaction receipt with retries
+        let txnReceipt = null;
+        let retries = 3;
+        while (retries > 0 && !txnReceipt) {
+            try {
+                txnReceipt = await context.provider.waitForTransaction(
+                    sendTransactionResponse.hash,
+                    1,
+                    TRANSACTION_RECEIPT_TIMEOUT
+                );
+            } catch (error) {
+                elizaLogger.warn(
+                    traceId,
+                    `[${moxieUserId}] [sendApprovalTransactionFromEmbeddedWallet] Error waiting for transaction receipt, retrying: ${error.message}`
+                );
+                retries--;
+                if (retries === 0) throw error;
+                // Exponential backoff
+                await new Promise(resolve => setTimeout(resolve, (4 - retries) * 2000));
+            }
+        }
 
         if (!txnReceipt) {
             elizaLogger.error(
@@ -257,13 +316,13 @@ async function sendApprovalTransactionFromEmbeddedWallet(
                 `[${moxieUserId}] [sendApprovalTransactionFromEmbeddedWallet] approval transaction successful: ${sendTransactionResponse.hash}`
             );
             return sendTransactionResponse;
+        } else if (txnReceipt.status === 0) { // 0 is failure
+            elizaLogger.error(
+                traceId,
+                `[${moxieUserId}] [sendApprovalTransactionFromEmbeddedWallet] approval transaction failed: ${sendTransactionResponse.hash} with status: ${txnReceipt.status}`
+            );
+            throw new Error('Approval transaction failed');
         }
-
-        elizaLogger.error(
-            traceId,
-            `[${moxieUserId}] [sendApprovalTransactionFromEmbeddedWallet] approval transaction failed: ${sendTransactionResponse.hash} with status: ${txnReceipt.status}`
-        );
-        throw new Error('Approval transaction failed: Transaction reverted');
     } catch (error) {
         elizaLogger.error(
             traceId,
@@ -348,41 +407,60 @@ async function signTypedDataFromEmbeddedWallet(
         orderParams
     );
 
-    try {
-        const moxieWalletClient = context.state.moxieWalletClient as MoxieWalletClient;
-        const orderData = {
-            types: orderTypes,
-            domain,
-            primaryType: "Order",
-            message: orderParams,
-        };
+    const maxRetries = 3;
+    let retryCount = 0;
+    let lastError;
 
-        elizaLogger.debug(
-            traceId,
-            '[signTypedDataFromEmbeddedWallet] orderData:',
-            JSON.stringify(orderData)
-        );
+    while (retryCount < maxRetries) {
+        try {
+            const moxieWalletClient = context.state.moxieWalletClient as MoxieWalletClient;
+            const orderData = {
+                types: orderTypes,
+                domain,
+                primaryType: "Order",
+                message: orderParams,
+            };
 
-        const signatureData = await moxieWalletClient.signTypedData(
-            orderData.domain,
-            orderData.types,
-            orderData.message,
-            orderData.primaryType
-        );
-        elizaLogger.debug(
-            traceId,
-            '[signTypedDataFromEmbeddedWallet] signatureData:',
-            JSON.stringify(signatureData)
-        );
+            elizaLogger.debug(
+                traceId,
+                '[signTypedDataFromEmbeddedWallet] orderData:',
+                JSON.stringify(orderData)
+            );
 
-        return signatureData;
-    } catch (error) {
-        elizaLogger.error(
-            traceId,
-            '[signTypedDataFromEmbeddedWallet] Failed to sign order data:',
-            error
-        );
-        throw new Error(`Failed to sign order data: ${error.message}`);
+            const signatureData = await moxieWalletClient.signTypedData(
+                orderData.domain,
+                orderData.types,
+                orderData.message,
+                orderData.primaryType
+            );
+            elizaLogger.debug(
+                traceId,
+                '[signTypedDataFromEmbeddedWallet] signatureData:',
+                JSON.stringify(signatureData)
+            );
+
+            return signatureData;
+        } catch (error) {
+            lastError = error;
+            retryCount++;
+            elizaLogger.warn(
+                traceId,
+                `[signTypedDataFromEmbeddedWallet] Failed to sign order data, retry ${retryCount}/${maxRetries}:`,
+                error
+            );
+            
+            if (retryCount < maxRetries) {
+                // Exponential backoff
+                await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
+            }
+        }
     }
+
+    elizaLogger.error(
+        traceId,
+        '[signTypedDataFromEmbeddedWallet] Failed to sign order data after multiple attempts:',
+        lastError
+    );
+    throw new Error(`Failed to sign order data after ${maxRetries} attempts: ${lastError.message}`);
 }
 

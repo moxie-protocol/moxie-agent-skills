@@ -18,7 +18,7 @@ import { execute0xSwap, get0xSwapQuote } from "../utils/0xApis";
 import { checkAllowanceAndApproveSpendRequest } from "../utils/checkAndApproveTransaction";
 import { numberToHex } from "viem";
 import { size } from "viem";
-import { swapCompletedTemplate, swapInProgressTemplate } from "../utils/callbackTemplates";
+import { swapCompletedTemplate, swapFailedTemplate, swapInProgressTemplate, swapTransactionFailed, swapTransactionVerificationTimedOut } from "../utils/callbackTemplates";
 import { createCowLimitOrder } from "../service/cowLimitOrder";
 import { getERC20TokenSymbol } from "@moxie-protocol/moxie-agent-lib";
 
@@ -745,7 +745,14 @@ async function getTargetQuantityForBalanceBasedSwaps(
     }
 
     // calculate the percentage to be used for the swap
-    const percentage = balance.type === 'FULL' ? 100 : balance.percentage;
+    let percentage = balance.type === 'FULL' ? 100 : balance.percentage;
+    
+    // If ETH and 100%, use 99% instead
+    if (sellTokenSymbol === "ETH" && percentage === 100) {
+        percentage = 99;
+        elizaLogger.debug(traceId,`[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [balance] Using 99% instead of 100% for ETH`);
+    }
+    
     // Scale up by a larger factor (e.g., 1e7)
     quantityInWEI = (BigInt(currentWalletBalance) * BigInt(percentage * 1e7)) / BigInt(1e9)
     elizaLogger.debug(traceId,`[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [balance] quantityInWEI: ${quantityInWEI}`);
@@ -876,13 +883,30 @@ async function swap(
     try {
         elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [swap] quote.permit2.eip712: ${JSON.stringify(quote.permit2?.eip712)}`);
         if (quote.permit2?.eip712) {
-            signResponse = await walletClient.signTypedData(
-                quote.permit2.eip712.domain,
-                quote.permit2.eip712.types,
-                quote.permit2.eip712.message,
-                quote.permit2.eip712.primaryType,
-            );
-            elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [swap] signResponse: ${JSON.stringify(signResponse)}`);
+            const MAX_RETRIES = 3;
+            let retryCount = 0;
+            
+            while (retryCount < MAX_RETRIES) {
+                try {
+                    signResponse = await walletClient.signTypedData(
+                        quote.permit2.eip712.domain,
+                        quote.permit2.eip712.types,
+                        quote.permit2.eip712.message,
+                        quote.permit2.eip712.primaryType,
+                    );
+                    elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [swap] signResponse: ${JSON.stringify(signResponse)}`);
+                    break; // Exit the loop if successful
+                } catch (error) {
+                    retryCount++;
+                    elizaLogger.warn(traceId, `[tokenSwap] [${moxieUserId}] [swap] Signing attempt ${retryCount} failed: ${error.message}`);
+                    if (retryCount >= MAX_RETRIES) {
+                        elizaLogger.error(traceId,`[tokenSwap] [${moxieUserId}] [swap] [ERROR] Failed to sign typed data after ${MAX_RETRIES} attempts`);
+                        throw error; // Rethrow the error after all retries are exhausted
+                    }
+                    // Wait before retrying (exponential backoff)
+                    await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retryCount)));
+                }
+            }
         }
 
         if (signResponse && signResponse.signature && quote.transaction?.data) {
@@ -923,15 +947,15 @@ async function swap(
         txnReceipt = await handleTransactionStatusSwap(traceId, moxieUserId, provider, tx.hash);
         if (!txnReceipt) {
             elizaLogger.error(traceId,`[tokenSwap] [${moxieUserId}] [swap] txnReceipt is null`);
-            throw new Error(`Transaction receipt is null for ${tx.hash}.`);
         }
     } catch (error) {
         elizaLogger.error(traceId,`[tokenSwap] [${moxieUserId}] [swap] Error handling transaction status: ${JSON.stringify(error)}`);
+        await context.callback(swapTransactionVerificationTimedOut(tx.hash));
         throw error;
     }
 
     elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [swap] 0x swap txnReceipt: ${JSON.stringify(txnReceipt)}`);
-    if (txnReceipt.status == 1) {
+    if (txnReceipt && txnReceipt.status == 1) {
 
         if (buyTokenAddress !== ETH_ADDRESS && buyTokenAddress !== WETH_ADDRESS) {
             // decode the txn receipt to get the moxie purchased
@@ -952,7 +976,7 @@ async function swap(
         };
     } else {
         elizaLogger.error(traceId,`[tokenSwap] [${moxieUserId}] [swap] 0x swap failed: ${tx.hash} `);
-        throw new Error(`0x swap failed: ${tx.hash}`);
+        await context.callback(swapTransactionFailed(tx.hash));
     }
 }
 
