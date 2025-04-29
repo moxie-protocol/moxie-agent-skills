@@ -39,12 +39,10 @@ if (!process.env.CHAIN_ID || isNaN(Number(process.env.CHAIN_ID))) {
 
 if (!process.env.SWAP_FEE_BPS || isNaN(Number(process.env.SWAP_FEE_BPS))) {
     elizaLogger.error("SWAP_FEE_BPS environment variable is not set");
-    throw new Error("SWAP_FEE_BPS environment variable is not set");
 }
 
 if (!process.env.SWAP_FEE_RECIPIENT) {
     elizaLogger.error("SWAP_FEE_RECIPIENT environment variable is not set");
-    throw new Error("SWAP_FEE_RECIPIENT environment variable is not set");
 }
 
 /**

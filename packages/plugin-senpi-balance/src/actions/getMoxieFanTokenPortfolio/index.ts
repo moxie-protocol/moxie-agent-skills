@@ -18,7 +18,7 @@ import { streamText } from "@senpi-ai/core";
 import {
     SenpiUser,
     senpiUserService,
-    getSenpiPortfolioInfo,
+    getMoxiePortfolioInfo,
     SenpiAgentDBAdapter,
 } from "@senpi-ai/senpi-agent-lib";
 import {
@@ -242,7 +242,7 @@ export default {
                     senpiUserInfoMultiple.map(async (user) => {
                         let totalCreatorCoinValue = 0;
                         let fanTokenHoldings = [];
-                        const portfolioInfo = await getSenpiPortfolioInfo(
+                        const portfolioInfo = await getMoxiePortfolioInfo(
                             user.id,
                             runtime
                         );
@@ -391,7 +391,7 @@ export default {
 
             // Fetch fresh portfolio data
             let totalCreatorCoinValue = 0;
-            const portfolioData = await getSenpiPortfolioInfo(
+            const portfolioData = await getMoxiePortfolioInfo(
                 senpiUserInfo?.id,
                 runtime
             );

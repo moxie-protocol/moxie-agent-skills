@@ -14,7 +14,7 @@ export { portfolioService };
 export { RedisClient } from "./services/RedisClient";
 
 export type { SenpiPortfolio } from "./services/portfolio";
-export { getSenpiPortfolioInfoByCreatorTokenDetails } from "./services/portfolioService";
+export { getMoxiePortfolioInfoByCreatorTokenDetails } from "./services/portfolioService";
 
 export { SenpiAgentDBAdapter } from "./services/SenpiAgentDBAdapter";
 
@@ -59,7 +59,7 @@ export {
 } from "./wallet";
 
 export {
-    getSenpiPortfolioInfo,
+    getMoxiePortfolioInfo,
     type SenpiPortfolioInfo,
 } from "./services/portfolioService";
 

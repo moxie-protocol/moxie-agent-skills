@@ -18,7 +18,7 @@ import {
 import { elizaLogger, validateUuid, IAgentRuntime } from "@senpi-ai/core";
 import {
     SenpiWallet,
-    getSenpiPortfolioInfoByCreatorTokenDetails,
+    getMoxiePortfolioInfoByCreatorTokenDetails,
 } from "@senpi-ai/senpi-agent-lib";
 
 /**
@@ -101,7 +101,7 @@ export async function validateSenpiAIAgentBalance({
     }
 
     // Get portfolio info
-    const portfolioInfo = await getSenpiPortfolioInfoByCreatorTokenDetails(
+    const portfolioInfo = await getMoxiePortfolioInfoByCreatorTokenDetails(
         senpiUserId,
         {
             address: CREATOR_AGENT_TOKEN_ADDRESS,
@@ -189,7 +189,7 @@ export async function validateBaseEconomyTokenBalance({
     }
 
     // Get portfolio info
-    const portfolioInfo = await getSenpiPortfolioInfoByCreatorTokenDetails(
+    const portfolioInfo = await getMoxiePortfolioInfoByCreatorTokenDetails(
         senpiUserId,
         {
             address: BASE_ECONOMY_TOKEN_ADDRESS,

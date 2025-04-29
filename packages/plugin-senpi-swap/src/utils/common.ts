@@ -129,10 +129,10 @@ export function extractTokenDetails(
 //     walletAddress: string,
 //     callback?: Function
 // ): Promise<boolean> {
-//     if (!process.env.SENPI_TOKEN_ADDRESS) {
+//     if (!process.env.MOXIE_TOKEN_ADDRESS) {
 //         throw new Error('SENPI_TOKEN_ADDRESS environment variable is not set');
 //     }
-//     const balance = await getERC20Balance(traceId, process.env.SENPI_TOKEN_ADDRESS, walletAddress);
+//     const balance = await getERC20Balance(traceId, process.env.MOXIE_TOKEN_ADDRESS, walletAddress);
 //     const currentBalance = balance !== "" ? BigInt(balance) : 0n;
 
 //     if (currentBalance < requiredAmount) {

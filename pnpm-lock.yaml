@@ -240,7 +240,7 @@ importers:
         version: link:../packages/core
       '@tanstack/react-query':
         specifier: ^5.63.0
-        version: 5.74.7(react@19.1.0)
+        version: 5.74.9(react@19.1.0)
       '@uidotdev/usehooks':
         specifier: ^2.4.1
         version: 2.4.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -4290,11 +4290,11 @@ packages:
   '@swc/types@0.1.21':
     resolution: {integrity: sha512-2YEtj5HJVbKivud9N4bpPBAyZhj4S2Ipe5LkUG94alTpr7in/GU/EARgPAd3BwU+YOmFVJC2+kjqhGRi3r0ZpQ==}
 
-  '@tanstack/query-core@5.74.7':
-    resolution: {integrity: sha512-X3StkN/Y6KGHndTjJf8H8th7AX4bKfbRpiVhVqevf0QWlxl6DhyJ0TYG3R0LARa/+xqDwzU9mA4pbJxzPCI29A==}
+  '@tanstack/query-core@5.74.9':
+    resolution: {integrity: sha512-qmjXpWyigDw4SfqdSBy24FzRvpBPXlaSbl92N77lcrL+yvVQLQkf0T6bQNbTxl9IEB/SvVFhhVZoIlQvFnNuuw==}
 
-  '@tanstack/react-query@5.74.7':
-    resolution: {integrity: sha512-u4o/RIWnnrq26orGZu2NDPwmVof1vtAiiV6KYUXd49GuK+8HX+gyxoAYqIaZogvCE1cqOuZAhQKcrKGYGkrLxg==}
+  '@tanstack/react-query@5.74.9':
+    resolution: {integrity: sha512-F8xCXDQRDgsPzLzX9+d6ycNoITAIU2bycc1idZd06bt/GjN1quEJDjHvEDWZGoVn0A/ZmntVrYv6TE0kR7c7LA==}
     peerDependencies:
       react: ^18 || ^19
 
@@ -15852,11 +15852,11 @@ snapshots:
     dependencies:
       '@swc/counter': 0.1.3
 
-  '@tanstack/query-core@5.74.7': {}
+  '@tanstack/query-core@5.74.9': {}
 
-  '@tanstack/react-query@5.74.7(react@19.1.0)':
+  '@tanstack/react-query@5.74.9(react@19.1.0)':
     dependencies:
-      '@tanstack/query-core': 5.74.7
+      '@tanstack/query-core': 5.74.9
       react: 19.1.0
 
   '@tavily/core@0.0.2':

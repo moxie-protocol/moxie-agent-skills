@@ -17,7 +17,7 @@ import { portfolioExamples } from "./examples";
 import { mutiplePortfolioSummary, portfolioSummary } from "./template";
 import { portfolioUserIdsExtractionTemplate } from "../../commonTemplate";
 import {
-    getSenpiPortfolioInfo,
+    getMoxiePortfolioInfo,
     SenpiUser,
     senpiUserService,
     getPortfolioData,
@@ -162,7 +162,7 @@ export async function handleMultipleUsers(
                 (token.node.balanceUSD * 100) / totalTokenValue;
         });
 
-        const fanTokenPortfolioData = await getSenpiPortfolioInfo(
+        const fanTokenPortfolioData = await getMoxiePortfolioInfo(
             userInfo.id,
             runtime
         );
@@ -488,7 +488,7 @@ export default {
                 token.node.holdingPercentage =
                     (token?.node?.balanceUSD * 100) / totalTokenValue;
             });
-            const fanTokenPortfolioData = await getSenpiPortfolioInfo(
+            const fanTokenPortfolioData = await getMoxiePortfolioInfo(
                 senpiUserInfo?.id,
                 runtime
             );

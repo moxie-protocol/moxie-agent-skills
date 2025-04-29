@@ -242,7 +242,7 @@ export function createSenpiApiRouter(
                 await runtime.messageManager.addEmbeddingToMemory(memory);
                 await runtime.messageManager.createMemory(memory);
 
-                const SenpiWalletClient = new SenpiWalletClient(
+                const senpiWalletClient = new SenpiWalletClient(
                     agentWallet.address,
                     req.header("Authorization")
                 );
@@ -251,7 +251,7 @@ export function createSenpiApiRouter(
                     agentName: runtime.character.name,
                     senpiUserInfo: senpiUserInfo,
                     agentWallet: agentWallet,
-                    SenpiWalletClient: SenpiWalletClient,
+                    senpiWalletClient: senpiWalletClient,
                     agentWalletBalance: currentWalletBalance,
                     authorizationHeader: req.header("Authorization"),
                 });

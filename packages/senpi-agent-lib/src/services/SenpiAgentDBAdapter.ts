@@ -508,7 +508,7 @@ export class SenpiAgentDBAdapter extends PostgresDatabaseAdapter {
         try {
             // Get portfolio info
             const portfolioInfo =
-                await getSenpiPortfolioInfoByCreatorTokenDetails(senpiUserId, {
+                await getMoxiePortfolioInfoByCreatorTokenDetails(senpiUserId, {
                     address: creatorCoinTokenAddress,
                 });
 
@@ -564,7 +564,7 @@ export class SenpiAgentDBAdapter extends PostgresDatabaseAdapter {
  * @param creatorToken - The creator token details
  * @returns The portfolio info for the creator token or undefined if no portfolio info is found
  */
-export async function getSenpiPortfolioInfoByCreatorTokenDetails(
+export async function getMoxiePortfolioInfoByCreatorTokenDetails(
     senpiUserId: string,
     creatorToken: {
         address?: string;
@@ -574,7 +574,7 @@ export async function getSenpiPortfolioInfoByCreatorTokenDetails(
 ): Promise<SenpiPortfolioInfo[] | undefined> {
     try {
         elizaLogger.debug(
-            `[getSenpiPortfolioInfoByCreatorTokenDetails] [${senpiUserId}] Getting portfolio info for user ${senpiUserId} and creator token ${JSON.stringify(creatorToken)}`
+            `[getMoxiePortfolioInfoByCreatorTokenDetails] [${senpiUserId}] Getting portfolio info for user ${senpiUserId} and creator token ${JSON.stringify(creatorToken)}`
         );
 
         // Validate that at least one token detail is provided
@@ -618,7 +618,7 @@ export async function getSenpiPortfolioInfoByCreatorTokenDetails(
         ];
 
         elizaLogger.debug(
-            `[getSenpiPortfolioInfoByCreatorTokenDetails] [${senpiUserId}] Filter conditions: ${filterConditions.join(", ")}`
+            `[getMoxiePortfolioInfoByCreatorTokenDetails] [${senpiUserId}] Filter conditions: ${filterConditions.join(", ")}`
         );
 
         const query = SENPI_USER_PORTFOLIOS_QUERY(filterConditions);
@@ -670,20 +670,20 @@ export async function getSenpiPortfolioInfoByCreatorTokenDetails(
                 const portfolioInfo =
                     result.data.MoxieUserPortfolios.MoxieUserPortfolio;
                 elizaLogger.debug(
-                    `[getSenpiPortfolioInfoByCreatorTokenDetails] [${senpiUserId}] Portfolio response: ${JSON.stringify(portfolioInfo)}`
+                    `[getMoxiePortfolioInfoByCreatorTokenDetails] [${senpiUserId}] Portfolio response: ${JSON.stringify(portfolioInfo)}`
                 );
                 return portfolioInfo;
             } catch (error) {
                 attempts++;
                 if (attempts === maxAttempts) {
                     elizaLogger.error(
-                        `[getSenpiPortfolioInfoByCreatorTokenDetails] [${senpiUserId}] Failed after ${maxAttempts} attempts:`,
+                        `[getMoxiePortfolioInfoByCreatorTokenDetails] [${senpiUserId}] Failed after ${maxAttempts} attempts:`,
                         error
                     );
                     throw error;
                 }
                 elizaLogger.warn(
-                    `[getSenpiPortfolioInfoByCreatorTokenDetails] [${senpiUserId}] API call failed, attempt ${attempts}/${maxAttempts}. Retrying...`
+                    `[getMoxiePortfolioInfoByCreatorTokenDetails] [${senpiUserId}] API call failed, attempt ${attempts}/${maxAttempts}. Retrying...`
                 );
                 await new Promise((resolve) =>
                     setTimeout(resolve, backoffMs * attempts)
@@ -692,7 +692,7 @@ export async function getSenpiPortfolioInfoByCreatorTokenDetails(
         }
     } catch (error) {
         elizaLogger.error(
-            `[getSenpiPortfolioInfoByCreatorTokenDetails] [${senpiUserId}] Error fetching portfolio info:`,
+            `[getMoxiePortfolioInfoByCreatorTokenDetails] [${senpiUserId}] Error fetching portfolio info:`,
             error
         );
         throw error;

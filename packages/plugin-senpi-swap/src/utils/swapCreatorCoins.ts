@@ -55,8 +55,8 @@ export async function executeBuyAction(
     ) {
         throw new Error("Missing required parameters");
     }
-    const senpiTokenAddress = process.env.MOXIE_TOKEN_ADDRESS;
-    if (!senpiTokenAddress) {
+    const moxieTokenAddress = process.env.MOXIE_TOKEN_ADDRESS;
+    if (!moxieTokenAddress) {
         throw new Error(
             "MOXIE_TOKEN_ADDRESS environment variable is not defined"
         );
