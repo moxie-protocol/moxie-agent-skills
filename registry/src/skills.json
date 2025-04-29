@@ -12,12 +12,12 @@
         "capabilities": ["Token prices", "Market caps", "Liquidity", "Holders"],
         "starterQuestions": [
             {
-                "label": "Show token details for $moxie",
-                "value": "Show token details for $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527]"
+                "label": "Show token details for $[replace with token name]",
+                "value": "Show token details for $[replace with token name]"
             },
             {
-                "label": "Compare $moxie and $bnkr",
-                "value": "Compare $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] and $[BNKR|0x22af33fe49fd1fa80c7149773dde5890d3c76f3b]"
+                "label": "Compare $clanker and $bnkr",
+                "value": "Compare $[CLANKER|0x1bc0c42215582d5a085795f4badbac3ff36d1bcb] and $[BNKR|0x22af33fe49fd1fa80c7149773dde5890d3c76f3b]"
             }
         ],
         "mediaUrls": [
@@ -69,17 +69,17 @@
         "settings": {},
         "capabilities": [
             "Send tokens to yourself",
-            "Send tokens to any ENS or Moxie user",
+            "Send tokens to any ENS or Senpi user",
             "Send tokens to any 0x address"
         ],
         "starterQuestions": [
             {
-                "label": "Send 50% of my $moxie to @betashop.eth",
-                "value": "Send 50% of my $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] to @[betashop.eth|M4]"
+                "label": "Send 50% of my $[replace with token name] to betashop.eth",
+                "value": "Send 50% of my $[replace with token name] to @[betashop.eth|M4]"
             },
             {
-                "label": "Send 25% of my $eth to @betashop.eth",
-                "value": "Send 25% of my $eth to @[betashop.eth|M4]"
+                "label": "Send 25% of my $[replace with token name] to @betashop.eth ",
+                "value": "Send 25% of my $[replace with token name] to @[betashop.eth|M4]"
             }
         ],
         "mediaUrls": [
@@ -205,21 +205,20 @@
         "settings": {},
         "capabilities": [
             "Swap any token on Base. 💡Pro Tip: use “$” to auto-complete token names",
-            "Swap any creator coin on Moxie. 💡Pro Tip: use “@” to auto-complete creator coin names",
             "Spend a % of your wallet to buy coins"
         ],
         "starterQuestions": [
             {
-                "label": "Buy me $25 worth of $moxie",
-                "value": "Buy me $25 worth of $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527]"
+                "label": "Buy me $25 worth of $[replace with token name]",
+                "value": "Buy me $25 worth of $[replace with token name]"
             },
             {
-                "label": "Swap 100 $degen for $moxie_ai",
-                "value": "Swap 100 $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed] for $[MOXIE_AI|0xda7e153bbe75902bd23496284fe0c4b90c9ace7b]"
+                "label": "Swap 100 $degen for $[replace with token name]",
+                "value": "Swap 100 $degen for $[replace with token name]"
             },
             {
-                "label": "Use 40% of my $eth to buy $moxie and 20% to buy $degen",
-                "value": "Use 40% of my $eth to buy $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] and 20% to buy $[DEGEN|0x4ed4e862860bed51a9570b96d89af5e1b0efefed]"
+                "label": "Use 40% of my $eth to buy $$[replace with token name] and 20% to buy $degen",
+                "value": "Use 40% of my $eth to buy $$[replace with token name] and 20% to buy $degen"
             }
         ],
         "mediaUrls": [
@@ -324,7 +323,7 @@
         "displayName": "Base Whale Hunter",
         "version": "0.1.8+build.1",
         "author": null,
-        "description": "Discover Base whales with Moxie AI! ",
+        "description": "Discover Base whales with Senpi!",
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-whale-hunter",
         "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-whale-hunter/images/logo.svg",
         "settings": {},
