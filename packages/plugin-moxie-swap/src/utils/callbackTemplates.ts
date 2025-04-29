@@ -110,3 +110,14 @@ export const approvalTransactionFailed = (approvalTxHash: string) => ({
 export const moxieWalletClientNotFound = {
     text: `\nUnable to access moxie wallet details. Please ensure your moxie wallet is properly setup and try again.`,
 };
+
+export const approvalTransactionTimedOut = (approvalTxHash: string) => ({
+    text: `\nApproval transaction timed out. Please check [BaseScan](https://basescan.org/tx/${approvalTxHash}) to verify the status before retrying.`,
+    content: {
+        url: `https://basescan.org/tx/${approvalTxHash}`,
+    }
+});
+
+export const approvalTransactionSubmissionFailed = () => ({
+    text: `\nApproval transaction submission failed. Please try again.`,
+});
