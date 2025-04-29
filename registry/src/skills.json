@@ -534,21 +534,21 @@
     }, 
     {
         "pluginId": "79449cd9-0590-4ccc-9d9f-12f99438c17b",
-        "name": "@moxie-protocol/plugin-DEGENfans-alfafrens",
-        "displayName": "DEGENFans AlfaFrens",
+        "name": "@moxie-protocol/plugin-degenfans-alfafrens",
+        "displayName": "DegenFans AlfaFrens",
         "version": "0.0.2",
-        "author": "DEGENFans",
+        "author": "DegenFans",
         "description": "Enables your agent to recommend staking options for AlfaFrens channels",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-DEGENfans-alfafrens",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-DEGENfans-alfafrens/images/logo.png",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-degenfans-alfafrens",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-degenfans-alfafrens/images/logo.png",
         "settings": {},
         "capabilities": [
             "show the best staking options for a given staking amount"
         ],
         "starterQuestions": [
             {
-                "label": "What is the DEGENfans Alfafrens Skills?",
-                "value": "What is the DEGENfans Alfafrens Skills?"
+                "label": "What is the Degenfans Alfafrens Skills?",
+                "value": "What is the Degenfans Alfafrens Skills?"
             },
             {
                 "label": "What are some staking recommendations you have for Alfafrens?",
@@ -584,7 +584,7 @@
         "loaders": [
             "Querying AlfaFrens",
             "Waiting for response",
-            "Doing some DEGENFans magic"
+            "Doing some DegenFans magic"
         ],
         "orderIndex": 7
     },
