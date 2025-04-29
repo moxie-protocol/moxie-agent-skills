@@ -59,9 +59,11 @@ export const TRANSACTION_VERIFICATION_TIMEOUT = (txnHash: string) => {
     }
 }
 
-export const TRANSACTION_SUBMISSION_FAILED = () => {
+export const TRANSACTION_SUBMISSION_FAILED = (reason?: string) => {
     return {
-        text: `\nTransaction submission failed. Please try again.`,
+        text: reason 
+            ? `\nTransaction submission failed. Reason: ${reason}. Please try again.`
+            : `\nTransaction submission failed. Please try again.`,
         content: {
             action: "TOKEN_TRANSFERS"
         }
