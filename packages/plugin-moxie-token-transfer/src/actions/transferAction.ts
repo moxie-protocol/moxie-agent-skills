@@ -1082,6 +1082,14 @@ async function executeTransfer(
             context.traceId,
             `[tokenTransfer] [${context.moxieUserId}] [executeTransfer] Failed after ${MAX_RETRIES} attempts: ${lastError}`
         );
+        
+        // Check if the error is related to insufficient funds
+        if (lastError && lastError.message && lastError.message.includes("insufficient funds for gas * price + value")) {
+            return {
+                callBackTemplate: callBackTemplate.TRANSACTION_SUBMISSION_FAILED("Insufficient funds to cover gas costs for this transaction")
+            };
+        }
+        
         return {
             callBackTemplate: callBackTemplate.TRANSACTION_SUBMISSION_FAILED()
         };

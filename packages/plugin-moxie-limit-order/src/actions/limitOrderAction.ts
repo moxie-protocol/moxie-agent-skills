@@ -509,10 +509,19 @@ async function processSingleLimitOrder(
         let sellTokenAmountInWEI: bigint;
 
          // Get current token prices in USD
-         const [sellTokenPriceInUSD, buyTokenPriceInUSD] = await Promise.all([
-            fetchPriceWithRetry(sellTokenAddress, sellTokenSymbol, traceId, moxieUserId),
-            fetchPriceWithRetry(buyTokenAddress, buyTokenSymbol, traceId, moxieUserId)
-        ]);
+         let sellTokenPriceInUSD: number;
+         let buyTokenPriceInUSD: number;
+         try {
+             [sellTokenPriceInUSD, buyTokenPriceInUSD] = await Promise.all([
+                fetchPriceWithRetry(sellTokenAddress, sellTokenSymbol, traceId, moxieUserId),
+                fetchPriceWithRetry(buyTokenAddress, buyTokenSymbol, traceId, moxieUserId)
+             ]);
+         } catch (error) {
+             elizaLogger.error(traceId, `[limitOrder] [${moxieUserId}] [processSingleLimitOrder] Error fetching token prices: ${error}`);
+             return {
+                callBackTemplate: callBackTemplate.APPLICATION_ERROR(`Error fetching token prices: ${error.message}`)
+             };
+         }
         elizaLogger.debug(traceId,`[limitOrder] [${moxieUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [USD_VALUE_TYPE] sellTokenPriceInUSD: ${sellTokenPriceInUSD} and buyTokenPriceInUSD: ${buyTokenPriceInUSD}`);
 
          // Calculate target price based on limit price type

@@ -21,7 +21,7 @@ import { extractCreatorDetails, extractTokenDetails, handleTransactionStatus } f
 import { checkAllowanceAndApproveSpendRequest } from "../utils/checkAndApproveTransaction";
 import { numberToHex, size } from "viem";
 import { tokenSwapExamples } from "./examples";
-import { ETH_ADDRESS, MOXIE, MOXIE_TOKEN_ADDRESS, MOXIE_TOKEN_DECIMALS, USDC, USDC_ADDRESS, USDC_TOKEN_DECIMALS } from "../utils/constants";
+import { ETH_ADDRESS, MOXIE, MOXIE_TOKEN_ADDRESS, MOXIE_TOKEN_DECIMALS, USDC, USDC_ADDRESS, USDC_TOKEN_DECIMALS, WETH_ADDRESS } from "../utils/constants";
 import { calculateTokensBuy } from "../utils/moxieBondingCurve";
 import { initiatePurchaseTemplate, insufficientEthBalanceTemplate, swapInProgressTemplate, swapOperationFailedTemplate, swapCompletedTemplate, swapFailedTemplate, agentWalletNotFound, delegateAccessNotFound, moxieWalletClientNotFound } from "../utils/callbackTemplates";
 import { getSubjectTokenDetailsBySubjectAddress, getSubjectTokenDetailsBySubjectTokenAddresses, SubjectToken } from "../utils/subgraph";
@@ -1492,19 +1492,9 @@ export const tokenSwapAction = {
                                     : await getERC20Balance(traceId, sellTokenAddress, agentWallet.address)
                                 if (BigInt(currentSellTokenBalanceInWEI) < sellQuantityInWEI) {
                                     elizaLogger.error(traceId,`[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [SELL_QUANTITY] insufficient balance: ${currentSellTokenBalanceInWEI} < ${Number(sellQuantityInWEI)}`);
-                                    await handleInsufficientBalance(
-                                        traceId,
-                                        state.agentWalletBalance as Portfolio,
-                                        moxieUserId,
-                                        sellTokenAddress,
-                                        sellTokenSymbol,
-                                        sellQuantityInWEI,
-                                        BigInt(currentSellTokenBalanceInWEI),
-                                        sellTokenDecimals,
-                                        agentWallet.address,
-                                        callback,
-                                        buyTokenAddress
-                                    );
+                                    await callback({
+                                        text: `\nInsufficient ${sellTokenSymbol} balance to complete this transaction.\n\nCurrent balance: ${ethers.formatUnits(currentSellTokenBalanceInWEI, sellTokenDecimals)} ${sellTokenSymbol}\nRequired amount: ${ethers.formatUnits(sellQuantityInWEI, sellTokenDecimals)} ${sellTokenSymbol}\n\nPlease add ${ethers.formatUnits(sellQuantityInWEI - BigInt(currentSellTokenBalanceInWEI), sellTokenDecimals)} ${sellTokenSymbol} and try again.`,
+                                    })
                                     return true;
                                 }
                                     try {
@@ -1999,7 +1989,7 @@ async function swap(
     elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [swap] 0x swap txnReceipt: ${JSON.stringify(txnReceipt)}`);
     if (txnReceipt.status == 1) {
 
-        if (buyTokenAddress !== ETH_ADDRESS) {
+        if (buyTokenAddress !== ETH_ADDRESS && buyTokenAddress !== WETH_ADDRESS) {
             // decode the txn receipt to get the moxie purchased
             const transferDetails = await decodeTokenTransfer(traceId, moxieUserId, txnReceipt, buyTokenAddress, agentWalletAddress);
             elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [swap] 0x swap decodeTokenTransfer: ${JSON.stringify(transferDetails)}`);
