@@ -35,19 +35,18 @@ Step 1: Identify which type of query the question refers to. It might be about a
 `;
 
 export const extractWalletTemplate = `
-Given the conversation history and latest message, extract the following criteria for PnL queries:
+Your objective is to identify the type of the request and extract important information from a give user message, and then generate a structured JSON response.
 
-1. Criteria for User/Wallet/User&Token queries:
-   - If the query is for the user's PnL, choose "moxieUserId" from the context.
-   - If the query is for the agent's PnL, choose "wallet" from the context.
-   - if there's ens and moxieUserId then consider moxieUserId
-   - if the query contains string "M" followed by a number, then choose the value
-   - TYPE: "wallet" | "ens" | "moxieUserId"
-   - VALUE: "0x1c3a068430f8fe592703d07b9fd063d47bde8aba" | "chetan.eth" | "M5" | "M4"
+### Query types
+1. User/Wallet/User&Token queries
+- TYPE: "wallet" | "ens" | "moxieUserId"
+- VALUE: "0x....." | "chetan.eth" | "M[number_string]"
+Can also contain token address to specifically show PnL for the user & that token.
 
 2. Criteria for Token PnL:
-   - TYPE: "tokenAddress" or token in format $[token_symbol|token_address]
-   - VALUE: "0x1c3a068430f8fe592703d07b9fd063d47bde8aba" or valid ethereum token address
+- TYPE: "tokenAddress"
+- VALUE: "0x....."
+User query can contain a 0x format token address, or $[token_symbol|token_address], you only need 0x address.
 
 3. Criteria for Overall PnL (Best Traders):
    - TYPE: "overall"
@@ -58,8 +57,8 @@ Response format example:
 {
   "criteria": [
     {
-      "TYPE": "moxieUserId",
-      "VALUE": "M5"
+      "TYPE": "[query type]",
+      "VALUE": "[query value]"
     }
   ],
   "analysisType": "PROFIT",
@@ -67,12 +66,11 @@ Response format example:
   "chain": "base"
 }
 \`\`\`
-Latest message: {{latestMessage}}
+Latest message: {{latest_message}}
+Conversation history: {{conversation_history}}
 
-Conversation history:
-{{conversation}}
-
-Agent wallet address: {{agentWalletAddress}}
-
-Moxie user id: {{moxieUserId}}
+General rules:
+- if the query mentions both ENS and moxieUserId - use moxieUserId.
+- if the query mentions "my PnL", or "I earned/lost" use the following UserId: {{UserId}}
+- if the query mentions "my agent PnL" user the following wallet address: {{agent_wallet_address}}
 `;
