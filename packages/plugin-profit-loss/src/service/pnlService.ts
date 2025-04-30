@@ -39,7 +39,7 @@ export const preparePnlQuery = (pnlResponse: any) => {
   } = pnlResponse;
 
   // Initialize select fields
-  let selectFields = `moxie_user_id, token_address, profit_loss, token_sold_symbol, token_bought_symbol, total_sell_amount, total_buy_amount, total_sell_value_usd, total_buy_value_usd, buy_transaction_count, sale_transactions`;
+  let selectFields = `moxie_user_id, token_address, profit_loss, token_sold_symbol, token_bought_symbol, total_sell_amount, total_buy_amount, total_sell_value_usd, total_buy_value_usd, buy_transaction_count, sell_transaction_count`;
 
   if (tokenAddresses?.length > 0) {
     selectFields = `wallet_address, ${selectFields}`;
@@ -62,7 +62,7 @@ export const preparePnlQuery = (pnlResponse: any) => {
 
   if (moxieUserIds?.length > 0) {
     whereClauses.push(`moxie_user_id in (${moxieUserIds.map((id) => `'${id}'`).join(",")})`);
-    selectFields = `moxie_user_id, token_address, SUM(profit_loss) as total_profit_loss, MAX(token_sold_symbol) as token_sold_symbol, MAX(token_bought_symbol) as token_bought_symbol, SUM(total_sell_amount) as total_sell_amount, SUM(total_buy_amount) as total_buy_amount, SUM(total_sell_value_usd) as total_sell_value_usd, SUM(total_buy_value_usd) as total_buy_value_usd, SUM(buy_transaction_count) as buy_transaction_count, SUM(sale_transactions) as sale_transactions`;
+    selectFields = `moxie_user_id, token_address, SUM(profit_loss) as total_profit_loss, MAX(token_sold_symbol) as token_sold_symbol, MAX(token_bought_symbol) as token_bought_symbol, SUM(total_sell_amount) as total_sell_amount, SUM(total_buy_amount) as total_buy_amount, SUM(total_sell_value_usd) as total_sell_value_usd, SUM(total_buy_value_usd) as total_buy_value_usd, SUM(buy_transaction_count) as buy_transaction_count, SUM(sell_transaction_count) as sell_transaction_count`;
     query = `select ${selectFields} from dune.moxieprotocol.result_moxie_wallets`;
     groupByClauses.push(`token_address, moxie_user_id`);
     orderByClause = `total_profit_loss ${analysisType === "PROFIT" ? "desc" : "asc"}`;
@@ -124,6 +124,54 @@ export const fetchPnlData = async (query: string) => {
       if (retries > 0) {
         // Wait 1 second before retrying
         await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+  }
+
+  // If we get here, all retries failed
+  throw lastError;
+};
+
+/**
+ * Fetches total PnL from Dune Analytics using a prepared SQL query
+ *
+ * @param query - SQL query string for fetching total PnL data
+ * @returns Total PnL value
+ */
+export const fetchTotalPnl = async (pnlResponse: any) => {
+  let retries = 3;
+  let delay = 1000; // Start with 1 second delay
+  let lastError;
+
+  const {
+    walletAddresses,
+    moxieUserIds,
+  } = pnlResponse;
+
+  let query = `select SUM(profit_loss) as total_profit_loss from dune.moxieprotocol.result_moxie_wallets`;
+
+  if (walletAddresses?.length > 0 && moxieUserIds?.length > 0) {
+    query += ` where wallet_address in (${walletAddresses.map((address) => `${address}`).join(",")}) and moxie_user_id in (${moxieUserIds.map((id) => `'${id}'`).join(",")})`;
+  } else if (walletAddresses?.length > 0) {
+    query += ` where wallet_address in (${walletAddresses.map((address) => `${address}`).join(",")})`;
+  } else if (moxieUserIds?.length > 0) {
+    query += ` where moxie_user_id in (${moxieUserIds.map((id) => `'${id}'`).join(",")})`;
+  }
+
+  while (retries > 0) {
+    try {
+      const result = await client.runSql({ query_sql: query });
+      const totalPnl = result.result.rows[0].total_profit_loss;
+      return totalPnl as number;
+    } catch (error) {
+      lastError = error;
+      elizaLogger.error(`[fetchTotalPnl] Error fetching total PnL (${4-retries}/3 attempts): ${error}`);
+      retries--;
+
+      if (retries > 0) {
+        // Wait for the current delay before retrying
+        await new Promise(resolve => setTimeout(resolve, delay));
+        delay *= 2; // Exponential backoff: double the delay for the next retry
       }
     }
   }
