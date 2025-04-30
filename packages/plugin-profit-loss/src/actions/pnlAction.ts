@@ -1,6 +1,6 @@
 import { IAgentRuntime, Memory, State, HandlerCallback, elizaLogger, ModelClass, composeContext, generateObjectDeprecated, streamText, ModelProviderName } from "@moxie-protocol/core";
 import { extractWalletTemplate, pnLTemplate } from "../template";
-import { fetchPnlData, preparePnlQuery } from "../service/pnlService";
+import { fetchPnlData, fetchTotalPnl, preparePnlQuery } from "../service/pnlService";
 import { getERC20TokenSymbol, MoxieUser } from "@moxie-protocol/moxie-agent-lib";
 import { ethers } from "ethers";
 import * as agentLib from "@moxie-protocol/moxie-agent-lib";
@@ -85,26 +85,25 @@ export const PnLAction = {
             elizaLogger.debug(traceId, `[PnLAction] agent wallet address: ${agentWalletAddress}`);
 
             // use dune table called result_wallet_pnl to get the PnL data
-            const pnlQuery = await preparePnlQuery(pnlResponse);
+            const pnlQuery = preparePnlQuery(pnlResponse);
 
-            const pnlData = await fetchPnlData(pnlQuery);
-
-            // calculate the total PnL
-            const totalPnl = pnlData.reduce((acc, curr) => acc + curr.profit_loss, 0) || 0;
+            const [pnlData, totalPnl] = await Promise.all([
+                fetchPnlData(pnlQuery),
+                (moxieUserIds.length > 0 || walletAddresses.length > 0) ? fetchTotalPnl(pnlResponse) : Promise.resolve(0)
+            ]);
 
             elizaLogger.debug(traceId, `[PnLAction] pnlData: ${JSON.stringify(pnlData)}`);
             elizaLogger.debug(traceId, `[PnLAction] totalPnl: ${totalPnl}`);
 
-            const pnlDataTemplate = pnLTemplate
-                .replace("{{pnlData}}", JSON.stringify(pnlData))
-                .replace("{{totalPnl}}", totalPnl.toString());
-
+            let pnlDataTemplate = pnLTemplate.replace("{{pnlData}}", JSON.stringify(pnlData))
+                                             .replace("{{totalPnl}}", (moxieUserIds.length > 0 || walletAddresses.length > 0) ? totalPnl.toString() : "");
+                                             
             const currentContext = composeContext({
                 state,
                 template: pnlDataTemplate,
             });
 
-            const response = await streamText({
+            const response = streamText({
                 runtime,
                 context: currentContext,
                 modelClass: ModelClass.MEDIUM,
