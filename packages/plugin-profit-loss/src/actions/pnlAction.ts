@@ -75,6 +75,15 @@ export const PnLAction = {
                     moxieUserIds.push(criterion.VALUE);
                 }
             }
+            //TODO: handle -ve case if nothing is given in input
+            if (tokenAddresses.length === 0 && walletAddresses.length === 0 && moxieUserIds.length === 0) {
+                elizaLogger.error(traceId, `[PnLAction] No valid criteria provided. Please provide at least one token address, wallet address, or Moxie user ID.`);
+                await callback?.({
+                    text: `Please provide at least one token address, wallet address, or Moxie user ID.`
+                });
+                return true;
+            }
+
 
             pnlResponse.tokenAddresses = tokenAddresses;
             pnlResponse.walletAddresses = walletAddresses;
@@ -97,7 +106,7 @@ export const PnLAction = {
 
             let pnlDataTemplate = pnLTemplate.replace("{{pnlData}}", JSON.stringify(pnlData))
                                              .replace("{{totalPnl}}", (moxieUserIds.length > 0 || walletAddresses.length > 0) ? totalPnl.toString() : "");
-                                             
+
             const currentContext = composeContext({
                 state,
                 template: pnlDataTemplate,

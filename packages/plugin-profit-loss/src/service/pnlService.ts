@@ -55,12 +55,20 @@ export const preparePnlQuery = (pnlResponse: any) => {
     whereClauses.push(`token_address not in (${BLACKLISTED_TOKEN_ADDRESSES.map((address) => `${address}`).join(",")})`);
   }
 
-  if (walletAddresses?.length > 0) {
+  // If both moxieUserIds and walletAddresses are provided, adjust select fields and group by clauses
+  if (moxieUserIds?.length > 0 && walletAddresses?.length > 0) {
+    whereClauses.push(`moxie_user_id in (${moxieUserIds.map((id) => `'${id}'`).join(",")})`);
+    whereClauses.push(`wallet_address in (${walletAddresses.map((address) => `${address}`).join(",")})`);
+    selectFields = `moxie_user_id, wallet_address, token_address, SUM(profit_loss) as total_profit_loss, MAX(token_sold_symbol) as token_sold_symbol, MAX(token_bought_symbol) as token_bought_symbol, SUM(total_sell_amount) as total_sell_amount, SUM(total_buy_amount) as total_buy_amount, SUM(total_sell_value_usd) as total_sell_value_usd, SUM(total_buy_value_usd) as total_buy_value_usd, SUM(buy_transaction_count) as buy_transaction_count, SUM(sell_transaction_count) as sell_transaction_count`;
+    query = `select ${selectFields} from dune.moxieprotocol.result_moxie_wallets`;
+    groupByClauses.push(`token_address, moxie_user_id, wallet_address`);
+    orderByClause = `total_profit_loss ${analysisType === "PROFIT" ? "desc" : "asc"}`;
+  } else if (walletAddresses?.length > 0) {
+    // If only wallet addresses are provided, adjust select fields and group by clauses
     whereClauses.push(`wallet_address in (${walletAddresses.map((address) => `${address}`).join(",")})`);
     orderByClause = `profit_loss ${analysisType === "PROFIT" ? "desc" : "asc"}`;
-  }
-
-  if (moxieUserIds?.length > 0) {
+  } else if (moxieUserIds?.length > 0) {
+    // If only moxieUserIds are provided, adjust select fields and group by clauses
     whereClauses.push(`moxie_user_id in (${moxieUserIds.map((id) => `'${id}'`).join(",")})`);
     selectFields = `moxie_user_id, token_address, SUM(profit_loss) as total_profit_loss, MAX(token_sold_symbol) as token_sold_symbol, MAX(token_bought_symbol) as token_bought_symbol, SUM(total_sell_amount) as total_sell_amount, SUM(total_buy_amount) as total_buy_amount, SUM(total_sell_value_usd) as total_sell_value_usd, SUM(total_buy_value_usd) as total_buy_value_usd, SUM(buy_transaction_count) as buy_transaction_count, SUM(sell_transaction_count) as sell_transaction_count`;
     query = `select ${selectFields} from dune.moxieprotocol.result_moxie_wallets`;
@@ -73,6 +81,7 @@ export const preparePnlQuery = (pnlResponse: any) => {
     orderByClause = `profit_loss ${analysisType === "PROFIT" ? "desc" : "asc"}`;
   }
 
+  // Append where clauses to the query
   if (whereClauses.length > 0) {
     query += ` where ${whereClauses.join(" and ")}`;
   }
