@@ -54,6 +54,7 @@ Given the conversation history and latest message, extract the following criteri
    - VALUE: "best_traders"
 
 Response format example:
+\`\`\`json
 {
   "criteria": [
     {
@@ -65,7 +66,7 @@ Response format example:
   "maxResults": 15,
   "chain": "base"
 }
-
+\`\`\`
 Latest message: {{latestMessage}}
 
 Conversation history:
