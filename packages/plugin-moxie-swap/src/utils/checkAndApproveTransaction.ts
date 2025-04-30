@@ -1,8 +1,8 @@
 import { elizaLogger, HandlerCallback } from '@moxie-protocol/core';
-import { MoxieWalletClient, MoxieWalletSendTransactionInputType } from '@elizaos/moxie-lib';
+import { MoxieWalletClient, MoxieWalletSendTransactionInputType } from '@moxie-protocol/moxie-agent-lib';
 import { ethers } from 'ethers';
 import { encodeFunctionData } from 'viem';
-import { approvalTransactionSubmitted, approvalTransactionConfirmed, approvalTransactionFailed } from './callbackTemplates';
+import { approvalTransactionSubmitted, approvalTransactionConfirmed, approvalTransactionFailed, approvalTransactionTimedOut, approvalTransactionSubmissionFailed } from './callbackTemplates';
 import { TRANSACTION_RECEIPT_TIMEOUT } from './constants';
 
 const MAX_UINT256 = BigInt("115792089237316195423570985008687907853269984665640564039457584007913129639935"); // Maximum uint256 value for unlimited approval
@@ -134,10 +134,10 @@ export async function checkAllowanceAndApproveSpendRequest(
         const approveRequestInput: MoxieWalletSendTransactionInputType = {
             address: walletAddress,
             chainType: "ethereum",
-            caip2: "eip155:" + (process.env.CHAIN_ID || '8453'),
+            caip2: `eip155:${process.env.CHAIN_ID || '8453'}`,
             transaction: {
-                from: walletAddress,
-                to: tokenAddress,
+                from: walletAddress as `0x${string}`,
+                to: tokenAddress as `0x${string}`,
                 data: approveData,
                 maxFeePerGas: Number(maxFeePerGas),
                 maxPriorityFeePerGas: Number(maxPriorityFeePerGas),
@@ -148,13 +148,34 @@ export async function checkAllowanceAndApproveSpendRequest(
         elizaLogger.debug(traceId,`[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] approve request: ${JSON.stringify(approveRequestInput, (key, value) =>
             typeof value === 'bigint' ? value.toString() : value
         )}`)
-        const approveResponse = await walletClient.sendTransaction(process.env.CHAIN_ID || '8453', {
-            fromAddress: walletAddress,
-            toAddress: tokenAddress,
-            data: approveData,
-            maxFeePerGas: Number(maxFeePerGas),
-            maxPriorityFeePerGas: Number(maxPriorityFeePerGas)
-        });
+        const MAX_SEND_RETRIES = 3;
+        let sendRetryCount = 0;
+        let approveResponse;
+        
+        while (sendRetryCount < MAX_SEND_RETRIES) {
+            try {
+                approveResponse = await walletClient.sendTransaction(process.env.CHAIN_ID || '8453', {
+                    fromAddress: walletAddress,
+                    toAddress: tokenAddress,
+                    data: approveData,
+                    maxFeePerGas: Number(maxFeePerGas),
+                    maxPriorityFeePerGas: Number(maxPriorityFeePerGas)
+                });
+                break; // Exit the loop if successful
+            } catch (error) {
+                sendRetryCount++;
+                elizaLogger.error(traceId,`[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] Retry ${sendRetryCount}/${MAX_SEND_RETRIES} for sending transaction: ${error.message}`);
+                
+                if (sendRetryCount >= MAX_SEND_RETRIES) {
+                    elizaLogger.error(traceId,`[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] Failed to send transaction after ${MAX_SEND_RETRIES} attempts`);
+                    await callback(approvalTransactionSubmissionFailed());
+                    throw error;
+                }
+                
+                // Wait before retrying (exponential backoff)
+                await new Promise(resolve => setTimeout(resolve, 2000 * sendRetryCount));
+            }
+        }
         elizaLogger.debug(traceId,`[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] approval txn_hash: ${JSON.stringify(approveResponse)}`)
         const approvalTxHash = approveResponse.hash
         await callback(approvalTransactionSubmitted(approvalTxHash));
@@ -162,13 +183,29 @@ export async function checkAllowanceAndApproveSpendRequest(
         // check if the approve txn is success.
         if (approveResponse && approvalTxHash) {
             let receipt: ethers.TransactionReceipt;
-            try {
-                receipt = await provider.waitForTransaction(approvalTxHash, 1, TRANSACTION_RECEIPT_TIMEOUT);
-            } catch (error) {
-                if (error.message.includes('timeout')) {
-                    throw new Error('Approval transaction timed out');
+            const MAX_RETRIES = 3;
+            let retryCount = 0;
+            let lastError;
+            
+            while (retryCount < MAX_RETRIES) {
+                try {
+                    receipt = await provider.waitForTransaction(approvalTxHash, 1, TRANSACTION_RECEIPT_TIMEOUT);
+                    break; // Exit the loop if successful
+                } catch (error) {
+                    lastError = error;
+                    retryCount++;
+                    elizaLogger.debug(traceId,`[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] Retry ${retryCount}/${MAX_RETRIES} for transaction ${approvalTxHash}`);
+                    
+                    if (retryCount >= MAX_RETRIES) {
+                        if (error.message.includes('timeout')) {
+                            await callback(approvalTransactionTimedOut(approvalTxHash));
+                        }
+                        throw error;
+                    }
+                    
+                    // Wait before retrying (exponential backoff)
+                    await new Promise(resolve => setTimeout(resolve, 2000 * retryCount));
                 }
-                throw error;
             }
             elizaLogger.debug(traceId,`[${moxieUserId}] [checkAllowanceAndApproveSpendRequest] approval tx receipt: ${JSON.stringify(receipt)}`)
             if (receipt.status === 1) {
