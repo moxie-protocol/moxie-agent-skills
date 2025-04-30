@@ -33,62 +33,66 @@ export const PnLAction = {
         try {
             elizaLogger.debug(traceId, `[PnLAction] [${moxieUserId}] Starting PnL calculation`);
 
-            elizaLogger.debug(traceId, `[PnLAction] [${moxieUserId}] message context text: ${message.content.text}`);
-
             const latestMessage = message.content.text;
-
             const walletPnlTemplateWithLatestMessage = extractWalletTemplate
                 .replace("{{latestMessage}}", latestMessage)
                 .replace("{{conversation}}", "")
-                .replace("{{moxieUserId}}", moxieUserId);
+                .replace("{{moxieUserId}}", moxieUserId)
+                .replace("{{agentWalletAddress}}", agentWalletAddress);
 
             const context = composeContext({
                 state,
                 template: walletPnlTemplateWithLatestMessage,
             });
 
-            const walletPnlResponse = await generateObjectDeprecated({
+            const pnlResponse = await generateObjectDeprecated({
                 runtime,
                 context: context,
                 modelClass: ModelClass.SMALL,
             });
 
-            elizaLogger.debug(traceId, `[PnLAction] walletPnlResponse: ${JSON.stringify(walletPnlResponse)}`);
+            elizaLogger.debug(traceId, `[PnLAction] walletPnlResponse: ${JSON.stringify(pnlResponse)}`);
 
-            // Segregate the addresses from walletPnlResponse
-            const { tokenAddresses, walletAddresses } = await categorizeAddressesIntoTokensAndWallets(walletPnlResponse, context, traceId);
-
-            // Update the response object with segregated addresses
-            walletPnlResponse.tokenAddresses = tokenAddresses;
-            walletPnlResponse.walletAddresses = walletAddresses;
-
-            elizaLogger.debug(traceId, `[PnLAction] Segregated token addresses: ${JSON.stringify(tokenAddresses)}`);
-            elizaLogger.debug(traceId, `[PnLAction] Segregated wallet addresses: ${JSON.stringify(walletAddresses)}`);
-            elizaLogger.debug(traceId, `[PnLAction] Agent wallet address: ${agentWalletAddress}`);
-            if (walletPnlResponse.analysisFor === "agent") {
-                if (!state.agentWallet) {
-                    throw new Error("Agent wallet not found in state");
+            const criteria = Array.isArray(pnlResponse.criteria) ? pnlResponse.criteria : [];
+            const { analysisType, maxResults, chain } = pnlResponse;
+            // const { tokenAddresses, walletAddresses } = await categorizeAddressesIntoTokensAndWallets(pnlResponse, context, traceId);
+            const tokenAddresses: string[] = [];
+            const walletAddresses: string[] = [];
+            const moxieUserIds: string[] = [];
+            for (const criterion of criteria) {
+                if (criterion.TYPE === "tokenAddress") {
+                    tokenAddresses.push(criterion.VALUE);
+                } else if (criterion.TYPE === "wallet") {
+                    walletAddresses.push(criterion.VALUE);
+                } else if (criterion.TYPE === "ens") {
+                    const resolvedAddress = await resolveENSAddress(context, criterion.VALUE);
+                    if (resolvedAddress.isENS) {
+                        walletAddresses.push(resolvedAddress.resolvedAddress);
+                    } else {
+                        walletAddresses.push(criterion.VALUE);
+                    }
+                } else if (criterion.TYPE === "moxieUserId") {
+                    moxieUserIds.push(criterion.VALUE);
                 }
-
-                if (!(state.agentWallet as agentLib.MoxieClientWallet).delegated) {
-                    throw new Error("Delegate access not found for agent wallet");
-                }
-                walletPnlResponse.walletAddresses = [agentWalletAddress];
-                walletPnlResponse.analysisType = "WALLET_PNL";
-            } else if (walletPnlResponse.analysisFor === "user") {
-                walletPnlResponse.moxieUserIds = [moxieUserId];
-                walletPnlResponse.analysisType = "USER_PNL";
             }
 
+            pnlResponse.tokenAddresses = tokenAddresses;
+            pnlResponse.walletAddresses = walletAddresses;
+            pnlResponse.moxieUserIds = moxieUserIds;
+
+            elizaLogger.debug(traceId, `[PnLAction] categorized token addresses: ${JSON.stringify(tokenAddresses)}`);
+            elizaLogger.debug(traceId, `[PnLAction] categorized wallet addresses: ${JSON.stringify(walletAddresses)}`);
+            elizaLogger.debug(traceId, `[PnLAction] agent wallet address: ${agentWalletAddress}`);
+
             // use dune table called result_wallet_pnl to get the PnL data
-            const pnlQuery = await preparePnlQuery(walletPnlResponse);
+            const pnlQuery = await preparePnlQuery(pnlResponse);
 
             const pnlData = await fetchPnlData(pnlQuery);
 
             // calculate the total PnL
             const totalPnl = pnlData.reduce((acc, curr) => acc + curr.profit_loss, 0);
 
-            elizaLogger.debug(traceId, `[PnLAction] pnlData: ${pnlData}`);
+            elizaLogger.debug(traceId, `[PnLAction] pnlData: ${JSON.stringify(pnlData)}`);
             elizaLogger.debug(traceId, `[PnLAction] totalPnl: ${totalPnl}`);
 
             const pnlDataTemplate = pnLTemplate
@@ -106,7 +110,7 @@ export const PnLAction = {
                 modelClass: ModelClass.MEDIUM,
                 modelConfigOptions: {
                     modelProvider: ModelProviderName.OPENAI,
-                    temperature: 0.5,
+                    temperature: 0.0,
                     apiKey: process.env.OPENAI_API_KEY!,
                     modelClass: ModelClass.MEDIUM
                 }
@@ -189,18 +193,11 @@ async function resolveENSAddress(context: any, address: string) {
     }
 }
 
-/**
- * Categorizes addresses into tokens and wallets
- * @param walletPnlResponse - The wallet PnL response object
- * @param context - The context object
- * @param traceId - The trace ID
- * @returns An object containing token addresses and wallet addresses
- */
 async function categorizeAddressesIntoTokensAndWallets(walletPnlResponse: any, context: any, traceId: string) {
     const tokenAddresses: string[] = [];
     const walletAddresses: string[] = [];
 
-    const addresses = walletPnlResponse.walletAddresses.concat(walletPnlResponse.tokenAddresses);
+    const addresses = walletPnlResponse.criteria.map((c: any) => c.VALUE);
     for (const address of addresses) {
         if (address.toLowerCase().endsWith('.eth')) {
             // resolve the ENS address

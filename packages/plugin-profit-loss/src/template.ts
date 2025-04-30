@@ -35,24 +35,43 @@ Step 1: Identify which type of query the question refers to. It might be about a
 `;
 
 export const extractWalletTemplate = `
-Given the conversation history and latest message, extract:
-1. Wallet addresses (if any) in the format: ENS or base names in format ["abc.eth", "abc.base.eth"] or valid ethereum address
-2. Moxie User IDs (if any) in the format: @[username|userId] or userId extract userId from it
-3. Token addresses (if any) in the format: $[token_symbol|token_address] or valid ethereum address
-4. Analysis type: “USER_PNL” | “WALLET_PNL” | “PROFITABLE_TRADERS” | “LOSS_MAKING_TRADERS” | “TOKEN_TRADERS”
-5. Analysis for my agent wallet or my user: "agent" | "user" | "none"
-Response format:
+Given the conversation history and latest message, extract the following criteria for PnL queries:
+
+1. Criteria for User/Wallet/User&Token queries:
+   - If the query is for the user's PnL, choose "moxieUserId" from the context.
+   - If the query is for the agent's PnL, choose "wallet" from the context.
+   - if there's ens and moxieUserId then consider moxieUserId
+   - if the query contains string "M" followed by a number, then choose the val
+   - TYPE: "wallet" | "ens" | "moxieUserId"
+   - VALUE: "0x1c3a068430f8fe592703d07b9fd063d47bde8aba" | "chetan.eth" | "M5" | "M4"
+
+2. Criteria for Token PnL:
+   - TYPE: "tokenAddress" or token in format $[token_symbol|token_address]
+   - VALUE: "0x1c3a068430f8fe592703d07b9fd063d47bde8aba" or valid ethereum token address
+
+3. Criteria for Overall PnL (Best Traders):
+   - TYPE: "overall"
+   - VALUE: "best_traders"
+
+Response format example:
 {
-  “walletAddresses”: [],
-  “moxieUserIds”: [],
-  “tokenAddresses”: [],
-  “analysisType”: “”,
-  “maxResults”: 15,
-  “chain”: “base”,
-  “analysisFor”: "agent" | "user" | "none"
+  "criteria": [
+    {
+      "TYPE": "moxieUserId",
+      "VALUE": "M5"
+    }
+  ],
+  "analysisType": "PROFIT",
+  "maxResults": 15,
+  "chain": "base"
 }
 
 Latest message: {{latestMessage}}
+
 Conversation history:
 {{conversation}}
+
+Agent wallet address: {{agentWalletAddress}}
+
+Moxie user id: {{moxieUserId}}
 `;
