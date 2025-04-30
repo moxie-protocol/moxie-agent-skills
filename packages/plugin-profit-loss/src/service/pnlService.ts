@@ -17,6 +17,18 @@ const client = new DuneClient(process.env.DUNE_API_KEY!);
  * @param pnlResponse.chain - Blockchain network to query (e.g. 'base')
  * @returns SQL query string for fetching PnL data
  */
+const BLACKLISTED_TOKEN_ADDRESSES = [
+  '0x4200000000000000000000000000000000000006',
+  '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+  '0x50c5725949a6f0c72e6c4a641f24049a917db0cb',
+  '0x820c137fa70c8691f0e44dc420a5e53c168921dc',
+  '0xc1cba3fcea344f92d9239c08c0568f6f2f0ee452',
+  '0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34',
+  '0x04c0599ae5a44757c0af6f9ec3b93da8976c150a',
+  '0x5875eee11cf8398102fdad704c9e96607675467a',
+  '0x3128a0f7f0ea68e7b7c9b00afa7e41045828e858'
+];
+
 export const preparePnlQuery = (pnlResponse: any) => {
   const {
     walletAddresses,
@@ -27,7 +39,7 @@ export const preparePnlQuery = (pnlResponse: any) => {
   } = pnlResponse;
 
   // Initialize select fields
-  let selectFields = `moxie_user_id, token_address, profit_loss, token_sold_symbol, token_bought_symbol, total_sell_amount, total_buy_amount, total_sell_value_usd, total_buy_value_usd, buy_transaction_count, sale_transactions, avg_buy_price_usd, avg_sell_price_usd, is_oversold, first_sale_time, last_sale_time`;
+  let selectFields = `moxie_user_id, token_address, profit_loss, token_sold_symbol, token_bought_symbol, total_sell_amount, total_buy_amount, total_sell_value_usd, total_buy_value_usd, buy_transaction_count, sale_transactions`;
 
   if (tokenAddresses?.length > 0) {
     selectFields = `wallet_address, ${selectFields}`;
@@ -37,15 +49,20 @@ export const preparePnlQuery = (pnlResponse: any) => {
   const whereClauses = [];
   const groupByClauses = [];
   let orderByClause = "";
+
+  // Blacklist specific token addresses
+  if (BLACKLISTED_TOKEN_ADDRESSES.length > 0) {
+    whereClauses.push(`token_address not in (${BLACKLISTED_TOKEN_ADDRESSES.map((address) => `${address}`).join(",")})`);
+  }
+
   if (walletAddresses?.length > 0) {
     whereClauses.push(`wallet_address in (${walletAddresses.map((address) => `${address}`).join(",")})`);
     orderByClause = `profit_loss ${analysisType === "PROFIT" ? "desc" : "asc"}`;
   }
 
-
   if (moxieUserIds?.length > 0) {
     whereClauses.push(`moxie_user_id in (${moxieUserIds.map((id) => `'${id}'`).join(",")})`);
-    selectFields = `moxie_user_id, token_address, SUM(profit_loss) as total_profit_loss, MAX(token_sold_symbol) as token_sold_symbol, MAX(token_bought_symbol) as token_bought_symbol, SUM(total_sell_amount) as total_sell_amount, SUM(total_buy_amount) as total_buy_amount, SUM(total_sell_value_usd) as total_sell_value_usd, SUM(total_buy_value_usd) as total_buy_value_usd, SUM(buy_transaction_count) as buy_transaction_count, SUM(sale_transactions) as sale_transactions, AVG(avg_buy_price_usd) as avg_buy_price_usd, AVG(avg_sell_price_usd) as avg_sell_price_usd`;
+    selectFields = `moxie_user_id, token_address, SUM(profit_loss) as total_profit_loss, MAX(token_sold_symbol) as token_sold_symbol, MAX(token_bought_symbol) as token_bought_symbol, SUM(total_sell_amount) as total_sell_amount, SUM(total_buy_amount) as total_buy_amount, SUM(total_sell_value_usd) as total_sell_value_usd, SUM(total_buy_value_usd) as total_buy_value_usd, SUM(buy_transaction_count) as buy_transaction_count, SUM(sale_transactions) as sale_transactions`;
     query = `select ${selectFields} from dune.moxieprotocol.result_moxie_wallets`;
     groupByClauses.push(`token_address, moxie_user_id`);
     orderByClause = `total_profit_loss ${analysisType === "PROFIT" ? "desc" : "asc"}`;
@@ -74,7 +91,7 @@ export const preparePnlQuery = (pnlResponse: any) => {
   }
 
   // Add limit clause using maxResults or default to 15
-  query += ` limit ${maxResults || 15}`;
+  query += ` limit ${maxResults || 20}`;
 
   elizaLogger.debug(`[preparePnlQuery] query: ${query}`);
   return query;
