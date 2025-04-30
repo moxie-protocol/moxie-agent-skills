@@ -90,7 +90,7 @@ export const PnLAction = {
             const pnlData = await fetchPnlData(pnlQuery);
 
             // calculate the total PnL
-            const totalPnl = pnlData.reduce((acc, curr) => acc + curr.profit_loss, 0);
+            const totalPnl = pnlData.reduce((acc, curr) => acc + curr.profit_loss, 0) || 0;
 
             elizaLogger.debug(traceId, `[PnLAction] pnlData: ${JSON.stringify(pnlData)}`);
             elizaLogger.debug(traceId, `[PnLAction] totalPnl: ${totalPnl}`);

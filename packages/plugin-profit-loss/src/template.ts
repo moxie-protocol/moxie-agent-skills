@@ -41,7 +41,7 @@ Given the conversation history and latest message, extract the following criteri
    - If the query is for the user's PnL, choose "moxieUserId" from the context.
    - If the query is for the agent's PnL, choose "wallet" from the context.
    - if there's ens and moxieUserId then consider moxieUserId
-   - if the query contains string "M" followed by a number, then choose the val
+   - if the query contains string "M" followed by a number, then choose the value
    - TYPE: "wallet" | "ens" | "moxieUserId"
    - VALUE: "0x1c3a068430f8fe592703d07b9fd063d47bde8aba" | "chetan.eth" | "M5" | "M4"
 
@@ -63,7 +63,7 @@ Response format example:
     }
   ],
   "analysisType": "PROFIT",
-  "maxResults": 15,
+  "maxResults": 20,
   "chain": "base"
 }
 \`\`\`
