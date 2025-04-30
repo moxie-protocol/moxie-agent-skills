@@ -8,52 +8,69 @@ const client = new DuneClient(process.env.DUNE_API_KEY!);
 /**
  * Prepares a SQL query to fetch PnL data from Dune Analytics based on wallet response parameters
  *
- * @param walletResponse - Object containing query parameters
- * @param walletResponse.walletAddresses - Array of wallet addresses to filter by
- * @param walletResponse.moxieUserIds - Array of Moxie user IDs to filter by
- * @param walletResponse.tokenAddresses - Array of token contract addresses to filter by
- * @param walletResponse.analysisType - Type of analysis to perform ('PROFITABLE_TRADERS'|'LOSS_MAKING_TRADERS'|'WALLET_PNL'|'TOKEN_TRADERS')
- * @param walletResponse.maxResults - Maximum number of results to return (defaults to 15)
- * @param walletResponse.chain - Blockchain network to query (e.g. 'base')
+ * @param pnlResponse - Object containing query parameters
+ * @param pnlResponse.walletAddresses - Array of wallet addresses to filter by
+ * @param pnlResponse.moxieUserIds - Array of Moxie user IDs to filter by
+ * @param pnlResponse.tokenAddresses - Array of token contract addresses to filter by
+ * @param pnlResponse.analysisType - Type of analysis to perform ('PROFIT'|'LOSS')
+ * @param pnlResponse.maxResults - Maximum number of results to return (defaults to 15)
+ * @param pnlResponse.chain - Blockchain network to query (e.g. 'base')
  * @returns SQL query string for fetching PnL data
  */
-export const preparePnlQuery = (walletResponse: any) => {
+export const preparePnlQuery = (pnlResponse: any) => {
   const {
     walletAddresses,
     moxieUserIds,
     tokenAddresses,
     analysisType,
     maxResults,
-  } = walletResponse;
+  } = pnlResponse;
 
-  let query = `select moxie_user_id, token_address, profit_loss, token_sold_symbol, token_bought_symbol, total_sell_amount, total_buy_amount, total_sell_value_usd, total_buy_value_usd, buy_transaction_count, sale_transactions, avg_buy_price_usd, avg_sell_price_usd, is_oversold, first_sale_time, last_sale_time from dune.moxieprotocol.result_moxie_wallets`;
+  // Initialize select fields
+  let selectFields = `moxie_user_id, token_address, profit_loss, token_sold_symbol, token_bought_symbol, total_sell_amount, total_buy_amount, total_sell_value_usd, total_buy_value_usd, buy_transaction_count, sale_transactions, avg_buy_price_usd, avg_sell_price_usd, is_oversold, first_sale_time, last_sale_time`;
+
+  if (tokenAddresses?.length > 0) {
+    selectFields = `wallet_address, ${selectFields}`;
+  }
+
+  let query = `select ${selectFields} from dune.moxieprotocol.result_moxie_wallets`;
   const whereClauses = [];
-
-  if (walletAddresses?.length > 0 && analysisType === "WALLET_PNL") {
+  const groupByClauses = [];
+  let orderByClause = "";
+  if (walletAddresses?.length > 0) {
     whereClauses.push(`wallet_address in (${walletAddresses.map((address) => `${address}`).join(",")})`);
+    orderByClause = `profit_loss ${analysisType === "PROFIT" ? "desc" : "asc"}`;
   }
 
-  if (moxieUserIds?.length > 0 && analysisType === "USER_PNL") {
+
+  if (moxieUserIds?.length > 0) {
     whereClauses.push(`moxie_user_id in (${moxieUserIds.map((id) => `'${id}'`).join(",")})`);
+    selectFields = `moxie_user_id, token_address, SUM(profit_loss) as total_profit_loss, MAX(token_sold_symbol) as token_sold_symbol, MAX(token_bought_symbol) as token_bought_symbol, SUM(total_sell_amount) as total_sell_amount, SUM(total_buy_amount) as total_buy_amount, SUM(total_sell_value_usd) as total_sell_value_usd, SUM(total_buy_value_usd) as total_buy_value_usd, SUM(buy_transaction_count) as buy_transaction_count, SUM(sale_transactions) as sale_transactions, AVG(avg_buy_price_usd) as avg_buy_price_usd, AVG(avg_sell_price_usd) as avg_sell_price_usd`;
+    query = `select ${selectFields} from dune.moxieprotocol.result_moxie_wallets`;
+    groupByClauses.push(`token_address, moxie_user_id`);
+    orderByClause = `total_profit_loss ${analysisType === "PROFIT" ? "desc" : "asc"}`;
   }
 
-  if (tokenAddresses?.length > 0 || analysisType === "TOKEN_TRADERS") {
+  if (tokenAddresses?.length > 0) {
     whereClauses.push(`token_address in (${tokenAddresses.map((address) => `${address}`).join(",")})`);
+    orderByClause = `profit_loss ${analysisType === "PROFIT" ? "desc" : "asc"}`;
   }
 
   if (whereClauses.length > 0) {
     query += ` where ${whereClauses.join(" and ")}`;
   }
 
-  if (analysisType) {
+  if (groupByClauses.length > 0) {
+    query += ` group by ${groupByClauses.join(", ")}`;
+  }
+
+  if (analysisType == "LOSS") {
     // Add order by clause based on analysis type
-    if (analysisType === "PROFITABLE_TRADERS" || analysisType === "WALLET_PNL" || analysisType === "TOKEN_TRADERS") {
-      query += " order by profit_loss desc";
-    } else if (analysisType === "LOSS_MAKING_TRADERS") {
-      query += " order by profit_loss asc";
-    } else {
-      query += " order by profit_loss desc";
-    }
+    orderByClause = `profit_loss asc`;
+  }
+
+  if (orderByClause) {
+    query += ` order by ${orderByClause}`;
   }
 
   // Add limit clause using maxResults or default to 15
