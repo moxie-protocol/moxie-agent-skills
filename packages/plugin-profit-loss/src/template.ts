@@ -67,7 +67,7 @@ Response format example:
 }
 \`\`\`
 Latest message: {{latestMessage}}
-Conversation history: {{recentMessages}
+Conversation history: {{recentMessages}}
 
 General rules:
 - if the query mentions both ENS and moxieUserId - use moxieUserId.
