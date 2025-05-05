@@ -34,7 +34,7 @@ export const PnLAction = {
             elizaLogger.debug(traceId, `[PnLAction] [${moxieUserId}] Starting PnL calculation`);
 
             const latestMessage = message.content.text;
-
+            let start =  new Date();
             const context = composeContext({
                 state: {
                     ...state,
@@ -50,7 +50,7 @@ export const PnLAction = {
                 context: context,
                 modelClass: ModelClass.SMALL,
             });
-
+            elizaLogger.debug(traceId, `[PnLAction] time taken to extract wallet addresses: ${new Date().getTime() - start.getTime()}ms`);
             elizaLogger.debug(traceId, `[PnLAction] walletPnlResponse: ${JSON.stringify(pnlResponse)}`);
 
             const criteria = Array.isArray(pnlResponse.criteria) ? pnlResponse.criteria : [];
@@ -93,6 +93,7 @@ export const PnLAction = {
             elizaLogger.debug(traceId, `[PnLAction] categorized wallet addresses: ${JSON.stringify(walletAddresses)}`);
             elizaLogger.debug(traceId, `[PnLAction] agent wallet address: ${agentWalletAddress}`);
 
+            start = new Date();
             // use dune table called result_wallet_pnl to get the PnL data
             const pnlQuery = preparePnlQuery(pnlResponse);
 
@@ -126,7 +127,7 @@ export const PnLAction = {
                     modelClass: ModelClass.MEDIUM
                 }
             });
-
+            elizaLogger.debug(traceId, `[PnLAction] time taken to generate pnl data template: ${new Date().getTime() - start.getTime()}ms`);
             for await (const textPart of response) {
                 callback({ text: textPart, action: "PROFIT_LOSS" });
             }
