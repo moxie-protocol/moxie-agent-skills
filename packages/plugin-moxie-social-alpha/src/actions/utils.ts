@@ -41,16 +41,10 @@ export async function fetchTopCreatorsByMoxieId(
             elizaLogger.debug(`using cached creators list for ${moxieId}`);
             return JSON.parse(cachedCreators as string);
         }
-        const portfolio =
-            await portfolioService.fetchPortfolioByMoxieIdOrderByTVL(
-                moxieId,
-                noOfUsers
-            );
 
-
-        const moxieUserIds = portfolio
-            .filter((p) => p?.fanTokenMoxieUserId && p?.fanTokenMoxieUserId !== moxieId)
-            .map((p) => p.fanTokenMoxieUserId);
+        // TODO: add change here change the logic to get the top creators by env instead of portfolio
+        // It will be used in future go get createor by env
+        const moxieUserIds = FREEMIUM_TRENDING_CREATORS_LIST;
 
         elizaLogger.debug(`top creators moxieUserIds: ${moxieUserIds}`);
         elizaLogger.debug(`caching creators list for ${moxieId}`);
