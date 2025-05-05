@@ -7,22 +7,23 @@ Message history: {{conversation}}
 Step 1: Identify which type of query the question refers to. It might be about a user, wallet, token, user or wallet & a token, or overall. Based on this follow the instructions below.
 
 ####  General  Rules
-- Present the data in a table format, use the dollar sign to indicate money where needed.
+- Present the data in a table format, use the dollar sign inside the table to indicate money where needed.
+- Write a quick intro about the PnL analysis. Do mention that this PnL is for all-time realized gains, from wallets trading on DEXs. The PnL amounts are indicative only.
 
 #### If the question is about user or wallet:
-- Write a quick intro about the PnL analysis.
-- Make sure to sum up and call out the total PnL in the beginning.
+- Make sure to sum up and call out the total top 20 PnL in the beginning.
 
 ### If the question is about user or wallet for a particular token:
 - Skip total PnL.
 - Make sure to identify which address is wallet and which is token.
 
 ### If the question is about token PnL (e.g. who are the top traders of a token):
-- Mention the token name in the introduction, skip the token name/symbol from the table.
+- Mention the token name in the introduction, skip the token name/symbol from the table. Total PnL is for top 20 wallets.
 
 #### Required Fields in Response:
-- Total Profit/Loss
+- Wallet Address (only for token PnL)
 - Token Name/Symbol
+- Total Profit/Loss
 - Total Buy Amount (USD)
 - Total Sell Amount (USD)
 - Number of Buy Transactions
