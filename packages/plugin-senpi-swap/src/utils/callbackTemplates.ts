@@ -22,9 +22,9 @@ export const insufficientSenpiBalanceTemplate = (
 
 export const initiatePurchaseTemplate = (
     buyTokenCreatorUsername: string,
-    senpiInWEI: bigint
+    moxieInWEI: bigint
 ) => ({
-    text: `\nInitiating purchase of ${buyTokenCreatorUsername} creator coins for ${ethers.formatUnits(senpiInWEI.toString(), MOXIE_TOKEN_DECIMALS)} MOXIE.`,
+    text: `\nInitiating purchase of ${buyTokenCreatorUsername} creator coins for ${ethers.formatUnits(moxieInWEI.toString(), MOXIE_TOKEN_DECIMALS)} MOXIE.`,
 });
 
 export const swapInProgressTemplate = (
@@ -92,24 +92,24 @@ export const transactionFailedTemplate = (error: Error) => ({
 });
 
 export const indicativePriceInMOXIETemplate = (
-    senpiInWEI: bigint,
+    moxieInWEI: bigint,
     sellQuantity: bigint,
     value_type: string
 ) => ({
-    text: `\nIndicative price: ${sellQuantity} ${value_type} = ${ethers.formatUnits(senpiInWEI, MOXIE_TOKEN_DECIMALS)} MOXIE`,
+    text: `\nIndicative price: ${sellQuantity} ${value_type} = ${ethers.formatUnits(moxieInWEI, MOXIE_TOKEN_DECIMALS)} MOXIE`,
     content: {
-        indicativePrice: senpiInWEI.toString(),
+        indicativePrice: moxieInWEI.toString(),
     },
 });
 
 export const MOXIEToCreatorCoinPriceTemplate = (
-    senpiInWEI: bigint,
+    moxieInWEI: bigint,
     sellQuantity: bigint,
     value_type: string
 ) => ({
-    text: `\nIndicative price: ${sellQuantity} ${value_type} = ${ethers.formatUnits(senpiInWEI, MOXIE_TOKEN_DECIMALS)} MOXIE`,
+    text: `\nIndicative price: ${sellQuantity} ${value_type} = ${ethers.formatUnits(moxieInWEI, MOXIE_TOKEN_DECIMALS)} MOXIE`,
     content: {
-        indicativePrice: senpiInWEI.toString(),
+        indicativePrice: moxieInWEI.toString(),
     },
 });
 

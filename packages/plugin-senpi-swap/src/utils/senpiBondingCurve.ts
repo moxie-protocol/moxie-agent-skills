@@ -569,7 +569,7 @@ export function decodeSellSharesEvent(
     traceId: string,
     receipt: ethers.TransactionReceipt,
     senpiUserId: string
-): { creatorCoinsSold: string; senpiReceived: string } {
+): { creatorCoinsSold: string; moxieReceived: string } {
     // Find the share sale event log
     const shareTransferLog = receipt.logs.find(
         (log) => log.topics[0] === subjectShareSoldTopic0
@@ -610,15 +610,15 @@ export function decodeSellSharesEvent(
 
     // Extract and format the transfer amounts
     const creatorCoinsSold = ethers.formatEther(decodedData.args._sellAmount);
-    const senpiReceived = ethers.formatEther(decodedData.args._buyAmount);
+    const moxieReceived = ethers.formatEther(decodedData.args._buyAmount);
 
     elizaLogger.debug(
         traceId,
-        `[creatorCoinSwap] [decodeSellSharesEvent] [${senpiUserId}] creatorCoinsSold: ${creatorCoinsSold} senpiReceived: ${senpiReceived}`
+        `[creatorCoinSwap] [decodeSellSharesEvent] [${senpiUserId}] creatorCoinsSold: ${creatorCoinsSold} moxieReceived: ${moxieReceived}`
     );
 
     return {
         creatorCoinsSold,
-        senpiReceived,
+        moxieReceived,
     };
 }

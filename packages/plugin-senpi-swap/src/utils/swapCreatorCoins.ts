@@ -334,26 +334,26 @@ export async function executeSellAction(
         }
 
         // Decode event and return results
-        const { creatorCoinsSold, senpiReceived } = decodeSellSharesEvent(
+        const { creatorCoinsSold, moxieReceived } = decodeSellSharesEvent(
             traceId,
             swapReceipt,
             senpiUserId
         );
 
         await callback?.({
-            text: `\nTransaction Complete: Successfully sold ${creatorCoinsSold} creator coins and received ${senpiReceived} $MOXIE `,
+            text: `\nTransaction Complete: Successfully sold ${creatorCoinsSold} creator coins and received ${moxieReceived} $MOXIE `,
         });
 
         elizaLogger.debug(
             traceId,
-            `[creatorCoinSwap] [${senpiUserId}] [executeSellAction] swap response: ${JSON.stringify({ swapTxnHash, creatorCoinsSold, senpiReceived })}`
+            `[creatorCoinSwap] [${senpiUserId}] [executeSellAction] swap response: ${JSON.stringify({ swapTxnHash, creatorCoinsSold, moxieReceived })}`
         );
 
         return {
             success: true,
             hash: swapTxnHash,
             creatorCoinsSold,
-            senpiReceived,
+            moxieReceived,
         };
     } catch (error) {
         elizaLogger.error(
