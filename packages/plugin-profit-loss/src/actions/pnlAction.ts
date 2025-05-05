@@ -104,8 +104,10 @@ export const PnLAction = {
             elizaLogger.debug(traceId, `[PnLAction] pnlData: ${JSON.stringify(pnlData)}`);
             elizaLogger.debug(traceId, `[PnLAction] totalPnl: ${totalPnl}`);
 
-            let pnlDataTemplate = pnLTemplate.replace("{{pnlData}}", JSON.stringify(pnlData))
-                                             .replace("{{totalPnl}}", (moxieUserIds.length > 0 || walletAddresses.length > 0) ? totalPnl.toString() : "");
+            let pnlDataTemplate = pnLTemplate.replace("{{latestMessage}}", latestMessage)
+                .replace("{{conversation}}", JSON.stringify(message.content.text))
+                .replace("{{pnlData}}", JSON.stringify(pnlData))
+                .replace("{{totalPnl}}", (moxieUserIds.length > 0 || walletAddresses.length > 0) ? totalPnl.toString() : "");
 
             const currentContext = composeContext({
                 state,
