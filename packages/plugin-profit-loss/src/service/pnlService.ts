@@ -83,7 +83,9 @@ export const preparePnlQuery = (pnlResponse: any) => {
 
   // Append where clauses to the query
   if (whereClauses.length > 0) {
-    query += ` where ${whereClauses.join(" and ")}`;
+    query += ` where ${whereClauses.join(" and ")} and buy_transaction_count > 0`;
+  } else {
+    query += ` where buy_transaction_count > 0`;
   }
 
   if (groupByClauses.length > 0) {
