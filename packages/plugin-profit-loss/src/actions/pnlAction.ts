@@ -34,15 +34,15 @@ export const PnLAction = {
             elizaLogger.debug(traceId, `[PnLAction] [${moxieUserId}] Starting PnL calculation`);
 
             const latestMessage = message.content.text;
-            const walletPnlTemplateWithLatestMessage = extractWalletTemplate
-                .replace("{{latestMessage}}", latestMessage)
-                .replace("{{conversation}}", "")
-                .replace("{{moxieUserId}}", moxieUserId)
-                .replace("{{agentWalletAddress}}", agentWalletAddress);
 
             const context = composeContext({
-                state,
-                template: walletPnlTemplateWithLatestMessage,
+                state: {
+                    ...state,
+                    latestMessage: latestMessage,
+                    moxieUserId,
+                    agentWalletAddress: agentWalletAddress,
+                },
+                template: extractWalletTemplate,
             });
 
             const pnlResponse = await generateObjectDeprecated({

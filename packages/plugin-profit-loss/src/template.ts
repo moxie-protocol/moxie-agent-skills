@@ -66,11 +66,11 @@ Response format example:
   "chain": "base"
 }
 \`\`\`
-Latest message: {{latest_message}}
-Conversation history: {{conversation_history}}
+Latest message: {{latestMessage}}
+Conversation history: {{recentMessages}}
 
 General rules:
 - if the query mentions both ENS and moxieUserId - use moxieUserId.
-- if the query mentions "my PnL", or "I earned/lost" use the following UserId: {{UserId}}
-- if the query mentions "my agent PnL" user the following wallet address: {{agent_wallet_address}}
+- if the query mentions "my PnL", or "I earned/lost" use the following UserId: {{moxieUserId}}
+- if the query mentions "my agent PnL" user the following wallet address: {{agentWalletAddress}}
 `;
