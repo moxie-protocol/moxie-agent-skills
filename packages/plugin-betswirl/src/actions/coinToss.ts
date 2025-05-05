@@ -308,7 +308,7 @@ export const coinTossAction: Action = {
             elizaLogger.log("Starting COIN_TOSS handler...");
 
             // Validate the chain
-            const wallet = state.SenpiWalletClient as SenpiWalletClient;
+            const wallet = state.senpiWalletClient as SenpiWalletClient;
             const chainId = await getChainIdFromWallet();
 
             // Initialize or update state

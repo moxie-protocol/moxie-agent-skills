@@ -146,6 +146,17 @@ export const approvalTransactionFailed = (approvalTxHash: string) => ({
     text: `\nApproval transaction is failed!`,
 });
 
-export const SenpiWalletClientNotFound = {
-    text: `\nUnable to access senpi wallet details. Please ensure your senpi wallet is properly setup and try again.`,
+export const senpiWalletClientNotFound = {
+    text: `\nUnable to access Senpi wallet details. Please ensure your Senpi wallet is properly setup and try again.`,
 };
+
+export const approvalTransactionTimedOut = (approvalTxHash: string) => ({
+    text: `\nApproval transaction timed out. Please check [BaseScan](https://basescan.org/tx/${approvalTxHash}) to verify the status before retrying.`,
+    content: {
+        url: `https://basescan.org/tx/${approvalTxHash}`,
+    },
+});
+
+export const approvalTransactionSubmissionFailed = () => ({
+    text: `\nApproval transaction submission failed. Please try again.`,
+});

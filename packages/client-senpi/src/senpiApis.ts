@@ -186,7 +186,7 @@ export function createSenpiApiRouter(
                 // Setting default mock values for states in local development
                 const senpiUserInfo: SenpiUser = mockSenpiUser;
                 const senpiUserId: string = senpiUserInfo.id;
-                const agentWallet: walletService.SenpiClientWalet = mockWallet;
+                const agentWallet: walletService.SenpiClientWallet = mockWallet;
                 let currentWalletBalance: Portfolio = mockPortfolio;
 
                 // If Zapper API key is set, fetch the current balance of the agent wallet

@@ -2,12 +2,12 @@ import { elizaLogger, HandlerCallback } from "@senpi-ai/core";
 import {
     SenpiWalletClient,
     SenpiWalletSendTransactionResponseType,
-} from "@elizaos/senpi-lib";
+} from "@senpi-ai/senpi-agent-lib";
 import { ethers } from "ethers";
 import { checkAllowanceAndApproveSpendRequest } from "./checkAndApproveTransaction";
-import { buyShares, decodeBuySharesEvent } from "./senpiBondingCurve";
+import { buyShares, decodeBuySharesEvent } from "./moxieBondingCurve";
 import { handleTransactionStatus } from "./common";
-import { sellShares, decodeSellSharesEvent } from "./senpiBondingCurve";
+import { sellShares, decodeSellSharesEvent } from "./moxieBondingCurve";
 import {
     insufficientEthBalanceTemplate,
     swapOperationFailedTemplate,

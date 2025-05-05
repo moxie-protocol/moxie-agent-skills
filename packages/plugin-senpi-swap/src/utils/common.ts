@@ -24,42 +24,87 @@ export async function handleTransactionStatus(
     );
     let txnReceipt: ethers.TransactionReceipt | null = null;
 
-    try {
-        txnReceipt = await provider.waitForTransaction(
-            txHash,
-            1,
-            TRANSACTION_RECEIPT_TIMEOUT
-        );
-        if (!txnReceipt) {
+    const MAX_RETRIES = 3;
+    let retryCount = 0;
+    let lastError;
+
+    while (retryCount < MAX_RETRIES) {
+        try {
+            txnReceipt = await provider.waitForTransaction(
+                txHash,
+                1,
+                TRANSACTION_RECEIPT_TIMEOUT
+            );
+
+            if (!txnReceipt) {
+                elizaLogger.error(
+                    traceId,
+                    `[${senpiUserId}] [handleTransactionStatus] Transaction receipt timeout`
+                );
+                retryCount++;
+
+                if (retryCount >= MAX_RETRIES) {
+                    elizaLogger.error(
+                        traceId,
+                        `[${senpiUserId}] [handleTransactionStatus] Max retries (${MAX_RETRIES}) reached for transaction receipt`
+                    );
+                    return null;
+                }
+
+                elizaLogger.debug(
+                    traceId,
+                    `[${senpiUserId}] [handleTransactionStatus] Retry ${retryCount}/${MAX_RETRIES} for transaction ${txHash}`
+                );
+                // Wait before retrying (exponential backoff)
+                await new Promise((resolve) =>
+                    setTimeout(resolve, 2000 * retryCount)
+                );
+                continue;
+            }
+
+            if (txnReceipt.status === 1) {
+                elizaLogger.debug(
+                    traceId,
+                    `[${senpiUserId}] [handleTransactionStatus] transaction successful: ${txHash}`
+                );
+                return txnReceipt;
+            } else {
+                elizaLogger.error(
+                    traceId,
+                    `[${senpiUserId}] [handleTransactionStatus] transaction failed: ${txHash} with status: ${txnReceipt.status}`
+                );
+                return txnReceipt;
+            }
+        } catch (error) {
+            lastError = error;
+            retryCount++;
+            const errorMessage =
+                error instanceof Error ? error.message : "Unknown error";
             elizaLogger.error(
                 traceId,
-                `[${senpiUserId}] [handleTransactionStatus] Transaction receipt timeout`
+                `[${senpiUserId}] [handleTransactionStatus] Error waiting for transaction receipt: ${errorMessage}`
             );
-            return null;
-        }
 
-        if (txnReceipt.status === 1) {
+            if (retryCount >= MAX_RETRIES) {
+                elizaLogger.error(
+                    traceId,
+                    `[${senpiUserId}] [handleTransactionStatus] Max retries (${MAX_RETRIES}) reached after error: ${errorMessage}`
+                );
+                return null;
+            }
+
             elizaLogger.debug(
                 traceId,
-                `[${senpiUserId}] [handleTransactionStatus] transaction successful: ${txHash}`
+                `[${senpiUserId}] [handleTransactionStatus] Retry ${retryCount}/${MAX_RETRIES} for transaction ${txHash}`
             );
-            return txnReceipt;
-        } else {
-            elizaLogger.error(
-                traceId,
-                `[${senpiUserId}] [handleTransactionStatus] transaction failed: ${txHash} with status: ${txnReceipt.status}`
+            // Wait before retrying (exponential backoff)
+            await new Promise((resolve) =>
+                setTimeout(resolve, 2000 * retryCount)
             );
-            return null;
         }
-    } catch (error) {
-        const errorMessage =
-            error instanceof Error ? error.message : "Unknown error";
-        elizaLogger.error(
-            traceId,
-            `[${senpiUserId}] [handleTransactionStatus] Error waiting for transaction receipt: ${errorMessage}`
-        );
-        return null;
     }
+
+    return null;
 }
 
 export function convert32BytesToAddress(hexString: string): string {

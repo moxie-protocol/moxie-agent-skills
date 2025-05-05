@@ -85,7 +85,7 @@ export const tokenTransferAction = {
         // pick senpi user info from state
         const senpiUserInfo = state.senpiUserInfo as agentLib.SenpiUser;
         const senpiUserId = senpiUserInfo.id;
-        const agentWallet = state.agentWallet as agentLib.SenpiClientWalet;
+        const agentWallet = state.agentWallet as agentLib.SenpiClientWallet;
 
         // add senpi user id to context
         context.senpiUserId = senpiUserId;
@@ -334,7 +334,7 @@ async function processMessage(
         `[tokenTransfer] [${context.senpiUserId}] [processMessage] message called: ${JSON.stringify(message)}`
     );
 
-    const agentWallet = state.agentWallet as agentLib.SenpiClientWalet;
+    const agentWallet = state.agentWallet as agentLib.SenpiClientWallet;
 
     // Compose transfer context
     let transferContext = composeContext({
@@ -445,7 +445,7 @@ async function preValidateRequiredData(context: Context) {
     }
 
     // check agent wallet
-    const agentWallet = state.agentWallet as agentLib.SenpiClientWalet;
+    const agentWallet = state.agentWallet as agentLib.SenpiClientWallet;
     if (!agentWallet) {
         elizaLogger.error(
             context.traceId,
@@ -468,7 +468,7 @@ async function preValidateRequiredData(context: Context) {
     }
 
     // check if the senpi wallet client is set
-    if (!state.SenpiWalletClient) {
+    if (!state.senpiWalletClient) {
         elizaLogger.error(
             context.traceId,
             `[tokenTransfer] [preValidateRequiredData] Senpi wallet client not found`
@@ -491,7 +491,7 @@ async function preValidateRequiredData(context: Context) {
 async function processTransfer(
     context: Context,
     transferOptions: TransactionResponse,
-    agentWallet: agentLib.SenpiClientWalet,
+    agentWallet: agentLib.SenpiClientWallet,
     callback: HandlerCallback
 ): Promise<FunctionResponse<CallbackTemplate>> {
     elizaLogger.debug(
@@ -567,7 +567,7 @@ async function processTransfer(
 async function processSingleTransfer(
     context: Context,
     transfer: Transfer,
-    agentWallet: agentLib.SenpiClientWalet,
+    agentWallet: agentLib.SenpiClientWallet,
     currentWalletBalanceForBalanceBasedSwaps: Map<string, bigint | undefined>
 ): Promise<FunctionResponse<CallbackTemplate>> {
     elizaLogger.debug(
@@ -753,8 +753,7 @@ async function processSingleTransfer(
                 `[tokenTransfer] [${context.senpiUserId}] [processTransfer] [HANDLE_TRANSACTION_STATUS] [ERROR] Transaction failed`
             );
             return {
-                callBackTemplate:
-                    callBackTemplate.APPLICATION_ERROR("Transaction failed"),
+                callBackTemplate: txnReceipt.callBackTemplate,
             };
         }
 
@@ -883,7 +882,7 @@ async function resolveENSAddress(context: Context, address: string) {
         `[tokenTransfer] [resolveENSAddress] Checking address: ${address}`
     );
 
-    let response = {
+    const response = {
         isENS: false,
         resolvedAddress: null,
     };
@@ -1232,7 +1231,7 @@ async function resolveTokenAddress(
                     tokenDecimals: Number(subjectTokenDetails.data.decimals),
                     tokenType: "CREATOR_COIN",
                     currentSenpiPriceInWEI:
-                        subjectTokenDetails.data.currentPriceInWeiInSenpi,
+                        subjectTokenDetails.data.currentPriceInWeiInMoxie,
                 },
             };
         }
@@ -1429,22 +1428,67 @@ async function executeTransfer(
 
     // Send the transaction
     const walletClient = context.state
-        .SenpiWalletClient as agentLib.SenpiWalletClient;
+        .senpiWalletClient as agentLib.SenpiWalletClient;
     let transactionResponse: agentLib.SenpiWalletSendTransactionResponseType;
-    try {
-        transactionResponse = await walletClient.sendTransaction(
-            process.env.CHAIN_ID || "8453",
-            request
-        );
-    } catch (error) {
+    const MAX_RETRIES = 3;
+    let retryCount = 0;
+    let lastError: any;
+
+    while (retryCount < MAX_RETRIES) {
+        try {
+            elizaLogger.debug(
+                context.traceId,
+                `[tokenTransfer] [${context.senpiUserId}] [executeTransfer] Attempt ${retryCount + 1} of ${MAX_RETRIES}`
+            );
+            transactionResponse = await walletClient.sendTransaction(
+                process.env.CHAIN_ID || "8453",
+                request
+            );
+            break; // Success, exit the retry loop
+        } catch (error) {
+            lastError = error;
+            retryCount++;
+            elizaLogger.warn(
+                context.traceId,
+                `[tokenTransfer] [${context.senpiUserId}] [executeTransfer] Error sending transaction (attempt ${retryCount}): ${error}`
+            );
+
+            if (retryCount < MAX_RETRIES) {
+                // Wait before retrying (exponential backoff)
+                const delay = 1000 * Math.pow(2, retryCount);
+                elizaLogger.debug(
+                    context.traceId,
+                    `[tokenTransfer] [${context.senpiUserId}] [executeTransfer] Retrying in ${delay}ms...`
+                );
+                await new Promise((resolve) => setTimeout(resolve, delay));
+            }
+        }
+    }
+
+    if (retryCount === MAX_RETRIES) {
         elizaLogger.error(
             context.traceId,
-            `[tokenTransfer] [${context.senpiUserId}] [executeTransfer] Error sending transaction: ${error}`
+            `[tokenTransfer] [${context.senpiUserId}] [executeTransfer] Failed after ${MAX_RETRIES} attempts: ${lastError}`
         );
+
+        // Check if the error is related to insufficient funds
+        if (
+            lastError &&
+            lastError.message &&
+            lastError.message.includes(
+                "insufficient funds for gas * price + value"
+            )
+        ) {
+            return {
+                callBackTemplate:
+                    callBackTemplate.TRANSACTION_SUBMISSION_FAILED(
+                        "Insufficient funds to cover gas costs for this transaction"
+                    ),
+            };
+        }
+
         return {
-            callBackTemplate: callBackTemplate.APPLICATION_ERROR(
-                "Error sending transaction"
-            ),
+            callBackTemplate: callBackTemplate.TRANSACTION_SUBMISSION_FAILED(),
         };
     }
 
@@ -1473,7 +1517,7 @@ async function getTargetQuantityForBalanceBasedTokenTransfer(
     currentWalletBalance: bigint | undefined,
     tokenAddress: string,
     tokenSymbol: string,
-    agentWallet: agentLib.SenpiClientWalet,
+    agentWallet: agentLib.SenpiClientWallet,
     balance: Balance
 ): Promise<FunctionResponse<bigint>> {
     // Input validation
@@ -1541,7 +1585,16 @@ async function getTargetQuantityForBalanceBasedTokenTransfer(
         // Calculate transfer amount based on percentage
         // Using 1e9 as base to maintain precision while avoiding overflow
         const percentageBase = 1e9;
-        const scaledPercentage = balance.percentage * 1e7; // Scale up by 1e7 to maintain precision
+        // If ETH and 100%, use 99% instead to leave gas for transaction
+        const adjustedPercentage =
+            tokenSymbol.toUpperCase() === "ETH" && balance.percentage === 100
+                ? 99
+                : balance.percentage;
+        elizaLogger.debug(
+            context.traceId,
+            `[tokenTransfer] [${context.senpiUserId}] [getTargetQuantityForBalanceBasedTokenTransfer] Original percentage: ${balance.percentage}, Adjusted percentage: ${adjustedPercentage}`
+        );
+        const scaledPercentage = adjustedPercentage * 1e7; // Scale up by 1e7 to maintain precision
         const quantityInWEI =
             (walletBalance * BigInt(scaledPercentage)) / BigInt(percentageBase);
 

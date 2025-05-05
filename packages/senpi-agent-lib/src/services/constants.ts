@@ -1,6 +1,6 @@
 import { Fta } from "./fta";
 import { SenpiUser } from "./types";
-import { SenpiClientWalet } from "../wallet";
+import { SenpiClientWallet } from "../wallet";
 import { Portfolio, PortfolioV2Data } from "./zapperService";
 
 /**
@@ -92,7 +92,7 @@ export const mockSenpiUser: SenpiUser = {
 };
 
 // Mock Senpi Wallet Data
-export const mockWallet: SenpiClientWalet = {
+export const mockWallet: SenpiClientWallet = {
     address: "0xa5cc845ef113c4c0908d4c1f4616a000b9a67b80",
     chainType: "ethereum",
     chainId: "8453",

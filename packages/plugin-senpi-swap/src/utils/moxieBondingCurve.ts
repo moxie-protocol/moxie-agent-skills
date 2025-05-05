@@ -10,7 +10,7 @@ import {
     SenpiWalletClient,
     SenpiWalletSendTransactionInputType,
     SenpiWalletSendTransactionResponseType,
-} from "@elizaos/senpi-lib";
+} from "@senpi-ai/senpi-agent-lib";
 
 type SubjectSharePurchasedEvent = {
     args: {

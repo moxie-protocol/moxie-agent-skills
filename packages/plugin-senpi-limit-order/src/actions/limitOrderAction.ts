@@ -58,7 +58,10 @@ import { numberToHex } from "viem";
 import { size } from "viem";
 import {
     swapCompletedTemplate,
+    swapFailedTemplate,
     swapInProgressTemplate,
+    swapTransactionFailed,
+    swapTransactionVerificationTimedOut,
 } from "../utils/callbackTemplates";
 import { createCowLimitOrder } from "../service/cowLimitOrder";
 import { getERC20TokenSymbol } from "@senpi-ai/senpi-agent-lib";
@@ -112,7 +115,7 @@ export const limitOrderAction = {
         // pick senpi user info from state
         const senpiUserInfo = state.senpiUserInfo as agentLib.SenpiUser;
         const senpiUserId = senpiUserInfo.id;
-        const agentWallet = state.agentWallet as agentLib.SenpiClientWalet;
+        const agentWallet = state.agentWallet as agentLib.SenpiClientWallet;
 
         // add senpi user id to context
         context.senpiUserId = senpiUserId;
@@ -214,18 +217,18 @@ async function preValidateRequiredData(context: Context): Promise<boolean> {
 
     // Validate required state objects
     if (!state.senpiUserInfo) {
-        throw new Error("Senpi user info not found in state");
+        throw new Error("Moxie user info not found in state");
     }
 
     if (!state.agentWallet) {
         throw new Error("Agent wallet not found in state");
     }
 
-    if (!(state.agentWallet as agentLib.SenpiClientWalet).delegated) {
+    if (!(state.agentWallet as agentLib.SenpiClientWallet).delegated) {
         throw new Error("Delegate access not found for agent wallet");
     }
 
-    if (!state.SenpiWalletClient) {
+    if (!state.senpiWalletClient) {
         throw new Error("Senpi wallet client not found in state");
     }
 
@@ -636,7 +639,7 @@ async function processSingleLimitOrder(
         value_type,
         balance,
     } = limitOrder;
-    const agentWallet = context.state.agentWallet as agentLib.SenpiClientWalet;
+    const agentWallet = context.state.agentWallet as agentLib.SenpiClientWallet;
     // extract the sell token address and symbol
     let sellTokenAddress: string;
     let sellTokenSymbol: string;
@@ -708,20 +711,34 @@ async function processSingleLimitOrder(
         let sellTokenAmountInWEI: bigint;
 
         // Get current token prices in USD
-        const [sellTokenPriceInUSD, buyTokenPriceInUSD] = await Promise.all([
-            fetchPriceWithRetry(
-                sellTokenAddress,
-                sellTokenSymbol,
+        let sellTokenPriceInUSD: number;
+        let buyTokenPriceInUSD: number;
+        try {
+            [sellTokenPriceInUSD, buyTokenPriceInUSD] = await Promise.all([
+                fetchPriceWithRetry(
+                    sellTokenAddress,
+                    sellTokenSymbol,
+                    traceId,
+                    senpiUserId
+                ),
+                fetchPriceWithRetry(
+                    buyTokenAddress,
+                    buyTokenSymbol,
+                    traceId,
+                    senpiUserId
+                ),
+            ]);
+        } catch (error) {
+            elizaLogger.error(
                 traceId,
-                senpiUserId
-            ),
-            fetchPriceWithRetry(
-                buyTokenAddress,
-                buyTokenSymbol,
-                traceId,
-                senpiUserId
-            ),
-        ]);
+                `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] Error fetching token prices: ${error}`
+            );
+            return {
+                callBackTemplate: callBackTemplate.APPLICATION_ERROR(
+                    `Error fetching token prices: ${error.message}`
+                ),
+            };
+        }
         elizaLogger.debug(
             traceId,
             `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [BUY_QUANTITY] [USD_VALUE_TYPE] sellTokenPriceInUSD: ${sellTokenPriceInUSD} and buyTokenPriceInUSD: ${buyTokenPriceInUSD}`
@@ -947,7 +964,7 @@ async function processSingleLimitOrder(
  * Check the user communication preferences
  * @param userId The user ID of the person performing the swap
  * @param traceId The trace ID of the request
- * @param senpiUserId The Senpi user ID of the person performing the swap
+ * @param senpiUserId The Moxie user ID of the person performing the swap
  * @returns Promise that resolves to the user communication preferences
  */
 async function checkUserCommunicationPreferences(
@@ -955,7 +972,7 @@ async function checkUserCommunicationPreferences(
     senpiUserId: string
 ): Promise<string | null> {
     try {
-        const response = await fetch(process.env.SENPI_API_URL_INTERNAL, {
+        const response = await fetch(process.env.MOXIE_API_URL_INTERNAL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -1035,7 +1052,17 @@ async function getTargetQuantityForBalanceBasedSwaps(
     }
 
     // calculate the percentage to be used for the swap
-    const percentage = balance.type === "FULL" ? 100 : balance.percentage;
+    let percentage = balance.type === "FULL" ? 100 : balance.percentage;
+
+    // If ETH and 100%, use 99% instead
+    if (sellTokenSymbol === "ETH" && percentage === 100) {
+        percentage = 99;
+        elizaLogger.debug(
+            traceId,
+            `[limitOrder] [${senpiUserId}] [processSingleLimitOrder] [balance] Using 99% instead of 100% for ETH`
+        );
+    }
+
     // Scale up by a larger factor (e.g., 1e7)
     quantityInWEI =
         (BigInt(currentWalletBalance) * BigInt(percentage * 1e7)) / BigInt(1e9);
@@ -1074,7 +1101,7 @@ async function swap(
     const senpiUserId = context.senpiUserId;
     const provider = context.provider;
     const walletClient = context.state
-        .SenpiWalletClient as agentLib.SenpiWalletClient;
+        .senpiWalletClient as agentLib.SenpiWalletClient;
 
     elizaLogger.debug(
         traceId,
@@ -1213,16 +1240,41 @@ async function swap(
             `[tokenSwap] [${senpiUserId}] [swap] quote.permit2.eip712: ${JSON.stringify(quote.permit2?.eip712)}`
         );
         if (quote.permit2?.eip712) {
-            signResponse = await walletClient.signTypedData(
-                quote.permit2.eip712.domain,
-                quote.permit2.eip712.types,
-                quote.permit2.eip712.message,
-                quote.permit2.eip712.primaryType
-            );
-            elizaLogger.debug(
-                traceId,
-                `[tokenSwap] [${senpiUserId}] [swap] signResponse: ${JSON.stringify(signResponse)}`
-            );
+            const MAX_RETRIES = 3;
+            let retryCount = 0;
+
+            while (retryCount < MAX_RETRIES) {
+                try {
+                    signResponse = await walletClient.signTypedData(
+                        quote.permit2.eip712.domain,
+                        quote.permit2.eip712.types,
+                        quote.permit2.eip712.message,
+                        quote.permit2.eip712.primaryType
+                    );
+                    elizaLogger.debug(
+                        traceId,
+                        `[tokenSwap] [${senpiUserId}] [swap] signResponse: ${JSON.stringify(signResponse)}`
+                    );
+                    break; // Exit the loop if successful
+                } catch (error) {
+                    retryCount++;
+                    elizaLogger.warn(
+                        traceId,
+                        `[tokenSwap] [${senpiUserId}] [swap] Signing attempt ${retryCount} failed: ${error.message}`
+                    );
+                    if (retryCount >= MAX_RETRIES) {
+                        elizaLogger.error(
+                            traceId,
+                            `[tokenSwap] [${senpiUserId}] [swap] [ERROR] Failed to sign typed data after ${MAX_RETRIES} attempts`
+                        );
+                        throw error; // Rethrow the error after all retries are exhausted
+                    }
+                    // Wait before retrying (exponential backoff)
+                    await new Promise((resolve) =>
+                        setTimeout(resolve, 1000 * Math.pow(2, retryCount))
+                    );
+                }
+            }
         }
 
         if (signResponse && signResponse.signature && quote.transaction?.data) {
@@ -1295,13 +1347,13 @@ async function swap(
                 traceId,
                 `[tokenSwap] [${senpiUserId}] [swap] txnReceipt is null`
             );
-            throw new Error(`Transaction receipt is null for ${tx.hash}.`);
         }
     } catch (error) {
         elizaLogger.error(
             traceId,
             `[tokenSwap] [${senpiUserId}] [swap] Error handling transaction status: ${JSON.stringify(error)}`
         );
+        await context.callback(swapTransactionVerificationTimedOut(tx.hash));
         throw error;
     }
 
@@ -1309,12 +1361,12 @@ async function swap(
         traceId,
         `[tokenSwap] [${senpiUserId}] [swap] 0x swap txnReceipt: ${JSON.stringify(txnReceipt)}`
     );
-    if (txnReceipt.status == 1) {
+    if (txnReceipt && txnReceipt.status == 1) {
         if (
             buyTokenAddress !== ETH_ADDRESS &&
             buyTokenAddress !== WETH_ADDRESS
         ) {
-            // decode the txn receipt to get the senpi purchased
+            // decode the txn receipt to get the moxie purchased
             const transferDetails = await decodeTokenTransfer(
                 senpiUserId,
                 txnReceipt,
@@ -1356,7 +1408,7 @@ async function swap(
             traceId,
             `[tokenSwap] [${senpiUserId}] [swap] 0x swap failed: ${tx.hash} `
         );
-        throw new Error(`0x swap failed: ${tx.hash}`);
+        await context.callback(swapTransactionFailed(tx.hash));
     }
 }
 
@@ -1506,7 +1558,7 @@ const calculateBuyQuantityAmounts = async (
             let sellAmount: string;
             if (type === "SELL") {
                 // this is for usd based direct sell case where user is selling in terms of buy quantity
-                // sell $KTA when price increase by 10% and get me $10 worth of senpi
+                // sell $KTA when price increase by 10% and get me $10 worth of moxie
                 buyAmount = new Decimal(buyQuantity)
                     .div(buyTokenPriceInUSD)
                     .toFixed(buyTokenDecimals);
@@ -1558,7 +1610,7 @@ const calculateBuyQuantityAmounts = async (
             let buyAmount: string;
             let sellAmount: string;
             if (type === "SELL") {
-                // sell $[KTA|0x12323423] when price increase by 10% and get me 1000 senpi
+                // sell $[KTA|0x12323423] when price increase by 10% and get me 1000 moxie
                 buyAmount = new Decimal(buyQuantity).toFixed(buyTokenDecimals);
                 sellAmount = new Decimal(buyQuantity)
                     .mul(buyTokenPriceInUSD)
@@ -1642,7 +1694,7 @@ const calculateSellQuantityAmounts = async (
                     .toFixed(sellTokenDecimals);
             } else if (type === "BUY") {
                 // this is for usd based direct buy case where user is buying in terms of sell quantity
-                // example: buy $KTA when price drops by 20% using 100$ $usdc
+                // example: buy $KTA when price drops by 20% using 100$ $moxie
                 sellAmount = new Decimal(sellQuantity)
                     .div(sellTokenPriceInUSD)
                     .toFixed(sellTokenDecimals);
@@ -1697,7 +1749,7 @@ const calculateSellQuantityAmounts = async (
                     .toFixed(buyTokenDecimals);
             } else if (type === "BUY") {
                 // this is for direct buy case where user is buying in terms of sell quantity
-                // example: buy $KTA when price drops by 20% using 100 $usdc
+                // example: buy $KTA when price drops by 20% using 100 $moxie
                 sellAmount = new Decimal(sellQuantity).toFixed(
                     sellTokenDecimals
                 );

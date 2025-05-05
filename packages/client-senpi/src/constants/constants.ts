@@ -1,6 +1,6 @@
 import type {
     SenpiUser,
-    SenpiClientWalet,
+    SenpiClientWallet,
     Portfolio,
 } from "@senpi-ai/senpi-agent-lib";
 
@@ -105,7 +105,7 @@ export const mockSenpiUser: SenpiUser = {
 };
 
 // Mock Senpi Wallet Data
-export const mockWallet: SenpiClientWalet = {
+export const mockWallet: SenpiClientWallet = {
     address: "0xa5cc845ef113c4c0908d4c1f4616a000b9a67b80",
     chainType: "ethereum",
     chainId: "8453",

@@ -2,7 +2,7 @@ import { State } from "@senpi-ai/core";
 import { IAgentRuntime } from "@senpi-ai/core";
 import { Wallet as PrivyWallet } from "@privy-io/server-auth";
 import { ethers } from "ethers";
-import { SenpiClientWalet, SenpiWalletClient } from "../wallet";
+import { SenpiClientWallet, SenpiWalletClient } from "../wallet";
 export interface TwitterMetadata {
     username: string;
     name?: string;

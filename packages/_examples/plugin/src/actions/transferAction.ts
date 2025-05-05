@@ -106,7 +106,7 @@ export const transferAction: Action = {
             elizaLogger.log(
                 `Transfering ${formattedValue} wei to address ${toAddress}...`
             );
-            const wallet = state.SenpiWalletClient as SenpiWalletClient;
+            const wallet = state.senpiWalletClient as SenpiWalletClient;
 
             const { hash } = await wallet.sendTransaction("8543", {
                 toAddress,

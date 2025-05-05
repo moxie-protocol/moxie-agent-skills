@@ -12,7 +12,7 @@ import {
     generateObjectDeprecated,
 } from "@senpi-ai/core";
 import {
-    SenpiClientWalet,
+    SenpiClientWallet,
     SenpiUser,
     SenpiWalletClient,
     formatUserMention,
@@ -94,7 +94,7 @@ export const autonomousTradingAction: Action = {
             );
 
             // read senpiUserInfo from state
-            const agentWallet = state.agentWallet as SenpiClientWalet;
+            const agentWallet = state.agentWallet as SenpiClientWallet;
 
             if (!agentWallet) {
                 elizaLogger.error(
@@ -114,7 +114,7 @@ export const autonomousTradingAction: Action = {
                 return true;
             }
 
-            const walletClient = state.SenpiWalletClient as SenpiWalletClient;
+            const walletClient = state.senpiWalletClient as SenpiWalletClient;
             if (!walletClient) {
                 elizaLogger.error(
                     traceId,

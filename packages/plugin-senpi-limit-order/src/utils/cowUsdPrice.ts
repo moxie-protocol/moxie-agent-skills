@@ -139,6 +139,9 @@ export async function fetchPriceWithRetry(
                 traceId,
                 `[getPrice] [${senpiUserId}] [COW_PRICE] [${tokenSymbol}] ${JSON.stringify(cowPriceData)}`
             );
+            if (!cowPriceData.price) {
+                throw new Error(`Failed to get ${tokenSymbol} price from CoW API`);
+            }
             return cowPriceData.price;
         } catch (error) {
             lastError = error;

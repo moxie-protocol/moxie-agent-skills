@@ -185,5 +185,5 @@ export type SenpiWalletSendTransactionResponseType =
     EthereumSendTransactionResponseType;
 export type SenpiWalletSendTransactionInputType =
     EthereumSendTransactionInputType;
-export type SenpiClientWalet = Wallet;
+export type SenpiClientWallet = Wallet;
 export type SenpiHex = Hex;

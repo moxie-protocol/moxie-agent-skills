@@ -303,7 +303,7 @@ export const diceAction: Action = {
             elizaLogger.log("Starting DICE handler...");
 
             // Validate the chain
-            const wallet = state.SenpiWalletClient as SenpiWalletClient;
+            const wallet = state.senpiWalletClient as SenpiWalletClient;
             const chainId = await getChainIdFromWallet();
 
             // Initialize or update state

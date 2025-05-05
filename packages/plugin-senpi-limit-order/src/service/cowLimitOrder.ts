@@ -8,10 +8,11 @@ import {
 import { elizaLogger } from "@senpi-ai/core";
 import {
     SenpiAgentDBAdapter,
+    SenpiWalletSendTransactionResponseType,
     TransactionDetails,
 } from "@senpi-ai/senpi-agent-lib";
 import {
-    SenpiClientWalet,
+    SenpiClientWallet,
     SenpiWalletClient,
     SenpiWalletSignTypedDataResponseType,
 } from "@senpi-ai/senpi-agent-lib/src/wallet";
@@ -98,7 +99,7 @@ export async function createCowLimitOrder(
             "Agent wallet is required for transactions",
         ],
         SenpiWalletClient: [
-            context.state.SenpiWalletClient,
+            context.state.senpiWalletClient,
             "Senpi wallet client is required for transactions",
         ],
         orderParams: [orderParams, "Order parameters are required"],
@@ -134,7 +135,7 @@ export async function createCowLimitOrder(
             provider
         );
 
-        const agentWallet = (context.state.agentWallet as SenpiClientWalet)
+        const agentWallet = (context.state.agentWallet as SenpiClientWallet)
             .address;
         elizaLogger.debug(
             traceId,
@@ -230,13 +231,42 @@ export async function createCowLimitOrder(
             JSON.stringify(finalOrderParams)
         );
 
-        // Send order to cow
-        const order = await orderBookApi.sendOrder(finalOrderParams);
-        elizaLogger.debug(
-            traceId,
-            "[createCowLimitOrder] Order created:",
-            order
-        );
+        // Send order to cow with retries
+        let order;
+        let retries = 3;
+        let lastError;
+
+        while (retries > 0) {
+            try {
+                order = await orderBookApi.sendOrder(finalOrderParams);
+                elizaLogger.debug(
+                    traceId,
+                    "[createCowLimitOrder] Order created:",
+                    order
+                );
+                break;
+            } catch (error) {
+                lastError = error;
+                retries--;
+                elizaLogger.warn(
+                    traceId,
+                    `[createCowLimitOrder] Failed to send order, retries left: ${retries}`,
+                    error
+                );
+                if (retries > 0) {
+                    // Wait before retrying (exponential backoff)
+                    await new Promise((resolve) =>
+                        setTimeout(resolve, (3 - retries) * 1000)
+                    );
+                }
+            }
+        }
+
+        if (!order) {
+            throw new Error(
+                `Failed to send order after multiple attempts: ${lastError?.message}`
+            );
+        }
 
         return order;
     } catch (error) {
@@ -267,10 +297,11 @@ async function sendApprovalTransactionFromEmbeddedWallet(
         "[sendApprovalTransactionFromEmbeddedWallet] started"
     );
 
-    const agentWallet = (context.state.agentWallet as SenpiClientWalet).address;
+    const agentWallet = (context.state.agentWallet as SenpiClientWallet)
+        .address;
     const chainId = process.env.CHAIN_ID || "8453";
-    const SenpiWalletClient = context.state
-        .SenpiWalletClient as SenpiWalletClient;
+    const senpiWalletClient = context.state
+        .senpiWalletClient as SenpiWalletClient;
 
     try {
         const sendTransactionInput: TransactionDetails = {
@@ -285,10 +316,32 @@ async function sendApprovalTransactionFromEmbeddedWallet(
             )}`
         );
 
-        const sendTransactionResponse = await SenpiWalletClient.sendTransaction(
-            chainId,
-            sendTransactionInput
-        );
+        let sendTransactionResponse: SenpiWalletSendTransactionResponseType;
+        let sendTxRetries = 3;
+        let lastSendTxError: any;
+
+        while (sendTxRetries > 0) {
+            try {
+                sendTransactionResponse =
+                    await senpiWalletClient.sendTransaction(
+                        chainId,
+                        sendTransactionInput
+                    );
+                break; // Exit the loop if successful
+            } catch (error) {
+                lastSendTxError = error;
+                elizaLogger.warn(
+                    traceId,
+                    `[${senpiUserId}] [sendApprovalTransactionFromEmbeddedWallet] Error sending transaction, retries left: ${sendTxRetries - 1}: ${error.message}`
+                );
+                sendTxRetries--;
+                if (sendTxRetries === 0) throw error;
+                // Wait before retrying (exponential backoff)
+                await new Promise((resolve) =>
+                    setTimeout(resolve, (4 - sendTxRetries) * 2000)
+                );
+            }
+        }
         elizaLogger.debug(
             traceId,
             `[sendApprovalTransactionFromEmbeddedWallet] sendTransactionResponse: ${JSON.stringify(
@@ -296,12 +349,29 @@ async function sendApprovalTransactionFromEmbeddedWallet(
             )}`
         );
 
-        // Wait for and validate transaction receipt
-        const txnReceipt = await context.provider.waitForTransaction(
-            sendTransactionResponse.hash,
-            1,
-            TRANSACTION_RECEIPT_TIMEOUT
-        );
+        // Wait for and validate transaction receipt with retries
+        let txnReceipt = null;
+        let retries = 3;
+        while (retries > 0 && !txnReceipt) {
+            try {
+                txnReceipt = await context.provider.waitForTransaction(
+                    sendTransactionResponse.hash,
+                    1,
+                    TRANSACTION_RECEIPT_TIMEOUT
+                );
+            } catch (error) {
+                elizaLogger.warn(
+                    traceId,
+                    `[${moxieUserId}] [sendApprovalTransactionFromEmbeddedWallet] Error waiting for transaction receipt, retrying: ${error.message}`
+                );
+                retries--;
+                if (retries === 0) throw error;
+                // Exponential backoff
+                await new Promise((resolve) =>
+                    setTimeout(resolve, (4 - retries) * 2000)
+                );
+            }
+        }
 
         if (!txnReceipt) {
             elizaLogger.error(
@@ -318,13 +388,14 @@ async function sendApprovalTransactionFromEmbeddedWallet(
                 `[${senpiUserId}] [sendApprovalTransactionFromEmbeddedWallet] approval transaction successful: ${sendTransactionResponse.hash}`
             );
             return sendTransactionResponse;
+        } else if (txnReceipt.status === 0) {
+            // 0 is failure
+            elizaLogger.error(
+                traceId,
+                `[${senpiUserId}] [sendApprovalTransactionFromEmbeddedWallet] approval transaction failed: ${sendTransactionResponse.hash} with status: ${txnReceipt.status}`
+            );
+            throw new Error("Approval transaction failed");
         }
-
-        elizaLogger.error(
-            traceId,
-            `[${senpiUserId}] [sendApprovalTransactionFromEmbeddedWallet] approval transaction failed: ${sendTransactionResponse.hash} with status: ${txnReceipt.status}`
-        );
-        throw new Error("Approval transaction failed: Transaction reverted");
     } catch (error) {
         elizaLogger.error(
             traceId,
@@ -415,41 +486,64 @@ async function signTypedDataFromEmbeddedWallet(
         orderParams
     );
 
-    try {
-        const SenpiWalletClient = context.state
-            .SenpiWalletClient as SenpiWalletClient;
-        const orderData = {
-            types: orderTypes,
-            domain,
-            primaryType: "Order",
-            message: orderParams,
-        };
+    const maxRetries = 3;
+    let retryCount = 0;
+    let lastError;
 
-        elizaLogger.debug(
-            traceId,
-            "[signTypedDataFromEmbeddedWallet] orderData:",
-            JSON.stringify(orderData)
-        );
+    while (retryCount < maxRetries) {
+        try {
+            const senpiWalletClient = context.state
+                .senpiWalletClient as SenpiWalletClient;
+            const orderData = {
+                types: orderTypes,
+                domain,
+                primaryType: "Order",
+                message: orderParams,
+            };
 
-        const signatureData = await SenpiWalletClient.signTypedData(
-            orderData.domain,
-            orderData.types,
-            orderData.message,
-            orderData.primaryType
-        );
-        elizaLogger.debug(
-            traceId,
-            "[signTypedDataFromEmbeddedWallet] signatureData:",
-            JSON.stringify(signatureData)
-        );
+            elizaLogger.debug(
+                traceId,
+                "[signTypedDataFromEmbeddedWallet] orderData:",
+                JSON.stringify(orderData)
+            );
 
-        return signatureData;
-    } catch (error) {
-        elizaLogger.error(
-            traceId,
-            "[signTypedDataFromEmbeddedWallet] Failed to sign order data:",
-            error
-        );
-        throw new Error(`Failed to sign order data: ${error.message}`);
+            const signatureData = await senpiWalletClient.signTypedData(
+                orderData.domain,
+                orderData.types,
+                orderData.message,
+                orderData.primaryType
+            );
+            elizaLogger.debug(
+                traceId,
+                "[signTypedDataFromEmbeddedWallet] signatureData:",
+                JSON.stringify(signatureData)
+            );
+
+            return signatureData;
+        } catch (error) {
+            lastError = error;
+            retryCount++;
+            elizaLogger.warn(
+                traceId,
+                `[signTypedDataFromEmbeddedWallet] Failed to sign order data, retry ${retryCount}/${maxRetries}:`,
+                error
+            );
+
+            if (retryCount < maxRetries) {
+                // Exponential backoff
+                await new Promise((resolve) =>
+                    setTimeout(resolve, Math.pow(2, retryCount) * 1000)
+                );
+            }
+        }
     }
+
+    elizaLogger.error(
+        traceId,
+        "[signTypedDataFromEmbeddedWallet] Failed to sign order data after multiple attempts:",
+        lastError
+    );
+    throw new Error(
+        `Failed to sign order data after ${maxRetries} attempts: ${lastError.message}`
+    );
 }

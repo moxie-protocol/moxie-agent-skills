@@ -305,7 +305,7 @@ export const rouletteAction: Action = {
             elizaLogger.log("Starting ROULETTE handler...");
 
             // Validate the chain
-            const wallet = state.SenpiWalletClient as SenpiWalletClient;
+            const wallet = state.senpiWalletClient as SenpiWalletClient;
             const chainId = await getChainIdFromWallet();
 
             // Initialize or update state

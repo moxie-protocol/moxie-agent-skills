@@ -54,7 +54,7 @@ export {
     type SenpiWalletSendTransactionResponseType,
     type SenpiWalletSendTransactionInputType,
     type SenpiHex,
-    type SenpiClientWalet,
+    type SenpiClientWallet,
     SenpiWalletClient,
 } from "./wallet";
 

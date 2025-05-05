@@ -1,11 +1,11 @@
 import { elizaLogger, HandlerCallback } from "@senpi-ai/core";
-// import { SenpiWalletClient, SenpiWalletSendTransactionInputType } from '@elizaos/senpi-lib';
 import { ethers } from "ethers";
 import { encodeFunctionData } from "viem";
 import {
     approvalTransactionSubmitted,
     approvalTransactionConfirmed,
     approvalTransactionFailed,
+    approvalTransactionTimedOut,
 } from "./callbackTemplates";
 import {
     SenpiWalletClient,
@@ -68,13 +68,13 @@ const ERC20_ABI = [
 
 /**
  * Checks the allowance of a token and approves spending if necessary
- * @param senpiUserId The ID of the Senpi user making the purchase
+ * @param senpiUserId The ID of the Moxie user making the purchase
  * @param walletAddress The address of the wallet to check allowance for
  * @param tokenAddress The address of the token to check allowance for
  * @param spenderAddress The address of the spender to check allowance for
  * @param amountInWEI The amount of tokens to check allowance for
  * @param provider The provider to use for the transaction
- * @param walletClient The Senpi wallet client to use for the transaction
+ * @param walletClient The Moxie wallet client to use for the transaction
  * @param callback The callback to use for the transaction
  */
 export async function checkAllowanceAndApproveSpendRequest(
@@ -162,10 +162,10 @@ export async function checkAllowanceAndApproveSpendRequest(
         const approveRequestInput: SenpiWalletSendTransactionInputType = {
             address: walletAddress,
             chainType: "ethereum",
-            caip2: "eip155:" + (process.env.CHAIN_ID || "8453"),
+            caip2: `eip155:${process.env.CHAIN_ID || "8453"}`,
             transaction: {
-                from: walletAddress,
-                to: tokenAddress,
+                from: walletAddress as `0x${string}`,
+                to: tokenAddress as `0x${string}`,
                 data: approveData,
                 maxFeePerGas: Number(maxFeePerGas),
                 maxPriorityFeePerGas: Number(maxPriorityFeePerGas),
@@ -181,16 +181,45 @@ export async function checkAllowanceAndApproveSpendRequest(
                     typeof value === "bigint" ? value.toString() : value
             )}`
         );
-        const approveResponse = await walletClient.sendTransaction(
-            process.env.CHAIN_ID || "8453",
-            {
-                fromAddress: walletAddress,
-                toAddress: tokenAddress,
-                data: approveData,
-                maxFeePerGas: Number(maxFeePerGas),
-                maxPriorityFeePerGas: Number(maxPriorityFeePerGas),
+        let approveResponse;
+        const MAX_RETRIES = 3;
+        let retryCount = 0;
+
+        while (retryCount < MAX_RETRIES) {
+            try {
+                approveResponse = await walletClient.sendTransaction(
+                    process.env.CHAIN_ID || "8453",
+                    {
+                        fromAddress: walletAddress,
+                        toAddress: tokenAddress,
+                        data: approveData,
+                        maxFeePerGas: Number(maxFeePerGas),
+                        maxPriorityFeePerGas: Number(maxPriorityFeePerGas),
+                    }
+                );
+                break; // Exit the loop if successful
+            } catch (error) {
+                retryCount++;
+                elizaLogger.warn(
+                    traceId,
+                    `[${senpiUserId}] [checkAllowanceAndApproveSpendRequest] Transaction attempt ${retryCount} failed: ${error.message}`
+                );
+                if (retryCount >= MAX_RETRIES) {
+                    elizaLogger.error(
+                        traceId,
+                        `[${senpiUserId}] [checkAllowanceAndApproveSpendRequest] [ERROR] Failed to send transaction after ${MAX_RETRIES} attempts`
+                    );
+                    await callback(
+                        approvalTransactionFailed(approveResponse.hash)
+                    );
+                    throw error; // Rethrow the error after all retries are exhausted
+                }
+                // Wait before retrying (exponential backoff)
+                await new Promise((resolve) =>
+                    setTimeout(resolve, 1000 * Math.pow(2, retryCount))
+                );
             }
-        );
+        }
         elizaLogger.debug(
             traceId,
             `[${senpiUserId}] [checkAllowanceAndApproveSpendRequest] approval txn_hash: ${JSON.stringify(approveResponse)}`
@@ -201,17 +230,41 @@ export async function checkAllowanceAndApproveSpendRequest(
         // check if the approve txn is success.
         if (approveResponse && approvalTxHash) {
             let receipt: ethers.providers.TransactionReceipt;
-            try {
-                receipt = await provider.waitForTransaction(
-                    approvalTxHash,
-                    1,
-                    TRANSACTION_RECEIPT_TIMEOUT
-                );
-            } catch (error) {
-                if (error.message.includes("timeout")) {
-                    throw new Error("Approval transaction timed out");
+            const MAX_RECEIPT_RETRIES = 3;
+            let receiptRetryCount = 0;
+
+            while (receiptRetryCount < MAX_RECEIPT_RETRIES) {
+                try {
+                    receipt = await provider.waitForTransaction(
+                        approvalTxHash,
+                        1,
+                        TRANSACTION_RECEIPT_TIMEOUT
+                    );
+                    break; // Exit the loop if successful
+                } catch (error) {
+                    receiptRetryCount++;
+                    elizaLogger.warn(
+                        traceId,
+                        `[${senpiUserId}] [checkAllowanceAndApproveSpendRequest] Transaction receipt attempt ${receiptRetryCount} failed: ${error.message}`
+                    );
+                    if (receiptRetryCount >= MAX_RECEIPT_RETRIES) {
+                        elizaLogger.error(
+                            traceId,
+                            `[${senpiUserId}] [checkAllowanceAndApproveSpendRequest] [ERROR] Failed to get transaction receipt after ${MAX_RECEIPT_RETRIES} attempts`
+                        );
+                        await callback(
+                            approvalTransactionTimedOut(approvalTxHash)
+                        );
+                        throw error; // Rethrow the error after all retries are exhausted
+                    }
+                    // Wait before retrying (exponential backoff)
+                    await new Promise((resolve) =>
+                        setTimeout(
+                            resolve,
+                            1000 * Math.pow(2, receiptRetryCount)
+                        )
+                    );
                 }
-                throw error;
             }
             elizaLogger.debug(
                 traceId,
