@@ -3,7 +3,6 @@ You are summarizing a Profit and loss - money earned or lost trading cryptocurre
 
 Most recent message: {{latestMessage}}
 Message history: {{conversation}}
-User/wallet: {{userOrWallet}}
 
 Step 1: Identify which type of query the question refers to. It might be about a user, wallet, token, user or wallet & a token, or overall. Based on this follow the instructions below.
 
