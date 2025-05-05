@@ -18,6 +18,7 @@ const client = new DuneClient(process.env.DUNE_API_KEY!);
  * @returns SQL query string for fetching PnL data
  */
 const BLACKLISTED_TOKEN_ADDRESSES = [
+  '0x0000000000000000000000000000000000000000',
   '0x4200000000000000000000000000000000000006',
   '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
   '0x50c5725949a6f0c72e6c4a641f24049a917db0cb',
@@ -42,7 +43,7 @@ export const preparePnlQuery = (pnlResponse: any) => {
   let selectFields = `moxie_user_id, token_address, profit_loss, token_sold_symbol, token_bought_symbol, total_sell_amount, total_buy_amount, total_sell_value_usd, total_buy_value_usd, buy_transaction_count, sell_transaction_count`;
 
   if (tokenAddresses?.length > 0) {
-    selectFields = `wallet_address, ${selectFields}`;
+    selectFields = `wallet_address, profit_loss, total_sell_amount, total_buy_amount, total_sell_value_usd, total_buy_value_usd, buy_transaction_count, sell_transaction_count`;
   }
 
   let query = `select ${selectFields} from dune.moxieprotocol.result_moxie_wallets`;
