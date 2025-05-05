@@ -43,7 +43,7 @@ export const preparePnlQuery = (pnlResponse: any) => {
   let selectFields = `moxie_user_id, token_address, profit_loss, token_sold_symbol, token_bought_symbol, total_sell_amount, total_buy_amount, total_sell_value_usd, total_buy_value_usd, buy_transaction_count, sell_transaction_count`;
 
   if (tokenAddresses?.length > 0) {
-    selectFields = `wallet_address, profit_loss, total_sell_amount, total_buy_amount, total_sell_value_usd, total_buy_value_usd, buy_transaction_count, sell_transaction_count`;
+    selectFields = `profit_loss, total_sell_amount, total_buy_amount, total_sell_value_usd, total_buy_value_usd, buy_transaction_count, sell_transaction_count`;
   }
 
   let query = `select ${selectFields} from dune.moxieprotocol.result_moxie_wallets`;
@@ -60,7 +60,7 @@ export const preparePnlQuery = (pnlResponse: any) => {
   if (moxieUserIds?.length > 0 && walletAddresses?.length > 0) {
     whereClauses.push(`moxie_user_id in (${moxieUserIds.map((id) => `'${id}'`).join(",")})`);
     whereClauses.push(`wallet_address in (${walletAddresses.map((address) => `${address}`).join(",")})`);
-    selectFields = `moxie_user_id, wallet_address, token_address, SUM(profit_loss) as total_profit_loss, MAX(token_sold_symbol) as token_sold_symbol, MAX(token_bought_symbol) as token_bought_symbol, SUM(total_sell_amount) as total_sell_amount, SUM(total_buy_amount) as total_buy_amount, SUM(total_sell_value_usd) as total_sell_value_usd, SUM(total_buy_value_usd) as total_buy_value_usd, SUM(buy_transaction_count) as buy_transaction_count, SUM(sell_transaction_count) as sell_transaction_count`;
+    selectFields = `moxie_user_id, token_address, SUM(profit_loss) as total_profit_loss, MAX(token_sold_symbol) as token_sold_symbol, MAX(token_bought_symbol) as token_bought_symbol, SUM(total_sell_amount) as total_sell_amount, SUM(total_buy_amount) as total_buy_amount, SUM(total_sell_value_usd) as total_sell_value_usd, SUM(total_buy_value_usd) as total_buy_value_usd, SUM(buy_transaction_count) as buy_transaction_count, SUM(sell_transaction_count) as sell_transaction_count`;
     query = `select ${selectFields} from dune.moxieprotocol.result_moxie_wallets`;
     groupByClauses.push(`token_address, moxie_user_id, wallet_address`);
     orderByClause = `total_profit_loss ${analysisType === "PROFIT" ? "desc" : "asc"}`;

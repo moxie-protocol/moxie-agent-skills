@@ -106,6 +106,7 @@ export const PnLAction = {
 
             let pnlDataTemplate = pnLTemplate.replace("{{latestMessage}}", latestMessage)
                 .replace("{{conversation}}", JSON.stringify(message.content.text))
+                .replace("{{criteria}}", JSON.stringify(pnlResponse.criteria))
                 .replace("{{pnlData}}", JSON.stringify(pnlData))
                 .replace("{{totalPnl}}", (moxieUserIds.length > 0 || walletAddresses.length > 0) ? totalPnl.toString() : "");
 
