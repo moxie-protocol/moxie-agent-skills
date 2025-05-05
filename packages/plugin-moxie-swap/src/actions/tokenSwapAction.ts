@@ -1989,7 +1989,7 @@ async function swap(
     elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [swap] 0x swap txnReceipt: ${JSON.stringify(txnReceipt)}`);
     if (txnReceipt.status == 1) {
 
-        if (buyTokenAddress !== ETH_ADDRESS && buyTokenAddress !== WETH_ADDRESS) {
+        if (buyTokenAddress.toLowerCase() !== ETH_ADDRESS.toLowerCase() && buyTokenAddress.toLowerCase() !== WETH_ADDRESS.toLowerCase()) {
             // decode the txn receipt to get the moxie purchased
             const transferDetails = await decodeTokenTransfer(traceId, moxieUserId, txnReceipt, buyTokenAddress, agentWalletAddress);
             elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [swap] 0x swap decodeTokenTransfer: ${JSON.stringify(transferDetails)}`);
