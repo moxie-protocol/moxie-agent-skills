@@ -20,26 +20,55 @@ export async function handleTransactionStatus(
 ): Promise<ethers.TransactionReceipt | null> {
     elizaLogger.debug(traceId,`[${moxieUserId}] [handleTransactionStatus] called with input details: [${txHash}]`);
     let txnReceipt: ethers.TransactionReceipt | null = null;
+    
+    const MAX_RETRIES = 3;
+    let retryCount = 0;
+    let lastError;
 
-    try {
-        txnReceipt = await provider.waitForTransaction(txHash, 1, TRANSACTION_RECEIPT_TIMEOUT);
-        if (!txnReceipt) {
-            elizaLogger.error(traceId,`[${moxieUserId}] [handleTransactionStatus] Transaction receipt timeout`);
-            return null;
-        }
+    while (retryCount < MAX_RETRIES) {
+        try {
+            txnReceipt = await provider.waitForTransaction(txHash, 1, TRANSACTION_RECEIPT_TIMEOUT);
+            
+            if (!txnReceipt) {
+                elizaLogger.error(traceId,`[${moxieUserId}] [handleTransactionStatus] Transaction receipt timeout`);
+                retryCount++;
+                
+                if (retryCount >= MAX_RETRIES) {
+                    elizaLogger.error(traceId,`[${moxieUserId}] [handleTransactionStatus] Max retries (${MAX_RETRIES}) reached for transaction receipt`);
+                    return null;
+                }
+                
+                elizaLogger.debug(traceId,`[${moxieUserId}] [handleTransactionStatus] Retry ${retryCount}/${MAX_RETRIES} for transaction ${txHash}`);
+                // Wait before retrying (exponential backoff)
+                await new Promise(resolve => setTimeout(resolve, 2000 * retryCount));
+                continue;
+            }
 
-        if (txnReceipt.status === 1) {
-            elizaLogger.debug(traceId,`[${moxieUserId}] [handleTransactionStatus] transaction successful: ${txHash}`);
-            return txnReceipt;
-        } else {
-            elizaLogger.error(traceId,`[${moxieUserId}] [handleTransactionStatus] transaction failed: ${txHash} with status: ${txnReceipt.status}`);
-            return null;
+            if (txnReceipt.status === 1) {
+                elizaLogger.debug(traceId,`[${moxieUserId}] [handleTransactionStatus] transaction successful: ${txHash}`);
+                return txnReceipt;
+            } else {
+                elizaLogger.error(traceId,`[${moxieUserId}] [handleTransactionStatus] transaction failed: ${txHash} with status: ${txnReceipt.status}`);
+                return txnReceipt;
+            }
+        } catch (error) {
+            lastError = error;
+            retryCount++;
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            elizaLogger.error(traceId,`[${moxieUserId}] [handleTransactionStatus] Error waiting for transaction receipt: ${errorMessage}`);
+            
+            if (retryCount >= MAX_RETRIES) {
+                elizaLogger.error(traceId,`[${moxieUserId}] [handleTransactionStatus] Max retries (${MAX_RETRIES}) reached after error: ${errorMessage}`);
+                return null;
+            }
+            
+            elizaLogger.debug(traceId,`[${moxieUserId}] [handleTransactionStatus] Retry ${retryCount}/${MAX_RETRIES} for transaction ${txHash}`);
+            // Wait before retrying (exponential backoff)
+            await new Promise(resolve => setTimeout(resolve, 2000 * retryCount));
         }
-    } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        elizaLogger.error(traceId,`[${moxieUserId}] [handleTransactionStatus] Error waiting for transaction receipt: ${errorMessage}`);
-        return null;
     }
+    
+    return null;
 }
 
 export function convert32BytesToAddress(hexString: string): string {
