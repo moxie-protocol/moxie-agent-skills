@@ -118,7 +118,7 @@ export const preparePnlQuery = (pnlResponse: any) => {
 export const fetchPnlData = async (query: string) => {
   let retries = 3;
   let lastError;
-
+  let start = new Date();
   while (retries > 0) {
     try {
       const result = await client.runSql({ query_sql: query });
@@ -126,7 +126,7 @@ export const fetchPnlData = async (query: string) => {
       const pnlData = result.result.rows as unknown as PnlData[];
 
       elizaLogger.debug(`[fetchPnlData] PnL data: ${pnlData.length} rows`);
-
+      elizaLogger.debug(`[fetchPnlData] time taken to fetch pnl data: ${new Date().getTime() - start.getTime()}ms`);
       return pnlData;
     } catch (error) {
       lastError = error;
@@ -161,7 +161,7 @@ export const fetchTotalPnl = async (pnlResponse: any) => {
   } = pnlResponse;
 
   let query = `select SUM(profit_loss) as total_profit_loss from dune.moxieprotocol.result_moxie_wallets`;
-
+  let start = new Date();
   if (walletAddresses?.length > 0 && moxieUserIds?.length > 0) {
     query += ` where wallet_address in (${walletAddresses.map((address) => `${address}`).join(",")}) and moxie_user_id in (${moxieUserIds.map((id) => `'${id}'`).join(",")})`;
   } else if (walletAddresses?.length > 0) {
@@ -174,6 +174,7 @@ export const fetchTotalPnl = async (pnlResponse: any) => {
     try {
       const result = await client.runSql({ query_sql: query });
       const totalPnl = result.result.rows[0].total_profit_loss;
+      elizaLogger.debug(`[fetchTotalPnl] time taken to fetch total pnl: ${new Date().getTime() - start.getTime()}ms`);
       return totalPnl as number;
     } catch (error) {
       lastError = error;
