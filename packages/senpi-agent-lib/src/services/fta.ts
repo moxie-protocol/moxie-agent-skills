@@ -25,7 +25,7 @@ export interface Fta {
     userFansSharePercentage: number;
     imageURL: string;
     identityType: string;
-    senpiUserId: string;
+    moxieUserId: string;
     isFeatured: boolean;
     reserveRatio: number;
     priceCurve: number;
@@ -33,7 +33,7 @@ export interface Fta {
 
 export interface FtaUserMapping {
     entitySymbol: string;
-    senpiUserId: string;
+    moxieUserId: string;
 }
 
 interface FtaResponse {
@@ -58,10 +58,10 @@ interface FtaUserMappingResponse {
     };
 }
 
-export async function getUserFtaData(senpiUserId: string): Promise<Fta> {
+export async function getUserFtaData(moxieUserId: string): Promise<Fta> {
     const query = `
         query GetFta {
-            GetFta(input: { senpi_user_id: "${senpiUserId}" }) {
+            GetFta(input: { moxie_user_id: "${moxieUserId}" }) {
                 id
                 entityId
                 entityType
@@ -86,7 +86,7 @@ export async function getUserFtaData(senpiUserId: string): Promise<Fta> {
                 userFansSharePercentage
                 imageURL
                 identityType
-                senpiUserId
+                moxieUserId
                 isFeatured
                 reserveRatio
                 priceCurve
@@ -143,7 +143,7 @@ export async function getFTABySymbol(symbol: string): Promise<Fta | null> {
                 userFansSharePercentage
                 imageURL
                 identityType
-                senpiUserId
+                moxieUserId
                 isFeatured
                 reserveRatio
                 priceCurve
@@ -195,7 +195,7 @@ export async function getFtaUserMapping(
                 }
             ) {
                 ftas {
-                    senpiUserId
+                    moxieUserId
                     entitySymbol
                 }
             }

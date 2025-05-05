@@ -4,7 +4,7 @@ export interface TokenAddresses {
 }
 
 export interface TokenHolderDuneResponse {
-    senpi_user_id: string;
+    moxie_user_id: string;
     token_address: string;
     total_balance: number;
     total_balance_in_usd?: number;

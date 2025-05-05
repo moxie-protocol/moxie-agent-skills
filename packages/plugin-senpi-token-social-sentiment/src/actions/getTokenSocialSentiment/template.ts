@@ -32,21 +32,21 @@ also extract the token symbol from the query.
 ## Output:
 {
     "socialPlatform": ["twitter", "farcaster"],
-    "tokenSymbol": "senpi"
+    "tokenSymbol": "moxie"
 }
 
 example 1:
 query: Show me social sentiment for $usdc
 output: {
     "socialPlatform": ["twitter", "farcaster"],
-    "tokenSymbol": "senpi"
+    "tokenSymbol": "moxie"
 }
 
 example 2:
 query: Show me twitter sentiment for $usdc
 output: {
     "socialPlatform": ["twitter"],
-    "tokenSymbol": "senpi"
+    "tokenSymbol": "moxie"
 }
 
 example 3:
@@ -56,7 +56,7 @@ recentMessages:
 - Show me farcaster sentiment for it
 output: {
     "socialPlatform": ["farcaster"],
-    "tokenSymbol": "senpi"
+    "tokenSymbol": "moxie"
 }
 
 example 4:

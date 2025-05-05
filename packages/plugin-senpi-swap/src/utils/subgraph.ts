@@ -43,7 +43,7 @@ export async function getSubjectTokenDetailsBySubjectAddress(
         name
         symbol
         decimals
-        currentPriceInSenpi
+        currentPriceInMoxie
         currentPriceInWeiInMoxie
         subject {
           id
@@ -103,7 +103,7 @@ export interface SubjectToken {
     name: string;
     symbol: string;
     decimals: number;
-    currentPriceInSenpi: string;
+    currentPriceInMoxie: string;
     currentPriceInWeiInMoxie: string;
     reserve: string;
     reserveRatio: string;
@@ -156,7 +156,7 @@ export async function getSubjectTokenDetailsBySubjectTokenAddresses(
                 symbol
                 decimals
                 reserve
-                currentPriceInSenpi
+                currentPriceInMoxie
                 currentPriceInWeiInMoxie
                 reserveRatio
                 totalSupply

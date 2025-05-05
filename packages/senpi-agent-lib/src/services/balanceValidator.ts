@@ -1,7 +1,7 @@
 import { elizaLogger } from "@senpi-ai/core";
 import { SenpiUser } from "./types";
 export interface GetPluginTokenGateInput {
-    currentUserSenpiId: string;
+    currentUserMoxieId: string;
     senpiIds: string[];
 }
 
@@ -9,11 +9,11 @@ export interface PluginToken {
     fanTokenSymbol: string;
     fanTokenName: string;
     requiredTokens: number;
-    priceOfTheTokenInSenpi: number;
-    currentUserSenpiId: string;
+    priceOfTheTokenInMoxie: number;
+    currentUserMoxieId: string;
     minTokenRequiredForCreator: number;
     currentBalance: number;
-    creatorSenpiId: string;
+    creatorMoxieId: string;
     requiredSenpiAmountInUSD: number;
 }
 
@@ -30,22 +30,22 @@ export async function fetchPluginTokenGate(
 ): Promise<PluginToken[]> {
     elizaLogger.info(
         "[fetchPluginTokenGate-TokenGate] fetching plugin token gate for user:",
-        input.currentUserSenpiId,
+        input.currentUserMoxieId,
         "with senpiIds:",
         input.senpiIds
     );
     const query = `
-        query GetPluginTokenGateData($currentUserSenpiId: String!, $usdcIds: [String!]!) {
-            PluginTokenGate(input: { currentUserSenpiId: $currentUserSenpiId, senpiIds: $usdcIds }) {
+        query GetPluginTokenGateData($currentUserMoxieId: String!, $usdcIds: [String!]!) {
+            PluginTokenGate(input: { currentUserMoxieId: $currentUserMoxieId, senpiIds: $usdcIds }) {
                 tokens {
                     fanTokenSymbol
                     fanTokenName
                     requiredTokens
-                    priceOfTheTokenInSenpi
-                    currentUserSenpiId
+                    priceOfTheTokenInMoxie
+                    currentUserMoxieId
                     minTokenRequiredForCreator
                     currentBalance
-                    creatorSenpiId
+                    creatorMoxieId
                     requiredSenpiAmountInUSD
                 }
             }
@@ -61,7 +61,7 @@ export async function fetchPluginTokenGate(
             body: JSON.stringify({
                 query,
                 variables: {
-                    currentUserSenpiId: input.currentUserSenpiId,
+                    currentUserMoxieId: input.currentUserMoxieId,
                     senpiIds: input.senpiIds,
                 },
             }),
@@ -74,7 +74,7 @@ export async function fetchPluginTokenGate(
                 "[fetchPluginTokenGate] no tokens found for the given requested senpiIds:",
                 input.senpiIds,
                 "for user:",
-                input.currentUserSenpiId
+                input.currentUserMoxieId
             );
             if (input.senpiIds.length > 0) {
                 throw new Error(
@@ -102,13 +102,13 @@ export async function validateSenpiUserTokens(
     if (requestedSenpiUserIds.length > 0) {
         try {
             const pluginTokenGateResponses = await fetchPluginTokenGate({
-                currentUserSenpiId: senpiUserInfo.id,
+                currentUserMoxieId: senpiUserInfo.id,
                 senpiIds: requestedSenpiUserIds,
             });
 
             for (const pluginTokenGate of pluginTokenGateResponses) {
                 if (pluginTokenGate.requiredTokens > 0) {
-                    textResponse += `User needs at least ${pluginTokenGate.requiredTokens} tokens to ask a question for @[${pluginTokenGate.fanTokenName}|${pluginTokenGate.creatorSenpiId}] \n`;
+                    textResponse += `User needs at least ${pluginTokenGate.requiredTokens} tokens to ask a question for @[${pluginTokenGate.fanTokenName}|${pluginTokenGate.creatorMoxieId}] \n`;
                 }
             }
         } catch (error) {
