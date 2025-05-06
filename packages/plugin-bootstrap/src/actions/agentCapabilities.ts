@@ -13,7 +13,7 @@ import {
 
 export const agentCapabilitiesTemplate = `
 <conversation_history>
-{{recentMessagesData}}
+{{recentMessages}}
 </conversation_history>
 
 Focus on the latest messages in the conversation history. And see if the user is asking about the capabilities of the agent.
