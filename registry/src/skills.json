@@ -658,5 +658,60 @@
             "Reticulating splines"
         ],
         "orderIndex": 6
+    },
+    {
+        "pluginId": "b7d89f23-1c35-4d78-9b44-7a3d2c79e8a9",
+        "name": "@moxie-protocol/plugin-profit-loss",
+        "displayName": "Profit and Loss",
+        "version": "0.1.0",
+        "author": null,
+        "description": "This action can summarize Profit & Loss for a user, wallet address, or token address. It shows the money earned or lost by the specified entity.",
+        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-profit-loss",
+        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-profit-loss/images/logo.svg",
+        "settings": {},
+        "capabilities": [
+            "Track PnL for any wallet address",
+            "Find most profitable traders for any token",
+            "Analyze profitable/loss making trades on Base",
+            "Get detailed trade history and performance metrics"
+        ],
+        "starterQuestions": [
+            {
+                "label": "What's my total PnL on Base?",
+                "value": "What's my total PnL on Base?"
+            },
+            {
+                "label": "Show me the most profitable $moxie traders",
+                "value": "Show me the most profitable $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] traders"
+            },
+            {
+                "label": "What's the PnL for @betashop.eth?",
+                "value": "What's the PnL for @[betashop.eth|M4]?"
+            },
+            {
+                "label": "Who are the top performing traders on Base today?",
+                "value": "Who are the top performing traders on Base today?"
+            }
+        ],
+        "mediaUrls": [
+            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-pnl-tracker/images/logo.svg"
+        ],
+        "actions": [
+            "PROFIT_LOSS"
+        ],
+        "isPremium": false,
+        "freeQueries": 5,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
+        "status": "ACTIVE",
+        "isDefault": false,
+        "loaders": [
+            "Analyzing trade history",
+            "Calculating PnL",
+            "Crunching numbers",
+            "Preparing performance metrics",
+            "Generating insights"
+        ],
+        "orderIndex": 12
     }
 ]
