@@ -666,8 +666,8 @@
         "version": "0.1.0",
         "author": null,
         "description": "This action can summarize Profit & Loss for a user, wallet address, or token address. It shows the money earned or lost by the specified entity.",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-profit-loss",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-profit-loss/images/logo.svg",
+        "githubUrl": "https://github.com/Senpi-ai/senpi-agent-skills/tree/main/packages/plugin-profit-loss",
+        "logoUrl": "https://raw.githubusercontent.com/Senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-profit-loss/images/logo.svg",
         "settings": {},
         "capabilities": [
             "Track PnL for any wallet address",
@@ -694,7 +694,7 @@
             }
         ],
         "mediaUrls": [
-            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-pnl-tracker/images/logo.svg"
+            "https://raw.githubusercontent.com/Senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-moxie-pnl-tracker/images/logo.svg"
         ],
         "actions": [
             "PROFIT_LOSS"

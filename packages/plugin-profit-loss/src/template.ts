@@ -1,4 +1,4 @@
-export const pnLTemplate = `
+export const pnlTemplate = `
 You are summarizing a Profit and loss - money earned or lost trading cryptocurrencies.
 
 Most recent message: {{latestMessage}}
@@ -22,7 +22,7 @@ Step 1: Identify which type of query the question refers to. It might be about a
 - Mention the token name in the introduction, skip the token name/symbol from the table. Total PnL is for top 20 wallets.
 
 #### Required Fields in Response:
-- Wallet Address (only for token PnL)
+- User Name (only for token PnL)
 - Token Name/Symbol
 - Total Profit/Loss
 - Total Buy Amount (USD)
