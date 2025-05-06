@@ -1,4 +1,4 @@
-import { UUID } from "@moxie-protocol/core";
+import { UUID } from "@senpi-ai/core";
 
 export interface PostContent {
     text: string;
@@ -11,4 +11,4 @@ export interface PostResponse {
     success: boolean;
     postId?: string;
     error?: string;
-} 
+}

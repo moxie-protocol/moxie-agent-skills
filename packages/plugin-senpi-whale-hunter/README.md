@@ -1,0 +1,1 @@
+# Senpi Whale Hunter plugin

@@ -1,4 +1,4 @@
-import { IAgentRuntime, Memory, Provider, State } from "@moxie-protocol/core";
+import { IAgentRuntime, Memory, Provider, State } from "@senpi-ai/core";
 
 const boredomLevels = [
     {

@@ -1,4 +1,4 @@
-import type { UUID, Character } from "@moxie-protocol/core";
+import type { UUID, Character } from "@senpi-ai/core";
 
 const BASE_URL = "http://localhost:3000";
 

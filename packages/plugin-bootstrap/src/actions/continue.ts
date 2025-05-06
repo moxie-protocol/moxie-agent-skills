@@ -1,6 +1,6 @@
-import { composeContext, elizaLogger } from "@moxie-protocol/core";
-import { generateMessageResponse, generateTrueOrFalse } from "@moxie-protocol/core";
-import { booleanFooter, messageCompletionFooter } from "@moxie-protocol/core";
+import { composeContext, elizaLogger } from "@senpi-ai/core";
+import { generateMessageResponse, generateTrueOrFalse } from "@senpi-ai/core";
+import { booleanFooter, messageCompletionFooter } from "@senpi-ai/core";
 import {
     Action,
     ActionExample,
@@ -10,7 +10,7 @@ import {
     Memory,
     ModelClass,
     State,
-} from "@moxie-protocol/core"; 
+} from "@senpi-ai/core";
 
 const maxContinuesInARow = 3;
 

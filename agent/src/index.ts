@@ -18,15 +18,15 @@ import {
     settings,
     stringToUuid,
     validateCharacterConfig,
-} from "@moxie-protocol/core";
-import { MoxieClient } from "@moxie-protocol/client-moxie";
+} from "@senpi-ai/core";
+import { SenpiClient } from "@senpi-ai/client-senpi";
 import fs from "node:fs";
 import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import yargs from "yargs";
-import samplePlugin from "@moxie-protocol/plugin-sample";
-import degenfansAlfaFrensPlugin from  "@moxie-protocol/plugin-degenfans-alfafrens";
+import samplePlugin from "@senpi-ai/plugin-sample";
+import degenfansAlfaFrensPlugin from "@senpi-ai/plugin-degenfans-alfafrens";
 import bootstrapPlugin from "@elizaos/plugin-bootstrap";
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -244,7 +244,7 @@ async function handlePluginImporting(plugins: string[]) {
                     const importedPlugin = await import(plugin);
                     const functionName =
                         plugin
-                            .replace("@moxie-protocol/plugin-", "")
+                            .replace("@senpi-ai/plugin-", "")
                             .replace(/-./g, (x) => x[1].toUpperCase()) +
                         "Plugin"; // Assumes plugin function is camelCased with Plugin suffix
                     return (
@@ -523,7 +523,7 @@ function initializeCache(character: Character, db?: IDatabaseCacheAdapter) {
 
 async function startAgent(
     character: Character,
-    moxieClient: MoxieClient
+    senpiClient: SenpiClient
 ): Promise<AgentRuntime> {
     let db: IDatabaseAdapter & IDatabaseCacheAdapter;
     try {
@@ -557,7 +557,7 @@ async function startAgent(
         runtime.clients = await initializeClients(character, runtime);
 
         // add to container
-        moxieClient.registerAgent(runtime);
+        senpiClient.registerAgent(runtime);
 
         // report to console
         elizaLogger.debug(`Started ${character.name} as ${runtime.agentId}`);
@@ -607,7 +607,7 @@ const startAgents = async () => {
 
     await db.init();
 
-    const moxieClient = new MoxieClient(db);
+    const senpiClient = new SenpiClient(db);
     let serverPort = Number.parseInt(settings.SERVER_PORT || "3000");
     const args = parseArguments();
     const charactersArg = args.characters || args.character;
@@ -619,7 +619,7 @@ const startAgents = async () => {
 
     try {
         for (const character of characters) {
-            await startAgent(character, moxieClient);
+            await startAgent(character, senpiClient);
         }
     } catch (error) {
         elizaLogger.error("Error starting agents:", error);
@@ -634,15 +634,15 @@ const startAgents = async () => {
     }
 
     // upload some agent functionality into directClient
-    moxieClient.startAgent = async (character) => {
+    senpiClient.startAgent = async (character) => {
         // Handle plugins
         character.plugins = await handlePluginImporting(character.plugins);
 
         // wrap it so we don't have to inject directClient later
-        return startAgent(character, moxieClient);
+        return startAgent(character, senpiClient);
     };
 
-    moxieClient.start(serverPort);
+    senpiClient.start(serverPort);
 
     if (serverPort !== Number.parseInt(settings.SERVER_PORT || "3000")) {
         elizaLogger.log(`Server started on alternate port ${serverPort}`);

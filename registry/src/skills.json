@@ -1,13 +1,13 @@
 [
     {
         "pluginId": "a1aa9887-fc11-5f54-aa62-235c7536ba67",
-        "name": "@moxie-protocol/plugin-moxie-token-details",
+        "name": "@senpi-ai/plugin-senpi-token-details",
         "displayName": "Base Token Details",
         "version": "0.1.8+build.1",
         "author": null,
         "description": "Enables your agent to fetch token details for any token on Base",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-details",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-token-details/images/logo.svg",
+        "githubUrl": "https://github.com/senpi-ai/senpi-agent-skills/tree/main/packages/plugin-senpi-token-details",
+        "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-senpi-token-details/images/logo.svg",
         "settings": {},
         "capabilities": ["Token prices", "Market caps", "Liquidity", "Holders"],
         "starterQuestions": [
@@ -21,7 +21,7 @@
             }
         ],
         "mediaUrls": [
-            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-token-details/images/logo.svg"
+            "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-senpi-token-details/images/logo.svg"
         ],
         "actions": [
             "TOKEN_DETAILS",
@@ -59,13 +59,13 @@
     },
     {
         "pluginId": "927fb66c-2ebc-48e1-82a8-907c6e54e379",
-        "name": "@moxie-protocol/plugin-moxie-token-transfer",
+        "name": "@senpi-ai/plugin-senpi-token-transfer",
         "displayName": "Send Tokens",
         "version": "0.1.8+build.1",
         "author": null,
         "description": "Enables your agent to send tokens from your agent wallet",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-token-transfer",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-token-transfer/images/logo.svg",
+        "githubUrl": "https://github.com/senpi-ai/senpi-agent-skills/tree/main/packages/plugin-senpi-token-transfer",
+        "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-senpi-token-transfer/images/logo.svg",
         "settings": {},
         "capabilities": [
             "Send tokens to yourself",
@@ -83,7 +83,7 @@
             }
         ],
         "mediaUrls": [
-            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-token-transfer/images/logo.svg"
+            "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-senpi-token-transfer/images/logo.svg"
         ],
         "actions": [
             "TOKEN_TRANSFERS",
@@ -115,13 +115,13 @@
     },
     {
         "pluginId": "5d3b79e2-ac61-0bb6-a3ba-b0e00b943614",
-        "name": "@moxie-protocol/plugin-moxie-social-alpha",
+        "name": "@senpi-ai/plugin-senpi-social-alpha",
         "displayName": "Social Alpha",
         "version": "0.1.8+build.1",
         "author": null,
         "description": "In-depth analysis on Base users, including trades, portfolios, and posts on Farcaster and X.",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-social-alpha",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-social-alpha/images/logo.svg",
+        "githubUrl": "https://github.com/senpi-ai/senpi-agent-skills/tree/main/packages/plugin-senpi-social-alpha",
+        "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-senpi-social-alpha/images/logo.svg",
         "settings": {},
         "capabilities": [
             "AI Intelligence across onchain activity and social media",
@@ -149,7 +149,7 @@
             }
         ],
         "mediaUrls": [
-            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-social-alpha/images/logo.svg"
+            "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-senpi-social-alpha/images/logo.svg"
         ],
         "actions": [
             "TWEET_SUMMARY",
@@ -195,13 +195,13 @@
     },
     {
         "pluginId": "b5622f90-987e-51d1-bea9-5b1471bb9379",
-        "name": "@moxie-protocol/plugin-moxie-swap",
+        "name": "@senpi-ai/plugin-senpi-swap",
         "displayName": "Trade",
         "version": "0.1.8+build.1",
         "author": null,
         "description": "Enables your agent to trade and swap for you onchain using your Agent Wallet",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-swap",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-swap/images/logo.svg",
+        "githubUrl": "https://github.com/senpi-ai/senpi-agent-skills/tree/main/packages/plugin-senpi-swap",
+        "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-senpi-swap/images/logo.svg",
         "settings": {},
         "capabilities": [
             "Swap any token on Base. 💡Pro Tip: use “$” to auto-complete token names",
@@ -222,7 +222,7 @@
             }
         ],
         "mediaUrls": [
-            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-swap/images/logo.svg"
+            "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-senpi-swap/images/logo.svg"
         ],
         "actions": [
             "SWAP_TOKENS",
@@ -251,13 +251,13 @@
     },
     {
         "pluginId": "0ad0731e-698b-04bf-abeb-5d29cc36759f",
-        "name": "@moxie-protocol/plugin-moxie-balance",
+        "name": "@senpi-ai/plugin-senpi-balance",
         "displayName": "Portfolios",
         "version": "0.1.8+build.1",
         "author": null,
-        "description": "Enables your agent to fetch portfolio details for thousands of wallets indexed by Moxie",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-balance",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-balance/images/logo.svg",
+        "description": "Enables your agent to fetch portfolio details for thousands of wallets indexed by Senpi",
+        "githubUrl": "https://github.com/senpi-ai/senpi-agent-skills/tree/main/packages/plugin-senpi-balance",
+        "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-senpi-balance/images/logo.svg",
         "settings": {},
         "capabilities": [
             "Analyze my portfolio",
@@ -279,7 +279,7 @@
             }
         ],
         "mediaUrls": [
-            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-balance/images/logo.svg"
+            "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-senpi-balance/images/logo.svg"
         ],
         "actions": [
             "PORTFOLIO",
@@ -319,7 +319,7 @@
     },
     {
         "pluginId": "a8c0c53a-e4e5-0848-b69b-a17af97d64dd",
-        "name": "@moxie-protocol/plugin-moxie-whale-hunter",
+        "name": "@senpi-ai/plugin-senpi-whale-hunter",
         "displayName": "Base Whale Hunter",
         "version": "0.1.8+build.1",
         "author": null,
@@ -351,7 +351,7 @@
             }
         ],
         "mediaUrls": [
-            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-whale-hunter/images/logo.svg"
+            "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-senpi-whale-hunter/images/logo.svg"
         ],
         "actions": [
             "TOP_TRADERS",
@@ -378,13 +378,13 @@
     },
     {
         "pluginId": "36c9a919-5a55-4645-9008-cfd32ec4b5a2",
-        "name": "@moxie-protocol/plugin-moxie-limit-order",
+        "name": "@senpi-ai/plugin-senpi-limit-order",
         "displayName": "Limit Orders",
         "version": "0.1.8+build.1",
         "author": null,
         "description": "Enables your agent to buy or sell tokens for you based on limit conditions.",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-limit-order",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-limit-order/images/logo.svg",
+        "githubUrl": "https://github.com/senpi-ai/senpi-agent-skills/tree/main/packages/plugin-senpi-limit-order",
+        "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-senpi-limit-order/images/logo.svg",
         "settings": {},
         "capabilities": [
             "Buy on dip — buy a token when the price drops",
@@ -393,12 +393,12 @@
         ],
         "starterQuestions": [
             {
-                "label": "Buy me $25 worth of $moxie if the price dips by 5%",
-                "value": "Buy me $25 worth of $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] if the price dips by 5%"
+                "label": "Buy me $25 worth of $usdc if the price dips by 5%",
+                "value": "Buy me $25 worth of $[USDC|0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913] if the price dips by 5%"
             },
             {
-                "label": "Buy $25 worth of $moxie if the price increases by 10%",
-                "value": "Buy $25 worth of $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] if the price increases by 10%"
+                "label": "Buy $25 worth of $usdc if the price increases by 10%",
+                "value": "Buy $25 worth of $[USDC|0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913] if the price increases by 10%"
             },
             {
                 "label": "Sell 10% of my $BNKR if the price increases by 10%",
@@ -406,7 +406,7 @@
             }
         ],
         "mediaUrls": [
-            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-moxie-limit-order/images/logo.svg"
+            "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-senpi-limit-order/images/logo.svg"
         ],
         "actions": ["LIMIT_ORDERS"],
         "isPremium": false,
@@ -425,13 +425,13 @@
     },
     {
         "pluginId": "0ad0731e-698b-04bf-abeb-5d29cc36759d",
-        "name": "@moxie-protocol/plugin-token-social-sentiment",
+        "name": "@senpi-ai/plugin-token-social-sentiment",
         "displayName": "Token Sentiment",
         "version": "0.1.8+build.1",
         "author": null,
         "description": "Analyze token sentiments on X and Farcaster!",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-token-social-sentiment",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/e9ac0912aba19398350aeaa63006211f0ccca403/packages/plugin-moxie-token-social-sentiment/images/logo.svg",
+        "githubUrl": "https://github.com/senpi-ai/senpi-agent-skills/tree/main/packages/plugin-token-social-sentiment",
+        "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/e9ac0912aba19398350aeaa63006211f0ccca403/packages/plugin-senpi-token-social-sentiment/images/logo.svg",
         "settings": {},
         "capabilities": ["Analyze token sentiments on X and Farcaster"],
         "starterQuestions": [
@@ -449,7 +449,7 @@
             }
         ],
         "mediaUrls": [
-            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-token-social-sentiment/images/logo.svg"
+            "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/sharathkrml-patch-2/packages/plugin-token-social-sentiment/images/logo.svg"
         ],
         "actions": ["TOKEN_SOCIAL_SENTIMENT"],
         "isPremium": false,
@@ -468,13 +468,13 @@
     },
     {
         "pluginId": "f65a02f3-4bf2-436d-be50-34e7d33fd293",
-        "name": "@moxie-protocol/plugin-moxie-autonomous-trading",
+        "name": "@senpi-ai/plugin-senpi-autonomous-trading",
         "displayName": "Autonomous Trading",
         "version": "0.1.8+build.1",
         "author": "Senpi",
         "description": "Have Senpi automatically buy and sell tokens for you when specific conditions are met!",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-autonomous-trading",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/feat/trading-automations/packages/plugin-moxie-autonomous-trading/images/logo.svg",
+        "githubUrl": "https://github.com/senpi-ai/senpi-agent-skills/tree/main/packages/plugin-senpi-autonomous-trading",
+        "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/feat/trading-automations/packages/plugin-senpi-autonomous-trading/images/logo.svg",
         "settings": {},
         "capabilities": [
             "Copy Trade specific user(s)",
@@ -505,7 +505,7 @@
             }
         ],
         "mediaUrls": [
-            "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/feat/trading-automations/packages/plugin-moxie-autonomous-trading/images/logo.svg"
+            "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/feat/trading-automations/packages/plugin-senpi-autonomous-trading/images/logo.svg"
         ],
         "actions": [
             "AUTONOMOUS_TRADING",
@@ -531,16 +531,16 @@
             "Executing with quiet precision"
         ],
         "orderIndex": 0
-    }, 
+    },
     {
         "pluginId": "79449cd9-0590-4ccc-9d9f-12f99438c17b",
-        "name": "@moxie-protocol/plugin-degenfans-alfafrens",
+        "name": "@senpi-ai/plugin-degenfans-alfafrens",
         "displayName": "DegenFans AlfaFrens",
         "version": "0.0.2",
         "author": "DegenFans",
         "description": "Enables your agent to recommend staking options for AlfaFrens channels",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-degenfans-alfafrens",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/plugin-degenfans-alfafrens/images/logo.png",
+        "githubUrl": "https://github.com/senpi-ai/senpi-agent-skills/tree/main/packages/plugin-degenfans-alfafrens",
+        "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-degenfans-alfafrens/images/logo.png",
         "settings": {},
         "capabilities": [
             "show the best staking options for a given staking amount"
@@ -590,15 +590,19 @@
     },
     {
         "pluginId": "3d5e16f1-40e0-5df0-89c0-b2216bfa8850",
-        "name": "@moxie-protocol/plugin-moxie-groups",
+        "name": "@senpi-ai/plugin-senpi-groups",
         "displayName": "Senpi Groups",
         "version": "0.1.8+build.1",
         "author": "Senpi",
         "description": "Easily add any Base users to a group, which can then be used for copy trading and other features.",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-groups",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/feat/trading-automations/packages/plugin-moxie-groups/images/logo.svg",
+        "githubUrl": "https://github.com/senpi-ai/senpi-agent-skills/tree/main/packages/plugin-senpi-groups",
+        "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/feat/trading-automations/packages/plugin-senpi-groups/images/logo.svg",
         "settings": {},
-        "capabilities": ["Create groups", "Add users to groups (This can be done by asking Senpi or on the Groups page.)", "Add all to a group. (Example: (a) ask Senpi for the top holders of a token e.g. $zora, (b) after Senpi returns the results, ask Senpi to add all users to your Zora group.)"],
+        "capabilities": [
+            "Create groups",
+            "Add users to groups (This can be done by asking Senpi or on the Groups page.)",
+            "Add all to a group. (Example: (a) ask Senpi for the top holders of a token e.g. $zora, (b) after Senpi returns the results, ask Senpi to add all users to your Zora group.)"
+        ],
         "starterQuestions": [
             {
                 "label": "Create the [replace with group name] group",
@@ -623,7 +627,7 @@
         "skillCoinAddress": "",
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
-        "isDefault": true, 
+        "isDefault": true,
         "loaders": [
             "Establishing precision",
             "Opening the circle",
@@ -634,18 +638,19 @@
     },
     {
         "pluginId": "b30be45e-ff5a-4ef9-9674-7e27bdc8d1d8",
-        "name": "@moxie-protocol/plugin-senpi-sharing",
+        "name": "@senpi-ai/plugin-senpi-sharing",
         "displayName": "Cast on Farcaster",
         "version": "0.1.0",
         "author": "Senpi",
         "description": "Have Senpi create casts for you and post them on Farcaster!",
-        "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-senpi-sharing",
-        "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/feat/trading-automations/packages/plugin-senpi-sharing/images/logo.svg",
+        "githubUrl": "https://github.com/senpi-ai/senpi-agent-skills/tree/main/packages/plugin-senpi-sharing",
+        "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/feat/trading-automations/packages/plugin-senpi-sharing/images/logo.svg",
         "settings": {},
-        "capabilities": ["Tap the Farcaster icon under any Senpi response to have Senpi create casts for you", "Tap “Cast It!” to post the response on Farcaster! "],
-        "starterQuestions": [
-         
+        "capabilities": [
+            "Tap the Farcaster icon under any Senpi response to have Senpi create casts for you",
+            "Tap “Cast It!” to post the response on Farcaster! "
         ],
+        "starterQuestions": [],
         "mediaUrls": [""],
         "actions": ["POST_CONTENT"],
         "isPremium": false,
@@ -654,9 +659,7 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": true,
-        "loaders": [
-            "Reticulating splines"
-        ],
+        "loaders": ["Reticulating splines"],
         "orderIndex": 6
     }
 ]

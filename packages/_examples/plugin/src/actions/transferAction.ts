@@ -9,8 +9,8 @@ import {
     composeContext,
     generateObject,
     ModelClass,
-} from "@moxie-protocol/core";
-import { MoxieWalletClient } from "@moxie-protocol/moxie-agent-lib/src/wallet";
+} from "@senpi-ai/core";
+import { SenpiWalletClient } from "@senpi-ai/senpi-agent-lib/src/wallet";
 import { transferEthTemplate } from "../templates";
 import { TransferEthSchema } from "../types";
 
@@ -106,7 +106,7 @@ export const transferAction: Action = {
             elizaLogger.log(
                 `Transfering ${formattedValue} wei to address ${toAddress}...`
             );
-            const wallet = state.moxieWalletClient as MoxieWalletClient;
+            const wallet = state.senpiWalletClient as SenpiWalletClient;
 
             const { hash } = await wallet.sendTransaction("8543", {
                 toAddress,

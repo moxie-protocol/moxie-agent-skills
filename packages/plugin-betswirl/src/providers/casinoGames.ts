@@ -5,7 +5,7 @@ import {
     IAgentRuntime,
     Memory,
     State,
-} from "@moxie-protocol/core";
+} from "@senpi-ai/core";
 import {
     type CasinoChainId,
     getGamePausedFunctionData,

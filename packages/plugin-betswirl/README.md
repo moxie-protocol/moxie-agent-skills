@@ -1,12 +1,12 @@
-# BetSwirl Plugin for Moxie
+# BetSwirl Plugin for Senpi
 
 ## Overview
 
-The BetSwirl plugin is designed to integrate with the [Moxie Protocol](https://moxie.xyz) to provide betting functionalities of the [BetSwirl](https://www.betswirl.com) platform. This plugin allows **Moxie agents to place bets** on various games and **retrieve bets** information using predefined actions.
+The BetSwirl plugin is designed to integrate with the [Senpi AI](https://senpi.ai) to provide betting functionalities of the [BetSwirl](https://www.betswirl.com) platform. This plugin allows **Senpi agents to place bets** on various games and **retrieve bets** information using predefined actions.
 
 ## Description
 
-The BetSwirl plugin offers a seamless way to interact with the BetSwirl betting platform through the Moxie Protocol. It includes actions for placing bets on games and retrieving bets information. The plugin ensures that all interactions are validated and processed securely, providing agents with a reliable betting experience.
+The BetSwirl plugin offers a seamless way to interact with the BetSwirl betting platform through the Senpi AI. It includes actions for placing bets on games and retrieving bets information. The plugin ensures that all interactions are validated and processed securely, providing agents with a reliable betting experience.
 
 ## Actions
 
@@ -41,6 +41,7 @@ The `diceAction` allows agents to place a bet on a [Dice](https://www.betswirl.c
 The `getBetsAction` allows agents to retrieve a list of bets placed, a specific bettor on a particular game could be optionally provided. Users can specify the bettor's address, the game type, and the token address. The action fetches the bet information from the BetSwirl platform and returns a formatted list of bets.
 
 **Example Usage:**
+
 - `Get bets` will show the agent's last bets.
 - `Get coin-toss bets of 0x057BcBF736DADD774A8A45A185c1697F4cF7517D` will show the last Coin Toss bets of the provided address.
 

@@ -1,7 +1,7 @@
-import { composeContext } from "@moxie-protocol/core";
-import { generateText } from "@moxie-protocol/core";
-import { getGoals } from "@moxie-protocol/core";
-import { parseJsonArrayFromText } from "@moxie-protocol/core";
+import { composeContext } from "@senpi-ai/core";
+import { generateText } from "@senpi-ai/core";
+import { getGoals } from "@senpi-ai/core";
+import { parseJsonArrayFromText } from "@senpi-ai/core";
 import {
     IAgentRuntime,
     Memory,
@@ -10,7 +10,7 @@ import {
     type Goal,
     type State,
     Evaluator,
-} from "@moxie-protocol/core";
+} from "@senpi-ai/core";
 
 const goalsTemplate = `TASK: Update Goal
 Analyze the conversation and update the status of the goals based on the new information provided.

@@ -1,4 +1,4 @@
-## Steps for local setup & run moxie-agent-skills
+## Steps for local setup & run senpi-agent-skills
 
 1. Need node Node.js 23+
 2. pnpm 9+
@@ -6,15 +6,15 @@
     ```bash
     pnpm env use --global 23.3.0
     ```
-4. git clone git@github.com:moxie-protocol/moxie-agent-skills.git
-5. cd moxie-agent-skills
+4. git clone git@github.com:senpi-ai/senpi-agent-skills.git
+5. cd senpi-agent-skills
 6. Create a new branch from `main`
     ```sh
     git checkout -b <new-branch>
     ```
 7. `pnpm install --no-frozen-lockfile`
 8. `pnpm build`
-9. Setup .env file. By default, the Moxie Character uses OpenAI model thus need OpenAI API key
+9. Setup .env file. By default, the Senpi Character uses OpenAI model thus need OpenAI API key
 10. Run agent `pnpm start`
 11. Run client `pnpm start:client`
 

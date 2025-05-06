@@ -1,4 +1,4 @@
-# @moxie-protocol/plugin-senpi-sharing
+# @senpi-ai/plugin-senpi-sharing
 
 A plugin for creating and sharing summarized content across social platforms.
 
@@ -6,4 +6,4 @@ A plugin for creating and sharing summarized content across social platforms.
 
 This plugin provides the ability to create social media-ready content from conversations and messages, with automatic formatting and optimization for different platforms.
 
-## Installation 
+## Installation

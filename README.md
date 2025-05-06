@@ -1,5 +1,5 @@
 <div align="center">
-<a align="center" href="https://moxie.xyz" target="_blank">
+<a align="center" href="https://senpi.ai" target="_blank">
     <img src="./assets/logo.avif" alt="code snippets" height=50/>
   </a>
   <h1 align="center">Senpi Eliza AI Skills Framework</h1>
@@ -12,11 +12,11 @@
 
 - [Table of Contents](#table-of-contents)
 - [🚀 Quick Start](#-quick-start)
-  - [Prerequisites](#prerequisites)
-  - [Get Started](#get-started)
-  - [Create Your First Skills](#create-your-first-skills)
-  - [General Guidelines For Skills Development](#general-guidelines-for-skills-development)
-  - [Register Your Skills to Senpi](#register-your-skills-to-senpi)
+    - [Prerequisites](#prerequisites)
+    - [Get Started](#get-started)
+    - [Create Your First Skills](#create-your-first-skills)
+    - [General Guidelines For Skills Development](#general-guidelines-for-skills-development)
+    - [Register Your Skills to Senpi](#register-your-skills-to-senpi)
 - [💬 Community \& Contact](#-community--contact)
 - [👥 Contributors](#-contributors)
 
@@ -34,7 +34,7 @@ First, fork the repository and then clone it locally to your machine.
 Once you cloned the repository, you can setup your environment with the following scripts:
 
 ```bash
-cd moxie-agent-skills
+cd senpi-agent-skills
 cp .env.example .env
 pnpm install --no-frozen-lockfile && pnpm run && pnpm start
 ```
@@ -62,7 +62,7 @@ Then, using the template under the `packages/_examples/plugin` folder, you can c
 pnpm create:skills plugin-<skills-name>
 ```
 
-To learn more on how to create your first skill, you can follow this tutorial [here](https://developer.moxie.xyz/creator-agents-and-skills-marketplace/quickstart/create-your-first-skill).
+To learn more on how to create your first skill, you can follow this tutorial [here](https://developer.senpi.ai/creator-agents-and-skills-marketplace/quickstart/create-your-first-skill).
 
 For further customization, you can refer to the Eliza docs [here](https://elizaos.github.io/eliza/docs/packages/plugins/#available-plugins) as AI Agent Skills are simply Eliza Plugins with additional functionalities.
 
@@ -73,7 +73,7 @@ For further customization, you can refer to the Eliza docs [here](https://elizao
 
 ```json
 {
-    "name": "@moxie-protocol/plugin-<skills-name>",
+    "name": "@senpi-ai/plugin-<skills-name>",
     "version": "0.0.1"
 }
 ```
@@ -116,15 +116,15 @@ interface Skills {
 
 2.  If your AI Agent Skill require environment variable for production purpose, then fill in [this form](https://forms.gle/8hzDyCVKKLs4MkTEA) to request submission. The Senpi team shall directly reach out to you either through **Email** ([support@airstack.xyz](mailto:support@airstack.xyz)) or **Farcaster** (group chat) for submission.
 
-3.  Lastly, commit all the changes you made on your branches and create a new [PR](https://github.com/moxie-protocol/moxie-agent-skills/pulls) to the repository's `main` branch. <br /><br />Before requesting for review, make sure that you have fulfilled all the requirements in the [pre-launch checklist](./PRELAUNCH_CHECKLIST.md).<br/><br />The Senpi team will review the newly created AI Agent Skills and once merged, your Skills will automatically be registered to the Skills Marketplace where it's accessible for Senpi users to use.
+3.  Lastly, commit all the changes you made on your branches and create a new [PR](https://github.com/senpi-ai/senpi-agent-skills/pulls) to the repository's `main` branch. <br /><br />Before requesting for review, make sure that you have fulfilled all the requirements in the [pre-launch checklist](./PRELAUNCH_CHECKLIST.md).<br/><br />The Senpi team will review the newly created AI Agent Skills and once merged, your Skills will automatically be registered to the Skills Marketplace where it's accessible for Senpi users to use.
 
 ## 💬 Community & Contact
 
-- [GitHub Issues](https://github.com/moxie-protocol/moxie-agent-skills/issues). Best for: bugs you encounter when developing new AI Agent Skills, and feature proposals.
+- [GitHub Issues](https://github.com/senpi-ai/senpi-agent-skills/issues). Best for: bugs you encounter when developing new AI Agent Skills, and feature proposals.
 - [Telegram](https://t.me/+QVjX1VPh3SpmNjMx). Best for: sharing your AI Agent Skills and hanging out with the Senpi Developer Community.
 
 ## 👥 Contributors
 
-<a href="https://github.com/moxie-protocol/moxie-agent-skills/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=moxie-protocol/moxie-agent-skills" />
+<a href="https://github.com/senpi-ai/senpi-agent-skills/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=senpi-ai/senpi-agent-skills" />
 </a>

@@ -11,8 +11,8 @@ import {
     composeContext,
     generateObject,
     ModelClass,
-} from "@moxie-protocol/core";
-import { MoxieWalletClient } from "@moxie-protocol/moxie-agent-lib/src/wallet";
+} from "@senpi-ai/core";
+import { SenpiWalletClient } from "@senpi-ai/senpi-agent-lib/src/wallet";
 import {
     CASINO_GAME_TYPE,
     CoinToss,
@@ -28,7 +28,7 @@ import {
     getBet,
     getBetAmountInWei,
 } from "../utils/betswirl";
-import { formatTokenForMoxieTerminal } from "../utils/moxie";
+import { formatTokenForSenpiTerminal } from "../utils/senpi";
 
 export const CoinTossBetParameters = z.object({
     face: z
@@ -308,7 +308,7 @@ export const coinTossAction: Action = {
             elizaLogger.log("Starting COIN_TOSS handler...");
 
             // Validate the chain
-            const wallet = state.moxieWalletClient as MoxieWalletClient;
+            const wallet = state.senpiWalletClient as SenpiWalletClient;
             const chainId = await getChainIdFromWallet();
 
             // Initialize or update state
@@ -351,7 +351,7 @@ export const coinTossAction: Action = {
 
             // Validate the bet amount
             const betAmountInWei = getBetAmountInWei(betAmount, selectedToken);
-            const tokenForMoxieTerminal = formatTokenForMoxieTerminal(
+            const tokenForSenpiTerminal = formatTokenForSenpiTerminal(
                 chainId,
                 selectedToken
             );
@@ -372,7 +372,7 @@ export const coinTossAction: Action = {
             }
 
             await callback({
-                text: `Betting on ${face} with ${betAmount} ${tokenForMoxieTerminal}...`,
+                text: `Betting on ${face} with ${betAmount} ${tokenForSenpiTerminal}...`,
             });
 
             elizaLogger.log(
@@ -405,7 +405,7 @@ export const coinTossAction: Action = {
             const resolutionMessage = `
 You **${bet.isWin ? "Won" : "Lost"} ${bet.isWin ? `💰 ${bet.formattedPayoutMultiplier}x` : "💥"}**,
 Rolled face: ${bet.decodedRolled}
-Payout: [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) ${tokenForMoxieTerminal}
+Payout: [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) ${tokenForSenpiTerminal}
 
 [🔗 Go to more details](https://www.betswirl.com/${slugById[chainId]}/casino/${CASINO_GAME_TYPE.COINTOSS}/${bet.id})`;
 

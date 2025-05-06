@@ -1,7 +1,7 @@
 {
     "name": "@elizaos/plugin-bootstrap",
     "version": "0.1.8+build.1",
-    "type": "module", 
+    "type": "module",
     "main": "dist/index.js",
     "module": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -11,7 +11,7 @@
             "import": {
                 "@elizaos/source": "./src/index.ts",
                 "types": "./dist/index.d.ts",
-                "default": "./dist/index.js"    
+                "default": "./dist/index.js"
             }
         }
     },
@@ -19,7 +19,7 @@
         "dist"
     ],
     "dependencies": {
-        "@moxie-protocol/core": "workspace:*",
+        "@senpi-ai/core": "workspace:*",
         "tsup": "8.3.5"
     },
     "scripts": {

@@ -22,26 +22,24 @@ COPY packages/adapter-redis/ ./packages/adapter-redis/
 COPY packages/adapter-postgres/ ./packages/adapter-postgres/
 COPY packages/core/ ./packages/core/
 COPY packages/client-twitter/ ./packages/client-twitter/
-COPY packages/moxie-agent-lib/ ./packages/moxie-agent-lib/
+COPY packages/senpi-agent-lib/ ./packages/senpi-agent-lib/
 COPY packages/plugin-bootstrap/ ./packages/plugin-bootstrap/
-COPY packages/client-moxie/ ./packages/client-moxie/
+COPY packages/client-senpi/ ./packages/client-senpi/
 COPY packages/client-auto/ ./packages/client-auto/
-COPY packages/plugin-moxie-big-fan/ ./packages/plugin-moxie-big-fan/
-COPY packages/plugin-moxie-swap/ ./packages/plugin-moxie-swap/
-COPY packages/plugin-moxie-balance/ ./packages/plugin-moxie-balance/
-COPY packages/plugin-moxie-token-details/ ./packages/plugin-moxie-token-details/
-COPY packages/plugin-moxie-trading-automations/ ./packages/plugin-moxie-trading-automations/
-COPY packages/plugin-moxie-groups/ ./packages/plugin-moxie-groups/
+COPY packages/plugin-senpi-big-fan/ ./packages/plugin-senpi-big-fan/
+COPY packages/plugin-senpi-swap/ ./packages/plugin-senpi-swap/
+COPY packages/plugin-senpi-balance/ ./packages/plugin-senpi-balance/
+COPY packages/plugin-senpi-token-details/ ./packages/plugin-senpi-token-details/
+COPY packages/plugin-senpi-trading-automations/ ./packages/plugin-senpi-trading-automations/
+COPY packages/plugin-senpi-groups/ ./packages/plugin-senpi-groups/
 
-COPY moxie-agent/ ./moxie-agent/
-COPY moxie-broadcasting-agent/ ./moxie-broadcasting-agent/
 
 COPY scripts ./scripts
 COPY characters ./characters
 COPY client ./client
 COPY docs ./docs
-COPY moxie-agent ./moxie-agent
-RUN cd ./packages/moxie-agent-lib && pnpm install --no-frozen-lockfile && pnpm run build && cd ../../
+COPY agent ./agent
+RUN cd ./packages/senpi-agent-lib && pnpm install --no-frozen-lockfile && pnpm run build && cd ../../
 
 
 # Install dependencies and build the project
@@ -72,7 +70,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/packages ./packages
 COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/characters ./characters
-COPY --from=builder /app/moxie-agent ./moxie-agent
+COPY --from=builder /app/agent ./agent
 COPY --from=builder /app/client ./client
 COPY --from=builder /app/docs ./docs
 
@@ -80,4 +78,4 @@ COPY --from=builder /app/docs ./docs
 EXPOSE 3000 5173
 
 # Set the command to run the application
-CMD ["pnpm", "run", "start:debug", "--character=./characters/moxie.character.json"]
+CMD ["pnpm", "run", "start:debug", "--character=./characters/senpi.character.json"]

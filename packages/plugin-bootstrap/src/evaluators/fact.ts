@@ -1,13 +1,13 @@
-import { composeContext } from "@moxie-protocol/core";
-import { generateObjectArray } from "@moxie-protocol/core";
-import { MemoryManager } from "@moxie-protocol/core";
+import { composeContext } from "@senpi-ai/core";
+import { generateObjectArray } from "@senpi-ai/core";
+import { MemoryManager } from "@senpi-ai/core";
 import {
     ActionExample,
     IAgentRuntime,
     Memory,
     ModelClass,
     Evaluator,
-    } from "@moxie-protocol/core";
+} from "@senpi-ai/core";
 
 export const formatFacts = (facts: Memory[]) => {
     const messageStrings = facts

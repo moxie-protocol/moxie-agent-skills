@@ -11,9 +11,9 @@ import {
     composeContext,
     generateObject,
     ModelClass,
-} from "@moxie-protocol/core";
-import { MoxieUser } from "@moxie-protocol/moxie-agent-lib/src";
-import { MoxieWalletClient } from "@moxie-protocol/moxie-agent-lib/src/wallet";
+} from "@senpi-ai/core";
+import { SenpiUser } from "@senpi-ai/senpi-agent-lib/src";
+import { SenpiWalletClient } from "@senpi-ai/senpi-agent-lib/src/wallet";
 import {
     CASINO_GAME_TYPE,
     slugById,
@@ -26,7 +26,7 @@ import {
     OrderDirection,
 } from "@betswirl/sdk-core";
 import { getChainIdFromWallet } from "../utils/betswirl";
-import { formatTokenForMoxieTerminal } from "../utils/moxie";
+import { formatTokenForSenpiTerminal } from "../utils/senpi";
 
 export const GetBetsParameters = z.object({
     game: z
@@ -105,7 +105,7 @@ export const getBetsAction: Action = {
             elizaLogger.log("Starting GET_BETS handler...");
 
             // Validate the chain
-            const wallet = state.moxieWalletClient as MoxieWalletClient;
+            const wallet = state.senpiWalletClient as SenpiWalletClient;
             const chainId = await getChainIdFromWallet();
 
             // Initialize or update state
@@ -130,9 +130,9 @@ export const getBetsAction: Action = {
 
             // Send some text
             const bettorAddress = wallet.address.toLowerCase() as Hex;
-            const moxieUserInfo = state.moxieUserInfo as MoxieUser;
+            const senpiUserInfo = state.senpiUserInfo as SenpiUser;
             await callback({
-                text: `List of ${moxieUserInfo ? `@[${moxieUserInfo.userName}|${moxieUserInfo.id}]` : `[${truncate(bettorAddress, 10)}](${formatAccountUrl(bettorAddress, chainId)})`} bets:`,
+                text: `List of ${senpiUserInfo ? `@[${senpiUserInfo.userName}|${senpiUserInfo.id}]` : `[${truncate(bettorAddress, 10)}](${formatAccountUrl(bettorAddress, chainId)})`} bets:`,
             });
 
             elizaLogger.log(
@@ -152,7 +152,7 @@ export const getBetsAction: Action = {
 | - | - | - | - | - | - |
 ${bets.map(
     (bet) =>
-        `| ${bet.isWin ? `💰 ${bet.formattedPayoutMultiplier}x` : "💥"} | ${bet.game} | ${formatTokenForMoxieTerminal(chainId, bet.token)} | [${bet.fomattedRollTotalBetAmount}](${formatTxnUrl(bet.betTxnHash, chainId)}) | [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) | ${bet.betDate.toUTCString()} | `
+        `| ${bet.isWin ? `💰 ${bet.formattedPayoutMultiplier}x` : "💥"} | ${bet.game} | ${formatTokenForSenpiTerminal(chainId, bet.token)} | [${bet.fomattedRollTotalBetAmount}](${formatTxnUrl(bet.betTxnHash, chainId)}) | [${bet.formattedPayout}](${formatTxnUrl(bet.rollTxnHash, chainId)}) | ${bet.betDate.toUTCString()} | `
 ).join(`
 `)}
 

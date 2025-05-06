@@ -18,7 +18,7 @@ Please choose one of the following category that suits your PR the most.
 For bug fixes, please specify the severity level of the bug fixed.
 -->
 
-- [] Register New Skills (first time adding new skills to moxie.xyz)
+- [] Register New Skills (first time adding new skills to senpi.ai)
 - [] Bug Fixes (non-breaking change which fixes an issue)
     - [] Low
     - [] Medium
@@ -39,9 +39,9 @@ IF YOU ARE REGISTERING FOR NEW SKILLS, UNCOMMENT THIS AND MAKE SURE TO FULFILL A
 - [] Have a well-writen README for the skills full description of the functionality along with detailed list of all actions, providers, evaluators, services, and clients.
 - [] Have added the new skill metadata to the `registry/src/skill.json` registry
 - [] Have not made changes to other aspects of the repository other than the folder containing the new skills
-- [] (Optional) Have environment variables and have requested the Moxie team through [this form](https://forms.gle/8hzDyCVKKLs4MkTEA) for environment variables submission.
-- [] Does not contain any code that simply transfers Moxie user's holdings to a fixed address
-- [] Does not contain any code that extracts Moxie user's private informations (e.g. wallets, private keys, etc.)
+- [] (Optional) Have environment variables and have requested the Senpi team through [this form](https://forms.gle/8hzDyCVKKLs4MkTEA) for environment variables submission.
+- [] Does not contain any code that simply transfers Senpi user's holdings to a fixed address
+- [] Does not contain any code that extracts Senpi user's private informations (e.g. wallets, private keys, etc.)
 - [] Does not contain any code that interacts with smart contracts that has not verified and published its source code.
 - [] Have audited smart contracts if the skills contain code that interacts with smart contracts has volume/balance above 100k USD.
 -->

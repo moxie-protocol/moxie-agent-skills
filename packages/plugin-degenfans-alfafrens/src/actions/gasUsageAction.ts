@@ -9,18 +9,27 @@ import {
     composeContext,
     generateObject,
     ModelClass,
-} from "@moxie-protocol/core";
+} from "@senpi-ai/core";
 
 import { gasUsageTemplate, stakingConsultantTemplate } from "../templates";
 import { GasUsageSchema, Staking, StakingSchema } from "../types";
-import { FarcasterMetadata, ftaService, MoxieUser, TwitterMetadata } from "@moxie-protocol/moxie-agent-lib";
-import { getGasUsgae, getHelpText, getStakingOptions, getUserData, StakingRequest } from "../utils/degenfansApi";
-import { z } from 'zod';
+import {
+    FarcasterMetadata,
+    ftaService,
+    SenpiUser,
+    TwitterMetadata,
+} from "@senpi-ai/senpi-agent-lib";
+import {
+    getGasUsgae,
+    getHelpText,
+    getStakingOptions,
+    getUserData,
+    StakingRequest,
+} from "../utils/degenfansApi";
+import { z } from "zod";
 export const gasUsageAction: Action = {
     name: "GET_ALFAFRENS_GAS_USAGE",
-    similes: [
-        "VIEW_ALFAFRENS_GAS_USAGE"
-    ],
+    similes: ["VIEW_ALFAFRENS_GAS_USAGE"],
     description: "get gas usage for an AlfaFrens profile",
     suppressInitialMessage: true,
     validate: async () => true,
@@ -41,7 +50,7 @@ export const gasUsageAction: Action = {
                 state = await runtime.updateRecentMessageState(state);
             }
 
-            const moxieUserInfo: MoxieUser = state.moxieUserInfo as MoxieUser;
+            const senpiUserInfo: SenpiUser = state.senpiUserInfo as SenpiUser;
 
             const context = composeContext({
                 state,
@@ -54,26 +63,23 @@ export const gasUsageAction: Action = {
                 modelClass: ModelClass.SMALL,
                 schema: GasUsageSchema,
             });
-            let {
-                userAddress,
-            } = transferDetails.object as {
+            let { userAddress } = transferDetails.object as {
                 userAddress: string;
             };
 
-            const userData = getUserData(moxieUserInfo);
-
+            const userData = getUserData(senpiUserInfo);
 
             const resp = await getGasUsgae(userData, userAddress);
             let tbl: string = "";
             console.log(resp);
             if (resp.status == 200) {
                 if (resp.data.result.image) {
-                    tbl += "\n![gas usage image](" + resp.data.result.image + ")";
+                    tbl +=
+                        "\n![gas usage image](" + resp.data.result.image + ")";
                 }
-                tbl += "\n"
+                tbl += "\n";
 
                 tbl += getHelpText(resp.data.user);
-
 
                 tbl = resp.message + tbl;
             } else {
@@ -85,14 +91,16 @@ export const gasUsageAction: Action = {
         } catch (err) {
             let errorText = "";
             if (err instanceof z.ZodError) {
-                errorText = "following error occured:"
+                errorText = "following error occured:";
                 err.errors.forEach((err2) => {
                     errorText += "\n" + err2.message;
                 });
                 errorText += "\n\n";
             }
             await callback?.({
-                text: errorText + "also make sure, that you have an AlfaFrens account:\nhttps://alfafrens.com\n\nif you still face some issues, please contact @degenfans",
+                text:
+                    errorText +
+                    "also make sure, that you have an AlfaFrens account:\nhttps://alfafrens.com\n\nif you still face some issues, please contact @degenfans",
             });
         }
     },

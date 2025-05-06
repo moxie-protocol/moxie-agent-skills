@@ -49,24 +49,24 @@ try {
         fs.readFileSync(packageJsonFilePath),
         "utf8"
     );
-    packageJson.name = `@moxie-protocol/${pluginName}`;
+    packageJson.name = `@senpi-ai/${pluginName}`;
     fs.writeFileSync(packageJsonFilePath, JSON.stringify(packageJson, null, 4));
     console.log(`Updated package.json name in ${packageJsonFilePath}`);
 
-    // add the skill to moxie.character.json
-    const moxieCharacterFilePath = path.join(
+    // add the skill to senpi.character.json
+    const senpiCharacterFilePath = path.join(
         __dirname,
-        "../characters/moxie.character.json"
+        "../characters/senpi.character.json"
     );
-    const moxieCharacter = JSON.parse(fs.readFileSync(moxieCharacterFilePath), "utf8");
-    // check if the skill already exists in moxie.character.json
-    if (moxieCharacter.plugins.includes(`@moxie-protocol/${pluginName}`)) {
-        throw new Error(`Skill ${pluginName} already exists in moxie.character.json`);
+    const senpiCharacter = JSON.parse(fs.readFileSync(senpiCharacterFilePath), "utf8");
+    // check if the skill already exists in senpi.character.json
+    if (senpiCharacter.plugins.includes(`@senpi-ai/${pluginName}`)) {
+        throw new Error(`Skill ${pluginName} already exists in senpi.character.json`);
     }
-    moxieCharacter.plugins.push(`@moxie-protocol/${pluginName}`);
+    senpiCharacter.plugins.push(`@senpi-ai/${pluginName}`);
 
-    fs.writeFileSync(moxieCharacterFilePath, JSON.stringify(moxieCharacter, null, 4));
-    console.log(`Updated moxie.character.json in ${moxieCharacterFilePath}`);
+    fs.writeFileSync(senpiCharacterFilePath, JSON.stringify(senpiCharacter, null, 4));
+    console.log(`Updated senpi.character.json in ${senpiCharacterFilePath}`);
 
     // add the skill to agent/package.json
     const agentPackageJsonFilePath = path.join(
@@ -75,10 +75,10 @@ try {
     );
     const agentPackageJson = JSON.parse(fs.readFileSync(agentPackageJsonFilePath), "utf8");
     // check if the skill already exists in agent/package.json
-    if (agentPackageJson.dependencies[`@moxie-protocol/${pluginName}`]) {
+    if (agentPackageJson.dependencies[`@senpi-ai/${pluginName}`]) {
         throw new Error(`Skill ${pluginName} already exists in agent/package.json`);
     }
-    agentPackageJson.dependencies[`@moxie-protocol/${pluginName}`] = `workspace:*`;
+    agentPackageJson.dependencies[`@senpi-ai/${pluginName}`] = `workspace:*`;
 
     fs.writeFileSync(agentPackageJsonFilePath, JSON.stringify(agentPackageJson, null, 4));
     console.log(`Updated agent/package.json in ${agentPackageJsonFilePath}`);
@@ -96,8 +96,8 @@ try {
         version: "0.0.1",
         author: null,
         description: "A New skill",
-        githubUrl: `https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/${pluginName}`,
-        logoUrl: `https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/main/packages/${pluginName}/images/logo.png`,
+        githubUrl: `https://github.com/senpi-ai/senpi-agent-skills/tree/main/packages/${pluginName}`,
+        logoUrl: `https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/${pluginName}/images/logo.png`,
         settings: {},
         capabilities: [],
         starterQuestions: [],
