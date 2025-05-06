@@ -3129,8 +3129,8 @@ async function swap(
     );
     if (txnReceipt.status == 1) {
         if (
-            buyTokenAddress !== ETH_ADDRESS &&
-            buyTokenAddress !== WETH_ADDRESS
+            buyTokenAddress.toLowerCase() !== ETH_ADDRESS.toLowerCase() &&
+            buyTokenAddress.toLowerCase() !== WETH_ADDRESS.toLowerCase()
         ) {
             // decode the txn receipt to get the moxie purchased
             const transferDetails = await decodeTokenTransfer(
