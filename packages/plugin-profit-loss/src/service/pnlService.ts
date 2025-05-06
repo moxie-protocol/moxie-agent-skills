@@ -43,7 +43,7 @@ export const preparePnlQuery = (pnlResponse: any) => {
   let selectFields = `moxie_user_id, token_address, profit_loss, token_sold_symbol, token_bought_symbol, total_sell_amount, total_buy_amount, total_sell_value_usd, total_buy_value_usd, buy_transaction_count, sell_transaction_count`;
 
   if (tokenAddresses?.length > 0) {
-    selectFields = `profit_loss, total_sell_amount, total_buy_amount, total_sell_value_usd, total_buy_value_usd, buy_transaction_count, sell_transaction_count`;
+    selectFields = `moxie_user_id, SUM(profit_loss) as profit_loss, SUM(total_sell_amount) as total_sell_amount, SUM(total_buy_amount) as total_buy_amount, SUM(total_sell_value_usd) as total_sell_value_usd, SUM(total_buy_value_usd) as total_buy_value_usd, SUM(buy_transaction_count) as buy_transaction_count, SUM(sell_transaction_count) as sell_transaction_count`;
   }
 
   let query = `select ${selectFields} from dune.moxieprotocol.result_moxie_wallets`;
@@ -79,6 +79,7 @@ export const preparePnlQuery = (pnlResponse: any) => {
 
   if (tokenAddresses?.length > 0) {
     whereClauses.push(`token_address in (${tokenAddresses.map((address) => `${address}`).join(",")})`);
+    groupByClauses.push(`moxie_user_id`);
     orderByClause = `profit_loss ${analysisType === "PROFIT" ? "desc" : "asc"}`;
   }
 

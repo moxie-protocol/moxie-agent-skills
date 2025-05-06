@@ -1,7 +1,7 @@
 import { IAgentRuntime, Memory, State, HandlerCallback, elizaLogger, ModelClass, composeContext, generateObjectDeprecated, streamText, ModelProviderName } from "@moxie-protocol/core";
-import { extractWalletTemplate, pnLTemplate } from "../template";
+import { extractWalletTemplate, pnlTemplate } from "../template";
 import { fetchPnlData, fetchTotalPnl, preparePnlQuery } from "../service/pnlService";
-import { getERC20TokenSymbol, MoxieUser } from "@moxie-protocol/moxie-agent-lib";
+import { MoxieUser, moxieUserService } from "@moxie-protocol/moxie-agent-lib";
 import { ethers } from "ethers";
 import * as agentLib from "@moxie-protocol/moxie-agent-lib";
 
@@ -84,7 +84,6 @@ export const PnLAction = {
                 return true;
             }
 
-
             pnlResponse.tokenAddresses = tokenAddresses;
             pnlResponse.walletAddresses = walletAddresses;
             pnlResponse.moxieUserIds = moxieUserIds;
@@ -93,8 +92,7 @@ export const PnLAction = {
             elizaLogger.debug(traceId, `[PnLAction] categorized wallet addresses: ${JSON.stringify(walletAddresses)}`);
             elizaLogger.debug(traceId, `[PnLAction] agent wallet address: ${agentWalletAddress}`);
 
-            start = new Date();
-            // use dune table called result_wallet_pnl to get the PnL data
+            let pnlStart = new Date();
             const pnlQuery = preparePnlQuery(pnlResponse);
 
             const [pnlData, totalPnl] = await Promise.all([
@@ -104,8 +102,26 @@ export const PnLAction = {
 
             elizaLogger.debug(traceId, `[PnLAction] pnlData: ${JSON.stringify(pnlData)}`);
             elizaLogger.debug(traceId, `[PnLAction] totalPnl: ${totalPnl}`);
+            if (tokenAddresses.length > 0 || moxieUserIds.length > 0) {
+                try {
+                    const uniqueMoxieUserIds = [...new Set(pnlData.map(data => data.moxie_user_id).filter(Boolean))];
+                    const userNames = await moxieUserService.getUserByMoxieIdMultiple(uniqueMoxieUserIds);
+                    elizaLogger.debug(traceId, `[PnLAction] Fetched user names: ${JSON.stringify(userNames)}`);
 
-            let pnlDataTemplate = pnLTemplate.replace("{{latestMessage}}", latestMessage)
+                    // Replace moxieUserIds in pnlData with formatted userNames
+                    pnlData.forEach((data) => {
+                        if (data.moxie_user_id && userNames.has(data.moxie_user_id)) {
+                            const userName = userNames.get(data.moxie_user_id)?.userName;
+                            if (userName) {
+                                data.moxie_user_id = `@[${userName}|${data.moxie_user_id}]`;
+                            }
+                        }
+                    });
+                } catch (error) {
+                    elizaLogger.error(traceId, `[PnLAction] Error fetching user names for Moxie IDs: ${error.message}`);
+                }
+            }
+            let pnlDataTemplate = pnlTemplate.replace("{{latestMessage}}", latestMessage)
                 .replace("{{conversation}}", JSON.stringify(message.content.text))
                 .replace("{{criteria}}", JSON.stringify(pnlResponse.criteria))
                 .replace("{{pnlData}}", JSON.stringify(pnlData))
@@ -127,7 +143,7 @@ export const PnLAction = {
                     modelClass: ModelClass.MEDIUM
                 }
             });
-            elizaLogger.debug(traceId, `[PnLAction] time taken to generate pnl data template: ${new Date().getTime() - start.getTime()}ms`);
+            elizaLogger.debug(traceId, `[PnLAction] time taken to generate pnl data template: ${new Date().getTime() - pnlStart.getTime()}ms`);
             for await (const textPart of response) {
                 callback({ text: textPart, action: "PROFIT_LOSS" });
             }
@@ -144,12 +160,32 @@ export const PnLAction = {
 
 
 /**
- * Checks if an address is an ENS name and resolves it
+ * Checks if an address is an ENS name and resolves it, with caching to avoid repeated RPC calls.
+ * The cache is cleared after a couple of hours to manage memory usage.
  * @param address - The address or ENS name to check and resolve
  * @returns The resolved address and ENS details if applicable
  */
+
+const ensCache = new Map<string, { isENS: boolean, resolvedAddress: string | null, timestamp: number }>();
+const CACHE_EXPIRY_TIME = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
+
 async function resolveENSAddress(context: any, address: string) {
+    let start = new Date();
     elizaLogger.debug(context, `[PnLAction] [resolveENSAddress] Checking address: ${address}`);
+
+    const currentTime = Date.now();
+
+    // Check cache first and clear expired entries
+    if (ensCache.has(address)) {
+        const cachedEntry = ensCache.get(address);
+        if (currentTime - cachedEntry.timestamp < CACHE_EXPIRY_TIME) {
+            elizaLogger.debug(context, `[PnLAction] [resolveENSAddress] Cache hit for address: ${address}`);
+            elizaLogger.debug(context, `[PnLAction] [resolveENSAddress] Time taken to resolve ENS address: ${new Date().getTime() - start.getTime()}ms`);
+            return { isENS: cachedEntry.isENS, resolvedAddress: cachedEntry.resolvedAddress };
+        } else {
+            ensCache.delete(address);
+        }
+    }
 
     let response = {
         isENS: false,
@@ -177,6 +213,9 @@ async function resolveENSAddress(context: any, address: string) {
                 if (resolvedAddress) {
                     response.isENS = true;
                     response.resolvedAddress = resolvedAddress;
+                    // Cache the result with a timestamp
+                    ensCache.set(address, { ...response, timestamp: currentTime });
+                    elizaLogger.debug(context, `[PnLAction] [resolveENSAddress] Time taken to resolve ENS address: ${new Date().getTime() - start.getTime()}ms`);
                     return response;
                 }
 
@@ -204,44 +243,3 @@ async function resolveENSAddress(context: any, address: string) {
         return response;
     }
 }
-
-async function categorizeAddressesIntoTokensAndWallets(walletPnlResponse: any, context: any, traceId: string) {
-    const tokenAddresses: string[] = [];
-    const walletAddresses: string[] = [];
-
-    const addresses = walletPnlResponse.criteria.map((c: any) => c.VALUE);
-    for (const address of addresses) {
-        if (address.toLowerCase().endsWith('.eth')) {
-            // resolve the ENS address
-            const resolvedAddress = await resolveENSAddress(context, address);
-            if (resolvedAddress.isENS) {
-                walletAddresses.push(resolvedAddress.resolvedAddress);
-                continue;
-            } else {
-                walletAddresses.push(address);
-            }
-        }
-
-        if (!ethers.isAddress(address)) {
-            elizaLogger.debug(traceId, `[PnLAction] Invalid address format: ${address}`);
-            continue;
-        }
-
-        try {
-            // Try to get token symbol - if successful, it's likely a token contract
-            const tokenSymbol = await getERC20TokenSymbol(address);
-            if (tokenSymbol) {
-                // Address has contract code - likely a token
-                tokenAddresses.push(address.toLowerCase());
-            } else {
-                // Address has no contract code - likely a wallet
-                walletAddresses.push(address.toLowerCase());
-            }
-        } catch (error) {
-            elizaLogger.error(traceId, `[PnLAction] Error checking address ${address}: ${error}`);
-            continue;
-        }
-    }
-
-    return { tokenAddresses, walletAddresses };
-};
