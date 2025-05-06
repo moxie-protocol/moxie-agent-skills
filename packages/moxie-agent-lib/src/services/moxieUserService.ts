@@ -21,6 +21,7 @@ import {
     PublishPostInput,
     PublishPostResponse,
 } from "./types";
+import { fetchWithRetries } from "../utils";
 
 
 export async function getUserByMoxieId(
@@ -224,11 +225,16 @@ export async function getSocialProfilesByMoxieIdMultiple(
     const errorDetails = new Map<string, ErrorDetails>();
 
     try {
-        const results = await getUserByMoxieIdMultipleTokenGate(
-            userIds,
-            bearerToken,
-            pluginId
+        const results = await fetchWithRetries(
+            () => getUserByMoxieIdMultipleTokenGate(
+                userIds,
+                bearerToken,
+                pluginId
+                ),
+            3, // retries
+            1000 // initial delay in ms
         );
+
 
         results.users.forEach((userInfo, _index) => {
             const user = userInfo.user;
