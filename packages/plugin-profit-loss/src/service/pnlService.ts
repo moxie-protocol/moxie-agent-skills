@@ -38,72 +38,71 @@ export const preparePnlQuery = (pnlResponse: any) => {
     analysisType,
     maxResults,
   } = pnlResponse;
+  const buildWhereClause = (field: string, values: string[], isTokenOrWallet: boolean) => {
+    return isTokenOrWallet ? `${field} in (${values.map(value => `${value}`).join(",")})` : `${field} in (${values.map(value => `'${value}'`).join(",")})`;
+  };
 
-  // Initialize select fields
-  let selectFields = `moxie_user_id, token_address, profit_loss, token_sold_symbol, token_bought_symbol, total_sell_amount, total_buy_amount, total_sell_value_usd, total_buy_value_usd, buy_transaction_count, sell_transaction_count`;
+  const buildSelectFields = (isAggregated: boolean) => {
+    return isAggregated
+      ? `moxie_user_id, token_address, SUM(profit_loss) as total_profit_loss, MAX(token_sold_symbol) as token_sold_symbol, MAX(token_bought_symbol) as token_bought_symbol, SUM(total_sell_amount) as total_sell_amount, SUM(total_buy_amount) as total_buy_amount, SUM(total_sell_value_usd) as total_sell_value_usd, SUM(total_buy_value_usd) as total_buy_value_usd, SUM(buy_transaction_count) as buy_transaction_count, SUM(sell_transaction_count) as sell_transaction_count`
+      : `moxie_user_id, token_address, profit_loss, token_sold_symbol, token_bought_symbol, total_sell_amount, total_buy_amount, total_sell_value_usd, total_buy_value_usd, buy_transaction_count, sell_transaction_count`;
+  };
 
-  if (tokenAddresses?.length > 0) {
-    selectFields = `moxie_user_id, SUM(profit_loss) as profit_loss, SUM(total_sell_amount) as total_sell_amount, SUM(total_buy_amount) as total_buy_amount, SUM(total_sell_value_usd) as total_sell_value_usd, SUM(total_buy_value_usd) as total_buy_value_usd, SUM(buy_transaction_count) as buy_transaction_count, SUM(sell_transaction_count) as sell_transaction_count`;
-  }
+  const buildGroupByClause = (fields: string[]) => {
+    return fields.length > 0 ? ` group by ${fields.join(", ")}` : "";
+  };
 
+  const buildOrderByClause = (analysisType: string, isAggregated: boolean) => {
+    return isAggregated
+      ? `total_profit_loss ${analysisType === "PROFIT" ? "desc" : "asc"}`
+      : `profit_loss ${analysisType === "PROFIT" ? "desc" : "asc"}`;
+  };
+
+  let selectFields = buildSelectFields(false);
   let query = `select ${selectFields} from dune.moxieprotocol.result_moxie_wallets`;
   const whereClauses = [];
   const groupByClauses = [];
   let orderByClause = "";
 
-  // Blacklist specific token addresses
   if (BLACKLISTED_TOKEN_ADDRESSES.length > 0) {
-    whereClauses.push(`token_address not in (${BLACKLISTED_TOKEN_ADDRESSES.map((address) => `${address}`).join(",")})`);
+    whereClauses.push(`token_address not in (${BLACKLISTED_TOKEN_ADDRESSES.map(address => `${address}`).join(",")})`);
   }
 
-  // If both moxieUserIds and walletAddresses are provided, adjust select fields and group by clauses
-  if (moxieUserIds?.length > 0 && walletAddresses?.length > 0) {
-    whereClauses.push(`moxie_user_id in (${moxieUserIds.map((id) => `'${id}'`).join(",")})`);
-    whereClauses.push(`wallet_address in (${walletAddresses.map((address) => `${address}`).join(",")})`);
-    selectFields = `moxie_user_id, token_address, SUM(profit_loss) as total_profit_loss, MAX(token_sold_symbol) as token_sold_symbol, MAX(token_bought_symbol) as token_bought_symbol, SUM(total_sell_amount) as total_sell_amount, SUM(total_buy_amount) as total_buy_amount, SUM(total_sell_value_usd) as total_sell_value_usd, SUM(total_buy_value_usd) as total_buy_value_usd, SUM(buy_transaction_count) as buy_transaction_count, SUM(sell_transaction_count) as sell_transaction_count`;
-    query = `select ${selectFields} from dune.moxieprotocol.result_moxie_wallets`;
-    groupByClauses.push(`token_address, moxie_user_id, wallet_address`);
-    orderByClause = `total_profit_loss ${analysisType === "PROFIT" ? "desc" : "asc"}`;
-  } else if (walletAddresses?.length > 0) {
-    // If only wallet addresses are provided, adjust select fields and group by clauses
-    whereClauses.push(`wallet_address in (${walletAddresses.map((address) => `${address}`).join(",")})`);
-    orderByClause = `profit_loss ${analysisType === "PROFIT" ? "desc" : "asc"}`;
-  } else if (moxieUserIds?.length > 0) {
-    // If only moxieUserIds are provided, adjust select fields and group by clauses
-    whereClauses.push(`moxie_user_id in (${moxieUserIds.map((id) => `'${id}'`).join(",")})`);
-    selectFields = `moxie_user_id, token_address, SUM(profit_loss) as total_profit_loss, MAX(token_sold_symbol) as token_sold_symbol, MAX(token_bought_symbol) as token_bought_symbol, SUM(total_sell_amount) as total_sell_amount, SUM(total_buy_amount) as total_buy_amount, SUM(total_sell_value_usd) as total_sell_value_usd, SUM(total_buy_value_usd) as total_buy_value_usd, SUM(buy_transaction_count) as buy_transaction_count, SUM(sell_transaction_count) as sell_transaction_count`;
-    query = `select ${selectFields} from dune.moxieprotocol.result_moxie_wallets`;
-    groupByClauses.push(`token_address, moxie_user_id`);
-    orderByClause = `total_profit_loss ${analysisType === "PROFIT" ? "desc" : "asc"}`;
+  if (walletAddresses?.length > 0) {
+    whereClauses.push(buildWhereClause("wallet_address", walletAddresses, true));
+  }
+
+  if (moxieUserIds?.length > 0) {
+    whereClauses.push(buildWhereClause("moxie_user_id", moxieUserIds, false));
   }
 
   if (tokenAddresses?.length > 0) {
-    whereClauses.push(`token_address in (${tokenAddresses.map((address) => `${address}`).join(",")})`);
-    groupByClauses.push(`moxie_user_id`);
-    orderByClause = `profit_loss ${analysisType === "PROFIT" ? "desc" : "asc"}`;
+    whereClauses.push(buildWhereClause("token_address", tokenAddresses, true));
   }
 
-  // Append where clauses to the query
+  const isAggregated = moxieUserIds?.length > 0 || tokenAddresses?.length > 0;
+
+  if (isAggregated) {
+    selectFields = buildSelectFields(true);
+    query = `select ${selectFields} from dune.moxieprotocol.result_moxie_wallets`;
+    groupByClauses.push("token_address", "moxie_user_id");
+    orderByClause = buildOrderByClause(analysisType, true);
+  } else {
+    orderByClause = buildOrderByClause(analysisType, false);
+  }
+
   if (whereClauses.length > 0) {
     query += ` where ${whereClauses.join(" and ")} and buy_transaction_count > 0`;
   } else {
     query += ` where buy_transaction_count > 0`;
   }
 
-  if (groupByClauses.length > 0) {
-    query += ` group by ${groupByClauses.join(", ")}`;
-  }
-
-  if (analysisType == "LOSS") {
-    // Add order by clause based on analysis type
-    orderByClause = `profit_loss asc`;
-  }
+  query += buildGroupByClause(groupByClauses);
 
   if (orderByClause) {
     query += ` order by ${orderByClause}`;
   }
 
-  // Add limit clause using maxResults or default to 15
   query += ` limit ${maxResults || 20}`;
 
   elizaLogger.debug(`[preparePnlQuery] query: ${query}`);
