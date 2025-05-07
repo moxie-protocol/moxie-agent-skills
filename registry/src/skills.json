@@ -659,32 +659,39 @@
         "displayName": "Profit and Loss",
         "version": "0.1.0",
         "author": null,
-        "description": "This action can summarize Profit & Loss for a user, wallet address, or token address. It shows the money earned or lost by the specified entity.",
+        "description": "Analyze Profit and Loss on users and tokens",
         "githubUrl": "https://github.com/Senpi-ai/senpi-agent-skills/tree/main/packages/plugin-profit-loss",
         "logoUrl": "https://raw.githubusercontent.com/Senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-profit-loss/images/logo.svg",
         "settings": {},
         "capabilities": [
-            "Track PnL for any wallet address",
-            "Find most profitable traders for any token",
-            "Analyze profitable/loss making trades on Base",
-            "Get detailed trade history and performance metrics"
+            "Total PnL of any user or wallet",
+            "PnL of top traders of any token",
+            "PnL of any user or wallet on a specific token"
         ],
         "starterQuestions": [
             {
-                "label": "What's my total PnL on Base?",
-                "value": "What's my total PnL on Base?"
+                "label": "What is my PNL?",
+                "value": "What is my PNL?"
             },
             {
-                "label": "Show me the most profitable $moxie traders",
-                "value": "Show me the most profitable $[MOXIE|0x8c9037d1ef5c6d1f6816278c7aaf5491d24cd527] traders"
+                "label": "What is PNL of my Senpi agent?",
+                "value": "What is PNL of my Senpi agent?"
             },
             {
-                "label": "What's the PnL for @betashop.eth?",
-                "value": "What's the PnL for @[betashop.eth|M4]?"
+                "label": "Top PNL of $CLANKER",
+                "value": "Top PNL of $[CLANKER|0x1bc0c42215582d5A085795f4baDbaC3ff36d1Bcb]?"
             },
             {
-                "label": "Who are the top performing traders on Base today?",
-                "value": "Who are the top performing traders on Base today?"
+                "label": "What is PNL of @jessepollak?",
+                "value": "What is PNL of @[jessepollak|M1245]?"
+            },
+            {
+                "label": "What is my PNL on $VVV?",
+                "value": "What is my PNL on $[VVV|0xacfE6019Ed1A7Dc6f7B508C02d1b04ec88cC21bf]?"
+            },
+            {
+                "label": "What is @kyle PNL on $CLANKER",
+                "value": "What is @[kyle|M25428] PNL on $[CLANKER|0x1bc0c42215582d5A085795f4baDbaC3ff36d1Bcb]?"
             }
         ],
         "mediaUrls": [
@@ -698,13 +705,12 @@
         "skillCoinAddress": "",
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
-        "isDefault": false,
+        "isDefault": true,
         "loaders": [
-            "Analyzing trade history",
-            "Calculating PnL",
-            "Crunching numbers",
-            "Preparing performance metrics",
-            "Generating insights"
+            "Running the numbers... tracking every trade and result.",
+            "Scanning wallets and trades… seeking clarity amidst chaos.",
+            "Reading the market memory… compiling PNL.",
+            "The dojo sees all — preparing your report now."
         ],
         "orderIndex": 12
     }

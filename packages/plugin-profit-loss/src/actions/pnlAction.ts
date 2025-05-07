@@ -169,21 +169,21 @@ export const PnLAction = {
 const ensCache = new Map<string, { isENS: boolean, resolvedAddress: string | null, timestamp: number }>();
 const CACHE_EXPIRY_TIME = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
 
-async function resolveENSAddress(context: any, address: string) {
+async function resolveENSAddress(context: any, ensName: string) {
     let start = new Date();
-    elizaLogger.debug(context, `[PnLAction] [resolveENSAddress] Checking address: ${address}`);
+    elizaLogger.debug(context, `[PnLAction] [resolveENSAddress] Checking address: ${ensName}`);
 
     const currentTime = Date.now();
 
     // Check cache first and clear expired entries
-    if (ensCache.has(address)) {
-        const cachedEntry = ensCache.get(address);
+    if (ensCache.has(ensName)) {
+        const cachedEntry = ensCache.get(ensName);
         if (currentTime - cachedEntry.timestamp < CACHE_EXPIRY_TIME) {
-            elizaLogger.debug(context, `[PnLAction] [resolveENSAddress] Cache hit for address: ${address}`);
+            elizaLogger.debug(context, `[PnLAction] [resolveENSAddress] Cache hit for address: ${ensName}`);
             elizaLogger.debug(context, `[PnLAction] [resolveENSAddress] Time taken to resolve ENS address: ${new Date().getTime() - start.getTime()}ms`);
             return { isENS: cachedEntry.isENS, resolvedAddress: cachedEntry.resolvedAddress };
         } else {
-            ensCache.delete(address);
+            ensCache.delete(ensName);
         }
     }
 
@@ -194,7 +194,7 @@ async function resolveENSAddress(context: any, address: string) {
 
     try {
         // Check if the address ends with .eth
-        const isENS = address.toLowerCase().endsWith('.eth');
+        const isENS = ensName.toLowerCase().endsWith('.eth');
 
         if (!isENS) {
             return response;
@@ -208,13 +208,13 @@ async function resolveENSAddress(context: any, address: string) {
 
         while (retries > 0) {
             try {
-                const resolvedAddress = await provider.resolveName(address);
+                const resolvedAddress = await provider.resolveName(ensName);
 
                 if (resolvedAddress) {
                     response.isENS = true;
                     response.resolvedAddress = resolvedAddress;
                     // Cache the result with a timestamp
-                    ensCache.set(address, { ...response, timestamp: currentTime });
+                    ensCache.set(ensName, { ...response, timestamp: currentTime });
                     elizaLogger.debug(context, `[PnLAction] [resolveENSAddress] Time taken to resolve ENS address: ${new Date().getTime() - start.getTime()}ms`);
                     return response;
                 }
@@ -225,7 +225,7 @@ async function resolveENSAddress(context: any, address: string) {
                 retries--;
 
             } catch (error) {
-                elizaLogger.error(context.traceId, `[PnLAction] [resolveENSAddress] Attempt ${6-retries}/ 5 failed to resolve ENS name: ${address}`);
+                elizaLogger.error(context.traceId, `[PnLAction] [resolveENSAddress] Attempt ${6-retries}/ 5 failed to resolve ENS name: ${ensName}`);
                 if (retries === 1) {
                     return response;
                 }
@@ -235,7 +235,7 @@ async function resolveENSAddress(context: any, address: string) {
             }
         }
 
-        elizaLogger.error(context.traceId, `[PnLAction] [resolveENSAddress] Unable to resolve ENS name after retries: ${address}`);
+        elizaLogger.error(context.traceId, `[PnLAction] [resolveENSAddress] Unable to resolve ENS name after retries: ${ensName}`);
         return response;
 
     } catch (error) {
