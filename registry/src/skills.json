@@ -668,7 +668,7 @@
         "author": null,
         "description": "Analyze Profit and Loss on users and tokens",
         "githubUrl": "https://github.com/Senpi-ai/senpi-agent-skills/tree/main/packages/plugin-profit-loss",
-        "logoUrl": "https://raw.githubusercontent.com/Senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-profit-loss/images/logo.svg",
+        "logoUrl": "https://raw.githubusercontent.com/Senpi-ai/senpi-agent-skills/refs/heads/feat/profit-loss/packages/plugin-profit-loss/src/images/pnl.svg",
         "settings": {},
         "capabilities": [
             "Total PnL of any user or wallet",
