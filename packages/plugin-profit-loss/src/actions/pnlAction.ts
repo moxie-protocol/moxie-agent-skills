@@ -7,7 +7,7 @@ import * as agentLib from "@moxie-protocol/moxie-agent-lib";
 
 export const PnLAction = {
     name: "PROFIT_LOSS",
-    description: "This action can summarize Profit & Loss for a user, wallet address, or token address. It shows the money earned or lost by the specified entity.",
+    description: "PROFIT_LOSS: This action can summarize Profit & Loss for a user (can be invoke by simply saying 'my pnl'), wallet address, token address, or senpi agent. It shows the money earned or lost by the specified entity.",
     suppressInitialMessage: true,
     examples: [],
     similes: ["PNL", "PNL_DATA", "PROFIT_LOSS", "PROFIT_LOSS_DATA", "USER_PnL", "WALLET_PnL", "TOKEN_PnL"],
