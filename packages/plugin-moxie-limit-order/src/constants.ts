@@ -13,7 +13,7 @@ export const TRANSACTION_RECEIPT_TIMEOUT = 60000;
 export const subjectSharePurchasedTopic0 = "0x96c1b5a0ee3c1932c831b8c6a559c93b48a3109915784a05ff44a07cc09c3931"
 export const subjectShareSoldTopic0 = "0x44ebb8a56b0413525e33cc89179d9758b2b1ab944b0bbeeb6d119adb2a6e3fe2"
 export const BASE_NETWORK_ID = 8453;
-export const ERC20_TXN_SLIPPAGE_BPS = 100; // 1% slippage (100 basis points = 1%)
+export const ERC20_TXN_SLIPPAGE_BPS = Number(process.env.ERC20_TXN_SLIPPAGE_BPS || 200); // 2%
 export const LIMIT_ORDER_EXPIRY_HOURS = Number(process.env.LIMIT_ORDER_EXPIRY_HOURS || "168"); // Default: 1 week if env var is empty or not set
 
 export const ERC20_ABI = [
