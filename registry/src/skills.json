@@ -171,13 +171,7 @@
             "FARCASTER_AND_TWITTER_SUMMARY",
             "FARCASTER_AND_TWITTER_ACTIVITY",
             "FARCASTER_AND_TWITTER_UPDATES",
-            "SOCIAL_POSTS",
-            "TRENDING_CREATOR_COINS",
-            "CREATOR_COIN_PURCHASES",
-            "CREATOR_COIN_RECOMMENDATIONS",
-            "CREATOR_COIN_BUY_RECOMMENDATIONS",
-            "CREATOR_COIN_TRENDING_CRYPTOCURRENCIES",
-            "CREATOR_COIN_SWAP_SUMMARIES"
+            "SOCIAL_POSTS"
         ],
         "isPremium": false,
         "freeQueries": 0,

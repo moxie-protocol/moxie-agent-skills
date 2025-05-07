@@ -41,17 +41,7 @@ export async function fetchTopCreatorsByMoxieId(
             elizaLogger.debug(`using cached creators list for ${moxieId}`);
             return JSON.parse(cachedCreators as string);
         }
-        const portfolio =
-            await portfolioService.fetchPortfolioByMoxieIdOrderByTVL(
-                moxieId,
-                noOfUsers
-            );
-
-
-        const moxieUserIds = portfolio
-            .filter((p) => p?.fanTokenMoxieUserId && p?.fanTokenMoxieUserId !== moxieId)
-            .map((p) => p.fanTokenMoxieUserId);
-
+        const moxieUserIds = FREEMIUM_TRENDING_CREATORS_LIST;
         elizaLogger.debug(`top creators moxieUserIds: ${moxieUserIds}`);
         elizaLogger.debug(`caching creators list for ${moxieId}`);
 

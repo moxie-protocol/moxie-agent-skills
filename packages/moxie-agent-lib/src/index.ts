@@ -68,4 +68,4 @@ export {
 
 export { deleteLimitOrders } from "./services/cowService";
 
-export { formatUserMention, formatGroupMention, formatTokenMention } from "./utils";
+export { formatUserMention, formatGroupMention, formatTokenMention, fetchWithRetries } from "./utils";
