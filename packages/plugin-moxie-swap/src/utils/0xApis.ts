@@ -69,26 +69,35 @@ export const get0xSwapQuote = async ({
     sellTokenAddress: string;
     sellTokenSymbol: string;
 }) => {
-    const MAX_RETRIES = 3;
+    const MAX_RETRIES = 5;
     const RETRY_DELAY = 1000; // 1 second delay between retries
     
     let retryCount = 0;
-    
+    let adjustedSlippage = ERC20_TXN_SLIPPAGE_BPS;
     while (retryCount < MAX_RETRIES) {
         try {
             if(!process.env.ZERO_EX_API_KEY) {
                 return mockGetQuoteResponse;
             }
             
-            elizaLogger.debug(traceId,`[get0xSwapQuote] [${moxieUserId}] input details: [${walletAddress}] [${sellTokenAddress}] [${buyTokenAddress}] [${sellAmountBaseUnits}] [${buyTokenSymbol}] [${sellTokenSymbol}]`)
-            
+            elizaLogger.debug(
+                traceId,
+                `[get0xSwapQuote] [${moxieUserId}] input details: ` +
+                `[walletAddress: ${walletAddress}] ` +
+                `[sellTokenAddress: ${sellTokenAddress}] ` + 
+                `[buyTokenAddress: ${buyTokenAddress}] ` +
+                `[sellAmountBaseUnits: ${sellAmountBaseUnits}] ` +
+                `[buyTokenSymbol: ${buyTokenSymbol}] ` +
+                `[sellTokenSymbol: ${sellTokenSymbol}] ` +
+                `[adjustedSlippage: ${adjustedSlippage}]`
+            );
             const quote = (await zxClient.swap.permit2.getQuote.query({
                 sellAmount: sellAmountBaseUnits,
                 sellToken: sellTokenAddress,
                 buyToken: buyTokenAddress,
                 chainId: Number(process.env.CHAIN_ID || '8453'),
                 taker: walletAddress,
-                slippageBps: ERC20_TXN_SLIPPAGE_BPS,
+                slippageBps: adjustedSlippage,
                 swapFeeToken: isStableCoin(buyTokenSymbol) ? buyTokenAddress : 
                              isStableCoin(sellTokenSymbol) ? sellTokenAddress : 
                              sellTokenAddress, // default to sellToken if neither present in stableCoins env variable
@@ -101,11 +110,14 @@ export const get0xSwapQuote = async ({
             retryCount++;
             
             if (retryCount >= MAX_RETRIES) {
-                elizaLogger.error(traceId,`[get0xSwapQuote] [${moxieUserId}] [ERROR] Failed to get 0x swap quote after ${MAX_RETRIES} attempts: ${JSON.stringify(error)}`);
+                elizaLogger.error(traceId,`[ERROR] [get0xSwapQuote] [${moxieUserId}] [ERROR] Failed to get 0x swap quote after ${MAX_RETRIES} attempts: ${JSON.stringify(error)}`);
                 throw error;
             }
-            
-            elizaLogger.warn(traceId,`[get0xSwapQuote] [${moxieUserId}] [RETRY ${retryCount}/${MAX_RETRIES}] Failed to get 0x swap quote: ${JSON.stringify(error)}`);
+            elizaLogger.error(traceId,`[ERROR] [get0xSwapQuote] [${moxieUserId}] [RETRY ${retryCount}/${MAX_RETRIES}] Failed to get 0x swap quote: ${JSON.stringify(error)}`);
+
+            // increments the slippage by 5% for each retry
+            adjustedSlippage += ERC20_TXN_SLIPPAGE_BPS;
+            elizaLogger.debug(traceId,`[get0xSwapQuote] [${moxieUserId}] adjustedSlippage after retry ${retryCount}: ${adjustedSlippage}`)
             
             // Wait before retrying
             await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
