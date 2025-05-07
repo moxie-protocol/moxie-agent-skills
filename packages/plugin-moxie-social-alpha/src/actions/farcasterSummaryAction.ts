@@ -20,8 +20,10 @@ import { Cast, fetchCastByFid } from "../services/farcasterService";
 import { getMoxieIdsFromMessage, streamTextByLines, handleIneligibleMoxieUsers } from "./utils";
 import { FIVE_MINS, getFarcasterCastsCacheKey, ONE_HOUR } from "../cache";
 import { TOP_CREATORS_COUNT } from "../config";
+import { fetchWithRetries } from "@moxie-protocol/moxie-agent-lib";
 
 const SOCIAL_ALPHA = "SOCIAL_ALPHA";
+
 
 export async function fetchFarcasterCastsByMoxieUserIds(
     userIdToFarcasterUsernames: Map<
@@ -46,9 +48,13 @@ export async function fetchFarcasterCastsByMoxieUserIds(
                 if (cachedCasts) {
                     casts = JSON.parse(cachedCasts as string);
                 } else {
-                    casts = await fetchCastByFid(
-                        farcasterDetails.userId,
-                        maxCastsPerUser
+                    casts = await fetchWithRetries(
+                        () => fetchCastByFid(
+                            farcasterDetails.userId,
+                            maxCastsPerUser
+                        ),
+                        3, 
+                        1000 // initial delay in ms
                     );
                 }
 

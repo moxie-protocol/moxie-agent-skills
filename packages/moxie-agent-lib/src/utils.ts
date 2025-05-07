@@ -28,4 +28,24 @@ const formatTokenMention = (tokenSymbol: string, tokenAddress: string) => {
     return `$[${tokenSymbol}|${tokenAddress}]`;
 }
 
-export { formatUserMention, formatGroupMention, formatTokenMention };
+async function fetchWithRetries<T>(
+    fn: () => Promise<T>,
+    retries: number = 3,
+    initialDelay: number = 500
+): Promise<T> {
+    let attempt = 0;
+    let delay = initialDelay;
+    while (true) {
+        try {
+            return await fn();
+        } catch (err) {
+            attempt++;
+            if (attempt > retries) throw err;
+            await new Promise(res => setTimeout(res, delay));
+            delay *= 2; // Exponential backoff
+        }
+    }
+}
+
+
+export { formatUserMention, formatGroupMention, formatTokenMention, fetchWithRetries };
