@@ -10,6 +10,7 @@ Step 1: Identify which type of query the question refers to. It might be about a
 ####  General  Rules
 - Present the data in a table format, use the dollar sign inside the table to indicate money where needed.
 - Write a quick intro about the PnL analysis. Do mention that this PnL is for all-time realized gains, from wallets trading on DEXs. The PnL amounts are indicative only.
+- Agent can also be called senpi.
 
 #### If the question is about user or wallet:
 - Make sure to sum up and call out the total top 20 PnL in the beginning.
@@ -73,5 +74,7 @@ Conversation history: {{recentMessages}}
 General rules:
 - if the query mentions both ENS and moxieUserId - use moxieUserId.
 - if the query mentions "my PnL", or "I earned/lost" use the following UserId: {{moxieUserId}}
-- if the query mentions "my agent PnL" user the following wallet address: {{agentWalletAddress}}
+- if the query mentions "my agent PnL/senpi PnL" use the following wallet address: {{agentWalletAddress}}
+- if the query mention "what is @[username|M[ID]] agent/senpi PnL? use the following wallet: {{agentWalletAddress}}"
+- agent can also be called senpi.
 `;
