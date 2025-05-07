@@ -1,0 +1,194 @@
+import { DuneClient } from "@duneanalytics/client-sdk";
+import { PnlData } from "../types/type";
+import { elizaLogger } from "@moxie-protocol/core";
+
+const client = new DuneClient(process.env.DUNE_API_KEY!);
+
+
+/**
+ * Prepares a SQL query to fetch PnL data from Dune Analytics based on wallet response parameters
+ *
+ * @param pnlResponse - Object containing query parameters
+ * @param pnlResponse.walletAddresses - Array of wallet addresses to filter by
+ * @param pnlResponse.moxieUserIds - Array of Moxie user IDs to filter by
+ * @param pnlResponse.tokenAddresses - Array of token contract addresses to filter by
+ * @param pnlResponse.analysisType - Type of analysis to perform ('PROFIT'|'LOSS')
+ * @param pnlResponse.maxResults - Maximum number of results to return (defaults to 15)
+ * @param pnlResponse.chain - Blockchain network to query (e.g. 'base')
+ * @returns SQL query string for fetching PnL data
+ */
+const BLACKLISTED_TOKEN_ADDRESSES = [
+  '0x0000000000000000000000000000000000000000',
+  '0x4200000000000000000000000000000000000006',
+  '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+  '0x50c5725949a6f0c72e6c4a641f24049a917db0cb',
+  '0x820c137fa70c8691f0e44dc420a5e53c168921dc',
+  '0xc1cba3fcea344f92d9239c08c0568f6f2f0ee452',
+  '0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34',
+  '0x04c0599ae5a44757c0af6f9ec3b93da8976c150a',
+  '0x5875eee11cf8398102fdad704c9e96607675467a',
+  '0x3128a0f7f0ea68e7b7c9b00afa7e41045828e858'
+];
+
+export const preparePnlQuery = (pnlResponse: any) => {
+  const {
+    walletAddresses,
+    moxieUserIds,
+    tokenAddresses,
+    analysisType,
+    maxResults,
+  } = pnlResponse;
+  const buildWhereClause = (field: string, values: string[], isTokenOrWallet: boolean) => {
+    return isTokenOrWallet ? `${field} in (${values.map(value => `${value}`).join(",")})` : `${field} in (${values.map(value => `'${value}'`).join(",")})`;
+  };
+
+  const buildSelectFields = (isAggregated: boolean) => {
+    return isAggregated
+      ? `moxie_user_id, token_address, SUM(profit_loss) as total_profit_loss, MAX(token_sold_symbol) as token_sold_symbol, MAX(token_bought_symbol) as token_bought_symbol, SUM(total_sell_amount) as total_sell_amount, SUM(total_buy_amount) as total_buy_amount, SUM(total_sell_value_usd) as total_sell_value_usd, SUM(total_buy_value_usd) as total_buy_value_usd, SUM(buy_transaction_count) as buy_transaction_count, SUM(sell_transaction_count) as sell_transaction_count`
+      : `moxie_user_id, token_address, profit_loss, token_sold_symbol, token_bought_symbol, total_sell_amount, total_buy_amount, total_sell_value_usd, total_buy_value_usd, buy_transaction_count, sell_transaction_count`;
+  };
+
+  const buildGroupByClause = (fields: string[]) => {
+    return fields.length > 0 ? ` group by ${fields.join(", ")}` : "";
+  };
+
+  const buildOrderByClause = (analysisType: string, isAggregated: boolean) => {
+    return isAggregated
+      ? `total_profit_loss ${analysisType === "PROFIT" ? "desc" : "asc"}`
+      : `profit_loss ${analysisType === "PROFIT" ? "desc" : "asc"}`;
+  };
+
+  let selectFields = buildSelectFields(false);
+  let query = `select ${selectFields} from dune.moxieprotocol.result_moxie_wallets`;
+  const whereClauses = [];
+  const groupByClauses = [];
+  let orderByClause = "";
+
+  if (BLACKLISTED_TOKEN_ADDRESSES.length > 0) {
+    whereClauses.push(`token_address not in (${BLACKLISTED_TOKEN_ADDRESSES.map(address => `${address}`).join(",")})`);
+  }
+
+  if (walletAddresses?.length > 0) {
+    whereClauses.push(buildWhereClause("wallet_address", walletAddresses, true));
+  }
+
+  if (moxieUserIds?.length > 0) {
+    whereClauses.push(buildWhereClause("moxie_user_id", moxieUserIds, false));
+  }
+
+  if (tokenAddresses?.length > 0) {
+    whereClauses.push(buildWhereClause("token_address", tokenAddresses, true));
+  }
+
+  const isAggregated = moxieUserIds?.length > 0 || tokenAddresses?.length > 0;
+
+  if (isAggregated) {
+    selectFields = buildSelectFields(true);
+    query = `select ${selectFields} from dune.moxieprotocol.result_moxie_wallets`;
+    groupByClauses.push("token_address", "moxie_user_id");
+    orderByClause = buildOrderByClause(analysisType, true);
+  } else {
+    orderByClause = buildOrderByClause(analysisType, false);
+  }
+
+  if (whereClauses.length > 0) {
+    query += ` where ${whereClauses.join(" and ")} and buy_transaction_count > 0`;
+  } else {
+    query += ` where buy_transaction_count > 0`;
+  }
+
+  query += buildGroupByClause(groupByClauses);
+
+  if (orderByClause) {
+    query += ` order by ${orderByClause}`;
+  }
+
+  query += ` limit ${maxResults || 20}`;
+
+  elizaLogger.debug(`[preparePnlQuery] query: ${query}`);
+  return query;
+};
+
+/**
+ * Fetches PnL data from Dune Analytics using a prepared SQL query
+ *
+ * @param query - SQL query string for fetching PnL data
+ * @returns Array of PnL data objects
+ */
+export const fetchPnlData = async (query: string) => {
+  let retries = 3;
+  let lastError;
+  let start = new Date();
+  while (retries > 0) {
+    try {
+      const result = await client.runSql({ query_sql: query });
+
+      const pnlData = result.result.rows as unknown as PnlData[];
+
+      elizaLogger.debug(`[fetchPnlData] PnL data: ${pnlData.length} rows`);
+      elizaLogger.debug(`[fetchPnlData] time taken to fetch pnl data: ${new Date().getTime() - start.getTime()}ms`);
+      return pnlData;
+    } catch (error) {
+      lastError = error;
+      elizaLogger.error(`[fetchPnlData] Error fetching PnL data (${4-retries}/3 attempts): ${error}`);
+      retries--;
+
+      if (retries > 0) {
+        // Wait 1 second before retrying
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+  }
+
+  // If we get here, all retries failed
+  throw lastError;
+};
+
+/**
+ * Fetches total PnL from Dune Analytics using a prepared SQL query
+ *
+ * @param query - SQL query string for fetching total PnL data
+ * @returns Total PnL value
+ */
+export const fetchTotalPnl = async (pnlResponse: any) => {
+  let retries = 3;
+  let delay = 1000; // Start with 1 second delay
+  let lastError;
+
+  const {
+    walletAddresses,
+    moxieUserIds,
+  } = pnlResponse;
+
+  let query = `select SUM(profit_loss) as total_profit_loss from dune.moxieprotocol.result_moxie_wallets`;
+  let start = new Date();
+  if (walletAddresses?.length > 0 && moxieUserIds?.length > 0) {
+    query += ` where wallet_address in (${walletAddresses.map((address) => `${address}`).join(",")}) and moxie_user_id in (${moxieUserIds.map((id) => `'${id}'`).join(",")})`;
+  } else if (walletAddresses?.length > 0) {
+    query += ` where wallet_address in (${walletAddresses.map((address) => `${address}`).join(",")})`;
+  } else if (moxieUserIds?.length > 0) {
+    query += ` where moxie_user_id in (${moxieUserIds.map((id) => `'${id}'`).join(",")})`;
+  }
+
+  while (retries > 0) {
+    try {
+      const result = await client.runSql({ query_sql: query });
+      const totalPnl = result.result.rows[0].total_profit_loss;
+      elizaLogger.debug(`[fetchTotalPnl] time taken to fetch total pnl: ${new Date().getTime() - start.getTime()}ms`);
+      return totalPnl as number;
+    } catch (error) {
+      lastError = error;
+      elizaLogger.error(`[fetchTotalPnl] Error fetching total PnL (${4-retries}/3 attempts): ${error}`);
+      retries--;
+
+      if (retries > 0) {
+        // Wait for the current delay before retrying
+        await new Promise(resolve => setTimeout(resolve, delay));
+        delay *= 2; // Exponential backoff: double the delay for the next retry
+      }
+    }
+  }
+
+  // If we get here, all retries failed
+  throw lastError;
+};
