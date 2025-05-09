@@ -162,13 +162,22 @@ export const fetchTotalPnl = async (pnlResponse: any) => {
 
   let query = `select SUM(profit_loss) as total_profit_loss from dune.moxieprotocol.result_moxie_wallets`;
   let start = new Date();
-  if (walletAddresses?.length > 0 && moxieUserIds?.length > 0) {
-    query += ` where wallet_address in (${walletAddresses.map((address) => `${address}`).join(",")}) and moxie_user_id in (${moxieUserIds.map((id) => `'${id}'`).join(",")})`;
-  } else if (walletAddresses?.length > 0) {
-    query += ` where wallet_address in (${walletAddresses.map((address) => `${address}`).join(",")})`;
-  } else if (moxieUserIds?.length > 0) {
-    query += ` where moxie_user_id in (${moxieUserIds.map((id) => `'${id}'`).join(",")})`;
+  let conditions = [];
+
+  if (walletAddresses?.length > 0) {
+    conditions.push(`wallet_address in (${walletAddresses.map((address) => `${address}`).join(",")})`);
   }
+  if (moxieUserIds?.length > 0) {
+    conditions.push(`moxie_user_id in (${moxieUserIds.map((id) => `'${id}'`).join(",")})`);
+  }
+  if (BLACKLISTED_TOKEN_ADDRESSES.length > 0) {
+    conditions.push(`token_address not in (${BLACKLISTED_TOKEN_ADDRESSES.map((token) => `${token}`).join(",")})`);
+  }
+
+  if (conditions.length > 0) {
+    query += ` where ${conditions.join(" and ")}`;
+  }
+  elizaLogger.debug(`[fetchTotalPnl] query: ${query}`);
 
   while (retries > 0) {
     try {
