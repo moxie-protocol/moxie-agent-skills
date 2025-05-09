@@ -37,6 +37,7 @@
         "@moxie-protocol/plugin-moxie-token-transfer": "workspace:*",
         "@moxie-protocol/plugin-moxie-whale-hunter": "workspace:*",
         "@moxie-protocol/plugin-senpi-sharing": "workspace:*",
+        "@moxie-protocol/plugin-profit-loss": "workspace:*",
         "readline": "1.3.0",
         "ws": "8.18.0",
         "yargs": "17.7.2",

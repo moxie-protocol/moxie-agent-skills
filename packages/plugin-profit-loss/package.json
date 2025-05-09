@@ -1,0 +1,28 @@
+{
+    "name": "@moxie-protocol/plugin-profit-loss",
+    "version": "0.0.1",
+    "private": true,
+    "main": "dist/index.js",
+    "module": "dist/index.mjs",
+    "types": "dist/index.d.ts",
+    "type": "module",
+    "scripts": {
+        "build": "tsup",
+        "dev": "tsup --watch",
+        "clean": "rm -rf .turbo node_modules dist",
+        "lint": "eslint .",
+        "test": "jest"
+    },
+    "dependencies": {
+        "@duneanalytics/client-sdk": "^0.2.5",
+        "@moxie-protocol/core": "workspace:*",
+        "@moxie-protocol/moxie-agent-lib": "workspace:*",
+        "ethers": "^6.0.0"
+    },
+    "devDependencies": {
+        "@types/node": "^20.11.19",
+        "eslint": "^8.56.0",
+        "tsup": "^8.0.2",
+        "typescript": "^5.3.3"
+    }
+}

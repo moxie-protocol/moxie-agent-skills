@@ -837,6 +837,8 @@ async function swap(
             buyTokenAddress: buyTokenAddress,
             walletAddress: agentWalletAddress,
             sellTokenAddress: sellTokenAddress,
+            buyTokenSymbol: buyTokenSymbol,
+            sellTokenSymbol: sellTokenSymbol
         });
         elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [swap] get0xSwapQuote: ${JSON.stringify(quote)}`);
 
