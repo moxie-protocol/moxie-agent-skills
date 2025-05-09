@@ -230,36 +230,6 @@ export interface TokenDetails {
     liquidityPools?: LiquidityPool[];
 }
 
-export interface MoxiePortfolioInfo {
-    fanTokenSymbol: string;
-    fanTokenName: string;
-    fanTokenAddress: string;
-    totalLockedAmount: number;
-    totalUnlockedAmount: number;
-    totalAmount: number;
-    totalTvl: number;
-    walletAddresses: string[];
-    currentPrice: number;
-    lockedTvl: number;
-    unlockedTvl: number;
-    totalTvlInUSD: number;
-    lockedTvlInUSD: number;
-    unlockedTvlInUSD: number;
-    fanTokenMoxieUserId: string;
-    displayLabel: string;
-    holdingPercentage: number;
-}
-
-export interface MoxiePortfolioResponse {
-    errors?: Array<{
-        message: string;
-    }>;
-    data: {
-        MoxieUserPortfolios: {
-            MoxieUserPortfolio: MoxiePortfolioInfo[];
-        };
-    };
-}
 
 export interface Skill {
     id: string;

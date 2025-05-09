@@ -286,16 +286,7 @@
             "INVESTMENT_SUMMARY",
             "ASSET_POSITIONS",
             "PORTFOLIO_OVERVIEW",
-            "PORTFOLIO_STATUS",
-            "CREATOR_COIN_BALANCE",
-            "CREATOR_COIN",
-            "CREATOR_COIN_BALANCE",
-            "CREATOR_COIN_PRICE",
-            "CREATOR_COIN_POSITION",
-            "FAN_TOKEN",
-            "FAN_TOKEN_BALANCE",
-            "FAN_TOKEN_POSITION",
-            "FAN_TOKEN_PRICE"
+            "PORTFOLIO_STATUS"
         ],
         "isPremium": false,
         "freeQueries": 10,
