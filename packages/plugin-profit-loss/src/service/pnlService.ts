@@ -27,7 +27,9 @@ const BLACKLISTED_TOKEN_ADDRESSES = [
   '0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34',
   '0x04c0599ae5a44757c0af6f9ec3b93da8976c150a',
   '0x5875eee11cf8398102fdad704c9e96607675467a',
-  '0x3128a0f7f0ea68e7b7c9b00afa7e41045828e858'
+  '0x3128a0f7f0ea68e7b7c9b00afa7e41045828e858',
+  '0xd9aaec86b65d86f6a7b5b1b0c42ffa531710b6ca',
+  '0xb79dd08ea68a908a97220c76d19a6aa9cbde4376'
 ];
 
 export const preparePnlQuery = (pnlResponse: any) => {
