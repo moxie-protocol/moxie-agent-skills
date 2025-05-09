@@ -76,6 +76,5 @@ General rules:
 - if the query mentions both ENS and moxieUserId - use moxieUserId.
 - if the query mentions "my PnL", or "I earned/lost" use the following UserId: {{moxieUserId}}
 - if the query mentions "my agent PnL/senpi PnL" use the following wallet address: {{agentWalletAddress}}
-- if the query mention "what is @[username|M[ID]] agent/senpi PnL? use the following wallet: {{agentWalletAddress}}"
 - agent can also be called senpi.
 `;
