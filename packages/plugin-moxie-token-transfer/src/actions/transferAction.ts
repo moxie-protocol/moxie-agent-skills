@@ -497,7 +497,7 @@ async function processSingleTransfer(
         elizaLogger.debug(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [processTransfer] [transferAmountInWEI]: ${transferAmountInWEI}`);
 
         // check if the agent wallet has enough balance to cover the transfer amount
-        const currentBalanceInWEI = resolvedTokenAddress == ETH_ADDRESS ?
+        const currentBalanceInWEI = resolvedTokenAddress.toLowerCase() == ETH_ADDRESS.toLowerCase() ?
             await getNativeTokenBalance(agentWallet.address) :
             await getERC20Balance(resolvedTokenAddress, agentWallet.address);
         elizaLogger.debug(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [processTransfer] [currentBalanceInWEI]: ${currentBalanceInWEI}`);
@@ -1025,7 +1025,7 @@ async function executeTransfer(
     );
 
     // Prepare transaction input for ERC20 token transfer
-    const isEthTransfer = tokenAddress === ETH_ADDRESS;
+    const isEthTransfer = tokenAddress.toLowerCase() === ETH_ADDRESS.toLowerCase()  ;
     const request: agentLib.TransactionDetails = {
         fromAddress: agentWallet,
         toAddress: isEthTransfer ? recipientAddress : tokenAddress,
@@ -1241,7 +1241,7 @@ async function convertUSDToTokenAmount(
         // get the equivalent price using codex api
         // if ETH , we need use WETH price. since codex does not support native ETH
         let tokenAddressForCodex = tokenAddress;
-        if (tokenAddress === ETH_ADDRESS) {
+        if (tokenAddress.toLowerCase() === ETH_ADDRESS.toLowerCase()) {
             tokenAddressForCodex = WETH_ADDRESS;
         }
 
