@@ -931,7 +931,7 @@ async function resolveTokenAddress(context: Context, token: string): Promise<Fun
 
         elizaLogger.debug(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [resolveTokenAddress] Extracted ERC20 address: ${tokenAddress}`);
 
-        const tokenDecimals = tokenAddress === ETH_ADDRESS ? 18 : await getERC20Decimals(context, tokenAddress);
+        const tokenDecimals = tokenAddress.toLowerCase() === ETH_ADDRESS.toLowerCase() ? 18 : await getERC20Decimals(context, tokenAddress);
         elizaLogger.debug(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [resolveTokenAddress] Token decimals: ${tokenDecimals}`);
 
         return {
