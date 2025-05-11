@@ -112,9 +112,14 @@ export const PnLAction = {
                     pnlData.forEach((data) => {
                         if (data.moxie_user_id) {
                             const userName = userNames.get(data.moxie_user_id)?.userName;
-                            data.moxie_user_id = userName
-                                ? `@[${userName}|${data.moxie_user_id}]`
-                                : `@[${data.moxie_user_id}|${data.moxie_user_id}]`;
+                            if (/^0x[a-fA-F0-9]{40}$/.test(data.moxie_user_id)) {
+                                const formattedId = `${data.moxie_user_id.slice(0, 5)}...${data.moxie_user_id.slice(-3)}`;
+                                data.moxie_user_id = `@[${formattedId}|${formattedId}]`;
+                            } else {
+                                data.moxie_user_id = userName
+                                    ? `@[${userName}|${data.moxie_user_id}]`
+                                    : `@[${data.moxie_user_id}|${data.moxie_user_id}]`;
+                            }
                         }
                     });
                 } catch (error) {
