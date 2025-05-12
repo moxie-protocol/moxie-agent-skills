@@ -49,7 +49,7 @@ Can also contain token address to specifically show PnL for the user & that toke
 2. Criteria for Token PnL:
 - TYPE: "tokenAddress"
 - VALUE: "0x....."
-User query can contain a 0x format token address, or $[token_symbol|token_address], you only need 0x address.
+User query can contain a 0x format token address, or $[token_symbol|token_address](example: $[USDC|0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913]), you only need 0x address.
 
 3. Criteria for Overall PnL (Best Traders):
    - TYPE: "overall"
