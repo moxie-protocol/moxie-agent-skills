@@ -3,6 +3,7 @@ import { PnlData } from "../types/type";
 import { elizaLogger } from "@moxie-protocol/core";
 
 const client = new DuneClient(process.env.DUNE_API_KEY!);
+const RESULT_BASE_PNL_TABLE = process.env.RESULT_BASE_PNL_TABLE || 'dune.moxieprotocol.result_base_pnl_dev';
 
 
 /**
@@ -59,7 +60,8 @@ export const preparePnlQuery = (pnlResponse: any) => {
   };
 
   let selectFields = buildSelectFields(false);
-  let query = `select ${selectFields} from dune.moxieprotocol.result_base_pnl_dev`;
+  
+  let query = `select ${selectFields} from ${RESULT_BASE_PNL_TABLE}`;
   const whereClauses = [];
   const groupByClauses = [];
   let orderByClause = "";
@@ -84,7 +86,7 @@ export const preparePnlQuery = (pnlResponse: any) => {
 
     if (isAggregated) {
         selectFields = buildSelectFields(true);
-        query = `select ${selectFields} from dune.moxieprotocol.result_base_pnl_dev`;
+        query = `select ${selectFields} from ${RESULT_BASE_PNL_TABLE}`;
         groupByClauses.push("token_address", "moxie_user_id");
         orderByClause = buildOrderByClause(analysisType, true);
     } else {
@@ -160,9 +162,9 @@ export const fetchTotalPnl = async (pnlResponse: any) => {
     moxieUserIds,
   } = pnlResponse;
 
-    let query = `select SUM(profit_loss) as total_profit_loss from dune.moxieprotocol.result_base_pnl_dev`;
-    let start = new Date();
-    let conditions = [];
+  let query = `select SUM(profit_loss) as total_profit_loss from ${RESULT_BASE_PNL_TABLE}`;
+  let start = new Date();
+  let conditions = [];
 
   if (walletAddresses?.length > 0) {
     conditions.push(`wallet_address in (${walletAddresses.map((address) => `${address}`).join(",")})`);
