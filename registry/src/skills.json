@@ -726,6 +726,7 @@
         "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/feat/base-wallets-pnl-merged/packages/plugin-senpi-tutorial/images/logo.png",
         "settings": {},
         "capabilities": [
+            "List all the available tutorials for Senpi",
             "Recommend a relevant YouTube tutorial based on the user's request"
         ],
         "starterQuestions": [
