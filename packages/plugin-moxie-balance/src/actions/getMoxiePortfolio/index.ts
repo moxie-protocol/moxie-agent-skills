@@ -253,12 +253,11 @@ export default {
                 }
 
                 const {portfolioSummaries, commonPortfolioHoldingsMetadata} = await handleMultipleUsers(moxieUserInfoMultiple, runtime, moxieToUSD);
-                const {filteredCommonFanTokenHoldings,filteredCommonTokenHoldings} = getCommonHoldings(moxieUserInfoMultiple, commonPortfolioHoldingsMetadata)
+                const {filteredCommonTokenHoldings} = getCommonHoldings(moxieUserInfoMultiple, commonPortfolioHoldingsMetadata)
                 const newstate = await runtime.composeState(message, {
                     portfolioSummaries: JSON.stringify(portfolioSummaries),
                     isSelfPortolioRequested: JSON.stringify(false),
                     message: message.content.text,
-                    filteredCommonFanTokenHoldings: JSON.stringify(filteredCommonFanTokenHoldings),
                     filteredCommonTokenHoldings: JSON.stringify(filteredCommonTokenHoldings),
                     ineligibleMoxieUsers: JSON.stringify(ineligibleMoxieUsers)
                 });
