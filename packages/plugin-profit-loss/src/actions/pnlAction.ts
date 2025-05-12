@@ -110,16 +110,21 @@ export const PnLAction = {
 
                     // Replace moxieUserIds in pnlData with formatted userNames
                     pnlData.forEach((data) => {
-                        if (data.moxie_user_id) {
-                            const userName = userNames.get(data.moxie_user_id)?.userName;
-                            if (/^0x[a-fA-F0-9]{40}$/.test(data.moxie_user_id)) {
-                                const formattedId = `${data.moxie_user_id.slice(0, 6)}...${data.moxie_user_id.slice(-4)}`;
-                                data.moxie_user_id = `@[${formattedId}|${formattedId}]`;
-                            } else {
-                                data.moxie_user_id = userName
-                                    ? `@[${userName}|${data.moxie_user_id}]`
-                                    : `@[${data.moxie_user_id}|${data.moxie_user_id}]`;
-                            }
+                        if (!data.username) return;
+
+                        const userName = userNames.get(data.username)?.userName;
+                        const isMoxieId = /^M/.test(data.username);
+                        const isWalletAddress = /^0x[a-fA-F0-9]{40}$/.test(data.username);
+
+                        if (isMoxieId) {
+                            data.username = `@[${userName || data.username}|${data.username}]`;
+                        } else if (isWalletAddress) {
+                            const formattedId = `${data.username.slice(0, 6)}...${data.username.slice(-4)}`;
+                            data.username = `@[${formattedId}|${data.username}]`;
+                        } else if (data.moxie_user_id?.startsWith('M')) {
+                            data.username = `@[${data.username}|${data.moxie_user_id}]`;
+                        } else {
+                            data.username = `@[${data.username}|${data.username}]`;
                         }
                     });
                 } catch (error) {
