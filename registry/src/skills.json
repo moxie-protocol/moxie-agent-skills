@@ -525,7 +525,7 @@
             "Executing with quiet precision"
         ],
         "orderIndex": 0
-    }, 
+    },
     {
         "pluginId": "79449cd9-0590-4ccc-9d9f-12f99438c17b",
         "name": "@moxie-protocol/plugin-degenfans-alfafrens",
@@ -592,7 +592,11 @@
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-moxie-groups",
         "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/feat/trading-automations/packages/plugin-moxie-groups/images/logo.svg",
         "settings": {},
-        "capabilities": ["Create groups", "Add users to groups (This can be done by asking Senpi or on the Groups page.)", "Add all to a group. (Example: (a) ask Senpi for the top holders of a token e.g. $zora, (b) after Senpi returns the results, ask Senpi to add all users to your Zora group.)"],
+        "capabilities": [
+            "Create groups",
+            "Add users to groups (This can be done by asking Senpi or on the Groups page.)",
+            "Add all to a group. (Example: (a) ask Senpi for the top holders of a token e.g. $zora, (b) after Senpi returns the results, ask Senpi to add all users to your Zora group.)"
+        ],
         "starterQuestions": [
             {
                 "label": "Create the [replace with group name] group",
@@ -617,7 +621,7 @@
         "skillCoinAddress": "",
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
-        "isDefault": true, 
+        "isDefault": true,
         "loaders": [
             "Establishing precision",
             "Opening the circle",
@@ -636,10 +640,11 @@
         "githubUrl": "https://github.com/moxie-protocol/moxie-agent-skills/tree/main/packages/plugin-senpi-sharing",
         "logoUrl": "https://raw.githubusercontent.com/moxie-protocol/moxie-agent-skills/refs/heads/feat/trading-automations/packages/plugin-senpi-sharing/images/logo.svg",
         "settings": {},
-        "capabilities": ["Tap the Farcaster icon under any Senpi response to have Senpi create casts for you", "Tap “Cast It!” to post the response on Farcaster! "],
-        "starterQuestions": [
-         
+        "capabilities": [
+            "Tap the Farcaster icon under any Senpi response to have Senpi create casts for you",
+            "Tap “Cast It!” to post the response on Farcaster! "
         ],
+        "starterQuestions": [],
         "mediaUrls": [""],
         "actions": ["POST_CONTENT"],
         "isPremium": false,
@@ -648,9 +653,7 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": true,
-        "loaders": [
-            "Reticulating splines"
-        ],
+        "loaders": ["Reticulating splines"],
         "orderIndex": 6
     },
     {
@@ -697,9 +700,7 @@
         "mediaUrls": [
             "https://raw.githubusercontent.com/Senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-moxie-pnl-tracker/images/logo.svg"
         ],
-        "actions": [
-            "PROFIT_LOSS"
-        ],
+        "actions": ["PROFIT_LOSS"],
         "isPremium": false,
         "freeQueries": 5,
         "skillCoinAddress": "",
@@ -713,5 +714,60 @@
             "The dojo sees all — preparing your report now."
         ],
         "orderIndex": 13
+    },
+    {
+        "pluginId": "970e16ae-485d-4f68-b223-ee75c3c1908e",
+        "name": "@moxie-protocol/plugin-senpi-tutorial",
+        "displayName": "Senpi YouTube Tutorials",
+        "version": "0.0.1",
+        "author": "Yoseph",
+        "description": "Provides YouTube tutorials to help users to learn how to use Senpi.",
+        "githubUrl": "https://github.com/senpi-ai/senpi-agent-skills/tree/main/packages/plugin-senpi-tutorial",
+        "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-senpi-tutorial/images/logo.png",
+        "settings": {},
+        "capabilities": [],
+        "starterQuestions": [
+            {
+                "label": "Can you provide a tutorial to get started with Senpi?",
+                "value": "Can you provide a tutorial to get started with Senpi?"
+            },
+            {
+                "label": "Is there a tutorial to setup a limit order?",
+                "value": "Is there a tutorial to setup a limit order?"
+            },
+            {
+                "label": "Give me a tutorial to setup an autonomous trade",
+                "value": "Give me a tutorial to setup an autonomous trade"
+            },
+            {
+                "label": "Can you share a tutorial to do token research on Senpi?",
+                "value": "Can you share a tutorial to do token research on Senpi?"
+            }
+        ],
+        "mediaUrls": [
+            "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-senpi-tutorial/images/logo.png"
+        ],
+        "actions": [
+            "TUTORIAL_YOUTUBE_HELP_SENPI",
+            "TUTORIAL_TO_USE_SENPI",
+            "TUTORIAL_TO_GET_STARTED_WITH_SENPI",
+            "TUTORIAL_TO_DO_TOKEN_RESEARCH_WITH_SENPI",
+            "TUTORIAL_TO_SETUP_A_LIMIT_ORDER_WITH_SENPI",
+            "TUTORIAL_TO_SETUP_AN_AUTONOMOUS_TRADE_WITH_SENPI",
+            "TUTORIAL_TO_AUTOMATE_TRADES_WITH_SENPI"
+        ],
+        "isPremium": false,
+        "freeQueries": 0,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
+        "status": "ACTIVE",
+        "isDefault": true,
+        "loaders": [
+            "Searching for the best tutorials",
+            "Finding the most relevant tutorials",
+            "Loading tutorials",
+            "Preparing tutorials"
+        ],
+        "orderIndex": 99
     }
 ]
