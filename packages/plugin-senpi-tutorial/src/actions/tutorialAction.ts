@@ -27,8 +27,12 @@ export const tutorialAction: Action = {
         "HOW_DO_I_SETUP_A_LIMIT_ORDER_WITH_SENPI",
         "HOW_DO_I_SETUP_AN_AUTONOMOUS_TRADE_WITH_SENPI",
         "HOW_DO_I_AUTOMATE_TRADES_WITH_SENPI",
+        "HOW_DO_I_SETUP_LIMIT_ORDERS",
+        "HOW_DO_I_SETUP_AUTONOMOUS_TRADING",
+        "HOW_DO_I_RESEARCH_TOKENS_ON_SENPI",
     ],
-    description: "Provide users with tutorials to use Senpi",
+    description:
+        "Answer user's how-to questions about Senpi and provide them with relevant tutorials to use Senpi, including how to research tokens, setup limit orders, setup autonomous trading, and more.",
     suppressInitialMessage: true,
     validate: async () => true,
     handler: async (
@@ -178,7 +182,7 @@ export const tutorialAction: Action = {
             {
                 user: "{{user1}}",
                 content: {
-                    text: "How do I do token research with Senpi?",
+                    text: "How do I research tokens on Senpi?",
                 },
             },
             {
@@ -193,7 +197,7 @@ export const tutorialAction: Action = {
             {
                 user: "{{user1}}",
                 content: {
-                    text: "How do I setup a limit order with Senpi?",
+                    text: "How do I setup limit orders?",
                 },
             },
             {
@@ -208,7 +212,7 @@ export const tutorialAction: Action = {
             {
                 user: "{{user1}}",
                 content: {
-                    text: "How do I setup an autonomous trade with Senpi?",
+                    text: "How do I setup an autonomous trading?",
                 },
             },
             {
