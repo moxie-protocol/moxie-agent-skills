@@ -21,6 +21,12 @@ export const tutorialAction: Action = {
         "TUTORIAL_TO_SETUP_A_LIMIT_ORDER_WITH_SENPI",
         "TUTORIAL_TO_SETUP_AN_AUTONOMOUS_TRADE_WITH_SENPI",
         "TUTORIAL_TO_AUTOMATE_TRADES_WITH_SENPI",
+        "HOW_DO_I_USE_SENPI",
+        "HOW_DO_I_GET_STARTED_WITH_SENPI",
+        "HOW_DO_I_DO_TOKEN_RESEARCH_WITH_SENPI",
+        "HOW_DO_I_SETUP_A_LIMIT_ORDER_WITH_SENPI",
+        "HOW_DO_I_SETUP_AN_AUTONOMOUS_TRADE_WITH_SENPI",
+        "HOW_DO_I_AUTOMATE_TRADES_WITH_SENPI",
     ],
     description: "Provide users with tutorials to use Senpi",
     suppressInitialMessage: true,
@@ -128,6 +134,111 @@ export const tutorialAction: Action = {
                 user: "{{user1}}",
                 content: {
                     text: "can you give me tutorials on how to use the skills on Senpi?",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "Sorry, I don't have any tutorials for that request. Please try again later.",
+                    action: "TUTORIAL_YOUTUBE_HELP_SENPI",
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "How do I use Senpi?",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "To use Senpi, here's a tutorial for you: https://youtu.be/uElZko09rOg?si=BP4NYWgKm5MUHqV0x",
+                    action: "TUTORIAL_YOUTUBE_HELP_SENPI",
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "How do I get started with Senpi?",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "To get started with Senpi, here's a tutorial for you: https://youtu.be/uElZko09rOg?si=BP4NYWgKm5MUHqV0x",
+                    action: "TUTORIAL_YOUTUBE_HELP_SENPI",
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "How do I do token research with Senpi?",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "To do token research with Senpi, here's a tutorial for you: https://youtu.be/VigFMPzPmjQ?si=cAtVfHt-RrC86eKs",
+                    action: "TUTORIAL_YOUTUBE_HELP_SENPI",
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "How do I setup a limit order with Senpi?",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "To setup a limit order with Senpi, here's a tutorial for you: https://youtu.be/uElZko09rOg?si=BP4NYWgKm5MUHqV0x",
+                    action: "TUTORIAL_YOUTUBE_HELP_SENPI",
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "How do I setup an autonomous trade with Senpi?",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "To setup an autonomous trade with Senpi, here's a tutorial for you: https://youtu.be/uElZko09rOg?si=BP4NYWgKm5MUHqV0x",
+                    action: "TUTORIAL_YOUTUBE_HELP_SENPI",
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "How do I automate trades with Senpi?",
+                },
+            },
+            {
+                user: "{{user2}}",
+                content: {
+                    text: "To automate trades with Senpi, here's a tutorial for you: https://youtu.be/uElZko09rOg?si=BP4NYWgKm5MUHqV0x",
+                    action: "TUTORIAL_YOUTUBE_HELP_SENPI",
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "How do I use the skills on Senpi?",
                 },
             },
             {

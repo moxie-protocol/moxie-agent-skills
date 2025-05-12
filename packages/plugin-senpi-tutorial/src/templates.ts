@@ -32,7 +32,7 @@ Link: ${process.env.TOKEN_RESEARCH_TUTORIAL_URL}
 
 Link: ${process.env.LIMIT_ORDER_TUTORIAL_URL}
 
-If you don't find any of the tutorials relevant to the user's request, just say "Sorry, I don't find any tutorials for that request. For more help, please contact the Senpi team at [our Dojo](https://t.me/+VgP8Z8yPe045N2Ix)."
+If you don't find any of the tutorials relevant to the user's request, just say "Sorry, I don't find any tutorials for that request. For more help, please contact the Senpi team at [our Dojo](${process.env.SENPI_TELEGRAM_GROUP_URL})."
 
 Here are the recent user messages for context:
 {{recentMessages}}
