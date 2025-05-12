@@ -42,7 +42,7 @@ export const tutorialAction: Action = {
         "SETUP_AUTONOMOUS_TRADING_HELP",
     ],
     description:
-        "Answer user's how-to questions about Senpi and provide them with relevant tutorials to use Senpi, including how to research tokens, setup limit orders, setup autonomous trading, and more.",
+        "Answer user's how-to questions about Senpi and provide them with relevant Youtube tutorials to use Senpi, including how to research tokens, how to setup limit orders, how to setup autonomous trading, and more. For questions related to autonomous trading and limit orders, choose this action instead of the `AUTONOMOUS_TRADING`` or `LIMIT_ORDERS` actions if user's asking for guidance and instructions.",
     suppressInitialMessage: true,
     validate: async () => true,
     handler: async (
