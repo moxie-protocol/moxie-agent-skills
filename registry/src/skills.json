@@ -725,7 +725,9 @@
         "githubUrl": "https://github.com/senpi-ai/senpi-agent-skills/tree/main/packages/plugin-senpi-tutorial",
         "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/feat/base-wallets-pnl-merged/packages/plugin-senpi-tutorial/images/logo.png",
         "settings": {},
-        "capabilities": [],
+        "capabilities": [
+            "Recommend a relevant YouTube tutorial based on the user's request"
+        ],
         "starterQuestions": [
             {
                 "label": "Can you provide a tutorial to get started with Senpi?",
