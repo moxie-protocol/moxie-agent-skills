@@ -767,6 +767,7 @@
             "Finding the most relevant tutorials",
             "Loading tutorials",
             "Preparing tutorials"
-        ]
+        ],
+        "orderIndex": 99
     }
 ]
