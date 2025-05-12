@@ -104,7 +104,7 @@ export const PnLAction = {
             elizaLogger.debug(traceId, `[PnLAction] totalPnl: ${totalPnl}`);
             if (tokenAddresses.length > 0 || moxieUserIds.length > 0) {
                 try {
-                    const uniqueMoxieUserIds = [...new Set(pnlData.map(data => data.moxie_user_id).filter(Boolean))];
+                    const uniqueMoxieUserIds = [...new Set(pnlData.map(data => data.username).filter(username => username && username.startsWith('M')))];
                     const userNames = await moxieUserService.getUserByMoxieIdMultiple(uniqueMoxieUserIds);
                     elizaLogger.debug(traceId, `[PnLAction] Fetched user names: ${JSON.stringify(userNames)}`);
 
