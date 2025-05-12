@@ -721,34 +721,31 @@
         "displayName": "Senpi Tutorials",
         "version": "0.0.1",
         "author": null,
-        "description": "Provides step-by-step YouTube tutorials to help users master Senpi with ease and confidence.",
+        "description": "Watch video tutorials on how to trade like a pro with Senpi",
         "githubUrl": "https://github.com/senpi-ai/senpi-agent-skills/tree/main/packages/plugin-senpi-tutorial",
         "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-senpi-tutorial/images/logo.png",
         "settings": {},
         "capabilities": [
-            "List all the available tutorials for Senpi",
-            "Recommend a relevant YouTube tutorial based on the user's request"
+            "Get a list of Senpi tutorial videos",
+            "Watch tutorial videos in Senpi",
+            "Get recommended tutorials based on your needs"
         ],
         "starterQuestions": [
             {
-                "label": "List all the available tutorials for Senpi",
-                "value": "List all the available tutorials for Senpi"
+                "label": "How do I use Senpi?",
+                "value": "How do I use Senpi?"
             },
             {
-                "label": "Can you provide a tutorial to get started with Senpi?",
-                "value": "Can you provide a tutorial to get started with Senpi?"
+                "label": "How do I setup limit orders?",
+                "value": "How do I setup limit orders?"
             },
             {
-                "label": "Is there a tutorial to setup a limit order?",
-                "value": "Is there a tutorial to setup a limit order?"
+                "label": "How do I setup autonomous trading?",
+                "value": "How do I setup autonomous trading?"
             },
             {
-                "label": "Give me a video tutorial on how to setup my first an autonomous trade",
-                "value": "Give me a video tutorial on how to setup my first an autonomous trade"
-            },
-            {
-                "label": "Can you share a tutorial to do token research on Senpi?",
-                "value": "Can you share a tutorial to do token research on Senpi?"
+                "label": "How do I setup autonomous trading?",
+                "value": "How do I setup autonomous trading?"
             }
         ],
         "mediaUrls": [
