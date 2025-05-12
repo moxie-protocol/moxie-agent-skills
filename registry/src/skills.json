@@ -744,8 +744,8 @@
                 "value": "How do I setup autonomous trading?"
             },
             {
-                "label": "How do I setup autonomous trading?",
-                "value": "How do I setup autonomous trading?"
+                "label": "How do I research tokens on Senpi?",
+                "value": "How do I research tokens on Senpi?"
             }
         ],
         "mediaUrls": [
@@ -765,6 +765,19 @@
             "HOW_DO_I_SETUP_A_LIMIT_ORDER_WITH_SENPI",
             "HOW_DO_I_SETUP_AN_AUTONOMOUS_TRADE_WITH_SENPI",
             "HOW_DO_I_AUTOMATE_TRADES_WITH_SENPI",
+            "HOW_DO_I_SETUP_LIMIT_ORDERS",
+            "HOW_DO_I_SETUP_AUTONOMOUS_TRADING",
+            "HOW_DO_I_RESEARCH_TOKENS_ON_SENPI",
+            "SETUP_LIMIT_ORDERS",
+            "SETUP_AUTONOMOUS_TRADING",
+            "SETUP_LIMIT_ORDERS_TUTORIAL",
+            "SETUP_AUTONOMOUS_TRADING_TUTORIAL",
+            "SETUP_LIMIT_ORDERS_GUIDES",
+            "SETUP_AUTONOMOUS_TRADING_GUIDES",
+            "SETUP_LIMIT_ORDERS_INSTRUCTIONS",
+            "SETUP_AUTONOMOUS_TRADING_INSTRUCTIONS",
+            "SETUP_LIMIT_ORDERS_HELP",
+            "SETUP_AUTONOMOUS_TRADING_HELP",
             "LEARN_SENPI",
             "LEARN_SENPI",
             "LEARN_SENPI_TUTORIAL",
