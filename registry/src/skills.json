@@ -723,7 +723,7 @@
         "author": "Yoseph",
         "description": "Provides YouTube tutorials to help users to learn how to use Senpi.",
         "githubUrl": "https://github.com/senpi-ai/senpi-agent-skills/tree/main/packages/plugin-senpi-tutorial",
-        "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-senpi-tutorial/images/logo.png",
+        "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/feat/base-wallets-pnl-merged/packages/plugin-senpi-tutorial/images/logo.png",
         "settings": {},
         "capabilities": [],
         "starterQuestions": [
