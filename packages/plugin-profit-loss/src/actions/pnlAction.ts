@@ -110,15 +110,17 @@ export const PnLAction = {
 
                     // Replace moxieUserIds in pnlData with formatted userNames
                     pnlData.forEach((data) => {
-                        if (data.moxie_user_id) {
-                            const userName = userNames.get(data.moxie_user_id)?.userName;
-                            if (/^0x[a-fA-F0-9]{40}$/.test(data.moxie_user_id)) {
-                                const formattedId = `${data.moxie_user_id.slice(0, 6)}...${data.moxie_user_id.slice(-4)}`;
-                                data.moxie_user_id = `@[${formattedId}|${formattedId}]`;
+                        if (data.username) {
+                            const userName = userNames.get(data.username)?.userName;
+                            if (/^M/.test(data.username)) {
+                                data.username = userName
+                                    ? `@[${userName}|${data.username}]`
+                                    : `@[${data.username}|${data.username}]`;
+                            } else if (/^0x[a-fA-F0-9]{40}$/.test(data.username)) {
+                                const formattedId = `${data.username.slice(0, 6)}...${data.username.slice(-4)}`;
+                                data.username = `@[${formattedId}|${formattedId}]`;
                             } else {
-                                data.moxie_user_id = userName
-                                    ? `@[${userName}|${data.moxie_user_id}]`
-                                    : `@[${data.moxie_user_id}|${data.moxie_user_id}]`;
+                                data.username = `@[${data.username}|${data.username}]`;
                             }
                         }
                     });
