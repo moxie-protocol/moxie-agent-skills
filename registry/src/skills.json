@@ -718,10 +718,10 @@
     {
         "pluginId": "767a9871-a8c6-51df-a4fd-f42c9e4f6d37",
         "name": "@moxie-protocol/plugin-senpi-tutorial",
-        "displayName": "Senpi YouTube Tutorials",
+        "displayName": "Senpi Tutorials",
         "version": "0.0.1",
         "author": "Yoseph",
-        "description": "Provides YouTube tutorials to help users to learn how to use Senpi.",
+        "description": "Provides step-by-step YouTube tutorials to help users master Senpi with ease and confidence.",
         "githubUrl": "https://github.com/senpi-ai/senpi-agent-skills/tree/main/packages/plugin-senpi-tutorial",
         "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-senpi-tutorial/images/logo.png",
         "settings": {},
