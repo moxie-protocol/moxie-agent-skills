@@ -748,6 +748,7 @@
             "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-senpi-tutorial/images/logo.png"
         ],
         "actions": [
+            "TUTORIAL_YOUTUBE_HELP_SENPI",
             "TUTORIAL_TO_USE_SENPI",
             "TUTORIAL_TO_GET_STARTED_WITH_SENPI",
             "TUTORIAL_TO_DO_TOKEN_RESEARCH_WITH_SENPI",
