@@ -333,7 +333,7 @@ async function processMessage(
             );
             return {
                 callBackTemplate: {
-                    text: `${limitOrderOptions.error.prompt_message}${limitOrderOptions.error.missing_fields ? `\nTo learn more on how to place a limit order on Senpi, you can follow our [Limit Order Tutorial](${process.env.LIMIT_ORDER_TUTORIAL_URL}).` : ""}`,
+                    text: limitOrderOptions.error.prompt_message,
                     content: {
                         action: "LIMIT_ORDERS",
                         inReplyTo: message.id,

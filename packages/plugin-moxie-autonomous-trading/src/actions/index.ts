@@ -158,7 +158,7 @@ export const autonomousTradingAction: Action = {
                     `[autonomous trading] [${moxieUserId}] [AUTONOMOUS_TRADING] [ADD_RULE] error occured while performing add rule operation: ${JSON.stringify(autonomousTradingResponse.error)}`
                 );
                 callback?.({
-                    text: `${autonomousTradingResponse.error.prompt_message}${autonomousTradingResponse.error.missing_fields ? `\nTo learn more on how to setup an autonomous trade on Senpi, you can follow our [Autonomous Trade Tutorial](${process.env.AUTONOMOUS_TRADING_TUTORIAL_URL}).` : ""}`,
+                    text: autonomousTradingResponse.error.prompt_message,
                     action: "AUTONOMOUS_TRADING",
                 });
                 return true;
