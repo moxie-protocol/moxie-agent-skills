@@ -130,7 +130,7 @@ export const PnLAction = {
                 .replace("{{conversation}}", JSON.stringify(message.content.text))
                 .replace("{{criteria}}", JSON.stringify(pnlResponse.criteria))
                 .replace("{{pnlData}}", JSON.stringify(pnlData))
-                .replace("{{totalPnl}}", (moxieUserIds.length > 0 || walletAddresses.length > 0) ? totalPnl.toString() : "");
+                .replace("{{totalPnl}}", (moxieUserIds.length > 0 || walletAddresses.length > 0) && totalPnl !== null ? totalPnl.toString() : "0");
 
             const currentContext = composeContext({
                 state,
@@ -155,8 +155,9 @@ export const PnLAction = {
 
             return true;
         } catch (error) {
+            elizaLogger.error(traceId, `[PnLAction] Error fetching PnL data: ${error}`);
             await callback?.({
-                text: `Error fetching PnL data: ${error.message}`
+                text: `Error fetching PnL data, please try again later`
             });
             return true;
         }
