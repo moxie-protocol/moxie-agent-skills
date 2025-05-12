@@ -1,4 +1,5 @@
 export interface PnlData {
+    username: string;
     wallet_address: string;
     moxie_user_id: string;
     token_address: string;
