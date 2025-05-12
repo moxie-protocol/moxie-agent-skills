@@ -730,6 +730,10 @@
         ],
         "starterQuestions": [
             {
+                "label": "List all the available tutorials for Senpi",
+                "value": "List all the available tutorials for Senpi"
+            },
+            {
                 "label": "Can you provide a tutorial to get started with Senpi?",
                 "value": "Can you provide a tutorial to get started with Senpi?"
             },
