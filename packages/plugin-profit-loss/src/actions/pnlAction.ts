@@ -124,7 +124,7 @@ export const PnLAction = {
                         } else if (data.moxie_user_id?.startsWith('M')) {
                             data.username = `@[${data.username}|${data.moxie_user_id}]`;
                         } else {
-                            data.username = `@[${data.username}|${data.username}]`;
+                            data.username = `@[${data.username}|${data.wallet_address}]`;
                         }
                     });
                 } catch (error) {
