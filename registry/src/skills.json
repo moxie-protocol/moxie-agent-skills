@@ -865,6 +865,7 @@
         "minimumSkillBalance": 0,
         "status": "ACTIVE",
         "isDefault": true,
-        "loaders": ["Dusting your wallet"]
+        "loaders": ["Dusting your wallet"],
+        "orderIndex": 14
     }
 ]
