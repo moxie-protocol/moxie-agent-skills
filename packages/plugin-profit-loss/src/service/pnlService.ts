@@ -27,7 +27,9 @@ const BLACKLISTED_TOKEN_ADDRESSES = [
   '0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34',
   '0x04c0599ae5a44757c0af6f9ec3b93da8976c150a',
   '0x5875eee11cf8398102fdad704c9e96607675467a',
-  '0x3128a0f7f0ea68e7b7c9b00afa7e41045828e858'
+  '0x3128a0f7f0ea68e7b7c9b00afa7e41045828e858',
+  '0xd9aaec86b65d86f6a7b5b1b0c42ffa531710b6ca',
+  '0xb79dd08ea68a908a97220c76d19a6aa9cbde4376'
 ];
 
 export const preparePnlQuery = (pnlResponse: any) => {
@@ -162,13 +164,22 @@ export const fetchTotalPnl = async (pnlResponse: any) => {
 
   let query = `select SUM(profit_loss) as total_profit_loss from dune.moxieprotocol.result_moxie_wallets`;
   let start = new Date();
-  if (walletAddresses?.length > 0 && moxieUserIds?.length > 0) {
-    query += ` where wallet_address in (${walletAddresses.map((address) => `${address}`).join(",")}) and moxie_user_id in (${moxieUserIds.map((id) => `'${id}'`).join(",")})`;
-  } else if (walletAddresses?.length > 0) {
-    query += ` where wallet_address in (${walletAddresses.map((address) => `${address}`).join(",")})`;
-  } else if (moxieUserIds?.length > 0) {
-    query += ` where moxie_user_id in (${moxieUserIds.map((id) => `'${id}'`).join(",")})`;
+  let conditions = [];
+
+  if (walletAddresses?.length > 0) {
+    conditions.push(`wallet_address in (${walletAddresses.map((address) => `${address}`).join(",")})`);
   }
+  if (moxieUserIds?.length > 0) {
+    conditions.push(`moxie_user_id in (${moxieUserIds.map((id) => `'${id}'`).join(",")})`);
+  }
+  if (BLACKLISTED_TOKEN_ADDRESSES.length > 0) {
+    conditions.push(`token_address not in (${BLACKLISTED_TOKEN_ADDRESSES.map((token) => `${token}`).join(",")})`);
+  }
+
+  if (conditions.length > 0) {
+    query += ` where ${conditions.join(" and ")}`;
+  }
+  elizaLogger.debug(`[fetchTotalPnl] query: ${query}`);
 
   while (retries > 0) {
     try {

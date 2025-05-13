@@ -45,6 +45,7 @@ Instructions:
 
 6. Response Format:
    Provide a JSON response with the following structure:
+   \`\`\`json
    {
      "success": boolean,
      "actionType": string (optional),
@@ -55,7 +56,7 @@ Instructions:
        // ManageGroupsError object (null if no error)
      }
    }
-
+   \`\`\`
 Before providing your final response, conduct your analysis inside <analysis> tags. In your analysis:
 
 1. List all action types and their required parameters in a structured format:
