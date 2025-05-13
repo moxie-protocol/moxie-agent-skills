@@ -16,16 +16,14 @@ import {
 import { portfolioExamples } from "./examples";
 import { mutiplePortfolioSummary, portfolioSummary } from "./template";
 import { portfolioUserIdsExtractionTemplate } from "../../commonTemplate";
-import { getMoxiePortfolioInfo, MoxieUser, moxieUserService, getPortfolioData, Portfolio, getPortfolioV2Data, PortfolioV2Data, MoxiePortfolioInfo, MoxieAgentDBAdapter } from "@moxie-protocol/moxie-agent-lib";
+import { MoxieUser, moxieUserService, getPortfolioData, Portfolio, getPortfolioV2Data, PortfolioV2Data, MoxieAgentDBAdapter } from "@moxie-protocol/moxie-agent-lib";
 import { getCommonHoldings, getMoxieCache, getMoxieToUSD, getWalletAddresses, setMoxieCache, handleIneligibleMoxieUsers, formatMessages } from "../../util";
 import { PortfolioUserRequested } from "../../types";
 
 export interface PortfolioSummary {
     [userName: string]: {
         tokenBalances: any[];
-        appBalances: any[];
         totalTokenValue: number;
-        totalCreatorCoinValue: number;
     }
 }
 
@@ -35,12 +33,10 @@ export interface PortfolioSummary {
  */
 async function generatePortfolioSummary(
     portfolioV2Data: PortfolioV2Data,
-    fanTokenPortfolioData: MoxiePortfolioInfo[],
     moxieUserInfo: MoxieUser,
     message: Memory,
     runtime: IAgentRuntime,
     isSelfPortolioRequested: boolean,
-    totalCreatorCoinValue: number
 ) {
 
 
@@ -48,8 +44,6 @@ async function generatePortfolioSummary(
         tokenBalances: portfolioV2Data?.tokenBalances?.byToken?.edges,
     };
 
-    const fanTokenWalletAddresses = [...new Set(fanTokenPortfolioData?.flatMap(portfolio => portfolio.walletAddresses))]
-        .map((address: string) => `${address.slice(0, 2)}*****${address.slice(-4)}`);
 
     const tokenAddresses = [...new Set(portfolioV2Data?.metadata?.addresses)]
         .map((address: string) => `${address.slice(0, 2)}*****${address.slice(-4)}`);
@@ -57,7 +51,6 @@ async function generatePortfolioSummary(
     // Compose new state with filtered portfolio data
     const newstate = await runtime.composeState(message, {
         portfolio: JSON.stringify(portfolioDataFiltered),
-        fanTokenPortfolioData: JSON.stringify(fanTokenPortfolioData),
         moxieUserInfo: JSON.stringify(moxieUserInfo),
         truncatedMoxieUserInfo: JSON.stringify({
             id: moxieUserInfo.id,
@@ -66,8 +59,6 @@ async function generatePortfolioSummary(
             bio: moxieUserInfo.bio,
         }),
         tokenAddresses: isSelfPortolioRequested ? JSON.stringify(tokenAddresses) : JSON.stringify([]),
-        fanTokenWalletAddresses: isSelfPortolioRequested ? JSON.stringify(fanTokenWalletAddresses) : JSON.stringify([]),
-        totalCreatorCoinValue: totalCreatorCoinValue,
         message: message.content.text
     });
 
@@ -118,35 +109,15 @@ export async function handleMultipleUsers(
             token.node.holdingPercentage = (token.node.balanceUSD*100) / totalTokenValue
         })
 
-        const fanTokenPortfolioData = await getMoxiePortfolioInfo(userInfo.id, runtime)
-        let totalCreatorCoinValue = 0
-        let fanTokenHoldings = []
 
-        if (fanTokenPortfolioData && fanTokenPortfolioData.length > 0) {
-            fanTokenPortfolioData.forEach(portfolio => {
-                portfolio.totalAmount = portfolio.totalLockedAmount + portfolio.totalUnlockedAmount
-                portfolio.lockedTvlInUSD = portfolio.lockedTvl * moxieToUSD
-                portfolio.unlockedTvlInUSD = portfolio.unlockedTvl * moxieToUSD
-                portfolio.totalTvlInUSD = portfolio.totalTvl * moxieToUSD
-                portfolio.displayLabel = portfolio.fanTokenMoxieUserId && portfolio.fanTokenMoxieUserId.length > 0 ? `@[${portfolio.fanTokenName}|${portfolio.fanTokenMoxieUserId}]` : portfolio.fanTokenName || portfolio.fanTokenSymbol
-                totalCreatorCoinValue += portfolio.totalTvlInUSD || 0
-                fanTokenHoldings.push({fanTokenSymbol: portfolio.fanTokenSymbol, totalTvlInUSD: portfolio.totalTvlInUSD, totalAmount: (portfolio.totalLockedAmount + portfolio.totalUnlockedAmount), displayLabel: portfolio.displayLabel})
-            })
-            fanTokenPortfolioData.forEach(portfolio => {
-                portfolio.holdingPercentage = (portfolio.totalTvlInUSD * 100) / totalCreatorCoinValue
-            })
-        }
 
         portfolioSummaries.push({
             [userInfo.userName]: {
                 tokenBalances: tokenBalancesFiltered,
-                appBalances: fanTokenPortfolioData,
                 totalTokenValue: totalTokenValue,
-                totalCreatorCoinValue: totalCreatorCoinValue,
             }
         });
         commonPortfolioHoldingsMetadata[userInfo.userName] = {
-            fanTokenHoldings: fanTokenHoldings,
             tokenHoldings: tokenHoldings
         }
     }
@@ -282,12 +253,11 @@ export default {
                 }
 
                 const {portfolioSummaries, commonPortfolioHoldingsMetadata} = await handleMultipleUsers(moxieUserInfoMultiple, runtime, moxieToUSD);
-                const {filteredCommonFanTokenHoldings,filteredCommonTokenHoldings} = getCommonHoldings(moxieUserInfoMultiple, commonPortfolioHoldingsMetadata)
+                const {filteredCommonTokenHoldings} = getCommonHoldings(moxieUserInfoMultiple, commonPortfolioHoldingsMetadata)
                 const newstate = await runtime.composeState(message, {
                     portfolioSummaries: JSON.stringify(portfolioSummaries),
                     isSelfPortolioRequested: JSON.stringify(false),
                     message: message.content.text,
-                    filteredCommonFanTokenHoldings: JSON.stringify(filteredCommonFanTokenHoldings),
                     filteredCommonTokenHoldings: JSON.stringify(filteredCommonTokenHoldings),
                     ineligibleMoxieUsers: JSON.stringify(ineligibleMoxieUsers)
                 });
@@ -363,20 +333,6 @@ export default {
             portfolioV2Data?.tokenBalances?.byToken?.edges?.forEach(token => {
                 token.node.holdingPercentage = (token?.node?.balanceUSD*100) / totalTokenValue
             })
-            const fanTokenPortfolioData = await getMoxiePortfolioInfo(moxieUserInfo?.id, runtime)
-            let totalCreatorCoinValue = 0
-            if (fanTokenPortfolioData && fanTokenPortfolioData.length > 0) {
-                fanTokenPortfolioData.forEach(portfolio => {
-                    portfolio.totalAmount = portfolio.totalLockedAmount + portfolio.totalUnlockedAmount
-                    portfolio.lockedTvlInUSD = portfolio.lockedTvl * moxieToUSD
-                    portfolio.unlockedTvlInUSD = portfolio.unlockedTvl * moxieToUSD
-                    portfolio.totalTvlInUSD = portfolio.totalTvl * moxieToUSD
-                    portfolio.displayLabel = portfolio.fanTokenMoxieUserId && portfolio.fanTokenMoxieUserId.length > 0 ? `@[${portfolio.fanTokenName}|${portfolio.fanTokenMoxieUserId}]` : portfolio.fanTokenName || portfolio.fanTokenSymbol
-                    totalCreatorCoinValue += portfolio.totalTvlInUSD || 0
-                })
-                fanTokenPortfolioData.forEach(portfolio => {
-                    portfolio.holdingPercentage = (portfolio.totalTvlInUSD * 100) / totalCreatorCoinValue
-                })}
 
             if(!portfolioV2Data || portfolioV2Data?.tokenBalances?.totalBalanceUSD === 0) {
                 elizaLogger.error("[Portfolio] No Tokens in the portfolio for this wallet address: ", walletAddresses, ' moxieUser :', JSON.stringify(moxieUserInfo));
@@ -390,7 +346,7 @@ export default {
             elizaLogger.success("[Portfolio] Portfolio data fetched successfully");
             elizaLogger.log("[Portfolio] Generating portfolio summary");
 
-            const summaryStream = await generatePortfolioSummary(portfolioV2Data, fanTokenPortfolioData, moxieUserInfo, message, runtime, isSelfPortolioRequested, totalCreatorCoinValue);
+            const summaryStream = await generatePortfolioSummary(portfolioV2Data, moxieUserInfo, message, runtime, isSelfPortolioRequested);
 
             elizaLogger.success("[Portfolio] Successfully generated portfolio summary");
 
