@@ -131,6 +131,10 @@ export const PnLAction = {
                     elizaLogger.error(traceId, `[PnLAction] Error fetching user names for Moxie IDs: ${error.message}`);
                 }
             }
+            // Remove the wallet_address field from each entry in pnlData
+            pnlData.forEach((data) => {
+                delete data.wallet_address;
+            });
             let pnlDataTemplate = pnlTemplate.replace("{{latestMessage}}", latestMessage)
                 .replace("{{conversation}}", JSON.stringify(message.content.text))
                 .replace("{{criteria}}", JSON.stringify(pnlResponse.criteria))
