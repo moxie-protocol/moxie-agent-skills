@@ -3,7 +3,7 @@ import { Context, GetQuoteResponse } from "../types/types";
 import { createClientV2 } from "@0x/swap-ts-sdk";
 import { elizaLogger } from "@moxie-protocol/core";
 import { ethers } from "ethers";
-import { ERC20_TXN_SLIPPAGE_BPS } from "../constants";
+import { INITIAL_SLIPPAGE_IN_BPS, SLIPPAGE_INCREMENT_PER_RETRY_IN_BPS, SWAP_RETRY_COUNT, SWAP_RETRY_DELAY } from "../constants";
 import { mockGetQuoteResponse } from "../constants/constants";
 
 const initializeClients = () => {
@@ -58,11 +58,11 @@ export const get0xSwapQuote = async ({
     buyTokenSymbol: string;
     sellTokenSymbol: string;
 }) => {
-    const MAX_RETRIES = 5;
-    const RETRY_DELAY = 1000; // 1 second delay between retries
+    const MAX_RETRIES = SWAP_RETRY_COUNT;
+    const RETRY_DELAY = SWAP_RETRY_DELAY;
     
     let retryCount = 0;
-    let adjustedSlippage = ERC20_TXN_SLIPPAGE_BPS;
+    let adjustedSlippage = INITIAL_SLIPPAGE_IN_BPS;
     while (retryCount < MAX_RETRIES) {
         try {
             elizaLogger.debug(
@@ -105,8 +105,8 @@ export const get0xSwapQuote = async ({
 
             elizaLogger.warn(traceId,`[get0xSwapQuote] [${moxieUserId}] [RETRY ${retryCount}/${MAX_RETRIES}] Failed to get 0x swap quote: ${JSON.stringify(error)}`);
             
-            // increments the slippage by 5% for each retry
-            adjustedSlippage += ERC20_TXN_SLIPPAGE_BPS;
+            // increments the slippage for each retry
+            adjustedSlippage += SLIPPAGE_INCREMENT_PER_RETRY_IN_BPS;    
             elizaLogger.debug(traceId,`[get0xSwapQuote] [${moxieUserId}] adjustedSlippage after retry ${retryCount}: ${adjustedSlippage}`)
             
             // Wait before retrying

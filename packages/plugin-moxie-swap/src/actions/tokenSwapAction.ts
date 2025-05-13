@@ -9,7 +9,7 @@ import {
     type Memory,
     type State
 } from "@moxie-protocol/core";
-import { ftaService, getERC20TokenSymbol, MoxieClientWallet, MoxieHex, MoxieUser, MoxieWalletClient, MoxieWalletSendTransactionResponseType, MoxieWalletSignTypedDataResponseType, Portfolio } from "@moxie-protocol/moxie-agent-lib";
+import { ftaService, getERC20TokenSymbol, MoxieClientWallet, MoxieHex, MoxieUser, MoxieWalletClient, MoxieWalletSendTransactionResponseType, MoxieWalletSignTypedDataResponseType } from "@moxie-protocol/moxie-agent-lib";
 import {
     tokenSwapTemplate,
 } from "../templates/tokenSwapTemplate";
@@ -676,7 +676,7 @@ export const tokenSwapAction = {
                                         MOXIE_TOKEN_DECIMALS,
                                         buyTokenDecimals,
                                         callback,
-                                        state.agentWalletBalance as Portfolio,
+                                        state.agentWalletBalance,
                                         walletClient
                                     );
                                     elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [VALUE_TYPE] buyAmountInWEI: ${buyAmountInWEI}`);
@@ -761,7 +761,7 @@ export const tokenSwapAction = {
                                                 MOXIE_TOKEN_DECIMALS,
                                                 buyTokenDecimals,
                                                 callback,
-                                                state.agentWalletBalance as Portfolio,
+                                                state.agentWalletBalance,
                                                 walletClient
                                                 );
                                             elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] buyAmountInWEI: ${buyAmountInWEI}`);
@@ -817,7 +817,7 @@ export const tokenSwapAction = {
                                             MOXIE_TOKEN_DECIMALS,
                                             buyTokenDecimals,
                                             callback,
-                                            state.agentWalletBalance as Portfolio,
+                                            state.agentWalletBalance,
                                             walletClient
                                             );
                                         elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] swap response - buyAmountInWEI: ${buyAmountInWEI}`);
@@ -873,7 +873,7 @@ export const tokenSwapAction = {
                                             MOXIE_TOKEN_DECIMALS,
                                             buyTokenDecimals,
                                             callback,
-                                            state.agentWalletBalance as Portfolio,
+                                            state.agentWalletBalance,
                                             walletClient
                                         );
                                         elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] [MOXIE] buyAmountInWEI: ${buyAmountInWEI}`);
@@ -956,7 +956,7 @@ export const tokenSwapAction = {
                                                 sellTokenDecimals,
                                                 MOXIE_TOKEN_DECIMALS,
                                                 callback,
-                                                state.agentWalletBalance as Portfolio,
+                                                state.agentWalletBalance,
                                                 walletClient,
                                             );
                                             elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] [USD_VALUE_TYPE] buyAmountInWEI: ${buyAmountInWEI}`);
@@ -973,7 +973,7 @@ export const tokenSwapAction = {
                                     if (currentBalance < buyQuantityInWEI) {
                                         await handleInsufficientBalance(
                                             traceId,
-                                            state.agentWalletBalance as Portfolio,
+                                            state.agentWalletBalance,
                                             moxieUserId,
                                             MOXIE_TOKEN_ADDRESS,
                                             MOXIE,
@@ -1052,7 +1052,7 @@ export const tokenSwapAction = {
                                             sellTokenDecimals,
                                             MOXIE_TOKEN_DECIMALS,
                                             callback,
-                                            state.agentWalletBalance as Portfolio,
+                                            state.agentWalletBalance,
                                             walletClient,
                                         );
                                         elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_CREATOR] [BUY_QUANTITY] buyAmountInWEI: ${buyAmountInWEI}`);
@@ -1069,7 +1069,7 @@ export const tokenSwapAction = {
                                 if (currentBalance < quantityInWEI) {
                                     await handleInsufficientBalance(
                                         traceId,
-                                        state.agentWalletBalance as Portfolio,
+                                        state.agentWalletBalance,
                                         moxieUserId,
                                         MOXIE_TOKEN_ADDRESS,
                                         MOXIE,
@@ -1148,7 +1148,7 @@ export const tokenSwapAction = {
                                                 sellTokenDecimals,
                                                 MOXIE_TOKEN_DECIMALS,
                                                 callback,
-                                                state.agentWalletBalance as Portfolio,
+                                                state.agentWalletBalance,
                                                 walletClient
                                             );
                                             elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [USD_VALUE_TYPE] buyAmountInWEI: ${buyAmountInWEI}`);
@@ -1201,7 +1201,7 @@ export const tokenSwapAction = {
                                             sellTokenDecimals,
                                             MOXIE_TOKEN_DECIMALS,
                                             callback,
-                                            state.agentWalletBalance as Portfolio,
+                                            state.agentWalletBalance,
                                             walletClient
                                         );
                                         elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [DEFAULT] buyAmountInWEI: ${buyAmountInWEI}`);
@@ -1253,7 +1253,7 @@ export const tokenSwapAction = {
                                             sellTokenDecimals,
                                             MOXIE_TOKEN_DECIMALS,
                                             callback,
-                                            state.agentWalletBalance as Portfolio,
+                                            state.agentWalletBalance,
                                             walletClient
                                         );
                                         elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [CREATOR_TO_TOKEN] [BALANCE_BASED] [MOXIE] buyAmountInWEI: ${buyAmountInWEI}`);
@@ -1341,7 +1341,7 @@ export const tokenSwapAction = {
                                                 sellTokenDecimals,
                                                 buyTokenDecimals,
                                                 callback,
-                                                state.agentWalletBalance as Portfolio,
+                                                state.agentWalletBalance,
                                                 walletClient,
                                             );
                                             elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [tokenSwapAction] [SWAP] [TOKEN_TO_TOKEN] [BUY_QUANTITY] [USD_VALUE_TYPE] buyAmountInWEI: ${buyAmountInWEI}`);
@@ -1388,7 +1388,7 @@ export const tokenSwapAction = {
 
                                     await handleInsufficientBalance(
                                         traceId,
-                                        state.agentWalletBalance as Portfolio,
+                                        state.agentWalletBalance,
                                         moxieUserId,
                                         sellTokenAddress,
                                         sellTokenSymbol,
@@ -1415,7 +1415,7 @@ export const tokenSwapAction = {
                                         sellTokenDecimals,
                                         buyTokenDecimals,
                                         callback,
-                                        state.agentWalletBalance as Portfolio,
+                                        state.agentWalletBalance,
                                         walletClient
                                     );
                                 } catch (error) {
@@ -1477,7 +1477,7 @@ export const tokenSwapAction = {
                                         sellTokenDecimals,
                                         buyTokenDecimals,
                                         callback,
-                                        state.agentWalletBalance as Portfolio,
+                                        state.agentWalletBalance,
                                         walletClient
                                     );
                                 } catch (error) {
@@ -1511,7 +1511,7 @@ export const tokenSwapAction = {
                                         sellTokenDecimals,
                                         buyTokenDecimals,
                                         callback,
-                                        state.agentWalletBalance as Portfolio,
+                                        state.agentWalletBalance,
                                         walletClient
                                     );
                                 } catch (error) {
@@ -1548,7 +1548,7 @@ export const tokenSwapAction = {
                                         sellTokenDecimals,
                                         buyTokenDecimals,
                                         callback,
-                                        state.agentWalletBalance as Portfolio,
+                                        state.agentWalletBalance,
                                         walletClient
                                     );
                                 } catch (error) {
@@ -1732,7 +1732,7 @@ async function swap(
     sellTokenDecimals: number,
     buyTokenDecimals: number,
     callback: any,
-    agentWalletBalance: Portfolio,
+    agentWalletBalance,
     walletClient: MoxieWalletClient
 ): Promise<bigint> {
     elizaLogger.debug(traceId,`[tokenSwap] [${moxieUserId}] [swap] called, buyTokenAddress: ${buyTokenAddress}, buyTokenSymbol: ${buyTokenSymbol}, sellTokenAddress: ${sellTokenAddress}, sellTokenSymbol: ${sellTokenSymbol}, agentWalletAddress: ${agentWalletAddress}, sellAmountInWEI: ${sellAmountInWEI}`);
@@ -2220,7 +2220,7 @@ async function getCreatorCoinDetails(
  */
 async function handleInsufficientBalance(
     traceId: string,
-    currentWalletBalance: Portfolio,
+    currentWalletBalance,
     moxieUserId: string,
     sellTokenAddress: string,
     sellTokenSymbol: string,

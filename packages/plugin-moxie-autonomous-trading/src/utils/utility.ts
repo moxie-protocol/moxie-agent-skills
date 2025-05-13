@@ -195,7 +195,7 @@ const errorMessages: Record<string, string> = {
     AERR045: "Number of users for sell condition is provided bigger than the actual users in the rule. Please provide lower number.",
     AERR046: "Number of users for sell condition is provided bigger than actual users in the group. Please provide lower number.",
     AERR201: "Please try again with a valid group. Make sure to use '#' to select from your available groups. You can also ask me to create a new group by typing: create the group [groupname]",
-    AERR202: "Please add members to the group before setting up auto-trading",
+    AERR202: "Please add members to the group before setting up auto-trading. For example: add @betashop.eth to #copytrade",
     AERR203: "Hi, I'd be happy to help you setup that auto-trade but there are less members in the group than the copy traded users count. You can ask me to add more members by typing: add [user] to [groupname]",
     AERR204: "Hi, I'd be happy to help you setup that auto-trade but there are less members in the group than the sell condition value. You can ask me to add more members by typing: add [user] to [groupname]",
 };
