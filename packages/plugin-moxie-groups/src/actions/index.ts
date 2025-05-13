@@ -202,6 +202,8 @@ async function handleCreateGroupAndAddMember(traceId: string, moxieUserId: strin
             });
             return;
         }
+
+        elizaLogger.debug(traceId, `[MANAGE_GROUPS] [CREATE_GROUP_AND_ADD_GROUP_MEMBER] Senpi user IDs to add: ${senpiUserIdsToAdd}`);
         const isValidUserId = senpiUserIdsToAdd.every(userId => userId.startsWith('M'));
         if (!isValidUserId) {
             elizaLogger.warn(traceId, `[MANAGE_GROUPS] [CREATE_GROUP_AND_ADD_GROUP_MEMBER] All Senpi user IDs must start with a capital 'M'`);
@@ -257,6 +259,7 @@ async function handleAddGroupMember(traceId: string, moxieUserId: string, state:
             return;
         }
 
+        elizaLogger.debug(traceId, `[MANAGE_GROUPS] [ADD_GROUP_MEMBER] Senpi user IDs to add: ${senpiUserIdsToAdd}`);
         const isValidUserId = senpiUserIdsToAdd.every(userId => userId.startsWith('M'));
         if (!isValidUserId) {
             elizaLogger.warn(traceId, `[MANAGE_GROUPS] [ADD_GROUP_MEMBER] All Senpi user IDs must start with a capital 'M'`);
@@ -267,6 +270,7 @@ async function handleAddGroupMember(traceId: string, moxieUserId: string, state:
             return;
         }
 
+        elizaLogger.debug(traceId, `[MANAGE_GROUPS] [ADD_GROUP_MEMBER] Senpi user IDs to add: ${senpiUserIdsToAdd}`);
         const response = await addMembersToGroup(state.authorizationHeader as string, groupId, senpiUserIdsToAdd) as GroupOutput;
         const moxieUserProfiles = await moxieUserService.getUserByMoxieIdMultipleMinimal(senpiUserIdsToAdd);
         const idToUsernameMap = new Map();
