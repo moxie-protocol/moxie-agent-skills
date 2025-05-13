@@ -5,7 +5,7 @@ import { previewDustAction } from "./actions/dustPreview";
 const aiDusterPlugin: Plugin = {
     name: "AI Duster",
     description:
-        "Dust low-value tokens into ETH using your Moxie agent wallet.",
+        "Dust low-value tokens into ETH using your Senpi agent wallet.",
     actions: [dustWalletAction, explainAiDustingAction, previewDustAction],
     providers: [],
     evaluators: [],
