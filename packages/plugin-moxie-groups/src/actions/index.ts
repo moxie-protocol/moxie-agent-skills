@@ -192,7 +192,7 @@ async function handleCreateGroupAndAddMember(traceId: string, moxieUserId: strin
         }
 
         const response = await createGroup(state.authorizationHeader as string, groupName) as GroupOutput;
-        await createStubAccountsForEthereumAddresses(traceId, senpiUserIdsToAdd);
+        await createStubAccountsForEthereumAddresses(traceId, senpiUserIdsToAdd, callback);
         const isValidUserId = senpiUserIdsToAdd.every(userId => userId.startsWith('M'));
         if (!isValidUserId) {
             elizaLogger.warn(traceId, `[MANAGE_GROUPS] [CREATE_GROUP_AND_ADD_GROUP_MEMBER] All Senpi user IDs must start with a capital 'M'`);
@@ -236,7 +236,7 @@ async function handleAddGroupMember(traceId: string, moxieUserId: string, state:
             });
             return;
         }
-        await createStubAccountsForEthereumAddresses(traceId, senpiUserIdsToAdd);
+        await createStubAccountsForEthereumAddresses(traceId, senpiUserIdsToAdd, callback);
 
         const isValidUserId = senpiUserIdsToAdd.every(userId => userId.startsWith('M'));
         if (!isValidUserId) {
@@ -484,7 +484,7 @@ async function handleUpdateGroup(traceId: string, moxieUserId: string, state: St
     }
 }
 
-async function createStubAccountsForEthereumAddresses(traceId: string, senpiUserIdsToAdd: string[]) {
+async function createStubAccountsForEthereumAddresses(traceId: string, senpiUserIdsToAdd: string[], callback: HandlerCallback) {
     for (let i = 0; i < senpiUserIdsToAdd.length; i++) {
         const userId = senpiUserIdsToAdd[i];
         if (/^0x[a-fA-F0-9]{40}$/.test(userId)) { // Check if it's an Ethereum address
@@ -514,12 +514,16 @@ async function createStubAccountsForEthereumAddresses(traceId: string, senpiUser
                 const result = await response.json();
                 if (result.data && result.data.CreateStubAccount && result.data.CreateStubAccount.id) {
                     senpiUserIdsToAdd[i] = result.data.CreateStubAccount.id; // Replace with the new ID
-                    elizaLogger.debug(traceId, `[MANAGE_GROUPS] [ADD_GROUP_MEMBER] Created stub account for Ethereum address: ${userId}, New ID: ${result.data.CreateStubAccount.id}`);
+                    elizaLogger.debug(traceId, `[MANAGE_GROUPS] [ADD_GROUP_MEMBER] [STUB_ACCOUNT_CREATION] Created stub account for Ethereum address: ${userId}, New ID: ${result.data.CreateStubAccount.id}`);
                 } else {
-                    elizaLogger.warn(traceId, `[MANAGE_GROUPS] [ADD_GROUP_MEMBER] Failed to create stub account for Ethereum address: ${userId}`);
+                    elizaLogger.warn(traceId, `[MANAGE_GROUPS] [ADD_GROUP_MEMBER] [STUB_ACCOUNT_CREATION] Failed to create stub account for Ethereum address: ${userId}`);
                 }
             } catch (error) {
-                elizaLogger.error(traceId, `[MANAGE_GROUPS] [ADD_GROUP_MEMBER] Error creating stub account for Ethereum address: ${userId}, Error: ${error.message}`);
+                elizaLogger.error(traceId, `[MANAGE_GROUPS] [ADD_GROUP_MEMBER] [STUB_ACCOUNT_CREATION] Error creating stub account for Ethereum address: ${userId}, Error: ${error.message}`);
+                await callback?.({
+                    text: `❌ Failed to create stub account for Ethereum address: ${userId} | ${getErrorMessageFromCode(error)}`,
+                    action: "MANAGE_GROUPS",
+                });
             }
         }
     }
