@@ -793,5 +793,79 @@
             "Prepping the playbook to level you up"
         ],
         "orderIndex": 99
+    },
+    {
+        "pluginId": "5f823f62-19f7-460f-a05b-94351a07e00d",
+        "name": "@moxie-protocol/plugin-wallet-duster",
+        "displayName": "Wallet Duster",
+        "version": "0.0.1",
+        "author": null,
+        "description": "Swap low-value ERC-20 tokens (dust) into ETH in your agent wallet.",
+        "githubUrl": "https://github.com/senpi-ai/senpi-agent-skills/tree/main/packages/plugin-wallet-duster",
+        "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-wallet-duster/images/logo.png",
+        "settings": {},
+        "capabilities": [
+            "Swap low-value tokens in the agent wallet to ETH.",
+            "Simulate which tokens would be swapped without executing a transaction."
+        ],
+        "starterQuestions": [
+            {
+                "label": "How does wallet dusting work",
+                "value": "How does wallet dusting work?"
+            },
+            {
+                "label": "Preview dusting my wallet.",
+                "value": "Preview dusting my wallet."
+            },
+            {
+                "label": "Dust tokens under $5.",
+                "value": "Dust tokens under $5."
+            },
+            {
+                "label": "What's the value of dust in my agent wallet?",
+                "value": "What's the value of dust in my agent wallet?"
+            }
+        ],
+        "mediaUrls": [],
+        "actions": [
+            "DUST_WALLET_TO_ETH",
+            "CLEAN_WALLET",
+            "DUST_MY_TOKENS",
+            "REMOVE_DUST",
+            "SWAP_DUST_TO_ETH",
+            "CLEAR_LOW_VALUE_TOKENS",
+            "CLEAR_THE_DUST_OUT",
+            "SELL_ALL_TOKENS_UNDER",
+            "EXPLAIN_AI_DUSTING",
+            "EXPLAIN_WALLET_DUSTING",
+            "WHAT_IS_WALLET_DUSTING",
+            "HOW_DOES_WALLET_DUSTING_WORK",
+            "WHAT_DOES_THE_WALLET_DUSTING_SKILL_DO",
+            "EXPLAIN_WALLET_DUSTING",
+            "WHAT_IS_WALLET_DUSTING",
+            "PREVIEW_DUST",
+            "SHOW_DUST_TOKENS",
+            "WHAT_TOKENS_WILL_BE_DUSTED",
+            "LIST_LOW_VALUE_TOKENS",
+            "SHOW_TOKENS_BELOW_USD",
+            "SHOW_TOKENS_BELOW_VALUE",
+            "SHOW_TOKENS_BELOW_THRESHOLD",
+            "DUST_PREVIEW",
+            "PREVIEW_DUST_TOKENS",
+            "DUST_TOKENS",
+            "DUST_WALLET",
+            "DUST_TOKENS_UNDER",
+            "DUST_TOKENS_BELOW",
+            "HOW_MUCH_DUST_IN_WALLET",
+            "HOW_MANY_DUST_TOKENS_IN_WALLET"
+        ],
+        "isPremium": false,
+        "freeQueries": 0,
+        "skillCoinAddress": "",
+        "minimumSkillBalance": 0,
+        "status": "ACTIVE",
+        "isDefault": true,
+        "loaders": ["Dusting your wallet"],
+        "orderIndex": 14
     }
 ]
