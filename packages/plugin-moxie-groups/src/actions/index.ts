@@ -265,6 +265,7 @@ async function handleAddGroupMember(traceId: string, moxieUserId: string, state:
                     const result = await response.json();
                     if (result.data && result.data.CreateStubAccount && result.data.CreateStubAccount.id) {
                         senpiUserIdsToAdd[i] = result.data.CreateStubAccount.id; // Replace with the new ID
+                        elizaLogger.debug(traceId, `[MANAGE_GROUPS] [ADD_GROUP_MEMBER] Created stub account for Ethereum address: ${userId}, New ID: ${result.data.CreateStubAccount.id}`);
                     } else {
                         elizaLogger.warn(traceId, `[MANAGE_GROUPS] [ADD_GROUP_MEMBER] Failed to create stub account for Ethereum address: ${userId}`);
                     }
