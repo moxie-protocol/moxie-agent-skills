@@ -19,6 +19,14 @@ export const BASE_NETWORK_ID = 8453;
 export const MAX_UINT256 = BigInt(
     "115792089237316195423570985008687907853269984665640564039457584007913129639935"
 ); // Maximum uint256 value for unlimited approval
+export const INITIAL_SLIPPAGE_IN_BPS = Number(
+    process.env.INITIAL_SLIPPAGE_IN_BPS || 100
+); // 1%
+export const SLIPPAGE_INCREMENT_PER_RETRY_IN_BPS = Number(
+    process.env.SLIPPAGE_INCREMENT_PER_RETRY_IN_BPS || 200
+); // 2%
+export const SWAP_RETRY_COUNT = Number(process.env.SWAP_RETRY_COUNT || 5);
+export const SWAP_RETRY_DELAY = Number(process.env.SWAP_RETRY_DELAY || 1000); // 1 second
 
 export const ERC20_ABI = [
     {
