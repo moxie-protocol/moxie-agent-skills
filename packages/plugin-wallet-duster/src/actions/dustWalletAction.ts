@@ -191,12 +191,6 @@ export const dustWalletAction: Action = {
     ) => {
         try {
             const traceId = message.id;
-            // Initialize or update state
-            if (!state) {
-                state = (await runtime.composeState(message)) as State;
-            } else {
-                state = await runtime.updateRecentMessageState(state);
-            }
 
             const context = composeContext({
                 state,

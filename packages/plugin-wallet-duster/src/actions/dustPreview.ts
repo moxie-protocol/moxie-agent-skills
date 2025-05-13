@@ -209,13 +209,6 @@ export const previewDustAction: Action = {
         try {
             elizaLogger.log("Providing preview of dust in user's wallet");
 
-            // Initialize or update state
-            if (!state) {
-                state = (await runtime.composeState(message)) as State;
-            } else {
-                state = await runtime.updateRecentMessageState(state);
-            }
-
             const context = composeContext({
                 state,
                 template: dustRequestTemplate,
