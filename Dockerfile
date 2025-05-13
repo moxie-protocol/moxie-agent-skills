@@ -30,6 +30,8 @@ COPY packages/plugin-moxie-big-fan/ ./packages/plugin-moxie-big-fan/
 COPY packages/plugin-moxie-swap/ ./packages/plugin-moxie-swap/
 COPY packages/plugin-moxie-balance/ ./packages/plugin-moxie-balance/
 COPY packages/plugin-moxie-token-details/ ./packages/plugin-moxie-token-details/
+COPY packages/plugin-moxie-trading-automations/ ./packages/plugin-moxie-trading-automations/
+COPY packages/plugin-moxie-groups/ ./packages/plugin-moxie-groups/
 
 COPY moxie-agent/ ./moxie-agent/
 COPY moxie-broadcasting-agent/ ./moxie-broadcasting-agent/

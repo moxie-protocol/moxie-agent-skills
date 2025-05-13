@@ -60,7 +60,7 @@ export async function decodeTokenTransfer(moxieUserId: string, txReceipt: ethers
     try {
         elizaLogger.debug(`[decodeTokenTransfer] [${moxieUserId}] called with input details: [${JSON.stringify(txReceipt)}]`)
         // Find the log event for Moxie token transfer
-        if (buyTokenAddress !== ETH_ADDRESS) {
+        if (buyTokenAddress.toLowerCase() !== ETH_ADDRESS.toLowerCase()) {
             elizaLogger.debug(`[decodeTokenTransfer] [${moxieUserId}] fetching token log for transaction for ERC20: ${txReceipt.hash}`);
             const tokenLog = txReceipt.logs.find(log =>
                 log.address.toLowerCase() === buyTokenAddress.toLowerCase() &&

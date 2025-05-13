@@ -11,6 +11,7 @@ import { handleTransactionStatus } from "../utils/common";
 import { BASE_NETWORK_ID, ERC20_ABI, ETH_ADDRESS, MOXIE_TOKEN_ADDRESS, MOXIE_TOKEN_DECIMALS, USDC_ADDRESS, USDC_TOKEN_DECIMALS, WETH_ADDRESS } from "../constants";
 import { get0xPrice } from "../utils/0xApis";
 import Decimal from "decimal.js";
+import { getERC20TokenSymbol } from "@moxie-protocol/moxie-agent-lib";
 
 // Consider adding JSDoc for the tokenTransferAction object
 export const tokenTransferAction = {
@@ -496,7 +497,7 @@ async function processSingleTransfer(
         elizaLogger.debug(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [processTransfer] [transferAmountInWEI]: ${transferAmountInWEI}`);
 
         // check if the agent wallet has enough balance to cover the transfer amount
-        const currentBalanceInWEI = resolvedTokenAddress == ETH_ADDRESS ?
+        const currentBalanceInWEI = resolvedTokenAddress.toLowerCase() == ETH_ADDRESS.toLowerCase() ?
             await getNativeTokenBalance(agentWallet.address) :
             await getERC20Balance(resolvedTokenAddress, agentWallet.address);
         elizaLogger.debug(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [processTransfer] [currentBalanceInWEI]: ${currentBalanceInWEI}`);
@@ -534,7 +535,7 @@ async function processSingleTransfer(
                 `[tokenTransfer] [${context.moxieUserId}] [processTransfer] [HANDLE_TRANSACTION_STATUS] [ERROR] Transaction failed`
             );
             return {
-                callBackTemplate: callBackTemplate.APPLICATION_ERROR("Transaction failed")
+                callBackTemplate: txnReceipt.callBackTemplate
             };
         }
 
@@ -898,18 +899,39 @@ async function resolveTokenAddress(context: Context, token: string): Promise<Fun
             };
         }
 
-        // Try to extract token details from token:address format
-        const { tokenAddress, tokenSymbol } = extractTokenDetails(token);
-        if (!tokenAddress || !ethers.isAddress(tokenAddress)) {
-            elizaLogger.error(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [resolveTokenAddress] Invalid token format: ${token}`);
-            return {
-                callBackTemplate: callBackTemplate.APPLICATION_ERROR("Invalid token format")
-            };
+        let tokenSymbol: string;
+        let tokenAddress: string;
+        // Check if token is a valid Ethereum address
+        if (ethers.isAddress(token)) {
+            try {
+                // Token is a valid address, fetch symbol from JSON RPC
+                tokenSymbol = await getERC20TokenSymbol(token);
+                tokenAddress = token;
+                elizaLogger.debug(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [resolveTokenAddress] Token details: ${JSON.stringify({
+                    tokenAddress: tokenAddress,
+                    tokenSymbol: tokenSymbol,
+                    tokenType: "ERC20"
+                })}`);
+            } catch (error) {
+                elizaLogger.error(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [resolveTokenAddress] Error fetching token symbol: ${error}`);
+                return {
+                    callBackTemplate: callBackTemplate.APPLICATION_ERROR("Error fetching token symbol")
+                };
+            }
+        } else {
+            // Not a valid address, try to extract from token:address format
+            ({ tokenAddress, tokenSymbol } = extractTokenDetails(token));
+            if (!tokenAddress || !ethers.isAddress(tokenAddress)) {
+                elizaLogger.error(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [resolveTokenAddress] Invalid token format: ${token}`);
+                return {
+                    callBackTemplate: callBackTemplate.APPLICATION_ERROR("Invalid token format") 
+                };
+            }
         }
 
         elizaLogger.debug(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [resolveTokenAddress] Extracted ERC20 address: ${tokenAddress}`);
 
-        const tokenDecimals = tokenAddress === ETH_ADDRESS ? 18 : await getERC20Decimals(context, tokenAddress);
+        const tokenDecimals = tokenAddress.toLowerCase() === ETH_ADDRESS.toLowerCase() ? 18 : await getERC20Decimals(context, tokenAddress);
         elizaLogger.debug(context.traceId, `[tokenTransfer] [${context.moxieUserId}] [resolveTokenAddress] Token decimals: ${tokenDecimals}`);
 
         return {
@@ -1003,7 +1025,7 @@ async function executeTransfer(
     );
 
     // Prepare transaction input for ERC20 token transfer
-    const isEthTransfer = tokenAddress === ETH_ADDRESS;
+    const isEthTransfer = tokenAddress.toLowerCase() === ETH_ADDRESS.toLowerCase()  ;
     const request: agentLib.TransactionDetails = {
         fromAddress: agentWallet,
         toAddress: isEthTransfer ? recipientAddress : tokenAddress,
@@ -1023,15 +1045,53 @@ async function executeTransfer(
     // Send the transaction
     const walletClient = context.state.moxieWalletClient as agentLib.MoxieWalletClient;
     let transactionResponse: agentLib.MoxieWalletSendTransactionResponseType;
-    try {
-        transactionResponse = await walletClient.sendTransaction(process.env.CHAIN_ID || '8453', request);
-    } catch (error) {
+    const MAX_RETRIES = 3;
+    let retryCount = 0;
+    let lastError: any;
+
+    while (retryCount < MAX_RETRIES) {
+        try {
+            elizaLogger.debug(
+                context.traceId,
+                `[tokenTransfer] [${context.moxieUserId}] [executeTransfer] Attempt ${retryCount + 1} of ${MAX_RETRIES}`
+            );
+            transactionResponse = await walletClient.sendTransaction(process.env.CHAIN_ID || '8453', request);
+            break; // Success, exit the retry loop
+        } catch (error) {
+            lastError = error;
+            retryCount++;
+            elizaLogger.warn(
+                context.traceId,
+                `[tokenTransfer] [${context.moxieUserId}] [executeTransfer] Error sending transaction (attempt ${retryCount}): ${error}`
+            );
+            
+            if (retryCount < MAX_RETRIES) {
+                // Wait before retrying (exponential backoff)
+                const delay = 1000 * Math.pow(2, retryCount);
+                elizaLogger.debug(
+                    context.traceId,
+                    `[tokenTransfer] [${context.moxieUserId}] [executeTransfer] Retrying in ${delay}ms...`
+                );
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
+    }
+
+    if (retryCount === MAX_RETRIES) {
         elizaLogger.error(
             context.traceId,
-            `[tokenTransfer] [${context.moxieUserId}] [executeTransfer] Error sending transaction: ${error}`
+            `[tokenTransfer] [${context.moxieUserId}] [executeTransfer] Failed after ${MAX_RETRIES} attempts: ${lastError}`
         );
+        
+        // Check if the error is related to insufficient funds
+        if (lastError && lastError.message && lastError.message.includes("insufficient funds for gas * price + value")) {
+            return {
+                callBackTemplate: callBackTemplate.TRANSACTION_SUBMISSION_FAILED("Insufficient funds to cover gas costs for this transaction")
+            };
+        }
+        
         return {
-            callBackTemplate: callBackTemplate.APPLICATION_ERROR("Error sending transaction")
+            callBackTemplate: callBackTemplate.TRANSACTION_SUBMISSION_FAILED()
         };
     }
 
@@ -1116,7 +1176,15 @@ async function getTargetQuantityForBalanceBasedTokenTransfer(
         // Calculate transfer amount based on percentage
         // Using 1e9 as base to maintain precision while avoiding overflow
         const percentageBase = 1e9;
-        const scaledPercentage = balance.percentage * 1e7; // Scale up by 1e7 to maintain precision
+        // If ETH and 100%, use 99% instead to leave gas for transaction
+        const adjustedPercentage = (tokenSymbol.toUpperCase() === "ETH" && balance.percentage === 100)
+            ? 99
+            : balance.percentage;
+        elizaLogger.debug(
+            context.traceId,
+            `[tokenTransfer] [${context.moxieUserId}] [getTargetQuantityForBalanceBasedTokenTransfer] Original percentage: ${balance.percentage}, Adjusted percentage: ${adjustedPercentage}`
+        );
+        const scaledPercentage = adjustedPercentage * 1e7; // Scale up by 1e7 to maintain precision
         const quantityInWEI = (walletBalance * BigInt(scaledPercentage)) / BigInt(percentageBase);
 
         elizaLogger.debug(
@@ -1173,7 +1241,7 @@ async function convertUSDToTokenAmount(
         // get the equivalent price using codex api
         // if ETH , we need use WETH price. since codex does not support native ETH
         let tokenAddressForCodex = tokenAddress;
-        if (tokenAddress === ETH_ADDRESS) {
+        if (tokenAddress.toLowerCase() === ETH_ADDRESS.toLowerCase()) {
             tokenAddressForCodex = WETH_ADDRESS;
         }
 

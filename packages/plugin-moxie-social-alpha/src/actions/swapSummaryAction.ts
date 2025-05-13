@@ -18,7 +18,7 @@ import * as templates from "../templates";
 import { fetchSwapData } from "../utils";
 import { TOP_CREATORS_COUNT } from "../config";
 import { getMoxieIdsFromMessage, streamTextByLines, handleIneligibleMoxieUsers } from "./utils";
-import { getTokenDetails, MoxieAgentDBAdapter, MoxieUser, moxieUserService } from "@moxie-protocol/moxie-agent-lib";
+import { getTokenDetails, getTrendingTokenDetails, MoxieAgentDBAdapter, MoxieUser, moxieUserService } from "@moxie-protocol/moxie-agent-lib";
 export const tokenSwapSummary: Action = {
     name: "TRENDING_TOKENS",
     suppressInitialMessage: true,
@@ -111,104 +111,6 @@ export const tokenSwapSummary: Action = {
                 user: "assistant",
                 content: {
                     text: "I'll check dickybima's recent token swap transactions and provide a summary:\n\nLooking at dickybima's recent activity, they've been actively trading tokens. Here are their recent swaps:\n\n- Bought 0.5 $ETH (0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2)\n- Swapped some $USDC (0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48) for $MATIC (0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0)\n\nWould you like me to help you swap any of these tokens? I can assist you with the purchase process.",
-                },
-            },
-        ],
-    ],
-};
-
-export const creatorCoinSwapSummary: Action = {
-    name: "TRENDING_CREATOR_COINS",
-    suppressInitialMessage: true,
-    similes: [
-        "CREATOR_COIN_PURCHASES",
-        "CREATOR_COIN_RECOMMENDATIONS",
-        "CREATOR_COIN_BUY_RECOMMENDATIONS",
-        "CREATOR_COIN_TRENDING_CRYPTOCURRENCIES",
-        "CREATOR_COIN_SWAP_SUMMARIES",
-    ],
-    description:
-        "Retrieves insights on trending swaps of creator coins only. Use when users explicitly request details on creator coins.",
-    validate: async function (
-        runtime: IAgentRuntime,
-        message: Memory,
-        state?: State
-    ): Promise<boolean> {
-        return true;
-    },
-    handler: async (
-        runtime: IAgentRuntime,
-        message: Memory,
-        state?: State,
-        options?: { [key: string]: unknown },
-        callback?: HandlerCallback
-    ) => {
-        return swapSummaryHandler(
-            runtime,
-            message,
-            state,
-            options,
-            callback,
-            "CREATOR_COIN"
-        );
-    },
-    examples: [
-        [
-            {
-                user: "user",
-                content: {
-                    text: "Can you give me a summary of what creator coins my favorite creators have been buying lately?",
-                },
-            },
-            {
-                user: "assistant",
-                content: {
-                    text: "I'll check the recent onchain transactions from your favorite creators and summarize them for you.",
-                },
-            },
-        ],
-
-        [
-            {
-                user: "user",
-                content: {
-                    text: "Tell me what creator coins betashop is buying",
-                },
-            },
-            {
-                user: "assistant",
-                content: {
-                    text: "I've looked through their recent transactions. Here's a summary:\n\nVitalik Buterin (@VitalikButerin) has been buying /yeschef and fid:123. His most recent purchase was 100 $ETH.\n\nBalaji (@balajis) has been buying $SOL and $FTM. He's also been swapping $BTC for $ETH.\n\nWould you like me to suggest a token to buy based on their recent activity?",
-                },
-            },
-        ],
-
-        [
-            {
-                user: "user",
-                content: {
-                    text: "betashop.eth's creator coin swaps",
-                },
-            },
-            {
-                user: "assistant",
-                content: {
-                    text: "I've looked through betashop.eth's recent creator coin transactions. Here's a summary:\n\nbetashop.eth has been actively trading creator coins. They recently purchased $VITALIK (0x1234...abcd) and $BALAJI (0x5678...efgh) creator coins. They also bought some $RACER (0x91011...ijkl) tokens.\n\nWould you like me to help you swap any of these creator coins? I can assist you with the purchase process.",
-                },
-            },
-        ],
-
-        [
-            {
-                user: "user",
-                content: {
-                    text: "Give me @[betashop|M4]'s creator coin swaps",
-                },
-            },
-            {
-                user: "assistant",
-                content: {
-                    text: "I'll check betashop's recent creator coin swap transactions and provide a summary:\n\nLooking at betashop's recent activity, they've been actively trading creator coins. Here are their recent swaps:\n\n- Bought $VITALIK (0x1234...abcd)\n- Swapped some $BALAJI (0x5678...efgh) for $RACER (0x91011...ijkl)\n\nWould you like me to help you swap any of these creator coins? I can assist you with the purchase process.",
                 },
             },
         ],
@@ -358,7 +260,8 @@ async function swapSummaryHandler(
     const allSwaps = await fetchSwapData(
         eligibleMoxieIds,
         tokenType,
-        onlyIncludeSpecifiedMoxieIds
+        onlyIncludeSpecifiedMoxieIds,
+        timeFilter
     );
 
     if (allSwaps.length === 0) {
@@ -398,7 +301,11 @@ async function swapSummaryHandler(
 
     elizaLogger.debug(`tokenAddresses: ${tokenAddresses}`);
 
-    const tokenDetails = await getTokenDetails(tokenAddresses);
+    let tokenDetails = await getTokenDetails(tokenAddresses);
+
+    if (tokenType === "NON_CREATOR_COIN") {
+        tokenDetails = await getTrendingTokenDetails(tokenAddresses);
+    }
 
     elizaLogger.debug(`tokenDetails: ${JSON.stringify(tokenDetails)}`)
 

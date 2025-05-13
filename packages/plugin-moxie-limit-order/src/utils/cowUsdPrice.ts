@@ -109,12 +109,18 @@ export async function fetchPriceWithRetry(tokenAddress: string, tokenSymbol: str
     let lastError;
     for (let i = 0; i < MAX_RETRIES; i++) {
         try {
+            if (tokenSymbol === "ETH") { // CoW API does not support ETH, so we use WETH
+                tokenAddress = WETH_ADDRESS;
+            }
             const cowResponse = await fetch(`https://bff.cow.fi/${BASE_NETWORK_ID}/tokens/${tokenAddress}/usdPrice`);
             const cowPriceData = await cowResponse.json();
             elizaLogger.debug(
                 traceId,
                 `[getPrice] [${moxieUserId}] [COW_PRICE] [${tokenSymbol}] ${JSON.stringify(cowPriceData)}`
             );
+            if (!cowPriceData.price) {
+                throw new Error(`Failed to get ${tokenSymbol} price from CoW API`);
+            }
             return cowPriceData.price;
         } catch (error) {
             lastError = error;

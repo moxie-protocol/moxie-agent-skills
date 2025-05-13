@@ -3,7 +3,7 @@ import { Context, GetQuoteResponse } from "../types/types";
 import { createClientV2 } from "@0x/swap-ts-sdk";
 import { elizaLogger } from "@moxie-protocol/core";
 import { ethers } from "ethers";
-import { ERC20_TXN_SLIPPAGE_BPS } from "../constants";
+import { INITIAL_SLIPPAGE_IN_BPS, SLIPPAGE_INCREMENT_PER_RETRY_IN_BPS, SWAP_RETRY_COUNT, SWAP_RETRY_DELAY } from "../constants";
 import { mockGetQuoteResponse } from "../constants/constants";
 
 const initializeClients = () => {
@@ -46,6 +46,8 @@ export const get0xSwapQuote = async ({
     buyTokenAddress,
     walletAddress,
     sellTokenAddress,
+    buyTokenSymbol,
+    sellTokenSymbol,
 }: {
     traceId: string;
     moxieUserId: string;
@@ -53,27 +55,71 @@ export const get0xSwapQuote = async ({
     buyTokenAddress: string;
     walletAddress: string;
     sellTokenAddress: string;
+    buyTokenSymbol: string;
+    sellTokenSymbol: string;
 }) => {
-    try {
-        elizaLogger.debug(traceId,`[get0xSwapQuote] [${moxieUserId}] input details: [${walletAddress}] [${sellTokenAddress}] [${buyTokenAddress}] [${sellAmountBaseUnits}]`)
-        if(!process.env.ZERO_EX_API_KEY) {
-            return mockGetQuoteResponse;
-        }
-        const quote = (await zxClient.swap.permit2.getQuote.query({
-            sellAmount: sellAmountBaseUnits,
-            sellToken: sellTokenAddress,
-            buyToken: buyTokenAddress,
-            chainId: Number(process.env.CHAIN_ID || '8453'),
-            taker: walletAddress,
-            slippageBps: ERC20_TXN_SLIPPAGE_BPS
-        })) as GetQuoteResponse;
+    const MAX_RETRIES = SWAP_RETRY_COUNT;
+    const RETRY_DELAY = SWAP_RETRY_DELAY;
+    
+    let retryCount = 0;
+    let adjustedSlippage = INITIAL_SLIPPAGE_IN_BPS;
+    while (retryCount < MAX_RETRIES) {
+        try {
+            elizaLogger.debug(
+                traceId,
+                `[get0xSwapQuote] [${moxieUserId}] input details: ` +
+                `[walletAddress: ${walletAddress}] ` +
+                `[sellTokenAddress: ${sellTokenAddress}] ` + 
+                `[buyTokenAddress: ${buyTokenAddress}] ` +
+                `[sellAmountBaseUnits: ${sellAmountBaseUnits}] ` +
+                `[buyTokenSymbol: ${buyTokenSymbol}] ` +
+                `[sellTokenSymbol: ${sellTokenSymbol}] ` +
+                `[adjustedSlippage: ${adjustedSlippage}]`
+            )
+            if(!process.env.ZERO_EX_API_KEY) {
+                return mockGetQuoteResponse;
+            }
+            const quote = (await zxClient.swap.permit2.getQuote.query({
+                sellAmount: sellAmountBaseUnits,
+                sellToken: sellTokenAddress,
+                buyToken: buyTokenAddress,
+                chainId: Number(process.env.CHAIN_ID || '8453'),
+                taker: walletAddress,
+                slippageBps: adjustedSlippage,
+                swapFeeToken: isStableCoin(buyTokenSymbol) ? buyTokenAddress : 
+                             isStableCoin(sellTokenSymbol) ? sellTokenAddress : 
+                             sellTokenAddress, // default to sellToken if neither present in stableCoins env variable
+                swapFeeBps: Number(process.env.SWAP_FEE_BPS),
+                swapFeeRecipient: process.env.SWAP_FEE_RECIPIENT
 
-        return quote;
-    } catch (error) {
-        elizaLogger.error(traceId,`[get0xSwapQuote] [${moxieUserId}] [ERROR] Failed to get 0x swap quote]: ${JSON.stringify(error)}`);
-        throw error;
+            })) as GetQuoteResponse;
+
+            return quote;
+        } catch (error) {
+            retryCount++;
+            
+            if (retryCount >= MAX_RETRIES) {
+                elizaLogger.error(traceId,`[get0xSwapQuote] [${moxieUserId}] [ERROR] Failed to get 0x swap quote after ${MAX_RETRIES} attempts: ${JSON.stringify(error)}`);
+                throw error;
+            }
+
+            elizaLogger.warn(traceId,`[get0xSwapQuote] [${moxieUserId}] [RETRY ${retryCount}/${MAX_RETRIES}] Failed to get 0x swap quote: ${JSON.stringify(error)}`);
+            
+            // increments the slippage for each retry
+            adjustedSlippage += SLIPPAGE_INCREMENT_PER_RETRY_IN_BPS;    
+            elizaLogger.debug(traceId,`[get0xSwapQuote] [${moxieUserId}] adjustedSlippage after retry ${retryCount}: ${adjustedSlippage}`)
+            
+            // Wait before retrying
+            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+        }
     }
 };
+
+const isStableCoin = (tokenSymbol: string) => {
+    // Map of stable coins by symbol
+    const stableCoins = (process.env.STABLE_COINS || 'USDC,USDT,DAI,ETH,WETH').split(',').map(coin => coin.trim());
+    return stableCoins.includes(tokenSymbol.toUpperCase());
+}
 
 /**
  * Execute 0x swap with 20% buffer for gas limit
@@ -96,27 +142,42 @@ export const execute0xSwap = async ({
     const { traceId, moxieUserId, provider } = context;
     elizaLogger.debug(traceId,`[execute0xSwap] [${moxieUserId}] input details: [${agentWalletAddress}] [${quote.transaction.to}] [${quote.transaction.value}] [${quote.transaction.data}] [${quote.transaction.gas}] [${quote.transaction.gasPrice}]`)
 
-    try {
-
-        const feeData = await provider.getFeeData();
-        elizaLogger.debug(traceId,`[execute0xSwap] [${moxieUserId}] feeData: ${JSON.stringify(feeData)}`)
-        const maxPriorityFeePerGas = (BigInt(feeData.maxPriorityFeePerGas!.toString()) * BigInt(120)) / BigInt(100);
-        const maxFeePerGas = (BigInt(feeData.maxFeePerGas!.toString()) * BigInt(120)) / BigInt(100);
-        const transactionDetails: TransactionDetails = {
-            fromAddress: agentWalletAddress,
-            toAddress: quote.transaction.to,
-            value: Number(quote.transaction.value),
-            data: quote.transaction.data,
-            maxFeePerGas: Number(maxFeePerGas),
-            maxPriorityFeePerGas: Number(maxPriorityFeePerGas)
+    const MAX_RETRIES = 3;
+    const RETRY_DELAY = 1000; // 1 second delay between retries
+    
+    let retryCount = 0;
+    
+    while (retryCount < MAX_RETRIES) {
+        try {
+            const feeData = await provider.getFeeData();
+            elizaLogger.debug(traceId,`[execute0xSwap] [${moxieUserId}] feeData: ${JSON.stringify(feeData)}`)
+            const maxPriorityFeePerGas = (BigInt(feeData.maxPriorityFeePerGas!.toString()) * BigInt(120)) / BigInt(100);
+            const maxFeePerGas = (BigInt(feeData.maxFeePerGas!.toString()) * BigInt(120)) / BigInt(100);
+            const transactionDetails: TransactionDetails = {
+                fromAddress: agentWalletAddress,
+                toAddress: quote.transaction.to,
+                value: Number(quote.transaction.value),
+                data: quote.transaction.data,
+                maxFeePerGas: Number(maxFeePerGas),
+                maxPriorityFeePerGas: Number(maxPriorityFeePerGas)
+            }
+            elizaLogger.debug(traceId,`[execute0xSwap] [${moxieUserId}] transactionDetails: ${JSON.stringify(transactionDetails)}`)
+            const tx = await walletClient.sendTransaction(process.env.CHAIN_ID || '8453', transactionDetails);
+            elizaLogger.debug(traceId,`[execute0xSwap] [${moxieUserId}] tx hash: ${tx.hash}`)
+            return tx;
+        } catch (error) {
+            retryCount++;
+            
+            if (retryCount >= MAX_RETRIES) {
+                elizaLogger.error(traceId,`[execute0xSwap] [${moxieUserId}] [ERROR] Failed to execute 0x swap after ${MAX_RETRIES} attempts: ${JSON.stringify(error)}`);
+                throw error;
+            }
+            
+            elizaLogger.warn(traceId,`[execute0xSwap] [${moxieUserId}] [RETRY ${retryCount}/${MAX_RETRIES}] Failed to execute 0x swap: ${JSON.stringify(error)}`);
+            
+            // Wait before retrying
+            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
         }
-        elizaLogger.debug(traceId,`[execute0xSwap] [${moxieUserId}] transactionDetails: ${JSON.stringify(transactionDetails)}`)
-        const tx = await walletClient.sendTransaction(process.env.CHAIN_ID || '8453', transactionDetails);
-        elizaLogger.debug(traceId,`[execute0xSwap] [${moxieUserId}] tx hash: ${tx.hash}`)
-        return tx;
-    } catch (error) {
-        elizaLogger.error(traceId,'[execute0xSwap] [${moxieUserId}] [ERROR] Error executing 0x swap:', {error});
-        throw error;
     }
 };
 

@@ -18,7 +18,10 @@ import {
     GetUserInfoBatchOutput,
     GetUserInfoMinimalResponse,
     MoxieUserMinimal,
+    PublishPostInput,
+    PublishPostResponse,
 } from "./types";
+import { fetchWithRetries } from "../utils";
 
 
 export async function getUserByMoxieId(
@@ -222,11 +225,16 @@ export async function getSocialProfilesByMoxieIdMultiple(
     const errorDetails = new Map<string, ErrorDetails>();
 
     try {
-        const results = await getUserByMoxieIdMultipleTokenGate(
-            userIds,
-            bearerToken,
-            pluginId
+        const results = await fetchWithRetries(
+            () => getUserByMoxieIdMultipleTokenGate(
+                userIds,
+                bearerToken,
+                pluginId
+                ),
+            3, // retries
+            1000 // initial delay in ms
         );
+
 
         results.users.forEach((userInfo, _index) => {
             const user = userInfo.user;
@@ -869,5 +877,52 @@ export async function getUserByMoxieIdMultipleMinimal(
     } catch (error) {
         elizaLogger.error("Error in getUserByMoxieIdMultipleMinimal:", error);
         return new Map();
+    }
+}
+
+
+export async function publishPost(
+    input: PublishPostInput,
+    bearerToken: string
+): Promise<PublishPostResponse> {
+    try {
+        const mutation = `
+            mutation PublishPost($text: String!, $platform: SocialPlatform!) {
+                PublishPost(input: {text: $text, platform: $platform}) {
+                    platform
+                    post {
+                        hash
+                        text
+                        username
+                    }
+                }
+            }
+        `;
+        const response = await fetch(process.env.MOXIE_BACKEND_INTERNAL_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: bearerToken,
+            },
+            body: JSON.stringify({
+                query: mutation,
+                variables: { text: input.text, platform: input.platform },
+            }),
+        });
+
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const { data, errors } = await response.json();
+
+        if (errors) {
+            throw new Error(errors[0]?.message || 'GraphQL error occurred');
+        }
+        return data?.PublishPost;
+    } catch (error) {
+        elizaLogger.error("Error in publishPost:", error);
+        throw error;
     }
 }

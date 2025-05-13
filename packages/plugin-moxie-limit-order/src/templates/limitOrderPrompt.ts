@@ -55,6 +55,7 @@ Please follow these steps to process the limit order intent:
      * Standard ERC20 tokens
      * Stablecoins
      * High volatility tokens
+     * Valid ethereum token address
    - Consider potential errors or missing information:
      * Missing BUY/SELL specification
      * Insufficient quantities
@@ -175,10 +176,10 @@ Please follow these steps to process the limit order intent:
      * If buyQuantity specified: The amount to buy when price target is reached
      * If sellQuantity specified: The amount to sell when price target is reached
    - sellToken: The token to be sold when the limit price is reached, which MUST be one of:
-     * An ERC20 token in the format $[token_symbol|token_address]
+     * An ERC20 token in the format $[token_symbol|token_address] or valid ethereum token address
      If the user hasn't specified a buyToken and the sellToken matches the default buyToken, prompt the user to specify a different token
    - buyToken: The token to be purchased when the limit price is reached, which MUST be one of:
-     * An ERC20 token in the format $[token_symbol|token_address]
+     * An ERC20 token in the format $[token_symbol|token_address] or valid ethereum token address
    - expirationTime: Optional timestamp for when the limit order expires. Must be a valid future timestamp if provided.
    - value_type:
     * ONLY include when amount is prefixed with $ symbol
@@ -205,15 +206,15 @@ Please follow these steps to process the limit order intent:
         * USDC or $USDC -> $[USDC|0x833589fcd6edb6e08f4c7c32d4f71b54bda02913]
         * MOXIE or $MOXIE -> $[MOXIE|0x8C9037D1Ef5c6D1f6816278C7AAF5491d24CD527]
     - All other ERC20 tokens MUST:
-        * Be explicitly provided in complete $[token_symbol|token_address] format
-        * Have both symbol AND address present
+        * Be explicitly provided in complete $[token_symbol|token_address] format or valid ethereum token address
+        * Have both symbol AND address present if token format is in $[token_symbol|token_address]
         * Never have assumed or guessed addresses and symbols
         * Return error if incomplete format is provided
         * Exact matches only - no partial matching
     - If proper token format is missing in the question or message history, return error with a message "Please specify the token using '$' mention."
     - When validating token formats:
         * Check for presence of both parts (symbol|address)
-        * Ensure the format matches exactly ($[...]|[...])
+        * Ensure the format matches exactly ($[...]|[...]) or valid ethereum token address
         * Return error if either part is missing
         * Never attempt to complete or guess missing parts
     - balance: Required when order size is specified as percentage:
@@ -369,7 +370,7 @@ Please follow these steps to process the limit order intent:
         * Batch remaining tokens in single response
         * Monitor partial fills
    - Format operation_description field:
-        * MUST use full token format $[SYMBOL|ADDRESS] for ALL token mentions
+        * MUST use full token format $[SYMBOL|ADDRESS] or valid ethereum token address for ALL token mentions
         * MUST include both tokens (buy and sell) in description
         * Common patterns to use:
             - For market orders:
@@ -394,8 +395,8 @@ For limit orders requiring confirmation:
  "limit_orders": [
     {
       "operation_description": "Placing <buy/sell> limit order with <quantity/amount> <token> <at/when> <price condition> <additional context about profit targets if applicable>",
-      "sellToken": "<@[username|userId] or $[token_symbol|token_address]>",
-      "buyToken": "<@[username|userId] or $[token_symbol|token_address]>",
+      "sellToken": "<@[username|userId] or $[token_symbol|token_address] or valid ethereum token address>",
+      "buyToken": "<@[username|userId] or $[token_symbol|token_address] or valid ethereum token address>",
       "type": "<SELL|BUY>",
       "execution_type": "<IMMEDIATE|FUTURE>",
       "limitPrice": {

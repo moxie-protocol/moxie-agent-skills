@@ -167,6 +167,9 @@ export const topTokenHoldersAction: Action = {
             return false;
         }
 
+        // Filter out holders with zero holdings
+        topTokenHolders = topTokenHolders.filter(holder => holder.total_balance > 0);
+
         // Calculate USD values and enrich holder data
         const priceUSD = Number(tokenDetails[0].priceUSD);
         elizaLogger.debug(`[topTokenHoldersAction] [${moxieUserId}] Price USD: ${priceUSD}`);

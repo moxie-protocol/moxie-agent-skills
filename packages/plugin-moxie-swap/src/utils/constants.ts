@@ -11,7 +11,10 @@ export const MOXIE_TOKEN_DECIMALS = 18;
 export const TRANSACTION_RECEIPT_TIMEOUT = 60000;
 export const subjectSharePurchasedTopic0 = "0x96c1b5a0ee3c1932c831b8c6a559c93b48a3109915784a05ff44a07cc09c3931"
 export const subjectShareSoldTopic0 = "0x44ebb8a56b0413525e33cc89179d9758b2b1ab944b0bbeeb6d119adb2a6e3fe2"
-export const ERC20_TXN_SLIPPAGE_BPS = 100; // 1% slippage (100 basis points = 1%)
+export const INITIAL_SLIPPAGE_IN_BPS = Number(process.env.INITIAL_SLIPPAGE_IN_BPS || 100); // 1%
+export const SLIPPAGE_INCREMENT_PER_RETRY_IN_BPS = Number(process.env.SLIPPAGE_INCREMENT_PER_RETRY_IN_BPS || 200); // 2%
+export const SWAP_RETRY_COUNT = Number(process.env.SWAP_RETRY_COUNT || 5);
+export const SWAP_RETRY_DELAY = Number(process.env.SWAP_RETRY_DELAY || 1000); // 1 second
 export const BASE_NETWORK_ID = 8453;
 
 export const BONDING_CURVE_ABI = [

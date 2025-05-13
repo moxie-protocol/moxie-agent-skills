@@ -23,7 +23,7 @@ export const APPLICATION_ERROR = (error: string) => {
 
 export const CREATOR_NOT_FOUND = (creatorId: string) => {
     return {
-        text: `\nUnfortunately, the user you are querying has not launched a creator coin yet. Creator coins are required to analyze user data using the Moxie AI Agent. Please try again`,
+        text: `\nUnfortunately, the user you are querying has not launched a creator coin yet. Creator coins are required to analyze user data using the Senpi AI Agent. Please try again`,
     }
 }
 
@@ -36,6 +36,34 @@ export const INSUFFICIENT_BALANCE = (tokenSymbol: string, currentBalance: string
 export const TRANSACTION_SUCCESSFUL = (txnHash: string, transferAmount: string, token: string, recipient: string) => {
     return {
         text: `\nTransaction Complete! Successfully sent ${transferAmount} ${token} to ${recipient}.\nView on [BaseScan](https://basescan.org/tx/${txnHash})`,
+        content: {
+            action: "TOKEN_TRANSFERS"
+        }
+    }
+}
+
+export const TRANSACTION_FAILED = (txnHash: string, error: string) => {
+    return {
+        text: `\nTransaction verification failed. Please try again.`,
+        content: {
+            action: "TOKEN_TRANSFERS"
+        }
+    }
+}
+export const TRANSACTION_VERIFICATION_TIMEOUT = (txnHash: string) => {
+    return {
+        text: `\nTransaction verification timed out. Please check [BaseScan](https://basescan.org/tx/${txnHash}) to verify the status before retrying.`,
+        content: {
+            action: "TOKEN_TRANSFERS"
+        }
+    }
+}
+
+export const TRANSACTION_SUBMISSION_FAILED = (reason?: string) => {
+    return {
+        text: reason 
+            ? `\nTransaction submission failed. Reason: ${reason}. Please try again.`
+            : `\nTransaction submission failed. Please try again.`,
         content: {
             action: "TOKEN_TRANSFERS"
         }
