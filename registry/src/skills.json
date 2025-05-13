@@ -802,7 +802,7 @@
         "author": null,
         "description": "Swap low-value ERC-20 tokens (dust) into ETH in your agent wallet.",
         "githubUrl": "https://github.com/senpi-ai/senpi-agent-skills/tree/main/packages/plugin-wallet-duster",
-        "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-wallet-duster/images/logo.png",
+        "logoUrl": "https://raw.githubusercontent.com/senpi-ai/senpi-agent-skills/refs/heads/feat/base-wallets-pnl-merged/packages/plugin-wallet-duster/images/logo.png",
         "settings": {},
         "capabilities": [
             "Swap low-value tokens in the agent wallet to ETH.",
