@@ -44,7 +44,7 @@ export const explainAiDustingAction: Action = {
         await callback?.({
             text: `AI Dusting automatically scans your wallet for low-value tokens — often called "dust" — and converts them into ETH.
 
-By default, it looks for any tokens worth less than $5 (you can change this). Once it finds them, it uses the 0x API to safely swap those tokens into ETH using your embedded Moxie agent wallet.`,
+By default, it looks for any tokens worth less than $5 (you can change this). Once it finds them, it uses the 0x API to safely swap those tokens into ETH using your embedded Senpi agent wallet.`,
         });
     },
 };
