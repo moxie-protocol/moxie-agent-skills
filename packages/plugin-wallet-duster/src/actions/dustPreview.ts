@@ -9,7 +9,7 @@ import {
     ModelClass,
     State,
 } from "@moxie-protocol/core";
-import { Portfolio } from "@moxie-protocol/moxie-agent-lib";
+import { MoxieUser, Portfolio } from "@moxie-protocol/moxie-agent-lib";
 import { DustRequestSchema } from "../types";
 import { dustRequestTemplate } from "../templates";
 import { ETH_ADDRESS } from "../constants/constants";
@@ -207,7 +207,12 @@ export const previewDustAction: Action = {
         callback?: HandlerCallback
     ) => {
         try {
-            elizaLogger.log("Providing preview of dust in user's wallet");
+            const traceId = message.id;
+            const moxieUserId = (state?.moxieUserInfo as MoxieUser)?.id;
+            elizaLogger.debug(
+                traceId,
+                `[dustPreview] [${moxieUserId}] Providing preview of dust in user's wallet`
+            );
 
             const context = composeContext({
                 state,
@@ -220,6 +225,11 @@ export const previewDustAction: Action = {
                 modelClass: ModelClass.SMALL,
                 schema: DustRequestSchema,
             });
+
+            elizaLogger.debug(
+                traceId,
+                `[dustPreview] [${moxieUserId}] details: ${JSON.stringify(details?.object)}`
+            );
             const extractedValue = details.object as {
                 threshold: number;
             };
@@ -228,6 +238,10 @@ export const previewDustAction: Action = {
                 (state.agentWalletBalance as Portfolio) ?? {
                     tokenBalances: [],
                 };
+            elizaLogger.debug(
+                traceId,
+                `[dustPreview] [${moxieUserId}] tokenBalances: ${JSON.stringify(tokenBalances)}`
+            );
             const dustTokens = tokenBalances.filter(
                 (t) =>
                     ((threshold > 0.01 &&
@@ -242,6 +256,10 @@ export const previewDustAction: Action = {
                     t.token.baseToken.address.toLowerCase() !==
                         ETH_ADDRESS.toLowerCase()
             );
+            elizaLogger.debug(
+                traceId,
+                `[dustPreview] [${moxieUserId}] dustTokens: ${JSON.stringify(dustTokens)}`
+            );
 
             if (!dustTokens.length) {
                 await callback?.({
@@ -254,6 +272,11 @@ export const previewDustAction: Action = {
             const totalUsdValue = dustTokens.reduce(
                 (sum, token) => sum + token.token.balanceUSD,
                 0
+            );
+
+            elizaLogger.debug(
+                traceId,
+                `[dustPreview] [${moxieUserId}] totalUsdValue: ${totalUsdValue}`
             );
 
             const lines = dustTokens.map(

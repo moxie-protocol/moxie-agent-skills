@@ -191,6 +191,11 @@ export const dustWalletAction: Action = {
     ) => {
         try {
             const traceId = message.id;
+            const moxieUserId = (state?.moxieUserInfo as MoxieUser)?.id;
+            elizaLogger.debug(
+                traceId,
+                `[dustWalletAction] [${moxieUserId}] Starting dusting process`
+            );
 
             const context = composeContext({
                 state,
@@ -203,6 +208,10 @@ export const dustWalletAction: Action = {
                 modelClass: ModelClass.SMALL,
                 schema: DustRequestSchema,
             });
+            elizaLogger.debug(
+                traceId,
+                `[dustWalletAction] [${moxieUserId}] details: ${JSON.stringify(details?.object)}`
+            );
             const extractedValue = details.object as {
                 threshold: number;
                 isConfirmed: boolean;
@@ -224,12 +233,15 @@ export const dustWalletAction: Action = {
 
             const wallet = state?.moxieWalletClient as MoxieWalletClient;
             const agentWallet = state?.agentWallet as MoxieClientWallet;
-            const moxieUserId = (state?.moxieUserInfo as MoxieUser)?.id;
 
             const { tokenBalances }: Portfolio =
                 (state?.agentWalletBalance as Portfolio) ?? {
                     tokenBalances: [],
                 };
+            elizaLogger.debug(
+                traceId,
+                `[dustWalletAction] [${moxieUserId}] tokenBalances: ${JSON.stringify(tokenBalances)}`
+            );
             const dustTokens = tokenBalances.filter(
                 (t) =>
                     ((threshold > 0.01 &&
@@ -243,6 +255,10 @@ export const dustWalletAction: Action = {
                         "0x0000000000000000000000000000000000000000".toLowerCase() &&
                     t.token.baseToken.address.toLowerCase() !==
                         ETH_ADDRESS.toLowerCase()
+            );
+            elizaLogger.debug(
+                traceId,
+                `[dustWalletAction] [${moxieUserId}] dustTokens: ${JSON.stringify(dustTokens)}`
             );
 
             if (!dustTokens.length) {
