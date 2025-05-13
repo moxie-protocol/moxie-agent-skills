@@ -104,28 +104,42 @@ export const PnLAction = {
             elizaLogger.debug(traceId, `[PnLAction] totalPnl: ${totalPnl}`);
             if (tokenAddresses.length > 0 || moxieUserIds.length > 0) {
                 try {
-                    const uniqueMoxieUserIds = [...new Set(pnlData.map(data => data.moxie_user_id).filter(Boolean))];
+                    const uniqueMoxieUserIds = [...new Set(pnlData.map(data => data.username).filter(username => username && username.startsWith('M')))];
                     const userNames = await moxieUserService.getUserByMoxieIdMultiple(uniqueMoxieUserIds);
                     elizaLogger.debug(traceId, `[PnLAction] Fetched user names: ${JSON.stringify(userNames)}`);
 
                     // Replace moxieUserIds in pnlData with formatted userNames
                     pnlData.forEach((data) => {
-                        if (data.moxie_user_id) {
-                            const userName = userNames.get(data.moxie_user_id)?.userName;
-                            data.moxie_user_id = userName
-                                ? `@[${userName}|${data.moxie_user_id}]`
-                                : `@[${data.moxie_user_id}|${data.moxie_user_id}]`;
+                        if (!data.username) return;
+
+                        const userName = userNames.get(data.username)?.userName;
+                        const isMoxieId = /^M/.test(data.username);
+                        const isWalletAddress = /^0x[a-fA-F0-9]{40}$/.test(data.username);
+
+                        if (isMoxieId) {
+                            data.username = `@[${userName || data.username}|${data.username}]`;
+                        } else if (isWalletAddress) {
+                            const formattedId = `${data.username.slice(0, 6)}...${data.username.slice(-4)}`;
+                            data.username = `@[${formattedId}|${data.username}]`;
+                        } else if (data.moxie_user_id?.startsWith('M')) {
+                            data.username = `@[${data.username}|${data.moxie_user_id}]`;
+                        } else {
+                            data.username = `@[${data.username}|${data.wallet_address}]`;
                         }
                     });
                 } catch (error) {
                     elizaLogger.error(traceId, `[PnLAction] Error fetching user names for Moxie IDs: ${error.message}`);
                 }
             }
+            // Remove the wallet_address field from each entry in pnlData
+            pnlData.forEach((data) => {
+                delete data.wallet_address;
+            });
             let pnlDataTemplate = pnlTemplate.replace("{{latestMessage}}", latestMessage)
                 .replace("{{conversation}}", JSON.stringify(message.content.text))
                 .replace("{{criteria}}", JSON.stringify(pnlResponse.criteria))
                 .replace("{{pnlData}}", JSON.stringify(pnlData))
-                .replace("{{totalPnl}}", (moxieUserIds.length > 0 || walletAddresses.length > 0) ? totalPnl.toString() : "");
+                .replace("{{totalPnl}}", (moxieUserIds.length > 0 || walletAddresses.length > 0) && totalPnl !== null ? totalPnl.toString() : "0");
 
             const currentContext = composeContext({
                 state,
@@ -150,8 +164,9 @@ export const PnLAction = {
 
             return true;
         } catch (error) {
+            elizaLogger.error(traceId, `[PnLAction] Error fetching PnL data: ${error}`);
             await callback?.({
-                text: `Error fetching PnL data: ${error.message}`
+                text: `Error fetching PnL data, please try again later`
             });
             return true;
         }
