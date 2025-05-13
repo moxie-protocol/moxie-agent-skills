@@ -504,43 +504,53 @@ async function handleUpdateGroup(traceId: string, moxieUserId: string, state: St
 }
 
 async function createStubAccountsForEthereumAddresses(traceId: string, senpiUserIdsToAdd: string[], callback: HandlerCallback) {
-    for (let i = 0; i < senpiUserIdsToAdd.length; i++) {
-        const userId = senpiUserIdsToAdd[i];
-        if (/^0x[a-fA-F0-9]{40}$/.test(userId)) { // Check if it's an Ethereum address
-            try {
-                const response = await fetch(process.env.MOXIE_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        query: `
-                            mutation CreateStubAccount {
-                                CreateStubAccount(
-                                    input: {
-                                        from: WALLET
-                                        subject: "${userId}"
-                                        ownerAddress: "${userId}"
-                                    }
-                                ) {
-                                    id
-                                }
-                            }
-                        `
-                    })
-                });
+    const MAX_RETRIES = 3;
 
-                const result = await response.json();
-                if (result.data && result.data.CreateStubAccount && result.data.CreateStubAccount.id) {
-                    senpiUserIdsToAdd[i] = result.data.CreateStubAccount.id; // Replace with the new ID
-                    elizaLogger.debug(traceId, `[MANAGE_GROUPS] [ADD_GROUP_MEMBER] [STUB_ACCOUNT_CREATION] Created stub account for Ethereum address: ${userId}, New ID: ${result.data.CreateStubAccount.id}`);
-                } else {
-                    elizaLogger.warn(traceId, `[MANAGE_GROUPS] [ADD_GROUP_MEMBER] [STUB_ACCOUNT_CREATION] Failed to create stub account for Ethereum address: ${userId}`);
+    await Promise.all(senpiUserIdsToAdd.map(async (userId, index) => {
+        if (/^0x[a-fA-F0-9]{40}$/.test(userId)) { // Check if it's an Ethereum address
+            let attempt = 0;
+            let success = false;
+
+            while (attempt < MAX_RETRIES && !success) {
+                try {
+                    const response = await fetch(process.env.MOXIE_API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            query: `
+                                mutation CreateStubAccount {
+                                    CreateStubAccount(
+                                        input: {
+                                            from: WALLET
+                                            subject: "${userId}"
+                                            ownerAddress: "${userId}"
+                                        }
+                                    ) {
+                                        id
+                                    }
+                                }
+                            `
+                        })
+                    });
+
+                    const result = await response.json();
+                    if (result.data && result.data.CreateStubAccount && result.data.CreateStubAccount.id) {
+                        senpiUserIdsToAdd[index] = result.data.CreateStubAccount.id; // Replace with the new ID
+                        elizaLogger.debug(traceId, `[MANAGE_GROUPS] [ADD_GROUP_MEMBER] [STUB_ACCOUNT_CREATION] Created stub account for Ethereum address: ${userId}, New ID: ${result.data.CreateStubAccount.id}`);
+                        success = true;
+                    } else {
+                        elizaLogger.warn(traceId, `[MANAGE_GROUPS] [ADD_GROUP_MEMBER] [STUB_ACCOUNT_CREATION] Failed to create stub account for Ethereum address: ${userId}`);
+                    }
+                } catch (error) {
+                    elizaLogger.error(traceId, `[MANAGE_GROUPS] [ADD_GROUP_MEMBER] [STUB_ACCOUNT_CREATION] Error creating stub account for Ethereum address: ${userId}, Error: ${error.message}`);
+                    if (attempt === MAX_RETRIES - 1) {
+                        throw error;
+                    }
                 }
-            } catch (error) {
-                elizaLogger.error(traceId, `[MANAGE_GROUPS] [ADD_GROUP_MEMBER] [STUB_ACCOUNT_CREATION] Error creating stub account for Ethereum address: ${userId}, Error: ${error.message}`);
-                throw error;
+                attempt++;
             }
         }
-    }
+    }));
 }
