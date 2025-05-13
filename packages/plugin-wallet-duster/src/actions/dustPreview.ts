@@ -244,9 +244,11 @@ export const previewDustAction: Action = {
             );
 
             if (!dustTokens.length) {
-                return callback?.({
+                await callback?.({
                     text: `\nNo tokens under $${threshold} found in your wallet.${threshold > 0.01 ? `\n\nOnly tokens above $0.01 have been shown. To show dust tokens below $0.01, set the threshold to $0.01 or below.` : ""}`,
                 });
+
+                return true;
             }
 
             const totalUsdValue = dustTokens.reduce(
@@ -260,12 +262,16 @@ export const previewDustAction: Action = {
             );
             const response = `You have ${dustTokens.length} dust token(s) totaling ${totalUsdValue < 0.01 ? "< $0.01" : `~ $${totalUsdValue.toFixed(2)}`}:\n| Token Symbol | Token Address | Value |\n|-------|-------|-------|\n${lines.join("\n")}${threshold > 0.01 ? `\n\nOnly tokens above $0.01 have been displayed. To display tokens below $0.01, set the threshold to $0.01 or below.` : ""}`;
 
-            return callback?.({ text: response });
+            await callback?.({ text: response });
+
+            return true;
         } catch (error) {
             elizaLogger.error("Error previewing dust:", error);
-            return callback?.({
+            await callback?.({
                 text: "An error occurred while previewing dust. Please try again later.",
             });
+
+            return true;
         }
     },
 };

@@ -280,11 +280,15 @@ export const dustWalletAction: Action = {
             await callback?.({
                 text: `\nDusted ${dustedTokenCount} dust token${dustedTokenCount === 1 ? "" : "s"} into ETH (${totalUsdValue < 0.01 ? "< $0.01" : `~ $${totalUsdValue.toFixed(2)}`}).${threshold > 0.01 ? `\n\nOnly tokens above $0.01 have been dusted. To dust tokens below $0.01, set the threshold to $0.01 or below.` : ""}`,
             });
+
+            return true;
         } catch (error) {
             elizaLogger.error("Error dusting wallet:", error);
-            callback?.({
+            await callback?.({
                 text: "An error occurred while dusting your wallet. Please try again later.",
             });
+
+            return true;
         }
     },
 };
