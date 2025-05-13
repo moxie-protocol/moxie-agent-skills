@@ -240,7 +240,7 @@ async function handleAddGroupMember(traceId: string, moxieUserId: string, state:
             const userId = senpiUserIdsToAdd[i];
             if (/^0x[a-fA-F0-9]{40}$/.test(userId)) { // Check if it's an Ethereum address
                 try {
-                    const response = await fetch('https://moxie-backend.prod.airstack.xyz/graphql', {
+                    const response = await fetch(process.env.MOXIE_API_URL, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
