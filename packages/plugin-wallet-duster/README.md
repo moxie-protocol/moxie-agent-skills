@@ -1,7 +1,7 @@
-# 🧠 Moxie AI Skill: `plugin-wallet-duster`
+# `plugin-wallet-duster`
 
 Turn your dust into ETH.
-AI Duster scans your Moxie Agent wallet for low-value ERC-20 tokens and
+AI Duster scans your Senpi Agent wallet for low-value ERC-20 tokens and
 automatically swaps them to ETH — with full support for threshold customization
 and dry-run previews.
 
@@ -26,24 +26,17 @@ Preview what tokens you'd dust from my wallet.
 
 ---
 
-## 🔐 Token Gating
+## 🧪 Local Setup (Senpi Agent)
 
-Access to this skill requires holding **at least 1 `alexcomeau` token**.
-(FID: 11161 — Token address: `0xff5a326b85335a8ec1f89b2f7ea0d7d00722aaf7`)
-
----
-
-## 🧪 Local Setup (Moxie Agent)
-
-Want to run this skill locally with the full **Moxie Agent + Client stack**? Follow these steps:
+Want to run this skill locally with the full **Senpi Agent + Client stack**? Follow these steps:
 
 ```bash
 # Set correct Node version
 pnpm env use --global 23.3.0
 
 # Clone and set up the monorepo
-git clone git@github.com:moxie-protocol/moxie-agent-skills.git
-cd moxie-agent-skills
+git clone git@github.com:senpi-ai/senpi-agent-skills.git
+cd senpi-agent-skills
 git checkout -b feature/plugin-wallet-duster
 pnpm install --no-frozen-lockfile
 
@@ -111,12 +104,12 @@ Example expected response:
 
 ## 🧠 Skill Metadata
 
-This Skill is registered with the Moxie Skills Marketplace and is fully compliant with ElizaOS:
+This Skill is registered with the Senpi Skills Marketplace and is fully compliant with ElizaOS:
 
 - ✅ Token-gated via `alexcomeau` token
 - ✅ Supports actions: `DUST_WALLET_TO_ETH`, `EXPLAIN_AI_DUSTING`
 - ✅ Supports `dryRun` preview mode
-- ✅ Fully integrated with Moxie Agent Wallet API
+- ✅ Fully integrated with Senpi Agent Wallet API
 
 ---
 
