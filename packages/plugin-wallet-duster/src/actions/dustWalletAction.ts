@@ -38,7 +38,7 @@ export const dustWalletAction: Action = {
     ],
     validate: async () => true,
     description:
-        "Dust any dust or low-value tokens in your agent wallet under a given USD value threshold and dusts them to ETH on Base.",
+        "Dust any dust or low-value tokens in your agent wallet under a given USD value threshold and dusts them to ETH on Base. Select this action when user request to dust their wallet and not just simply display the dust tokens, which will require confirmation and gas fee payments.",
     suppressInitialMessage: true,
     examples: [
         [
@@ -276,26 +276,22 @@ export const dustWalletAction: Action = {
             let totalUsdValue = 0;
             const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
             let dustedTokenCount = 0;
-            await Promise.all(
-                dustTokens.map((token) =>
-                    swap(
-                        traceId,
-                        token.token.baseToken.address,
-                        token.token.baseToken.symbol,
-                        moxieUserId,
-                        agentWallet.address,
-                        provider,
-                        callback,
-                        wallet
-                    ).then((dustedToken) => {
-                        if (dustedToken !== null) {
-                            dustedTokenCount++;
-                            totalUsdValue += token.token.balanceUSD;
-                        }
-                        return dustedToken;
-                    })
-                )
-            );
+            for (const token of dustTokens) {
+                const dustedToken = await swap(
+                    traceId,
+                    token.token.baseToken.address,
+                    token.token.baseToken.symbol,
+                    moxieUserId,
+                    agentWallet.address,
+                    provider,
+                    callback,
+                    wallet
+                );
+                if (dustedToken !== null) {
+                    dustedTokenCount++;
+                    totalUsdValue += token.token.balanceUSD;
+                }
+            }
 
             await callback?.({
                 text: `\nDusted ${dustedTokenCount} dust token${dustedTokenCount === 1 ? "" : "s"} into ETH (${totalUsdValue < 0.01 ? "< $0.01" : `~ $${totalUsdValue.toFixed(2)}`}).${threshold > 0.01 ? `\n\nOnly tokens above $0.01 have been dusted. To dust tokens below $0.01, set the threshold to $0.01 or below.` : ""}`,

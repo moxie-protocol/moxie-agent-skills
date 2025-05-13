@@ -29,7 +29,7 @@ export const previewDustAction: Action = {
         "HOW_MANY_DUST_TOKENS_IN_WALLET",
     ],
     description:
-        "Preview/Show how much or how many dust or low-value tokens would be dusted based on USD threshold given by user. By default, the threshold is $5. Use this action if user only ask to preview or display the dust tokens.",
+        "Select this action when user request to preview/show how much or how many dust or low-value tokens would be dusted based on USD threshold given by user. By default, the threshold is $5. Use this action if user only ask to preview or display the dust tokens, NOT when user ask to dust the tokens.",
     validate: async () => true,
     suppressInitialMessage: true,
     examples: [
