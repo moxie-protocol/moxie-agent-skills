@@ -252,7 +252,7 @@ export const previewDustAction: Action = {
 
             if (!dustTokens.length) {
                 return callback?.({
-                    text: `No tokens under $${threshold} found in your wallet.${threshold > 0.01 ? `\n\nOnly tokens above $0.01 have been shown. To show dust tokens below $0.01, set the threshold to $0.01 or below.` : ""}`,
+                    text: `\nNo tokens under $${threshold} found in your wallet.${threshold > 0.01 ? `\n\nOnly tokens above $0.01 have been shown. To show dust tokens below $0.01, set the threshold to $0.01 or below.` : ""}`,
                 });
             }
 
