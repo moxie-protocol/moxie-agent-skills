@@ -73,7 +73,7 @@ export async function swap(
     const buyTokenSymbol = "ETH";
     const buyTokenAddress = ETH_ADDRESS;
     await callback?.({
-        text: `# Dusting $${sellTokenSymbol} to $${buyTokenSymbol}\n`,
+        text: `\n# Dusting $${sellTokenSymbol} to $${buyTokenSymbol}\n`,
     });
     elizaLogger.debug(
         traceId,
