@@ -8,7 +8,6 @@ import {
     State,
 } from "@moxie-protocol/core";
 import {
-    portfolioService,
     MoxieUser,
     fetchPluginTokenGate,
 } from "@moxie-protocol/moxie-agent-lib";

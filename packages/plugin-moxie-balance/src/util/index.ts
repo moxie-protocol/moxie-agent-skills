@@ -65,68 +65,36 @@ export function getCommonHoldings(
     moxieUserInfoMultiple: MoxieUser[],
     portfolioSummaries: any
 ) {
-    const commonFanTokenHoldings = {};
     const commonTokenHoldings = {};
 
     for (const user of moxieUserInfoMultiple) {
-        if (portfolioSummaries[user.userName]) {
-            for (const portfolio of portfolioSummaries[user.userName]
-                .fanTokenHoldings) {
-                if (!commonFanTokenHoldings[portfolio.fanTokenSymbol]) {
-                    const key = `${user.userName}`;
-                    commonFanTokenHoldings[portfolio.fanTokenSymbol] = {
-                        [key]: {
-                            dollarValue: portfolio.totalTvlInUSD,
-                            amount: portfolio.totalAmount,
-                        },
-                        displayLabel: portfolio.displayLabel,
-                    };
-                } else {
-                    const key = `${user.userName}`;
-                    commonFanTokenHoldings[portfolio.fanTokenSymbol][key] = {
-                        dollarValue: portfolio.totalTvlInUSD,
-                        amount: portfolio.totalAmount,
-                    };
-                    commonFanTokenHoldings[
-                        portfolio.fanTokenSymbol
-                    ].displayLabel = portfolio.displayLabel;
-                }
-                if (
-                    portfolioSummaries[user.userName]?.tokenHoldings?.length > 0
-                ) {
-                    for (const token of portfolioSummaries[user.userName]
-                        .tokenHoldings) {
-                        if (!commonTokenHoldings[token.tokenSymbol]) {
-                            const key = `${user.userName}`;
-                            commonTokenHoldings[token.tokenSymbol] = {
-                                [key]: {
-                                    dollarValue: token.balanceUSD,
-                                    amount: token.balance,
-                                },
-                            };
-                        } else {
-                            const key = `${user.userName}`;
-                            commonTokenHoldings[token.tokenSymbol][key] = {
+        if (portfolioSummaries[user.userName] && portfolioSummaries[user.userName]?.tokenHoldings?.length > 0) {
+            for (const token of portfolioSummaries[user.userName].tokenHoldings) {
+                if (!commonTokenHoldings[token.tokenSymbol]) {
+                        const key = `${user.userName}`;
+                        commonTokenHoldings[token.tokenSymbol] = {
+                            [key]: {
                                 dollarValue: token.balanceUSD,
                                 amount: token.balance,
-                            };
-                        }
+                            },
+                        };
+                    } else {
+                        const key = `${user.userName}`;
+                        commonTokenHoldings[token.tokenSymbol][key] = {
+                            dollarValue: token.balanceUSD,
+                            amount: token.balance,
+                        };
                     }
-                }
             }
         }
     }
-    const filteredCommonFanTokenHoldings = Object.fromEntries(
-        Object.entries(commonFanTokenHoldings).filter(
-            ([symbol, holdings]) => Object.keys(holdings).length > 2
-        )
-    );
+
     const filteredCommonTokenHoldings = Object.fromEntries(
         Object.entries(commonTokenHoldings).filter(
             ([symbol, holdings]) => Object.keys(holdings).length > 1
         )
     );
-    return { filteredCommonFanTokenHoldings, filteredCommonTokenHoldings };
+    return {filteredCommonTokenHoldings };
 }
 
 export function roundToDecimalPlaces(
