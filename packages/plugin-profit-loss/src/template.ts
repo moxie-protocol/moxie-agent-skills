@@ -42,8 +42,14 @@ Your objective is to identify the type of the request and extract important info
 
 ### Query types
 1. User/Wallet/User&Token queries
-- TYPE: "wallet" | "ens" | "moxieUserId"
-- VALUE: "0x....." | "chetan.eth" | "M[number_string]"
+- TYPE: "wallet" 
+- VALUE: "0x....." 
+
+- TYPE: "ens"
+- VALUE: "chetan.eth" 
+
+- TYPE: "moxieUserId"
+- VALUE: "M[number_string]" 
 Can also contain token address to specifically show PnL for the user & that token.
 
 2. Criteria for Token PnL:
