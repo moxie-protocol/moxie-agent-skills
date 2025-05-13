@@ -796,10 +796,10 @@
         "status": "ACTIVE",
         "isDefault": true,
         "loaders": [
-            "Searching for the best tutorials",
-            "Finding the most relevant tutorials",
-            "Loading tutorials",
-            "Preparing tutorials"
+            "Summoning the dojo scrolls",
+            "Fetching wisdom from the masters",
+            "Loading walkthroughs for your next move",
+            "Prepping the playbook to level you up"
         ],
         "orderIndex": 99
     }
