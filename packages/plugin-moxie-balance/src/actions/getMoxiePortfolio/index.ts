@@ -222,35 +222,6 @@ export default {
                     return false;
                 }
 
-                // Fetch user info for all requested IDs
-                const ineligibleMoxieUsers = [];
-                const eligibleMoxieIds = [];
-
-                let userInfoBatchOutput;
-                try {
-                    userInfoBatchOutput = await moxieUserService.getUserByMoxieIdMultipleTokenGate(requestedMoxieUserIds, state.authorizationHeader as string, stringToUuid("PORTFOLIOS"));
-                } catch (error) {
-                    elizaLogger.error("Error fetching user info batch:", error instanceof Error ? error.stack : error);
-                    await callback({
-                        text: "There was an error processing your request. Please try again later.",
-                        action: "CREATOR_COIN_BALANCE_ERROR",
-                    });
-                    return false;
-                }
-
-                for (const userInfo of userInfoBatchOutput.users) {
-                    if (userInfo.errorDetails) {
-                        ineligibleMoxieUsers.push(userInfo.errorDetails);
-                    } else {
-                        eligibleMoxieIds.push(userInfo.user.id);
-                        moxieUserInfoMultiple.push(userInfo.user);
-                    }
-                }
-
-                if (ineligibleMoxieUsers.length > 0) {
-                    await handleIneligibleMoxieUsers(ineligibleMoxieUsers, callback);
-                    return false;
-                }
 
                 const {portfolioSummaries, commonPortfolioHoldingsMetadata} = await handleMultipleUsers(moxieUserInfoMultiple, runtime, moxieToUSD);
                 const {filteredCommonTokenHoldings} = getCommonHoldings(moxieUserInfoMultiple, commonPortfolioHoldingsMetadata)
@@ -259,7 +230,6 @@ export default {
                     isSelfPortolioRequested: JSON.stringify(false),
                     message: message.content.text,
                     filteredCommonTokenHoldings: JSON.stringify(filteredCommonTokenHoldings),
-                    ineligibleMoxieUsers: JSON.stringify(ineligibleMoxieUsers)
                 });
 
                 const context = composeContext({
@@ -282,36 +252,6 @@ export default {
             }
 
             elizaLogger.info("[Portfolio-TokenGate] isSelfPortolioRequested", isSelfPortolioRequested, "requestedMoxieUserIds", requestedMoxieUserIds);
-
-            if (!isSelfPortolioRequested && requestedMoxieUserIds?.length === 1) {
-                const ineligibleMoxieUsers = [];
-                const eligibleMoxieIds = [];
-                let userInfoBatchOutput;
-                try {
-                    userInfoBatchOutput = await moxieUserService.getUserByMoxieIdMultipleTokenGate(requestedMoxieUserIds, state.authorizationHeader as string, stringToUuid("PORTFOLIOS"));
-                } catch (error) {
-                    elizaLogger.error("Error fetching user info batch:", error instanceof Error ? error.stack : error);
-                    await callback({
-                        text: "There was an error processing your request. Please try again later.",
-                        action: "CREATOR_COIN_BALANCE_ERROR",
-                    });
-                    return false;
-                }
-
-                for (const userInfo of userInfoBatchOutput.users) {
-                    if (userInfo.errorDetails) {
-                        ineligibleMoxieUsers.push(userInfo.errorDetails);
-                    } else {
-                        eligibleMoxieIds.push(userInfo.user.id);
-                        moxieUserInfo = userInfo.user;
-                    }
-                }
-                if (ineligibleMoxieUsers.length > 0) {
-                    await handleIneligibleMoxieUsers(ineligibleMoxieUsers, callback);
-                    return false;
-                }
-            }
-
             // Get wallet addresses for single user
             const walletAddresses = await getWalletAddresses(moxieUserInfo);
 
