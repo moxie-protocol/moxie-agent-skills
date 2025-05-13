@@ -38,7 +38,7 @@ export const dustWalletAction: Action = {
     ],
     validate: async () => true,
     description:
-        "Dust any dust or low-value tokens in your agent wallet under a given USD value threshold and dusts them to ETH on Base.",
+        "Dust any dust or low-value tokens in your agent wallet under a given USD value threshold and dusts them to ETH on Base. Select this action when user request to dust their wallet and not just simply display the dust tokens, which will require confirmation and gas fee payments.",
     suppressInitialMessage: true,
     examples: [
         [
