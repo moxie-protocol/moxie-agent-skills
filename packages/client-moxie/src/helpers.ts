@@ -18,7 +18,6 @@ import {
 import { elizaLogger, validateUuid, IAgentRuntime } from "@moxie-protocol/core";
 import {
     MoxieWallet,
-    getMoxiePortfolioInfoByCreatorTokenDetails,
 } from "@moxie-protocol/moxie-agent-lib";
 
 /**
@@ -100,38 +99,6 @@ export async function validateMoxieAIAgentBalance({
         }
     }
 
-    // Get portfolio info
-    const portfolioInfo = await getMoxiePortfolioInfoByCreatorTokenDetails(
-        moxieUserId,
-        {
-            address: CREATOR_AGENT_TOKEN_ADDRESS,
-        }
-    );
-
-    // Return early if no portfolio found
-    if (!portfolioInfo?.length) {
-        elizaLogger.error(
-            `No portfolio info found for moxie user ${moxieUserId}`
-        );
-        return response;
-    }
-
-    const totalLockedAmount = portfolioInfo[0].totalLockedAmount;
-    const totalUnlockedAmount = portfolioInfo[0].totalUnlockedAmount;
-    const totalAmount = totalLockedAmount + totalUnlockedAmount;
-
-    elizaLogger.debug(
-        `[validateMoxieAIAgentBalance] [${moxieUserId}] Total amount: ${totalAmount}`
-    );
-
-    response.creatorAgentBalance = totalAmount;
-    response.hasSufficientBalance = totalAmount >= MINIMUM_CREATOR_AGENT_COINS;
-
-    if (!response.hasSufficientBalance) {
-        elizaLogger.error(
-            `[validateMoxieAIAgentBalance] [${moxieUserId}] Total amount is less than minimum creator agent coins`
-        );
-    }
 
     // Cache result if runtime provided
     if (runtime) {
@@ -186,39 +153,6 @@ export async function validateBaseEconomyTokenBalance({
         if (cachedData) {
             return JSON.parse(cachedData as string);
         }
-    }
-
-    // Get portfolio info
-    const portfolioInfo = await getMoxiePortfolioInfoByCreatorTokenDetails(
-        moxieUserId,
-        {
-            address: BASE_ECONOMY_TOKEN_ADDRESS,
-        }
-    );
-
-    // Return early if no portfolio found
-    if (!portfolioInfo?.length) {
-        elizaLogger.error(
-            `No portfolio info found for moxie user ${moxieUserId}`
-        );
-        return response;
-    }
-
-    const totalLockedAmount = portfolioInfo[0].totalLockedAmount;
-    const totalUnlockedAmount = portfolioInfo[0].totalUnlockedAmount;
-    const totalAmount = totalLockedAmount + totalUnlockedAmount;
-
-    elizaLogger.debug(
-        `[validateBaseEconomyTokenBalance] [${moxieUserId}] Total amount: ${totalAmount}`
-    );
-
-    response.baseEconomyTokenBalance = totalAmount;
-    response.hasSufficientBalance = totalAmount >= MINIMUM_BASE_ECONOMY_COINS;
-
-    if (!response.hasSufficientBalance) {
-        elizaLogger.error(
-            `[validateBaseEconomyTokenBalance] [${moxieUserId}] Total amount is less than minimum base economy tokens`
-        );
     }
 
     // Cache result if runtime provided
