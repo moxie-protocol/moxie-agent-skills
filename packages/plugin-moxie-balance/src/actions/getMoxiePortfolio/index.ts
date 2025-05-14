@@ -221,7 +221,10 @@ export default {
                     });
                     return false;
                 }
-
+                const userInfoResults = await Promise.all(requestedMoxieUserIds.map(moxieUserId => 
+                    moxieUserService.getUserByMoxieId(moxieUserId)
+                ));
+                moxieUserInfoMultiple.push(...userInfoResults);
 
                 const {portfolioSummaries, commonPortfolioHoldingsMetadata} = await handleMultipleUsers(moxieUserInfoMultiple, runtime, moxieToUSD);
                 const {filteredCommonTokenHoldings} = getCommonHoldings(moxieUserInfoMultiple, commonPortfolioHoldingsMetadata)
@@ -252,6 +255,11 @@ export default {
             }
 
             elizaLogger.info("[Portfolio-TokenGate] isSelfPortolioRequested", isSelfPortolioRequested, "requestedMoxieUserIds", requestedMoxieUserIds);
+
+            if (!isSelfPortolioRequested && requestedMoxieUserIds?.length === 1) {
+                moxieUserInfo = await moxieUserService.getUserByMoxieId(requestedMoxieUserIds[0])
+            }
+            
             // Get wallet addresses for single user
             const walletAddresses = await getWalletAddresses(moxieUserInfo);
 
