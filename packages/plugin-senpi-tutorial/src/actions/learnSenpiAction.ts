@@ -39,7 +39,9 @@ Ready to level up? Quickly master Senpi with these essential videos:
 - Token Research with Senpi: [Watch Now](${process.env.TOKEN_RESEARCH_TUTORIAL_URL})
 - Executing Limit Orders with Senpi: [Watch Now](${process.env.LIMIT_ORDER_TUTORIAL_URL})
 
-And don’t forget to join The Dojo! Our official Senpi Telegram group ([Join Now](${process.env.SENPI_TELEGRAM_GROUP_URL})) to ask questions, get insider alpha, share feedback, and chat directly with our team 🥷`,
+And don’t forget to join The Dojo! Our official Senpi Telegram group ([Join Now](${process.env.SENPI_TELEGRAM_GROUP_URL})) to ask questions, get insider alpha, share feedback, and chat directly with our team 🥷.
+
+<iframe src="${process.env.GET_STARTED_TUTORIAL_URL_EMBED}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
         });
     },
     examples: [
