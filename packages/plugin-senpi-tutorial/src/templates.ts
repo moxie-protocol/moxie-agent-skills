@@ -37,3 +37,28 @@ If you don't find any of the tutorials relevant to the user's request, just say 
 Here are the recent user messages for context:
 {{recentMessages}}
 `;
+
+export const videoLinkTemplate = `
+Based on the text given, extract the video link for the tutorial into an array of youtube video links based on the appearance order of the links in the text.
+
+# Example 1
+
+\`\`\`
+Here is a sample input text:
+- [Link 1](${process.env.GET_STARTED_TUTORIAL_URL})
+- [Link 2](${process.env.AUTONOMOUS_TRADE_TUTORIAL_URL})
+\`\`\`
+
+# Response:
+
+\`\`\`
+[
+    "${process.env.GET_STARTED_TUTORIAL_URL_EMBED}",
+    "${process.env.AUTONOMOUS_TRADE_TUTORIAL_URL_EMBED}"
+]
+\`\`\`
+
+
+Here is the text:
+{{text}}
+`;
