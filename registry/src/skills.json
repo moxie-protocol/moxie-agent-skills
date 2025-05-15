@@ -810,7 +810,7 @@
         ],
         "starterQuestions": [
             {
-                "label": "How does wallet dusting work",
+                "label": "How does wallet dusting work?",
                 "value": "How does wallet dusting work?"
             },
             {
@@ -850,14 +850,16 @@
             "SHOW_TOKENS_BELOW_USD",
             "SHOW_TOKENS_BELOW_VALUE",
             "SHOW_TOKENS_BELOW_THRESHOLD",
-            "DUST_PREVIEW",
             "PREVIEW_DUST_TOKENS",
+            "PREVIEW_DUSTING_MY_WALLET",
             "DUST_TOKENS",
             "DUST_WALLET",
             "DUST_TOKENS_UNDER",
             "DUST_TOKENS_BELOW",
             "HOW_MUCH_DUST_IN_WALLET",
-            "HOW_MANY_DUST_TOKENS_IN_WALLET"
+            "HOW_MANY_DUST_TOKENS_IN_WALLET",
+            "WHAT_IS_THE_VALUE_OF_DUST_IN_WALLET",
+            "WHAT_VALUE_OF_DUST_IN_WALLET"
         ],
         "isPremium": false,
         "freeQueries": 0,
