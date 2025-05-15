@@ -55,7 +55,7 @@ export const PnLAction = {
 
             const criteria = Array.isArray(pnlResponse.criteria) ? pnlResponse.criteria : [];
             const { analysisType, maxResults, chain } = pnlResponse;
-            // const { tokenAddresses, walletAddresses } = await categorizeAddressesIntoTokensAndWallets(pnlResponse, context, traceId);
+
             const tokenAddresses: string[] = [];
             const walletAddresses: string[] = [];
             const moxieUserIds: string[] = [];

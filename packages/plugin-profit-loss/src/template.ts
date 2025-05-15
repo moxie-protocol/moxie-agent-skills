@@ -61,6 +61,9 @@ User query can contain a 0x format token address, or $[token_symbol|token_addres
    - TYPE: "overall"
    - VALUE: "best_traders"
 
+###Timeframe Extraction
+- If the query specifies a timeframe (e.g., 7 days or 6 hours), format it appropriately as "7d" or "6h" and include it in the JSON response.
+
 Response format example:
 \`\`\`json
 {
@@ -72,7 +75,8 @@ Response format example:
   ],
   "analysisType": "PROFIT",
   "maxResults": 20,
-  "chain": "base"
+  "chain": "base",
+  "timeframe": "[formatted timeframe if applicable]"
 }
 \`\`\`
 Latest message: {{latestMessage}}
