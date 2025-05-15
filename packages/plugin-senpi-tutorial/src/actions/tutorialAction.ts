@@ -72,6 +72,7 @@ export const tutorialAction: Action = {
             });
             await callback?.({
                 text,
+                action: "TUTORIAL_YOUTUBE_HELP_SENPI",
             });
             return true;
         } catch (e) {
