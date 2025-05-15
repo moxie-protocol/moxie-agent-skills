@@ -10,10 +10,7 @@ import {
     elizaLogger,
     generateText,
 } from "@moxie-protocol/core";
-import { tutorialTemplate, videoLinkTemplate } from "../templates";
-import { generateObject } from "../../../core/src/generation";
-import { formatVideoLinks } from "../utils/format";
-import { z } from "zod";
+import { tutorialTemplate } from "../templates";
 
 export const tutorialAction: Action = {
     name: "TUTORIAL_YOUTUBE_HELP_SENPI",
@@ -73,29 +70,8 @@ export const tutorialAction: Action = {
                 context,
                 modelClass: ModelClass.SMALL,
             });
-            const videoLinkContext = composeContext({
-                state: {
-                    ...state,
-                    text,
-                },
-                template: videoLinkTemplate,
-            });
-
-            const details = await generateObject({
-                runtime,
-                context: videoLinkContext,
-                modelClass: ModelClass.SMALL,
-                schema: z.object({
-                    type: z.literal("array"),
-                    items: z.array(z.string()),
-                }),
-            });
-            const videoLinks = (
-                details.object as { type: string; items: string[] }
-            ).items;
-            elizaLogger.info(videoLinks);
             await callback?.({
-                text: text + "\n\n" + (await formatVideoLinks(videoLinks)),
+                text,
             });
             return true;
         } catch (e) {

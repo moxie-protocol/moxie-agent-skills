@@ -34,14 +34,23 @@ export const learnSenpiAction: Action = {
             text: `Welcome to Senpi, your onchainGPT built for autonomous crypto trading. Senpi identifies market opportunities, executes trades based on your strategies, and operates reliably around the clock—so you never miss a market move.
 
 Ready to level up? Quickly master Senpi with these essential videos:
-- Getting Started with Senpi: [Watch Now](${process.env.GET_STARTED_TUTORIAL_URL})
-- Setting Up Your First Autonomous Trade: [Watch Now](${process.env.AUTONOMOUS_TRADE_TUTORIAL_URL})
-- Token Research with Senpi: [Watch Now](${process.env.TOKEN_RESEARCH_TUTORIAL_URL})
-- Executing Limit Orders with Senpi: [Watch Now](${process.env.LIMIT_ORDER_TUTORIAL_URL})
+- Getting Started with Senpi:
 
-And don’t forget to join The Dojo! Our official Senpi Telegram group ([Join Now](${process.env.SENPI_TELEGRAM_GROUP_URL})) to ask questions, get insider alpha, share feedback, and chat directly with our team 🥷.
+<iframe src="${process.env.GET_STARTED_TUTORIAL_URL_EMBED}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-<iframe src="${process.env.GET_STARTED_TUTORIAL_URL_EMBED}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
+- Setting Up Your First Autonomous Trade:
+
+<iframe src="${process.env.AUTONOMOUS_TRADE_TUTORIAL_URL_EMBED}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+- Token Research with Senpi:
+
+<iframe src="${process.env.TOKEN_RESEARCH_TUTORIAL_URL_EMBED}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+- Executing Limit Orders with Senpi:
+
+<iframe src="${process.env.LIMIT_ORDER_TUTORIAL_URL_EMBED}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+And don’t forget to join The Dojo! Our official Senpi Telegram group ([Join Now](${process.env.SENPI_TELEGRAM_GROUP_URL})) to ask questions, get insider alpha, share feedback, and chat directly with our team 🥷.`,
         });
     },
     examples: [

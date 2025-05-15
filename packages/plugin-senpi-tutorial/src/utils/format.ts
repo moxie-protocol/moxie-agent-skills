@@ -1,3 +1,5 @@
+// Keep these functions for future iterations
+
 import fetch from "node-fetch";
 
 export const formatVideoLinks = async (videoLinks: string[]) => {
