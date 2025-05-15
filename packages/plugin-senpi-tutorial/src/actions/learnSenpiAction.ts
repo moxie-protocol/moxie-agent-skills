@@ -33,24 +33,19 @@ export const learnSenpiAction: Action = {
         callback({
             text: `Welcome to Senpi, your onchainGPT built for autonomous crypto trading. Senpi identifies market opportunities, executes trades based on your strategies, and operates reliably around the clock—so you never miss a market move.
 
-Ready to level up? Quickly master Senpi with these essential videos:
-- Getting Started with Senpi:
+Ready to level up? Quickly master Senpi by watching this tutorial:
 
 <iframe src="${process.env.GET_STARTED_TUTORIAL_URL_EMBED}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-- Setting Up Your First Autonomous Trade:
-
-<iframe src="${process.env.AUTONOMOUS_TRADE_TUTORIAL_URL_EMBED}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-
-- Token Research with Senpi:
-
-<iframe src="${process.env.TOKEN_RESEARCH_TUTORIAL_URL_EMBED}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-
-- Executing Limit Orders with Senpi:
-
-<iframe src="${process.env.LIMIT_ORDER_TUTORIAL_URL_EMBED}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+Want to learn more? Click one of the buttons below to explore more essential videos.
 
 And don’t forget to join The Dojo! Our official Senpi Telegram group ([Join Now](${process.env.SENPI_TELEGRAM_GROUP_URL})) to ask questions, get insider alpha, share feedback, and chat directly with our team 🥷.`,
+            action: "LEARN_SENPI",
+            cta: [
+                "HOW_DO_I_SETUP_AN_AUTONOMOUS_TRADE_WITH_SENPI",
+                "HOW_DO_I_DO_TOKEN_RESEARCH_WITH_SENPI",
+                "HOW_DO_I_SETUP_A_LIMIT_ORDER_WITH_SENPI",
+            ],
         });
     },
     examples: [
@@ -65,6 +60,7 @@ And don’t forget to join The Dojo! Our official Senpi Telegram group ([Join No
                 user: "{{user2}}",
                 content: {
                     text: "Here are all the tutorials for Senpi: [Watch Now](${process.env.GET_STARTED_SENPI_YOUTUBE_URL})",
+                    action: "LEARN_SENPI",
                 },
             },
         ],
@@ -79,6 +75,7 @@ And don’t forget to join The Dojo! Our official Senpi Telegram group ([Join No
                 user: "{{user2}}",
                 content: {
                     text: "Here are all the tutorials for Senpi: [Watch Now](${process.env.GET_STARTED_SENPI_YOUTUBE_URL})",
+                    action: "LEARN_SENPI",
                 },
             },
         ],
