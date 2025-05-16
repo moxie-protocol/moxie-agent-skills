@@ -16,4 +16,6 @@ Message history: {{previousMessage}}
 - At the end of every post, end with "Enter the dojo at @senpi.eth."
 - Just respond with the ready-to-post text for social media.
 - For usernames mentioned in the message: for names ending in '.eth & .base.eth' simply write them, if the name is 'M[ID]' ignore them, for others you tag them '@[username]'.
+- If the message was about learning Senpi through youtube tutorials, start the post with "I just learnt about Senpi through about ... in this tutorial.". And add summary on what the tutorial is about based on the message and provide the link to the tutorial.
+- For any embedded youtube links (format: https://www.youtube.com/embed/<VIDEO_ID>) in the message, convert them into a regular youtube link (format: https://www.youtube.com/watch?v=<VIDEO_ID>).
 `;
