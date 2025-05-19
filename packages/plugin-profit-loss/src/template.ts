@@ -63,7 +63,7 @@ User query can contain a 0x format token address, or $[token_symbol|token_addres
 
 ###Timeframe Extraction
 - If the query specifies "24 hours," convert it to "1d."
-- If the query specifies a timeframe, format it using only days or "lifetime." Use formats like "1d", "7d", "30days" or "lifetime."
+- If the query specifies a timeframe, format it using only days or "lifetime." Use formats like "1d", "7d", "30d" or "lifetime"
 
 Response format example:
 \`\`\`json
