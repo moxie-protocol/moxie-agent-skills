@@ -52,10 +52,10 @@ export const PnLAction = {
             });
             elizaLogger.debug(traceId, `[PnLAction] time taken to extract wallet addresses: ${new Date().getTime() - start.getTime()}ms`);
             elizaLogger.debug(traceId, `[PnLAction] pnlResponse: ${JSON.stringify(pnlResponse)}`);
-            if (!["1d", "7d", "30d", "lifetime", null].includes(pnlResponse.timeFrame)) {
-                elizaLogger.error(traceId, `[PnLAction] Unsupported timeframe provided: ${pnlResponse.timeFrame}`);
+            if (pnlResponse.timeFrame === undefined || !["1d", "7d", "30d", "lifetime", null].includes(pnlResponse.timeFrame)) {
+                elizaLogger.error(traceId, `[PnLAction] Unsupported or undefined timeframe provided: ${pnlResponse.timeFrame}`);
                 await callback?.({
-                    text: `The provided timeframe '${pnlResponse.timeFrame}' is not supported. Please use one of the following: 1d, 7d, 30d, lifetime, or leave it unspecified for lifetime pnl.`
+                    text: `The provided timeframe '${pnlResponse.timeFrame}' is not supported or is undefined. Please use one of the following: 1d, 7d, 30d, lifetime, or leave it unspecified for lifetime pnl.`
                 });
                 return true;
             }
