@@ -3,9 +3,6 @@ import { PnlData } from "../types/type";
 import { elizaLogger } from "@moxie-protocol/core";
 
 const client = new DuneClient(process.env.DUNE_API_KEY!);
-const RESULT_BASE_PNL_TABLE =
-  process.env.RESULT_BASE_PNL_TABLE ||
-  "dune.moxieprotocol.result_base_pnl_dev";
 
 /**
  * Prepares a SQL query to fetch PnL data from Dune Analytics based on wallet response parameters
@@ -31,6 +28,9 @@ const BLACKLISTED_TOKEN_ADDRESSES = [
   "0x5875eee11cf8398102fdad704c9e96607675467a",
   "0x3128a0f7f0ea68e7b7c9b00afa7e41045828e858",
 ];
+
+const RESULT_BASE_PNL_TABLE =
+  process.env.RESULT_BASE_PNL_TABLE || "dune.senpi.result_pnl_analysis";
 
 export const preparePnlQuery = (pnlResponse: any) => {
   const {
@@ -70,7 +70,23 @@ export const preparePnlQuery = (pnlResponse: any) => {
 
   let selectFields = buildSelectFields(false);
 
-  let query = `select ${selectFields} from ${RESULT_BASE_PNL_TABLE}`;
+  let pnlTable = RESULT_BASE_PNL_TABLE;
+  if (timeFrame === "1d") {
+    pnlTable += "_1d";
+  } else if (timeFrame === "7d") {
+    pnlTable += "_7d";
+  } else if (timeFrame === "30d") {
+    pnlTable += "_30d";
+  } else {
+    pnlTable += "_lifetime";
+  }
+  if (process.env.NODE_ENV === "production") {
+    pnlTable = pnlTable + "_prod";
+  } else {
+    pnlTable = pnlTable + "_dev";
+  }
+
+  let query = `select ${selectFields} from ${pnlTable}`;
   const whereClauses = [];
   const groupByClauses = [];
   let orderByClause = "";
@@ -99,19 +115,11 @@ export const preparePnlQuery = (pnlResponse: any) => {
     );
   }
 
-  if (timeFrame) {
-    whereClauses.push(`(
-      ${timeFrame} IS NULL
-      OR ${timeFrame} = ''
-      OR block_time >= NOW() - parse_duration(${timeFrame})
-    )`);
-  }
-
   const isAggregated = moxieUserIds?.length > 0 || tokenAddresses?.length > 0;
 
   if (isAggregated) {
     selectFields = buildSelectFields(true);
-    query = `select ${selectFields} from ${RESULT_BASE_PNL_TABLE}`;
+    query = `select ${selectFields} from ${pnlTable}`;
     groupByClauses.push("token_address", "moxie_user_id", "username");
     orderByClause = buildOrderByClause(analysisType, true);
   } else {
@@ -188,9 +196,26 @@ export const fetchTotalPnl = async (pnlResponse: any) => {
   let delay = 1000; // Start with 1 second delay
   let lastError;
 
-  const { walletAddresses, moxieUserIds } = pnlResponse;
+  const { walletAddresses, moxieUserIds, timeFrame } = pnlResponse;
 
-  let query = `select SUM(profit_loss) as total_profit_loss from ${RESULT_BASE_PNL_TABLE}`;
+  let pnlTable = RESULT_BASE_PNL_TABLE;
+  if (timeFrame === "1d") {
+    pnlTable += "_1d";
+  } else if (timeFrame === "7d") {
+    pnlTable += "_7d";
+  } else if (timeFrame === "30d") {
+    pnlTable += "_30d";
+  } else {
+    pnlTable += "_lifetime";
+  }
+  
+  if (process.env.NODE_ENV === "production") {
+    pnlTable = pnlTable + "_prod";
+  } else {
+    pnlTable = pnlTable + "_dev";
+  }
+
+  let query = `select SUM(profit_loss) as total_profit_loss from ${pnlTable}`;
   let start = new Date();
   let conditions = [];
 
