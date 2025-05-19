@@ -76,7 +76,7 @@ Response format example:
   "analysisType": "PROFIT",
   "maxResults": 20,
   "chain": "base",
-  "timeframe": "[formatted timeframe if applicable]"
+  "timeFrame": "[formatted timeframe if applicable]"
 }
 \`\`\`
 Latest message: {{latestMessage}}
