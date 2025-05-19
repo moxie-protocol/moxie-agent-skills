@@ -89,4 +89,5 @@ General rules:
 - if the query mentions "my PnL", or "I earned/lost" use the following UserId: {{moxieUserId}}
 - if the query mentions "my agent PnL/senpi PnL" use the following wallet address: {{agentWalletAddress}}
 - agent can also be called senpi.
+- focus on the latest message to extract information.
 `;
