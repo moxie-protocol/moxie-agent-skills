@@ -22,6 +22,7 @@ Step 1: Identify which type of query the question refers to. It might be about a
 
 ### If the question is about token PnL (e.g. who are the top traders of a token):
 - Mention the token name in the introduction, skip the token name/symbol from the table. Total PnL is for top 20 wallets.
+- Skip total PnL.
 
 #### Required Fields in Response:
 - User Name (only for token PnL)
