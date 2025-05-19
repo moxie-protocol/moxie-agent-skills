@@ -62,7 +62,8 @@ User query can contain a 0x format token address, or $[token_symbol|token_addres
    - VALUE: "best_traders"
 
 ###Timeframe Extraction
-- If the query specifies a timeframe (e.g., 7 days or 6 hours), format it appropriately as "7d" or "6h" and include it in the JSON response.
+- If the query specifies "24 hours," convert it to "1d."
+- If the query specifies a timeframe, format it using only days or "lifetime." Use formats like "1d", "7d", "30days" or "lifetime."
 
 Response format example:
 \`\`\`json
