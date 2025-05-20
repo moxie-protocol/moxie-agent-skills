@@ -70,8 +70,9 @@ export const tutorialAction: Action = {
                 context,
                 modelClass: ModelClass.SMALL,
             });
-            callback?.({
+            await callback?.({
                 text,
+                action: "TUTORIAL_YOUTUBE_HELP_SENPI",
             });
             return true;
         } catch (e) {

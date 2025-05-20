@@ -49,7 +49,8 @@ Instructions:
       - If the count is less than expected, review the input for any missed mentions.
       - Note any discrepancies.
    i. Determine the final action or prepare for an error response.
-   j. Summarize your final decision, explaining the reasoning and listing any missing parameters.
+   j. If the intent is to add members but only a group name is provided, choose CREATE_GROUP_AND_ADD_GROUP_MEMBER as the action.
+   k. Summarize your final decision, explaining the reasoning and listing any missing parameters.
 
 5. Response Format:
    After your analysis, provide the final JSON response with the following structure:

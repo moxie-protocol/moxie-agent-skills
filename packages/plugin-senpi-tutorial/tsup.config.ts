@@ -15,6 +15,13 @@ export default defineConfig({
         "http",
         "agentkeepalive",
         "safe-buffer",
+        "@anush008/tokenizers",
+        "node-fetch",
+        "onnxruntime-node",
+        "sharp",
+        "minipass",
+        "tar",
+        "js-sha1",
         // Add other modules you want to externalize
     ],
 });
