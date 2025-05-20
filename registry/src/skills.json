@@ -660,7 +660,8 @@
         "capabilities": [
             "Total PnL of any user or wallet",
             "PnL of top traders of any token",
-            "PnL of any user or wallet on a specific token"
+            "PnL of any user or wallet on a specific token",
+            "Filter PnL by time range: 1 day, 7 days, 30 days, or lifetime"
         ],
         "starterQuestions": [
             {
@@ -668,24 +669,24 @@
                 "value": "What is my PNL?"
             },
             {
-                "label": "What is PNL of my Senpi agent?",
-                "value": "What is PNL of my Senpi agent?"
+                "label": "What is 7-day PNL of my Senpi agent?",
+                "value": "What is 7-day PNL of my Senpi agent?"
             },
             {
                 "label": "Top PNL of $CLANKER",
                 "value": "Top PNL of $[CLANKER|0x1bc0c42215582d5A085795f4baDbaC3ff36d1Bcb]?"
             },
             {
-                "label": "What is PNL of @jessepollak?",
-                "value": "What is PNL of @[jessepollak|M1245]?"
+                "label": "What is PNL of @jessepollak last 30 days",
+                "value": "What is PNL of @[jessepollak|M1245] last 30 days?"
             },
             {
                 "label": "What is my PNL on $VVV?",
                 "value": "What is my PNL on $[VVV|0xacfE6019Ed1A7Dc6f7B508C02d1b04ec88cC21bf]?"
             },
             {
-                "label": "What is @kyle PNL on $CLANKER",
-                "value": "What is @[kyle|M25428] PNL on $[CLANKER|0x1bc0c42215582d5A085795f4baDbaC3ff36d1Bcb]?"
+                "label": "Top 1-day PNL of $WHIM traders",
+                "value": "Top 1-day PNL of $[WHIM|0x39a1cce09d7354ac2db86c6b02924360a10e4793] traders"
             }
         ],
         "mediaUrls": [
