@@ -174,7 +174,7 @@ export const PnLAction = {
             });
             elizaLogger.debug(traceId, `[PnLAction] time taken to generate pnl data template: ${new Date().getTime() - pnlStart.getTime()}ms`);
             for await (const textPart of response) {
-                callback({ text: textPart, action: "PROFIT_LOSS", cta: ["SHOW_MY_PNL_1DAY", "SHOW_MY_PNL_7DAYS", "SHOW_MY_PNL_30DAYS", "SHOW_MY_PNL_LIFETIME", "SHOW_MY_AGENT_PNL"] });
+                callback({ text: textPart, action: "PROFIT_LOSS" });
             }
 
             return true;
