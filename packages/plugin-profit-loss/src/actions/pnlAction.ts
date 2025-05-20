@@ -48,7 +48,13 @@ export const PnLAction = {
             const pnlResponse = await generateObjectDeprecated({
                 runtime,
                 context: context,
-                modelClass: ModelClass.SMALL,
+                modelClass: ModelClass.MEDIUM,
+                modelConfigOptions: {
+                    modelProvider: ModelProviderName.OPENAI,
+                    temperature: 0.0,
+                    apiKey: process.env.OPENAI_API_KEY!,
+                    modelClass: ModelClass.MEDIUM
+                }
             });
             elizaLogger.debug(traceId, `[PnLAction] time taken to extract wallet addresses: ${new Date().getTime() - start.getTime()}ms`);
             elizaLogger.debug(traceId, `[PnLAction] pnlResponse: ${JSON.stringify(pnlResponse)}`);

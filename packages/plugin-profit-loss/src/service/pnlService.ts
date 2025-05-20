@@ -80,6 +80,8 @@ export const preparePnlQuery = (pnlResponse: any) => {
   } else {
     pnlTable += "_lifetime";
   }
+
+  elizaLogger.debug(`[preparePnlQuery] Node env: ${process.env.NODE_ENV}`);
   if (process.env.NODE_ENV === "production") {
     pnlTable = pnlTable + "_prod";
   } else {
