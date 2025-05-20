@@ -80,11 +80,10 @@ export const preparePnlQuery = (pnlResponse: any) => {
   } else {
     pnlTable += "_lifetime";
   }
-  if (process.env.NODE_ENV === "production") {
-    pnlTable = pnlTable + "_prod";
-  } else {
-    pnlTable = pnlTable + "_dev";
-  }
+
+  elizaLogger.debug(`[preparePnlQuery] Pnl env: ${process.env.PNL_ENV}`);
+  pnlTable = pnlTable + "_" + process.env.PNL_ENV;
+  elizaLogger.debug(`[preparePnlQuery] Pnl table: ${pnlTable}`);
 
   let query = `select ${selectFields} from ${pnlTable}`;
   const whereClauses = [];
@@ -208,12 +207,10 @@ export const fetchTotalPnl = async (pnlResponse: any) => {
   } else {
     pnlTable += "_lifetime";
   }
-  
-  if (process.env.NODE_ENV === "production") {
-    pnlTable = pnlTable + "_prod";
-  } else {
-    pnlTable = pnlTable + "_dev";
-  }
+
+  elizaLogger.debug(`[fetchTotalPnl] Pnl env: ${process.env.PNL_ENV}`);
+  pnlTable = pnlTable + "_" + process.env.PNL_ENV;
+  elizaLogger.debug(`[fetchTotalPnl] Pnl table: ${pnlTable}`);
 
   let query = `select SUM(profit_loss) as total_profit_loss from ${pnlTable}`;
   let start = new Date();
