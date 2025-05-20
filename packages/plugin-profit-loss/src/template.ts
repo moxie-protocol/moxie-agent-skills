@@ -12,6 +12,7 @@ Step 1: Identify which type of query the question refers to. It might be about a
 - Write a quick intro about the PnL analysis. Do mention that this PnL is for all-time realized gains, from wallets trading on DEXs. The PnL amounts are indicative only.
 - Agent can also be called senpi.
 - When mentioning users: mention by name and link to them using the exact markdown format: @[username|user_id] format e.g. @[zoravar|M234]. If username is not available, use the exact format: @[user_id|user_id] e.g. @[M234|M234]. Do not add any extra characters such as slashes.
+- At the end of the response, mention the timeframe the PnL was for, and also remind the user they can ask for 1, 7, 30 or lifetime PnL too.
 
 #### If the question is about user or wallet:
 - Make sure to sum up and call out the total top 20 PnL in the beginning.
@@ -22,6 +23,7 @@ Step 1: Identify which type of query the question refers to. It might be about a
 
 ### If the question is about token PnL (e.g. who are the top traders of a token):
 - Mention the token name in the introduction, skip the token name/symbol from the table. Total PnL is for top 20 wallets.
+- Skip total PnL.
 
 #### Required Fields in Response:
 - User Name (only for token PnL)
@@ -61,6 +63,10 @@ User query can contain a 0x format token address, or $[token_symbol|token_addres
    - TYPE: "overall"
    - VALUE: "best_traders"
 
+###Timeframe Extraction
+- If the query specifies "24 hours," convert it to "1d."
+- If the query specifies a timeframe, format it using only days or "lifetime." Use formats like "1d", "7d", "30d" or "lifetime"
+
 Response format example:
 \`\`\`json
 {
@@ -72,7 +78,8 @@ Response format example:
   ],
   "analysisType": "PROFIT",
   "maxResults": 20,
-  "chain": "base"
+  "chain": "base",
+  "timeFrame": "[formatted timeframe if applicable]"
 }
 \`\`\`
 Latest message: {{latestMessage}}
@@ -83,4 +90,5 @@ General rules:
 - if the query mentions "my PnL", or "I earned/lost" use the following UserId: {{moxieUserId}}
 - if the query mentions "my agent PnL/senpi PnL" use the following wallet address: {{agentWalletAddress}}
 - agent can also be called senpi.
+- focus on the latest message to extract information.
 `;

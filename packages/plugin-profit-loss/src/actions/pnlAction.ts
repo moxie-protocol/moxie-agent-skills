@@ -51,11 +51,20 @@ export const PnLAction = {
                 modelClass: ModelClass.SMALL,
             });
             elizaLogger.debug(traceId, `[PnLAction] time taken to extract wallet addresses: ${new Date().getTime() - start.getTime()}ms`);
-            elizaLogger.debug(traceId, `[PnLAction] walletPnlResponse: ${JSON.stringify(pnlResponse)}`);
+            elizaLogger.debug(traceId, `[PnLAction] pnlResponse: ${JSON.stringify(pnlResponse)}`);
+            if (!pnlResponse?.timeFrame) {
+               pnlResponse.timeFrame = "lifetime";
+               elizaLogger.debug(traceId, `[PnLAction] timeFrame is undefined, setting to lifetime`);
+            } else if (!["1d", "7d", "30d", "lifetime"].includes(pnlResponse.timeFrame)) {
+                elizaLogger.error(traceId, `[PnLAction] Unsupported or undefined timeframe provided: ${pnlResponse.timeFrame}`);
+                await callback?.({
+                    text: `The provided timeframe '${pnlResponse.timeFrame}' is not supported or is undefined. Please use one of the following: 1d, 7d, 30d, lifetime, or leave it unspecified for lifetime pnl.`
+                });
+                return true;
+            }
 
             const criteria = Array.isArray(pnlResponse.criteria) ? pnlResponse.criteria : [];
-            const { analysisType, maxResults, chain } = pnlResponse;
-            // const { tokenAddresses, walletAddresses } = await categorizeAddressesIntoTokensAndWallets(pnlResponse, context, traceId);
+
             const tokenAddresses: string[] = [];
             const walletAddresses: string[] = [];
             const moxieUserIds: string[] = [];
@@ -159,7 +168,7 @@ export const PnLAction = {
             });
             elizaLogger.debug(traceId, `[PnLAction] time taken to generate pnl data template: ${new Date().getTime() - pnlStart.getTime()}ms`);
             for await (const textPart of response) {
-                callback({ text: textPart, action: "PROFIT_LOSS" });
+                callback({ text: textPart, action: "PROFIT_LOSS", cta: ["SHOW_MY_PNL_1DAY", "SHOW_MY_PNL_7DAYS", "SHOW_MY_PNL_30DAYS", "SHOW_MY_PNL_LIFETIME", "SHOW_MY_AGENT_PNL"] });
             }
 
             return true;
