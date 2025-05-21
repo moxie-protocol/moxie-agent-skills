@@ -694,10 +694,6 @@
                 "value": "What is PnL for #[base-hunters|6b37936c-d06c-4b54-8179-3190ecc1f0b3]?"
             },
             {
-                "label": "What is PnL for #Copytrade in the last 7 days?",
-                "value": "What is PnL for #[copytrade|7b37936c-d06c-4b54-8179-3190ecc1f0b3] in the last 7 days?"
-            },
-            {
                 "label": "Show 7 day PNL for #copytrade" group,
                 "value": "Show 7 day PNL for #copytrade group"
             }      
