@@ -49,7 +49,7 @@ export const extractWalletTemplate = `
 Your objective is to identify the type of the request and extract important information from a given user message, then generate a structured JSON response.
 
 ### Query types
-1. User/Wallet/User&Token queries
+1. User/Wallet/User&Token or Group queries
    - TYPE: "wallet" 
    - VALUE: "0x....."
 
@@ -59,6 +59,10 @@ Your objective is to identify the type of the request and extract important info
    - TYPE: "moxieUserId"
    - VALUE: "M[number_string]"
      Can also contain token address to specifically show PnL for the user & that token.
+
+   - TYPE: "group"
+   - VALUE: "[group_name|group_id]"
+
 
 2. Criteria for Token PnL:
    - TYPE: "tokenAddress"
@@ -71,7 +75,7 @@ Your objective is to identify the type of the request and extract important info
 
 4. Group PnL Queries:
    - TYPE: "group"
-   - VALUE: "{group_id|group_name}"
+   - VALUE: "[group_name|group_id]"
      Queries can be: 
      - show PnL for group #[Group Name|UUID]
      - what's pnl for #[Group Name|UUID]
