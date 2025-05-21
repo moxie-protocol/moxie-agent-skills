@@ -662,8 +662,7 @@
             "PnL of top traders of any token",
             "PnL of any user or wallet on a specific token",
             "Filter PnL by time range: 1 day, 7 days, 30 days, or lifetime",
-            "PnL of any group of users which can be created by Senpi",
-            "PnL of group with time range: 1 day, 7 days, 30 days, or lifetime"
+            "PnL of your groups"
         ],
         "starterQuestions": [
             {
@@ -697,7 +696,11 @@
             {
                 "label": "What is PnL for #Copytrade in the last 7 days?",
                 "value": "What is PnL for #[copytrade|7b37936c-d06c-4b54-8179-3190ecc1f0b3] in the last 7 days?"
-            }              
+            },
+            {
+                "label": "Show 7 day PNL for #copytrade" group,
+                "value": "Show 7 day PNL for #copytrade group"
+            }      
         ],
         "mediaUrls": [
             "https://raw.githubusercontent.com/Senpi-ai/senpi-agent-skills/refs/heads/main/packages/plugin-moxie-pnl-tracker/images/logo.svg"
