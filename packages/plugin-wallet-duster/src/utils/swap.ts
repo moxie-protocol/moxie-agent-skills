@@ -294,7 +294,13 @@ export async function swap(
     }
 
     await callback?.(
-        swapInProgressTemplate(sellTokenSymbol, buyTokenSymbol, tx.hash)
+        swapInProgressTemplate(
+            sellTokenSymbol,
+            sellTokenAddress,
+            buyTokenSymbol,
+            buyTokenAddress,
+            tx.hash
+        )
     );
 
     // wait for tx to be mined
@@ -343,7 +349,9 @@ export async function swap(
         await callback?.(
             swapCompletedTemplate(
                 sellTokenSymbol,
+                sellTokenAddress,
                 buyTokenSymbol,
+                buyTokenAddress,
                 buyAmountInWEI,
                 buyTokenDecimals
             )
