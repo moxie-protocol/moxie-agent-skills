@@ -70,5 +70,6 @@ Follow the user question and provide the details in a concise manner.
 - If no token details are provided, try finding the token details from the memory.
 - You are only able to provide the token details for last 24 hours at max
 - If no token details are provided and you are finding from the memory, do not explicity mention that you are finding from the memory or the token details are empty.
+- When mentioning token name/symbols, format them in the following format: $[tokenSymbol|tokenAddress]
 `;
 

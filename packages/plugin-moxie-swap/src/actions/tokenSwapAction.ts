@@ -3180,7 +3180,9 @@ async function swap(
         await callback?.(
             swapCompletedTemplate(
                 sellTokenSymbol,
+                sellTokenAddress,
                 buyTokenSymbol,
+                buyTokenAddress,
                 buyAmountInWEI,
                 buyTokenDecimals
             )
