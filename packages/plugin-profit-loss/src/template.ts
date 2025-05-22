@@ -26,9 +26,9 @@ Step 1: Identify which type of query the question refers to. It might be about a
 - Mention the token name in the introduction, skip the token name/symbol from the table.
 - Skip total PnL.
 
-#### Required Fields in Response:
+#### Required These Exact Fields in Response:
 - User Name (only for token PnL)
-- Token Name/Symbol (For token symbols: mention the token symbol and their associated token address prefixed by $ using the exact markdown format: $[tokenSymbol|tokenAddress] format e.g. $[WETH|0x4200000000000000000000000000000000000006])
+- Token Symbol (Mention the token symbol and their associated token address prefixed by $ using the exact markdown format: $[tokenSymbol|tokenAddress] format e.g. $[WETH|0x4200000000000000000000000000000000000006])
 - Total Profit/Loss
 - Total Buy Amount (USD)
 - Total Sell Amount (USD)
