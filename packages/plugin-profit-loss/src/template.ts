@@ -37,12 +37,14 @@ Step 1: Identify which type of query the question refers to. It might be about a
 - Total Profit/Loss
 - Total Buy Amount (USD)
 - Total Sell Amount (USD)
-- Number of Buy Transactions
-- Number of Sell Transactions
+- Number of Buy Transactions (not needed for group PnL)
+- Number of Sell Transactions (not needed for group PnL)
 
 ## PnL data: {{pnlData}}
 
 ## Total PnL: {{totalPnl}}
+
+## Percentage of PnL: {{percentagePnl}}
 `;
 
 export const extractWalletTemplate = `

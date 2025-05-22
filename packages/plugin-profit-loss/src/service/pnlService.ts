@@ -63,11 +63,11 @@ export const prepareGroupPnlQuery = (traceId: string, pnlResponse: any) => {
   const memberIdsString = allMemberIds.map(id => `'${id}'`).join(",");
 
   const blacklistedTokensString = BLACKLISTED_TOKEN_ADDRESSES.map(
-    (address) => `'${address}'`
+    (address) => `${address}`
   ).join(",");
 
   const query = `
-    WITH ranked_usernames AS (
+     WITH ranked_usernames AS (
       SELECT
           moxie_user_id,
           username AS display_username,
@@ -94,7 +94,11 @@ export const prepareGroupPnlQuery = (traceId: string, pnlResponse: any) => {
           SUM(total_sell_value_usd) AS total_sell_usd,
           SUM(profit_loss) AS pnl_usd
       FROM ${pnlGroupTable}
-      WHERE moxie_user_id IS NOT NULL
+      WHERE 
+          moxie_user_id IS NOT NULL
+          AND token_address NOT IN (${blacklistedTokensString})
+          AND buy_transaction_count > 0
+          AND moxie_user_id IN (${memberIdsString})
       GROUP BY moxie_user_id
     ),
     best_usernames AS (
@@ -115,12 +119,7 @@ export const prepareGroupPnlQuery = (traceId: string, pnlResponse: any) => {
     FROM aggregated_pnl a
     LEFT JOIN best_usernames b
       ON a.moxie_user_id = b.moxie_user_id
-    WHERE a.moxie_user_id IN (${memberIdsString})
-      AND token_address NOT IN (${blacklistedTokensString})
-      AND buy_transaction_count > 0
-    GROUP BY a.moxie_user_id, b.display_username, b.username_type
-    ORDER BY a.pnl_usd ${analysisType === "PROFIT" ? "DESC" : "ASC"}
-    LIMIT ${maxResults || 20}
+    ORDER BY a.pnl_usd DESC
   `;
 
   elizaLogger.debug(`[prepareGroupPnlQuery] traceId: ${traceId}, query: ${query}`);
