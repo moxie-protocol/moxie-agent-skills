@@ -12,6 +12,7 @@ Step 1: Identify which type of query the question refers to. It might be about a
 - Write a quick intro about the PnL analysis. Do mention that this PnL is for all-time realized gains, from wallets trading on DEXs. The PnL amounts are indicative only.
 - Agent can also be called senpi.
 - When mentioning users: mention by name and link to them using the exact markdown format: @[username|user_id] format e.g. @[zoravar|M234]. If username is not available, use the exact format: @[user_id|user_id] e.g. @[M234|M234]. Do not add any extra characters such as slashes.
+- When mentioning token symbols: mention the token symbol and their associated token address prefixed by $ using the exact markdown format: $[tokenSymbol|tokenAddress] format e.g. $[WETH|0x4200000000000000000000000000000000000006].
 - At the end of the response, mention the timeframe the PnL was for, and also remind the user they can ask for 1, 7, 30 or lifetime PnL too.
 
 #### If the question is about user or wallet:
@@ -25,9 +26,9 @@ Step 1: Identify which type of query the question refers to. It might be about a
 - Mention the token name in the introduction, skip the token name/symbol from the table.
 - Skip total PnL.
 
-#### Required Fields in Response:
+#### Required These Exact Fields in Response:
 - User Name (only for token PnL)
-- Token Name/Symbol
+- Token Symbol (Mention the token symbol and their associated token address prefixed by $ using the exact markdown format: $[tokenSymbol|tokenAddress] format e.g. $[WETH|0x4200000000000000000000000000000000000006])
 - Total Profit/Loss
 - Total Buy Amount (USD)
 - Total Sell Amount (USD)
@@ -44,20 +45,20 @@ Your objective is to identify the type of the request and extract important info
 
 ### Query types
 1. User/Wallet/User&Token queries
-- TYPE: "wallet" 
-- VALUE: "0x....." 
+   - TYPE: "wallet"
+   - VALUE: "0x....."
 
-- TYPE: "ens"
-- VALUE: "chetan.eth" 
+   - TYPE: "ens"
+   - VALUE: "chetan.eth"
 
-- TYPE: "moxieUserId"
-- VALUE: "M[number_string]" 
-Can also contain token address to specifically show PnL for the user & that token.
+   - TYPE: "moxieUserId"
+   - VALUE: "M[number_string]"
+     Can also contain token address to specifically show PnL for the user & that token.
 
 2. Criteria for Token PnL:
-- TYPE: "tokenAddress"
-- VALUE: "0x....."
-User query can contain a 0x format token address, or $[token_symbol|token_address](example: $[USDC|0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913]), you only need 0x address.
+   - TYPE: "tokenAddress"
+   - VALUE: "0x....."
+     User query can contain a 0x format token address, or $[token_symbol|token_address](example: $[USDC|0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913]), you only need 0x address.
 
 3. Criteria for Overall PnL (Best Traders):
    - TYPE: "overall"
@@ -82,6 +83,7 @@ Response format example:
   "timeFrame": "[formatted timeframe if applicable]"
 }
 \`\`\`
+
 Latest message: {{latestMessage}}
 Conversation history: {{recentMessages}}
 
