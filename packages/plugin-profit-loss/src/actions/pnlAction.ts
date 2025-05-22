@@ -157,6 +157,7 @@ export const PnLAction = {
             // For groups, we need to fetch PnL for each member individually
             let pnlData = [];
             let totalPnl = 0;
+            let pnlPercentageChange = 0;
 
             if (groupMembers.length > 0) {
                 // Make a single query for all group members using the dedicated group query method
@@ -167,6 +168,8 @@ export const PnLAction = {
                 pnlData = await fetchPnlData(groupPnlQuery);
                 // Calculate total PnL for all group members
                 totalPnl = pnlData.reduce((sum, data) => sum + (data.profit_loss || 0), 0);
+                let totalBuyAmount = pnlData.reduce((sum, data) => sum + (data.buy_amount || 0), 0);
+                pnlPercentageChange = totalBuyAmount > 0 ? ((totalPnl / totalBuyAmount) * 100) : 0;
             } else {
                 // Handle non-group PnL queries as before
                 [pnlData, totalPnl] = await Promise.all([
@@ -214,7 +217,8 @@ export const PnLAction = {
                 .replace("{{conversation}}", JSON.stringify(message.content.text))
                 .replace("{{criteria}}", JSON.stringify(pnlResponse.criteria))
                 .replace("{{pnlData}}", JSON.stringify(pnlData))
-                .replace("{{totalPnl}}", (moxieUserIds.length > 0 || walletAddresses.length > 0) && totalPnl !== null ? totalPnl.toString() : "0");
+                .replace("{{totalPnl}}", (moxieUserIds.length > 0 || walletAddresses.length > 0) && totalPnl !== null ? totalPnl.toString() : "0")
+                .replace("{{percentagePnl}}", groupMembers.length > 0 && pnlPercentageChange !== null ? pnlPercentageChange.toString() : "0");
 
             const currentContext = composeContext({
                 state,

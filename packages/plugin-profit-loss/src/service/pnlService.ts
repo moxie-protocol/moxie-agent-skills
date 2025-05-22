@@ -67,7 +67,7 @@ export const prepareGroupPnlQuery = (traceId: string, pnlResponse: any) => {
   ).join(",");
 
   const query = `
-    WITH ranked_usernames AS (
+     WITH ranked_usernames AS (
       SELECT
           moxie_user_id,
           username AS display_username,
