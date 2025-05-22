@@ -1,11 +1,12 @@
 const tokenOutputTemplate = `
 Show a table of tokens from portfolio.tokenBalances.node with:
+- Token Symbol in the first column. For this column, use the token symbol with its associated token address prefixed by $ using the exact markdown format: $[tokenSymbol|tokenAddress] format e.g. $[WETH|0x4200000000000000000000000000000000000006].
 - Amount and USD values
 - Sort by USD value (highest first)
 - Only include if balanceUSD > $0.01
 - show holdingPercentage for % of Holdings
 - Limit to top 15 holdings or more if asked in Analyze my portfolio.]
-- Show contract address for each token.
+- Show contract address for each token. For this column, only show the token address.
 `;
 
 const commonTokenOutputTemplate = `
