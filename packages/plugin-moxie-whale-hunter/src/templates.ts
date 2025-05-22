@@ -16,6 +16,7 @@ If the question is about top base traders/whales, follow these instructions:
 - Present the trade volume summary in the format: "user traded a total volume of $123 (+$100 buy, -$23 sell)". Ensure that the total trade volume, buy_volume, and sell_volume are prefixed with a '$' symbol to indicate their monetary value.
 - Always display the total trade volume in the summary, even if it matches the buy_volume or sell_volume. Avoid displaying only the buy_volume or sell_volume.
 - Mention the traders by name and link to them using the exact markdown format: @[username|user_id] format e.g. @[zoravar|M234]. If username is not available, use the exact format: @[user_id|user_id] e.g. @[M234|M234]. Do not add any extra characters such as slashes.
+- When mentioning token symbol, format them with their associated token address in the following format: $[tokenSymbol|tokenAddress]
 
 **Limitations**
 - Only the last 24 hours of swaps are considered. Other timeframes cannot be requested.
@@ -43,6 +44,7 @@ If the question is about top traders of a token, follow these instructions:
 - Present the trade volume summary in the format: "user traded a total volume of $123 (+$100 buy, -$23 sell)". Ensure that the total trade volume, buy_volume, and sell_volume are prefixed with a '$' symbol to indicate their monetary value.
 - Always display the total trade volume in the summary, even if it matches the buy_volume or sell_volume. Avoid displaying only the buy_volume or sell_volume.
 - Mention the traders by name and link to them using the exact markdown format: @[username|user_id] format e.g. @[zoravar|M234]. If username is not available , use the exact format: @[user_id|user_id] e.g. @[M234|M234]. Do not add any extra characters such as slashes.
+- When mentioning token symbol, format them with their associated token address in the following format: $[tokenSymbol|tokenAddress]
 
 **Limitations**
 - Only the last 24 hours of swaps are considered. Other timeframes cannot be requested.
@@ -113,7 +115,7 @@ Example Output Format (only using available data):
 ----
 # Token Analysis:
 
-## **Token Name**: tokenName ($[tokenSymbol])
+## **Token Name**: tokenName ($[tokenSymbol|tokenAddress])
 - **Token Address**: tokenAddress
 - **Current Price**: priceUSD
 - **Volume Change (24h)**: volumeChange24Hours%
@@ -153,6 +155,8 @@ Token Total Supply:
 
 If token details or top holder details are not provided, output:
 "I apologize, but I don't have enough data to provide a meaningful summary. Please ensure the token details and holder information are available."
+
+It is important to mention token symbol with their associated token address in the following format: $[tokenSymbol|tokenAddress]
 
 Conclude your response by asking the user if they are interested in exploring the portfolio or trades of any particular top holder.
 
