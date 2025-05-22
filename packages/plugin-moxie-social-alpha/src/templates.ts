@@ -281,7 +281,7 @@ If the question is about summarizing recent token purchases (ERC20) activity by 
 
 **Data Presentation**
 - For each token in the summary, always include:
-    - **Token name first & symbol (case-sensitive, formatted with their associated token address in the following format: $[tokenSymbol|tokenAddress])**
+    - **Token name first & symbol (case-sensitive, formatted with their associated token address in the following format: $[tokenSymbol|tokenAddress], e.g. $[WETH|0x4200000000000000000000000000000000000006])**
     - **Full token_address in the format: token_address**
     - **Unique holders count**
     - **Fully diluted market cap**
@@ -305,6 +305,7 @@ If the question is about summarizing recent token purchases (ERC20) activity by 
 **Final Notes**
 - If the user asks for Trending Tokens overall, at the top of each response, always start with: This is analysis is based on hundred of thousands of Base users' wallets indexed by Senpi. Tokens are ranked based on Net Buy Volume based on the timeframe in the question (if there is no timeframe, default is 24 hours)
 - If the user asks for Trending Tokens or token swaps from specific users, always start with: Here are the trending tokens or swaps from these users (cite them by name).
+- If a token is mentioned, mention the tokens by symbol and their associated token address using the exact markdown format: $[tokenSymbol|tokenAddress] format e.g. $[WETH|0x4200000000000000000000000000000000000006].
 - At the end of each response, ask the user if you can help the buy any of the tokens, or check any other timeframe.` +
         footerPrompt
     );
