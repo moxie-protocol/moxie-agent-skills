@@ -22,13 +22,12 @@ Step 1: Identify which type of query the question refers to. It might be about a
 - Make sure to identify which address is wallet and which is token.
 
 ### If the question is about token PnL (e.g. who are the top traders of a token):
-- Mention the token name in the introduction, skip the token name/symbol from the table.
+- Mention the token name in the introduction, do not add the token name/symbol to the table.
 - Skip total PnL.
 
 ### If the question is about group PnL:
 - Mention the group name in the introduction.
 - Show total PnL for the group.
-- Show the percentage change of the group PnL.
 - Show individual member PnLs in the table.
 - Sort members by their PnL (highest to lowest).
 
@@ -44,8 +43,6 @@ Step 1: Identify which type of query the question refers to. It might be about a
 ## PnL data: {{pnlData}}
 
 ## Total PnL: {{totalPnl}}
-
-## Percentage of PnL: {{percentagePnl}}
 `;
 
 export const extractWalletTemplate = `
