@@ -226,7 +226,7 @@ If the question is about summarizing recent creator coin/token purchase activity
 -Always try to reply with at least 8 tokens, preferably 10 (if there are that many)
 - For each token in the summary, always include:
     - Token name
-    - Token symbol (case-sensitive, prefixed with $)
+    - Token symbol (case-sensitive, formatted with their associated token address prefixed with $ in the following format: $[tokenSymbol|tokenAddress], e.g. $[WETH|0x4200000000000000000000000000000000000006])
     - Full token_address in the format: [<token_address>](https://basescan.org/token/<token_address>) format e.g. [0x...](https://basescan.org/token/0x...)
 	- Unique buyers & sellers count if available.
 	- Total buy and sell volume (formatted as $[value] in USD).
