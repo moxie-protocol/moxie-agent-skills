@@ -61,7 +61,8 @@ Your objective is to identify the type of the request and extract important info
      Can also contain token address to specifically show PnL for the user & that token.
 
    - TYPE: "group"
-   - VALUE: "[group_name|group_id]"
+   - VALUE: "[group_id]"
+     Extract only the UUID for group queries.
 
 
 2. Criteria for Token PnL:
