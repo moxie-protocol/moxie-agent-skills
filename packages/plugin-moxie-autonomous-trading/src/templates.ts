@@ -50,7 +50,7 @@ Please follow these steps to process the user input and generate the appropriate
    - sellPercentage: What percentage of their tokens must group members sell for it to qualify as a trigger.
 
 4. Look for optional token-level filters:
-   - tokenAge: Look for mentions of the token age. Extract min and max values if present.
+   - tokenAge: Look for mentions of the token age. Extract min and max values if present. Convert any time units (sec/hours/min/days/month/year) to seconds.
    - marketCap: Look for mentions of market cap requirements. Extract min and max values if present.
 
 5. Validate that all required parameters for the determined rule type are present.
