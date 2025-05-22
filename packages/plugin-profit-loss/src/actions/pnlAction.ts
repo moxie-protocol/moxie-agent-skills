@@ -122,6 +122,7 @@ export const PnLAction = {
                             groupId,
                             memberIds: groupMemberIds
                         });
+                        elizaLogger.debug(traceId, `[PnLAction] Group members: ${JSON.stringify(groupMemberIds)}`);
                     } catch (error) {
                         elizaLogger.error(traceId, `[PnLAction] Error fetching group details: ${error.message}`);
                         await callback?.({
@@ -164,7 +165,6 @@ export const PnLAction = {
                     groupMembers: groupMembers
                 });
                 pnlData = await fetchPnlData(groupPnlQuery);
-                
                 // Calculate total PnL for all group members
                 totalPnl = pnlData.reduce((sum, data) => sum + (data.profit_loss || 0), 0);
             } else {
