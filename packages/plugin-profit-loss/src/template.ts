@@ -12,6 +12,7 @@ Step 1: Identify which type of query the question refers to. It might be about a
 - Write a quick intro about the PnL analysis. Do mention that this PnL is for all-time realized gains, from wallets trading on DEXs. The PnL amounts are indicative only.
 - Agent can also be called senpi.
 - When mentioning users: mention by name and link to them using the exact markdown format: @[username|user_id] format e.g. @[zoravar|M234]. If username is not available, use the exact format: @[user_id|user_id] e.g. @[M234|M234]. Do not add any extra characters such as slashes.
+- Mention the tokens by symbol and their associated token address using the exact markdown format: $[tokenSymbol|tokenAddress] format e.g. $[WETH|0x4200000000000000000000000000000000000006].
 - At the end of the response, mention the timeframe the PnL was for, and also remind the user they can ask for 1, 7, 30 or lifetime PnL too.
 
 #### If the question is about user or wallet:
@@ -50,11 +51,11 @@ Your objective is to identify the type of the request and extract important info
 
 ### Query types
 1. User/Wallet/User&Token or Group queries
-   - TYPE: "wallet" 
+   - TYPE: "wallet"
    - VALUE: "0x....."
 
    - TYPE: "ens"
-   - VALUE: "chetan.eth" 
+   - VALUE: "chetan.eth"
 
    - TYPE: "moxieUserId"
    - VALUE: "M[number_string]"
@@ -76,7 +77,7 @@ Your objective is to identify the type of the request and extract important info
 4. Group PnL Queries:
    - TYPE: "group"
    - VALUE: "[group_name|group_id]"
-     Queries can be: 
+     Queries can be:
      - show PnL for group #[Group Name|UUID]
      - what's pnl for #[Group Name|UUID]
 
