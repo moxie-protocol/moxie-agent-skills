@@ -45,19 +45,19 @@ const RESULT_BASE_PNL_TABLE =
 export const prepareGroupPnlQuery = (traceId: string, pnlResponse: any) => {
   const { groupMembers, analysisType, maxResults, timeFrame } = pnlResponse;
 
-  let pnlTable = RESULT_BASE_PNL_TABLE;
+  let pnlGroupTable = RESULT_BASE_PNL_TABLE;
   if (timeFrame === "1d") {
-    pnlTable += "_1d";
+    pnlGroupTable += "_1d";
   } else if (timeFrame === "7d") {
-    pnlTable += "_7d";
+    pnlGroupTable += "_7d";
   } else if (timeFrame === "30d") {
-    pnlTable += "_30d";
+    pnlGroupTable += "_30d";
   } else {
-    pnlTable += "_lifetime";
+    pnlGroupTable += "_lifetime";
   }
 
-  pnlTable = pnlTable + "_" + process.env.PNL_ENV;
-  elizaLogger.debug(`[prepareGroupPnlQuery] traceId: ${traceId}, Pnl table: ${pnlTable}`);
+  pnlGroupTable = pnlGroupTable + "_" + process.env.PNL_ENV;
+  elizaLogger.debug(`[prepareGroupPnlQuery] traceId: ${traceId}, Pnl table: ${pnlGroupTable}`);
 
   const allMemberIds = groupMembers.flatMap(group => group.memberIds);
   const memberIdsString = allMemberIds.map(id => `'${id}'`).join(",");
@@ -84,7 +84,7 @@ export const prepareGroupPnlQuery = (traceId: string, pnlResponse: any) => {
                       ELSE 6
                   END
           ) AS rn
-      FROM dune.senpi.result_pnl_analysis_lifetime_dev
+      FROM ${pnlGroupTable}
       WHERE moxie_user_id IS NOT NULL
     ),
     aggregated_pnl AS (
@@ -93,7 +93,7 @@ export const prepareGroupPnlQuery = (traceId: string, pnlResponse: any) => {
           SUM(total_buy_value_usd) AS total_buy_usd,
           SUM(total_sell_value_usd) AS total_sell_usd,
           SUM(profit_loss) AS pnl_usd
-      FROM dune.senpi.result_pnl_analysis_lifetime_dev
+      FROM ${pnlGroupTable}
       WHERE moxie_user_id IS NOT NULL
       GROUP BY moxie_user_id
     ),
