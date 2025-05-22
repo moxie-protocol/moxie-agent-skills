@@ -1,9 +1,10 @@
 import { IAgentRuntime, Memory, State, HandlerCallback, elizaLogger, ModelClass, composeContext, generateObjectDeprecated, streamText, ModelProviderName } from "@moxie-protocol/core";
 import { extractWalletTemplate, pnlTemplate } from "../template";
-import { fetchPnlData, fetchTotalPnl, preparePnlQuery } from "../service/pnlService";
+import { fetchPnlData, fetchTotalPnl, preparePnlQuery, prepareGroupPnlQuery } from "../service/pnlService";
 import { MoxieUser, moxieUserService } from "@moxie-protocol/moxie-agent-lib";
 import { ethers } from "ethers";
 import * as agentLib from "@moxie-protocol/moxie-agent-lib";
+import { getGroupDetails } from "@moxie-protocol/plugin-moxie-groups/src/utils";
 
 export const PnLAction = {
     name: "PROFIT_LOSS",
@@ -74,6 +75,8 @@ export const PnLAction = {
             const tokenAddresses: string[] = [];
             const walletAddresses: string[] = [];
             const moxieUserIds: string[] = [];
+            const groupMembers: { groupId: string; memberIds: string[] }[] = [];
+
             for (const criterion of criteria) {
                 if (criterion.TYPE === "tokenAddress") {
                     tokenAddresses.push(criterion.VALUE);
@@ -88,13 +91,52 @@ export const PnLAction = {
                     }
                 } else if (criterion.TYPE === "moxieUserId") {
                     moxieUserIds.push(criterion.VALUE);
+                } else if (criterion.TYPE === "group") {
+                    try {
+                        // Extract group ID from the format {group_id|group_name}
+                        const groupId = criterion.VALUE;
+                        if (!groupId || !/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(groupId)) {
+                            elizaLogger.error(traceId, `[PnLAction] Invalid UUID format: ${criterion.VALUE}`);
+                            await callback?.({
+                                text: `Invalid Group Id format. Please provide a valid Group Id. Example: #[Group Name|UUID]`
+                            });
+                            return true;
+                        }
+
+                        // Get group details to fetch members
+                        const groupDetails = await getGroupDetails(
+                            state.authorizationHeader as string,
+                            groupId
+                        );
+                        if (!groupDetails.groups || groupDetails.groups.length === 0) {
+                            elizaLogger.error(traceId, `[PnLAction] Group not found: ${groupId}`);
+                            await callback?.({
+                                text: `Group not found. Please check the group ID.`
+                            });
+                            return true;
+                        }
+
+                        // Store group members separately
+                        const groupMemberIds = groupDetails.groups[0].members.map(member => member.moxieUserId);
+                        groupMembers.push({
+                            groupId,
+                            memberIds: groupMemberIds
+                        });
+                        elizaLogger.debug(traceId, `[PnLAction] Group members: ${JSON.stringify(groupMemberIds)}`);
+                    } catch (error) {
+                        elizaLogger.error(traceId, `[PnLAction] Error fetching group details: ${error.message}`);
+                        await callback?.({
+                            text: `Error fetching group details. Please try again later.`
+                        });
+                        return true;
+                    }
                 }
             }
-            //TODO: handle -ve case if nothing is given in input
-            if (tokenAddresses.length === 0 && walletAddresses.length === 0 && moxieUserIds.length === 0) {
-                elizaLogger.error(traceId, `[PnLAction] No valid criteria provided. Please provide at least one token address, wallet address, or Moxie user ID.`);
+            
+            if (tokenAddresses.length === 0 && walletAddresses.length === 0 && moxieUserIds.length === 0 && groupMembers.length === 0) {
+                elizaLogger.error(traceId, `[PnLAction] No valid criteria provided. Please provide at least one token address, wallet address, Moxie user ID, or group.`);
                 await callback?.({
-                    text: `Please provide at least one token address, wallet address, or Moxie user ID.`
+                    text: `Please provide at least one token address, wallet address, Moxie user ID, or group.`
                 });
                 return true;
             }
@@ -102,18 +144,36 @@ export const PnLAction = {
             pnlResponse.tokenAddresses = tokenAddresses;
             pnlResponse.walletAddresses = walletAddresses;
             pnlResponse.moxieUserIds = moxieUserIds;
+            pnlResponse.groupMembers = groupMembers;
 
             elizaLogger.debug(traceId, `[PnLAction] categorized token addresses: ${JSON.stringify(tokenAddresses)}`);
             elizaLogger.debug(traceId, `[PnLAction] categorized wallet addresses: ${JSON.stringify(walletAddresses)}`);
             elizaLogger.debug(traceId, `[PnLAction] agent wallet address: ${agentWalletAddress}`);
+            elizaLogger.debug(traceId, `[PnLAction] group members: ${JSON.stringify(groupMembers)}`);
 
             let pnlStart = new Date();
             const pnlQuery = preparePnlQuery(pnlResponse);
 
-            const [pnlData, totalPnl] = await Promise.all([
-                fetchPnlData(pnlQuery),
-                (moxieUserIds.length > 0 || walletAddresses.length > 0) ? fetchTotalPnl(pnlResponse) : Promise.resolve(0)
-            ]);
+            // For groups, we need to fetch PnL for each member individually
+            let pnlData = [];
+            let totalPnl = 0;
+
+            if (groupMembers.length > 0) {
+                // Make a single query for all group members using the dedicated group query method
+                const groupPnlQuery = prepareGroupPnlQuery(traceId, {
+                    ...pnlResponse,
+                    groupMembers: groupMembers
+                });
+                pnlData = await fetchPnlData(groupPnlQuery);
+                // Calculate total PnL for all group members
+                totalPnl = pnlData.reduce((sum, data) => sum + (data.profit_loss || 0), 0);
+            } else {
+                // Handle non-group PnL queries as before
+                [pnlData, totalPnl] = await Promise.all([
+                    fetchPnlData(pnlQuery),
+                    (moxieUserIds.length > 0 || walletAddresses.length > 0) ? fetchTotalPnl(pnlResponse) : Promise.resolve(0)
+                ]);
+            }
 
             elizaLogger.debug(traceId, `[PnLAction] pnlData: ${JSON.stringify(pnlData)}`);
             elizaLogger.debug(traceId, `[PnLAction] totalPnl: ${totalPnl}`);
