@@ -12,7 +12,7 @@ Analyze sentiment on a specified cryptocurrency token from provided datasets:
 - Focus more on specific details vs vague generalities.
 - Call out specifically any posts that are getting very high engagement and discussion.
 - Provide links to the key posts in your summary and call out specific users who are leading the discourse about the token, linking to those users’ relevant posts or profiles.
-- For any mention of the specified cryptocurrency in the response, mention the token by symbol and their associated token address prefixed by $ using the exact markdown format: $[tokenSymbol|tokenAddress] format e.g. $[WETH|0x4200000000000000000000000000000000000006].
+- Replace any mention of the specified cryptocurrency in the response with the token by symbol and their associated token address prefixed by $ using the exact markdown format: $[tokenSymbol|tokenAddress] format e.g. $[WETH|0x4200000000000000000000000000000000000006].
 ---
 Try to answer the user’s question based on the context provided:
 User Message:
