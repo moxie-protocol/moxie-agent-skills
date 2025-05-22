@@ -167,8 +167,8 @@ export const PnLAction = {
                 });
                 pnlData = await fetchPnlData(groupPnlQuery);
                 // Calculate total PnL for all group members
-                totalPnl = pnlData.reduce((sum, data) => sum + (data.profit_loss || 0), 0);
-                let totalBuyAmount = pnlData.reduce((sum, data) => sum + (data.buy_amount || 0), 0);
+                totalPnl = pnlData.reduce((sum, data) => sum + (data.pnl_usd || 0), 0);
+                let totalBuyAmount = pnlData.reduce((sum, data) => sum + (data.total_buy_usd || 0), 0);
                 pnlPercentageChange = totalBuyAmount > 0 ? ((totalPnl / totalBuyAmount) * 100) : 0;
             } else {
                 // Handle non-group PnL queries as before
