@@ -690,12 +690,12 @@
                 "value": "Top 1-day PNL of $[WHIM|0x39a1cce09d7354ac2db86c6b02924360a10e4793] traders"
             },
             {
-                "label": "What is PnL for #Base-Hunters?",
-                "value": "What is PnL for #[base-hunters|6b37936c-d06c-4b54-8179-3190ecc1f0b3]?"
+                "label": "What is PnL for #Copytrade?",
+                "value": "What is PnL for #[copytrade|7b37936c-d06c-4b54-8179-3190ecc1f0b3]?"
             },
             {
-                "label": "Show 7 day PNL for #copytrade" group,
-                "value": "Show 7 day PNL for #copytrade group"
+                "label": "Show 7 day PNL for #copytrade group",
+                "value": "Show 7 day PNL for #[copytrade|7b37936c-d06c-4b54-8179-3190ecc1f0b3] group"
             }      
         ],
         "mediaUrls": [
