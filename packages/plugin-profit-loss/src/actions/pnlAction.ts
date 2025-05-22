@@ -169,10 +169,6 @@ export const PnLAction = {
                 // Calculate total PnL for all group members
                 totalPnl = pnlData.reduce((sum, data) => sum + (data.pnl_usd || 0), 0);
                 let totalBuyAmount = pnlData.reduce((sum, data) => sum + (data.total_buy_usd || 0), 0);
-<<<<<<< HEAD
-=======
-                elizaLogger.debug(traceId, `[PnLAction] totalBuyAmount: ${totalBuyAmount}`);
->>>>>>> feat/pnl-groups
                 pnlPercentageChange = totalBuyAmount > 0 ? ((totalPnl / totalBuyAmount) * 100) : 0;
             } else {
                 // Handle non-group PnL queries as before
