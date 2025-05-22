@@ -169,6 +169,7 @@ export const PnLAction = {
                 // Calculate total PnL for all group members
                 totalPnl = pnlData.reduce((sum, data) => sum + (data.pnl_usd || 0), 0);
                 let totalBuyAmount = pnlData.reduce((sum, data) => sum + (data.total_buy_usd || 0), 0);
+                elizaLogger.debug(traceId, `[PnLAction] totalBuyAmount: ${totalBuyAmount}`);
                 pnlPercentageChange = totalBuyAmount > 0 ? ((totalPnl / totalBuyAmount) * 100) : 0;
             } else {
                 // Handle non-group PnL queries as before
@@ -180,6 +181,7 @@ export const PnLAction = {
 
             elizaLogger.debug(traceId, `[PnLAction] pnlData: ${JSON.stringify(pnlData)}`);
             elizaLogger.debug(traceId, `[PnLAction] totalPnl: ${totalPnl}`);
+            elizaLogger.debug(traceId, `[PnLAction] pnlPercentageChange: ${pnlPercentageChange}`);
             if (tokenAddresses.length > 0 || moxieUserIds.length > 0) {
                 try {
                     const uniqueMoxieUserIds = [...new Set(pnlData.map(data => data.username).filter(username => username && username.startsWith('M')))];
@@ -217,7 +219,7 @@ export const PnLAction = {
                 .replace("{{conversation}}", JSON.stringify(message.content.text))
                 .replace("{{criteria}}", JSON.stringify(pnlResponse.criteria))
                 .replace("{{pnlData}}", JSON.stringify(pnlData))
-                .replace("{{totalPnl}}", (moxieUserIds.length > 0 || walletAddresses.length > 0) && totalPnl !== null ? totalPnl.toString() : "0")
+                .replace("{{totalPnl}}", (moxieUserIds.length > 0 || walletAddresses.length > 0 || groupMembers.length > 0) && totalPnl !== null ? totalPnl.toString() : "0")
                 .replace("{{percentagePnl}}", groupMembers.length > 0 && pnlPercentageChange !== null ? pnlPercentageChange.toString() : "0");
 
             const currentContext = composeContext({
