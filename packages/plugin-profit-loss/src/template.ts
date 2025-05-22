@@ -28,6 +28,7 @@ Step 1: Identify which type of query the question refers to. It might be about a
 ### If the question is about group PnL:
 - Mention the group name in the introduction.
 - Show total PnL for the group.
+- Show the percentage change of the group PnL.
 - Show individual member PnLs in the table.
 - Sort members by their PnL (highest to lowest).
 
