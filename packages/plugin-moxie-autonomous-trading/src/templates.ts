@@ -26,7 +26,7 @@ Please follow these steps to process the user input and generate the appropriate
 3. Extract the required parameters based on the rule type:
 
    For COPY_TRADE and COPY_TRADE_AND_PROFIT:
-   - moxieIds: Find all matches of @[username|id] and extract the 'id' part.
+   - moxieIds: Find all matches of @[username|id] or @[0xaddress|id] and extract the 'id' part.
    - timeDurationInSec: Look for time-related phrases and convert to seconds. Note: This is not required if there's only one user whose trades are copied.
    - amountInUSD: Find the dollar amount mentioned to "buy" (not sell).
    - profitPercentage (for PROFIT rules only): Find the profit percentage mentioned for selling. Ensure to capture the exact percentage as stated by the user (e.g., if the user mentions 110%, record it as 110; if 10% is mentioned, record it as 10).
@@ -52,6 +52,7 @@ Please follow these steps to process the user input and generate the appropriate
 4. Look for optional token-level filters:
    - tokenAge: Look for mentions of the token age. Extract min and max values if present. Convert any time units (sec/hours/min/days/month/year) to seconds.
    - marketCap: Look for mentions of market cap requirements. Extract min and max values if present.
+   Important: tokenAge and marketCap are independent, optional filters. Do not assume they must be provided together. Extract them if present in the user query, regardless of whether the other is mentioned.
 
 5. Validate that all required parameters for the determined rule type are present.
 
@@ -76,6 +77,7 @@ Before providing the final JSON output, show your reasoning process inside <rule
 12. If 'timeDurationInSec' is not provided and there is more than one user or group member involved, throw an error "Please specify the duration between which copied traders make trades to be counted for the rule"
 13. Do not add sell conditions unless specifically asked by the user.
 14. Important: Copy trading rules must replicate the same trade action as the source. Only buy trades can be copied — initiating a sell trade in response to a buy, or copying a sell trade with a buy, is not supported. However, it's valid to specify exit conditions (like selling at a target profit or when users sell) for the copied buy trade.
+15. Carefully distinguish between timeDurationInSec and tokenAge. timeDurationInSec is related to the time window for monitoring trades, while tokenAge is a filter for the age of the token being traded.
 
 After completing the rule analysis, provide the JSON output based on your analysis.
 
