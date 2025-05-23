@@ -211,9 +211,13 @@ export const PnLAction = {
                 delete data.wallet_address;
             });
             pnlData.forEach((data) => {
-                if (data.username && data.username.length > 20) {
-                    const shortenedUsername = `${data.username.slice(0, 6)}...${data.username.slice(-10)}`;
-                    data.username = `@[${shortenedUsername}|${data.moxie_user_id || data.username}]`;
+                const usernameMatch = data.username.match(/@\[(.*?)\|/);
+                if (usernameMatch) {
+                    const username = usernameMatch[1];
+                    if (username.length > 20) {
+                        const shortenedUsername = `${username.slice(0, 6)}...${username.slice(-10)}`;
+                        data.username = `@[${shortenedUsername}|${data.moxie_user_id || username}]`;
+                    }
                 }
             });
             let pnlDataTemplate = pnlTemplate.replace("{{latestMessage}}", latestMessage)
