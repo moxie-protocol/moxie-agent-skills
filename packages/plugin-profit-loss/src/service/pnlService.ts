@@ -70,7 +70,7 @@ export const prepareGroupPnlQuery = (traceId: string, pnlResponse: any) => {
      WITH ranked_usernames AS (
       SELECT
           moxie_user_id,
-          username AS display_username,
+          username,
           username_type,
           ROW_NUMBER() OVER (
               PARTITION BY moxie_user_id 
@@ -104,14 +104,14 @@ export const prepareGroupPnlQuery = (traceId: string, pnlResponse: any) => {
     best_usernames AS (
       SELECT
           moxie_user_id,
-          display_username,
+          username,
           username_type
       FROM ranked_usernames
       WHERE rn = 1
     )
     SELECT 
       a.moxie_user_id AS user_id,
-      b.display_username,
+      b.username,
       b.username_type,
       a.total_buy_usd,
       a.total_sell_usd,
@@ -121,7 +121,6 @@ export const prepareGroupPnlQuery = (traceId: string, pnlResponse: any) => {
       ON a.moxie_user_id = b.moxie_user_id
     ORDER BY a.pnl_usd DESC
   `;
-
   elizaLogger.debug(`[prepareGroupPnlQuery] traceId: ${traceId}, query: ${query}`);
   return query;
 };
