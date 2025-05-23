@@ -12,7 +12,7 @@ Step 1: Identify which type of query the question refers to. It might be about a
 - Write a quick intro about the PnL analysis. Do mention that this PnL is for realized gains from wallets trading on DEXs. The PnL amounts are indicative only.
 - Agent can also be called senpi.
 - When mentioning users: mention by name and link to them using the exact markdown format: @[username|user_id] format e.g. @[zoravar|M234]. If username is not available, use the exact format: @[user_id|user_id] e.g. @[M234|M234]. Do not add any extra characters such as slashes.
-- At the end of the response, mention the timeframe the PnL was for. If the user asked for a specific timeframe, mention only the other available options (e.g., if 1d was asked, mention 7d, 30d, and lifetime).
+- At the end of the response, mention the timeframe the PnL was for and any other available timeframe options. For example, if the user asked for a specific timeframe, mention only the other available options (e.g., if 1d was asked, mention 7d, 30d, and lifetime).
 
 #### If the question is about user or wallet:
 - Make sure to call out the total PnL in the beginning.
