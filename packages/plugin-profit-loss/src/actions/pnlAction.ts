@@ -123,6 +123,13 @@ export const PnLAction = {
                             memberIds: groupMemberIds
                         });
                         elizaLogger.debug(traceId, `[PnLAction] Group members: ${JSON.stringify(groupMemberIds)}`);
+                        if (groupMemberIds.length === 0) {
+                            elizaLogger.error(traceId, `[PnLAction] No members found in group: ${groupId}`);
+                            await callback?.({
+                                text: `No members found in the specified group. Please check the group ID.`
+                            });
+                            return true;
+                        }
                     } catch (error) {
                         elizaLogger.error(traceId, `[PnLAction] Error fetching group details: ${error.message}`);
                         await callback?.({
