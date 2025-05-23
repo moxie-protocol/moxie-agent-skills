@@ -210,6 +210,12 @@ export const PnLAction = {
             pnlData.forEach((data) => {
                 delete data.wallet_address;
             });
+            pnlData.forEach((data) => {
+                if (data.username && data.username.length > 20) {
+                    const shortenedUsername = `${data.username.slice(0, 6)}...${data.username.slice(-10)}`;
+                    data.username = `@[${shortenedUsername}|${data.moxie_user_id || data.username}]`;
+                }
+            });
             let pnlDataTemplate = pnlTemplate.replace("{{latestMessage}}", latestMessage)
                 .replace("{{conversation}}", JSON.stringify(message.content.text))
                 .replace("{{criteria}}", JSON.stringify(pnlResponse.criteria))

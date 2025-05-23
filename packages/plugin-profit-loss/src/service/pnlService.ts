@@ -110,7 +110,7 @@ export const prepareGroupPnlQuery = (traceId: string, pnlResponse: any) => {
       WHERE rn = 1
     )
     SELECT 
-      a.moxie_user_id AS user_id,
+      a.moxie_user_id AS moxie_user_id,
       b.username,
       b.username_type,
       a.total_buy_usd,
