@@ -23,7 +23,7 @@ Step 1: Identify which type of query the question refers to. It might be about a
 - Make sure to identify which address is wallet and which is token.
 
 ### If the question is about token PnL (e.g. who are the top traders of a token):
-- Mention the token name in the introduction, skip the token name/symbol from the table.
+- Mention the token name in the introduction, do not add the token name/symbol to the table.
 - Skip total PnL.
 
 ### If the question is about group PnL:
@@ -38,8 +38,8 @@ Step 1: Identify which type of query the question refers to. It might be about a
 - Total Profit/Loss
 - Total Buy Amount (USD)
 - Total Sell Amount (USD)
-- Number of Buy Transactions
-- Number of Sell Transactions
+- Number of Buy Transactions (not needed for group PnL)
+- Number of Sell Transactions (not needed for group PnL)
 
 ## PnL data: {{pnlData}}
 
